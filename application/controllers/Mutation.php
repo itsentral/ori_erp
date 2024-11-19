@@ -133,7 +133,8 @@ class Mutation extends CI_Controller {
 	public function query_data_json_mutation($type, $material, $uri_approve, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		
 		$where = "";
-		$where_by = " AND a.created_by != 'json'";
+		$where_by = "";
+		// $where_by = " AND a.created_by != 'json'";
 		// if($type <> '0'){
 		// 	$where = " AND a.adjustment_type='".$type."' ";
 		// }
@@ -405,7 +406,7 @@ class Mutation extends CI_Controller {
 				$d_Header .= "<select name='detail[".$id."][material]' class='chosen_select form-control input-sm material'>";
 				$d_Header .= "<option value='0'>Select Material</option>";
 				foreach($material AS $row){
-				  $d_Header .= "<option value='".$row->id_material."'>".strtoupper($row->nm_material)."</option>";
+				  $d_Header .= "<option value='".$row->id_material."'>".strtoupper($row->id_material.' - '.$row->nm_material)."</option>";
 				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
@@ -545,7 +546,7 @@ class Mutation extends CI_Controller {
 
 				$grouping_temp[$value['id']]['id'] 			= $value['id'];
 				$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']];
-				$grouping_temp[$value['id']]['price'] 	    = $PRICE_INCOMING;
+				$grouping_temp[$value['id']]['price'] 	    = (!empty($PRICE_INCOMING))?$PRICE_INCOMING:0;
             }
 
             $ArrStock = array();
@@ -1031,9 +1032,9 @@ class Mutation extends CI_Controller {
 				$ArrJurnalNew2[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
 				$ArrJurnalNew2[$key]['id_category'] 		= $rest_pusat[0]->id_category;
 				$ArrJurnalNew2[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
-				$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_dari;
-				$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_ke;
+				$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_ke;
+				$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke); 
+				$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
 				$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
 				$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
 				$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
@@ -1128,6 +1129,7 @@ class Mutation extends CI_Controller {
 					'pesan'		=>'Save process success. Thanks ...',
 					'status'	=> 1
 				);
+				insertDataGroupReport($ArrUpdateStock, $id_gudang_dari, $id_gudang_ke, $kode_trans, null, null, null);
 				history("Approve mutation material : ".$kode_trans);
 			}
 			echo json_encode($Arr_Data);

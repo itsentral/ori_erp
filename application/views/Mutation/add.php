@@ -102,7 +102,7 @@ $MUTASI = ($type == 'mutasi')?'selected':'';
                                             echo "<option value='0'>Select Material</option>";
                                             foreach($material AS $row){
                                                 $SEL = ($row->id_material == $materialx)?'selected':'';
-                                                echo "<option value='".$row->id_material."' ".$SEL.">".strtoupper($row->nm_material)."</option>";
+                                                echo "<option value='".$row->id_material."' ".$SEL.">".strtoupper($row->id_material.' - '.$row->nm_material)."</option>";
                                             }
                                             echo "</select>";
                                         echo "</td>";

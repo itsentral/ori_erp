@@ -93,7 +93,7 @@ $MUTASI = ($type == 'mutasi')?'selected':'';
                                     $lot_number 		= (!empty($valx2['lot_number']))?strtoupper($valx2['lot_number']):'';
                                     $keterangan 		= (!empty($valx2['keterangan']))?strtoupper($valx2['keterangan']):'';
                                     $expired_date 		= (!empty($valx2['expired_date']) AND $valx2['expired_date'] != '0000-00-00')?$valx2['expired_date']:'';
-                                    $qty_oke 	        = (!empty($valx2['qty_oke']))?number_format($valx2['qty_oke'],2):'';
+                                    $qty_oke 	        = (!empty($valx2['qty_oke']))?$valx2['qty_oke']:'';
 
                                     echo "<tr class='header_".$id."'>";
                                         echo "<td align='left'>";
