@@ -149,7 +149,6 @@ class Jurnal_model extends CI_Model
 		return $Nomor_JS;
 	}
 	
-	
 	function get_Nomor_Jurnal_Sales_pre($Cabang='',$Tgl_Inv=''){
 		$db2 = $this->load->database('accounting', TRUE);
 		$nocab			= 'A';
@@ -166,7 +165,6 @@ class Jurnal_model extends CI_Model
 		$Nomor_JS		= $Format.str_pad($Urut, 5, "0", STR_PAD_LEFT);
 		return $Nomor_JS;
 	}
-
 
 
 	function get_Nomor_Jurnal_Sales_close($Cabang='',$Tgl_Inv=''){
