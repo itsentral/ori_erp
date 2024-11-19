@@ -22,6 +22,7 @@
         </tr>
     </table>
     <input type="hidden" name='kode' value='<?=$kode;?>'>
+    <input type="hidden" name='no_ipp' value='<?=$result_aksesoris[0]['no_ipp'];?>'>
     <br>
 	<table class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead id='head_table'>
@@ -67,8 +68,7 @@
                     $material = get_name('con_nonmat_new','material_name','code_group',$code_group);
                 }
                 $STOK = (!empty($GET_STOK[$code_group]))?$GET_STOK[$code_group]:0;
-				
-				
+                
                 echo "<tr>";
                     echo "<td align='center'>".$No."
                             <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>

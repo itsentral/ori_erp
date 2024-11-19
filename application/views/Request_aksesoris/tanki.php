@@ -6,7 +6,7 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-		<a href="<?php echo site_url($this->uri->segment(1).'/tanki') ?>" class="btn btn-sm btn-danger">PROJECT TANKI</a>
+		<a href="<?php echo site_url($this->uri->segment(1)) ?>" class="btn btn-sm btn-danger">PIPE FITTING</a>
 		</div>
 	</div>
 	<!-- /.box-header -->
@@ -32,7 +32,7 @@ $this->load->view('include/side_menu');
 
   <!-- modal -->
 	<div class="modal fade" id="ModalView"  style='overflow-y: auto;'>
-		<div class="modal-dialog"  style='width:95%;'>
+		<div class="modal-dialog"  style='width:70%;'>
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -132,7 +132,7 @@ $this->load->view('include/side_menu');
 									type	: "success",
 									timer	: 7000
 								});
-							window.location.href = base_url + active_controller;
+							window.location.href = base_url + active_controller+'/tanki';
 						}
 						else if(data.status == 0){
 							swal({
@@ -176,7 +176,7 @@ $this->load->view('include/side_menu');
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
 			"ajax":{
-				url : base_url + active_controller+'/server_side_request',
+				url : base_url + active_controller+'/server_side_request_tanki',
 				type: "post",
 				data: function(d){
 					// d.kode_partner = $('#kode_partner').val()
