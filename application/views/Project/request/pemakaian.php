@@ -4,6 +4,7 @@
 	<div class='form-group row'>
 		<label class='label-control col-sm-2'><b>Nama Customer</b></label>
 		<div class='col-sm-4'>
+		<input type="hidden" name='id_bq' value='<?=$id_bq;?>'>
 		<input type="hidden" name='id_customer' value='<?=$id_customer;?>'>
 			<?php
 				echo form_input(array('id'=>'nm_customer','name'=>'nm_customer','class'=>'form-control input-md','readonly'=>'readonly'),$nm_customer);

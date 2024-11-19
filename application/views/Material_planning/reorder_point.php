@@ -8,6 +8,7 @@ $this->load->view('include/side_menu');
 		<div class="box-tool pull-right">
 		<?php
 			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-danger','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 5px;','content'=>'Clear Propose Request','id'=>'autoDelete'));
+			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-primary','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','content'=>'Update Otomatis','id'=>'autoUpdate'));
 		?>
 		</div><br><br>
 		<div class="box-tool pull-right">
@@ -34,9 +35,9 @@ $this->load->view('include/side_menu');
 					<th class="text-center mid" width='8%'>Min Stock</th>
 					<th class="text-center mid" width='8%'>Max Stock</th>
 					<!-- <th class="text-center mid" width='8%'>QTR Order</th> -->
-					<th class="text-center mid" width='8%'>Min Order</th>
+					<!-- <th class="text-center mid" width='8%'>Min Order</th> -->
 					<th class="text-center mid" width='8%'>PR On Process</th>
-					<th class="text-center mid no-sort" width='8%'>Propose Request</th>
+					<th class="text-center mid no-sort" width='12%'>Propose Request</th>
 					<!-- <th class="text-center mid no-sort" width='8%'>Tgl Dibutuhkan</th> -->
 					<!-- <th class="text-center mid no-sort" width='3%'>#</th> -->
 				</tr>
@@ -242,6 +243,62 @@ $this->load->view('include/side_menu');
 				loading_spinner();
 				$.ajax({
 					url			: base_url + active_controller+'/clear_update_reorder',
+					type		: "POST",
+					cache		: false,
+					dataType	: 'json',
+					success		: function(data){
+						if(data.status == 1){
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000
+								});
+							window.location.href = base_url + active_controller+'/reorder_point';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title				: "Error Message !",
+							text				: 'An Error Occured During Process. Please try again..',
+							type				: "warning",
+							timer				: 7000
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
+		});
+	});
+
+	$(document).on('click','#autoUpdate', function(){
+		
+		swal({
+			title: "Are you sure?",
+			text: "Update otomatis kebutuhan !!!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				$.ajax({
+					url			: base_url + active_controller+'/auto_update_pr_material',
 					type		: "POST",
 					cache		: false,
 					dataType	: 'json',

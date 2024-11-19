@@ -24,7 +24,24 @@ $this->load->view('include/side_menu');
 				</div>
 			</div>	
 			<div class='form-group row'>
-				<label class='label-control col-sm-2'><b>Description <span class='text-red'>*</span></b></label>
+				<label class='label-control col-sm-2'><b>Category</b></label>
+				<div class='col-sm-4'>            
+					<div class="form-group">
+						<div class="radio">
+						<label>
+							<input type="radio" name="tipe" id="optionsRadios1" value="unit" checked="">
+							Unit
+						</label>
+						</div>
+						<div class="radio">
+						<label>
+							<input type="radio" name="tipe" id="optionsRadios2" value="packing">
+							Packing
+						</label>
+						</div>
+					</div>
+				</div>
+				<label class='label-control col-sm-2'><b>Description</b></label>
 				<div class='col-sm-4'>             
 						<?php
 							echo form_textarea(array('id'=>'descr','name'=>'descr','class'=>'form-control input-md', 'cols'=>'75','rows'=>'3','autocomplete'=>'off','placeholder'=>'Description piece'));											
@@ -73,15 +90,15 @@ $this->load->view('include/side_menu');
 				return false;
 				
 			}
-			if(descr == '' || descr == null){
-				swal({
-				  title	: "Error Message!",
-				  text	: 'Description Empty, please input first ...',
-				  type	: "warning"
-				});
-				$('#simpan-bro').prop('disabled',false);
-				return false;
-			}
+			// if(descr == '' || descr == null){
+			// 	swal({
+			// 	  title	: "Error Message!",
+			// 	  text	: 'Description Empty, please input first ...',
+			// 	  type	: "warning"
+			// 	});
+			// 	$('#simpan-bro').prop('disabled',false);
+			// 	return false;
+			// }
 			
 			swal({
 				  title: "Are you sure?",

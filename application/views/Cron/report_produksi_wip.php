@@ -131,7 +131,7 @@ $this->load->view('include/side_menu');
         var tahun = $('#tahun').val();
 		DataTables(bulan, tahun);
 
-        $(document).on('change', '#bulan', function(e){ 
+        $(document).on('change', '#bulan', function(e){
             var bulan = $('#bulan').val();
             var tahun = $('#tahun').val();
 		    DataTables(bulan, tahun);

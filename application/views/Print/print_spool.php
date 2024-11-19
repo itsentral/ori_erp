@@ -59,19 +59,20 @@
 </table><br>
 <?php
 foreach ($result as $key2 => $value2) { $key2++;
-    $result2 = $this->db->get_where('spool_group', array('spool_induk'=>$spool_induk,'kode_spool'=>$value2['kode_spool']))->result_array();
+    $result2 = $this->db->select('a.*, COUNT(a.id) AS qty_product')->group_by('a.id_milik')->get_where('spool_group_all a', array('a.spool_induk'=>$spool_induk,'a.kode_spool'=>$value2['kode_spool']))->result_array();
     ?>  
         <table class="gridtable" width='100%' border='1' cellpadding='2'>
             <thead>
                 <tr>
-                    <th colspan='7' align='left'><?=$key2?>. <?=$value2['kode_spool'];?></th>
+                    <th colspan='8' align='left'><?=$key2?>. <?=$value2['kode_spool'];?></th>
                 </tr>
                 <tr>
                     <th width='15%'>Spool</th>
+					<th width='3%' align="center">#</th>
 					<th align="center">Product</th>
 					<th align="center">Spec</th>
 					<th align="center">Length</th>
-					<th align="center">Code</th>
+					<th align="center">Qty</th>
 					<th align="center">No SPK</th>
 					<th align="center">Keterangan</th>
                 </tr>
@@ -90,14 +91,22 @@ foreach ($result as $key2 => $value2) { $key2++;
 					$CUTTING_KE = (!empty($value['cutting_ke']))?'.'.$value['cutting_ke']:'';
 					$LENGTH = (!empty($value['length']))?number_format($value['length']):'';
 
+					$product_name = $value['id_category'];
+					if($value['status_tanki'] == 'tanki'){
+						$product_name = $value['nm_tanki'];
+						$SPEC = $tanki_model->get_spec($value['id_milik']);
+					}
+
                     echo "<tr>";
-                        if($key == 1){
-                        echo "<td align='center' rowspan='".COUNT($result2)."' style='vertical-align:top;'>".$value2['kode_spool']."</td>";
-                        }
-						echo "<td align='left'>".strtoupper($value['id_category'])."</td>";
+                        // if($key == 1){
+                        // echo "<td align='center' rowspan='".COUNT($result2)."' style='vertical-align:top;'>".$value2['kode_spool']."</td>";
+                        // }
+						echo "<td align='center'>".$value2['kode_spool']."</td>";
+						echo "<td align='center'>".$key."</td>";
+						echo "<td align='left'>".strtoupper($product_name)."</td>";
 						echo "<td align='left'>".$SPEC."</td>";
 						echo "<td align='right'>".$LENGTH."</td>";
-						echo "<td align='left'>".$product_code."</td>";
+						echo "<td align='center'>".$value['qty_product']."</td>";
 						echo "<td align='center'>".$value['no_spk']."</td>";
                         echo "<td align='left'></td>";
                     echo "</tr>";
@@ -159,7 +168,7 @@ if(!empty($result_material)){
 		}
 		table.gridtable {
 			font-family: verdana,arial,sans-serif;
-			font-size:11px;
+			font-size:10px;
 			color:#333333;
 			border-width: 1px;
 			border-color: #666666;
@@ -167,14 +176,14 @@ if(!empty($result_material)){
 		}
 		table.gridtable th {
 			border-width: 1px;
-			padding: 8px;
+			padding: 5px;
 			border-style: solid;
 			border-color: #666666;
 			background-color: #f2f2f2;
 		}
 		table.gridtable th.head {
 			border-width: 1px;
-			padding: 8px;
+			padding: 5px;
 			border-style: solid;
 			border-color: #666666;
 			background-color: #7f7f7f;
@@ -247,7 +256,12 @@ if(!empty($result_material)){
 	// $mpdf->SetWatermarkText('ORI Group');
 	$mpdf->showWatermarkText = true;
 	$mpdf->SetTitle('SPK Spool');
-	$mpdf->AddPage();
+	$mpdf->AddPageByArray([
+		'margin-left' => 5,
+		'margin-right' => 5,
+		'margin-top' => 5,
+		'margin-bottom' => 12
+	]);
 	$mpdf->SetFooter($footer);
 	$mpdf->WriteHTML($html);
 	$mpdf->Output('SPK Spool '.$spool_induk.' '.date('YmdHis').'.pdf' ,'I');

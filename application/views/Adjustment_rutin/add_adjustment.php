@@ -76,7 +76,7 @@ $this->load->view('include/side_menu');
 						<option value='0'>Select Nama Barang</option>
 						<?php
 						foreach($barang AS $val => $valx){
-							echo "<option value='".$valx['code_group']."'>".strtoupper($valx['material_name']." - ".$valx['spec'])."</option>";
+							echo "<option value='".$valx['code_group']."'>".$valx['code_group']." - ".strtoupper($valx['material_name']." - ".$valx['spec'])."</option>";
 						}
 						?>
 					</select>

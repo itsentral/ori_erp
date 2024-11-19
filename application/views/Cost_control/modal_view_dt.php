@@ -37,7 +37,7 @@
 					$no_ipp 	= str_replace('BQ-','',$id_bq);
 					$id_milik 	= $valx['id'];
 
-					$GET_EST_ACT = getEstimasiVsAktual($id_milik, $no_ipp, $qty);
+					$GET_EST_ACT = getEstimasiVsAktual($id_milik, $no_ipp, $qty, 0);
 
 					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
 					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;

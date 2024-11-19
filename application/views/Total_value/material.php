@@ -1,12 +1,14 @@
 <?php
 $this->load->view('include/side_menu');
 $gudang = $this->uri->segment(3);
+// print_r($gudang);
+// exit;
 ?>
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data"> 
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3><br>
-		<!--<input type='hidden' id='gudang' value='<?=$gudang;?>'>-->
+		<input type='hidden' id='gudang1' value='<?=$gudang;?>'>
 		<div class='form-group row'>
 			<div class='col-sm-8 text-right'><b>Search:</b></div>
 			<div class='col-sm-2'>
@@ -14,6 +16,9 @@ $gudang = $this->uri->segment(3);
 				<select id='gudang' name='gudang' class='form-control input-sm'>
 					<!--<option value='0'>All Warehouse</option>-->
 					<?php
+					if($category == 'produksi'){
+						echo "<option value='0'>All Gudang Produksi</option>";
+					}
 						foreach($data_gudang AS $val => $valx){
 							echo "<option value='".$valx['id']."'>".strtoupper($valx['nm_gudang'])."</option>";
 						}
@@ -21,14 +26,21 @@ $gudang = $this->uri->segment(3);
 				</select>
 			</div>
 			<div class='col-sm-2'>
+			<input type="hidden" id='category' value='<?=$category;?>'>
 				<input type="text" name='date_filter' id='date_filter' class='form-control datepicker text-center' data-role="datepicker2" readonly placeholder='Change Date'>
 			</div>
 			<!-- <div class='col-sm-1'>
 				<button type='button' class='btn btn-md btn-success' id='search'>Search</button>
 			</div> -->
 		</div>
-		<button type='button' class='btn btn-sm btn-success' id='download_excel'><i class='fa fa-file-excel-o'></i> Download</button>
 		
+		<?php if($gudang=='pusat') {?>
+		<button type='button' class='btn btn-sm btn-success' id='download_excel'><i class='fa fa-file-excel-o'></i> Download Pusat</button>
+		<?php } elseif($gudang=='subgudang') {?>		
+		<button type='button' class='btn btn-sm btn-success' id='download_excel2'><i class='fa fa-file-excel-o'></i> Download Subgudang</button>
+		<?php } elseif($gudang=='produksi') {?>
+			<button type='button' class='btn btn-sm btn-success' id='download_excel3'><i class='fa fa-file-excel-o'></i> Download Produksi</button>
+		<?php } ?>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body table-responsive">
@@ -38,7 +50,7 @@ $gudang = $this->uri->segment(3);
 					<th class="text-center">#</th>
 					<th class="text-center">Id Material</th>
 					<th class="text-center">Material</th>
-					<th class="text-center">Category</th>
+					<th class="text-center">Category</th> 
 					<th class="text-center">Warehouse</th>
 					<th class="text-center">Stock</th>
                     <th class="text-center">Price Book</th>
@@ -105,7 +117,8 @@ $gudang = $this->uri->segment(3);
 				document.getElementById(this.id).value = '';
 				var gudang = $('#gudang').val();
 				var date_filter = $('#date_filter').val();
-				DataTables(gudang, date_filter);
+				var category = $('#category').val();
+				DataTables(gudang, date_filter,category);
 			}
 		}
 	});
@@ -115,6 +128,23 @@ $gudang = $this->uri->segment(3);
 		var gudang = $('#gudang').val();
 		var date_filter = $('#date_filter').val();
 		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+date_filter;
+		window.open(Links,'_blank');
+	});
+	
+	$(document).on('click', '#download_excel2', function(e){
+		e.preventDefault();
+		var gudang = $('#gudang').val();
+		var date_filter = $('#date_filter').val();
+		var Links		= base_url + active_controller+'/ExcelGudangSubgudang/'+gudang+'/'+date_filter;
+		window.open(Links,'_blank');
+	});
+	
+	$(document).on('click', '#download_excel3', function(e){
+		e.preventDefault();
+		var gudang = $('#gudang').val();
+		var date_filter = $('#date_filter').val();
+		var category = $('#category').val();
+		var Links		= base_url + active_controller+'/ExcelGudangProduksi/'+gudang+'/'+category+'/'+date_filter;
 		window.open(Links,'_blank');
 	});
 
@@ -127,14 +157,16 @@ $gudang = $this->uri->segment(3);
 			e.preventDefault();
 			var gudang = $('#gudang').val();
 			var date_filter = $('#date_filter').val();
-        	DataTables(gudang, date_filter);
+			var category = $('#category').val();
+        	DataTables(gudang, date_filter, category);
 		});
 
 		$(document).on('click','#search', function(e){
 			e.preventDefault();
 			var gudang = $('#gudang').val();
 			var date_filter = $('#date_filter').val();
-        	DataTables(gudang, date_filter);
+			var category = $('#category').val();
+        	DataTables(gudang, date_filter, category);
 		});
 
 		$(document).on('click', '.look_history', function(e){
@@ -156,11 +188,20 @@ $gudang = $this->uri->segment(3);
     
 
 		
-	function DataTables(gudang=null, date_filter=null){
+	function DataTables(gudang=null, date_filter=null, category=null){
 		let qty_stock	= 0;
 		let qty_booking	= 0;
 		let qty_available	= 0;
 		let qty_rusak	= 0;
+		let gudang1 = $('#gudang1').val();
+		if(gudang1 =='pusat'){
+			var link =  base_url + active_controller+'/server_side_material_stock';
+		}else if(gudang1 =='subgudang'){
+			var link =  base_url + active_controller+'/server_side_material_stock_subgudang';
+		}else{
+			var link =  base_url + active_controller+'/server_side_material_stock_produksi';
+		}
+		
 		var dataTable = $('#my-grid').DataTable({
 			"processing": true,
 			"serverSide": true,
@@ -177,11 +218,12 @@ $gudang = $this->uri->segment(3);
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
 			"ajax":{
-				url : base_url + active_controller+'/server_side_material_stock',
+				url :link,
 				type: "post",
 				data: function(d){
 					d.gudang = gudang,
-					d.date_filter = date_filter
+					d.date_filter = date_filter,
+					d.category = category
 				},
 				cache: false,
 				error: function(){

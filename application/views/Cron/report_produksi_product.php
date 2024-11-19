@@ -76,12 +76,18 @@ $this->load->view('include/side_menu');
 					<th colspan='2' class="text-center no-sort">WR</th>
 					<th colspan='2' class="text-center no-sort">RESIN</th>
 					<th colspan='2' class="text-center no-sort">CATALYS</th>
+					<th colspan='2' class="text-center no-sort">LAINNYA</th>
+					<th colspan='2' class="text-center no-sort">ADD</th>
 					<th width='120px' rowspan='2' class="text-center no-sort">Total Material</th>
 					<th width='60px' rowspan='2' class="text-center no-sort">Work Hour</th>
 					<th width='60px' rowspan='2' class="text-center no-sort">Man Power</th>
 					<th width='60px' rowspan='2' class="text-center no-sort">Man Hour</th>
 				</tr>
 				<tr class='bg-blue'>
+					<th width='300px' class="text-center no-sort">Material</th>
+					<th width='60px' class="text-center no-sort">Berat</th>
+					<th width='300px' class="text-center no-sort">Material</th>
+					<th width='60px' class="text-center no-sort">Berat</th>
 					<th width='300px' class="text-center no-sort">Material</th>
 					<th width='60px' class="text-center no-sort">Berat</th>
 					<th width='300px' class="text-center no-sort">Material</th>
@@ -251,7 +257,7 @@ $this->load->view('include/side_menu');
 	function DataTables(tanggal = null, bulan = null, tahun = null, range = null){
 		var dataTable = $('#my-grid').DataTable({ 
             "scrollX": true,
-			"scrollY": "500",
+			"scrollY": "700",
 			"scrollCollapse" : true,
 			"serverSide": true,
 			"processing": true,

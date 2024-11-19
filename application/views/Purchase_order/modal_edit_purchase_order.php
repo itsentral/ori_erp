@@ -10,6 +10,21 @@
 	<br>
 	<input type='hidden' name='no_po' value='<?=$data[0]->no_po;?>'>
 	<div class='form-group row'>
+		<label class='label-control col-sm-1'><b>Supplier</b></label>
+		<div class='col-sm-5'>
+			<select id='id_supplier' name='id_supplier' class='form-control input-sm chosen_select'>
+				<?php
+				foreach($listSupplier AS $val => $valx){
+					if($valx['id_supplier'] == $data[0]->id_supplier){
+					$sel = ($valx['id_supplier'] == $data[0]->id_supplier)?'selected':'';
+					echo "<option value='".$valx['id_supplier']."' ".$sel.">".strtoupper($valx['nm_supplier'])."</option>";
+					}
+				}
+				?>
+			</select>
+		</div>
+	</div>
+	<div class='form-group row'>
 		<label class='label-control col-sm-1'><b>Incoterms</b></label>
 		<div class='col-sm-3'>
 			<?php
@@ -37,12 +52,6 @@
 		</div>
 	</div>
 	<div class='form-group row'>
-		<label class='label-control col-sm-1'><b>Tax (%)</b></label>
-		<div class='col-sm-3'>
-			<?php
-			 echo form_input(array('id'=>'tax','name'=>'tax','class'=>'form-control input-md maskM','placeholder'=>'Tax (%)'), (!empty($data[0]->tax))?number_format($data[0]->tax):0);
-			?>
-		</div>
 		<label class='label-control col-sm-1'><b>Term Of Payment</b></label>
 		<div class='col-sm-3'>
 		<?php
@@ -95,11 +104,11 @@
 							echo "<td align='left'>
 									<input name='detail[".$no."][nm_material]' id='nm_material_".$no."' class='form-control input-md ' value='".strtoupper($valx['nm_material'])."' >
 									<input type='hidden' name='detail[".$no."][id]' id='id_".$no."' value='".$valx['id']."'>
-									<input type='hidden' name='detail[".$no."][price]' id='price_".$no."' value='".$valx['price_ref_sup']."'>
+									
 									</td>";
-							echo "<td align='right'><input name='detail[".$no."][qty]' id='qty_".$no."' class='form-control text-right input-md maskM ch_qty' value='".number_format($qty_p,2)."' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' readonly tabindex='-1'></td>";
-							echo "<td align='right'>".number_format($valx['price_ref_sup'],2)." <b class='text-primary'>".strtoupper($valx['currency'])."</b></td>";
-							echo "<td align='right'><div id='qtytot_".$no."' class='sum_tot'>".number_format($qty_p * $valx['price_ref_sup'],2)."</div></td>";
+							echo "<td align='center'><input type='hidden' name='detail[".$no."][qty]' id='qty_".$no."' class='form-control text-right input-md maskM ch_qty' value='".$qty_p."' readonly tabindex='-1'>".$qty_p."</td>";
+							echo "<td align='right'><input type='hidden' name='detail[".$no."][price]' id='price_".$no."' class='form-control text-right input-sm maskM ch_qty changePrice' value='".$valx['price_ref_sup']."'>".number_format($valx['price_ref_sup'],2)."</td>";
+							echo "<td align='right'><input type='text' name='detail[".$no."][totprice]' id='qtytot_".$no."' class='form-control sum_tot text-right input-sm maskM' value='".$qty_p * $valx['price_ref_sup']."' readonly></td>";
 						echo "</tr>";
 					}
 					/*
@@ -111,40 +120,49 @@
 					*/
 					?>
 					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><?=number_format($data[0]->total_po,2);?></td>
-					</tr>
-					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><?=number_format($data[0]->discount,2);?></td>
-					</tr>
-					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>NET PRICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><div><?=number_format($data[0]->net_price,2);?></div></td>
-					</tr>
-					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>TAX (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><?=number_format($data[0]->tax,2);?></td>
-					</tr>
-					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>NET PRICE + TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><?=number_format($data[0]->net_plus_tax,2);?></td>
-					</tr>
-					<tr hidden>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><?=number_format($data[0]->delivery_cost,2);?></td>
-					</tr>
-					<tr>
-						<td align='left' colspan='2'></td>					
-						<td class='text-right'><b>GRAND TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-						<td class='text-right mid text-bold'><div id='total'><?=number_format($data[0]->total_price,2);?></div></td>
-					</tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid' width='25%'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='total_po'  name='total_po' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Total' readonly value='<?=$SUM;?>'></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='discount' name='discount' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Discount (%)' value='<?=$data[0]->discount;?>'></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>NET PRICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='net_price' name='net_price' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price'  value='<?=$data[0]->net_price;?>'></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'>
+                            <select name="tax" id="tax" class='form-control chosen-select'>
+                                <?php
+                                foreach ($listPPN as $key => $value) {
+									$selected = ($value['data1'] == $data[0]->tax)?'selected':'';
+                                    echo "<option value='".$value['data1']."' ".$selected.">".$value['name']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>NET PRICE + TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='net_plus_tax' name='net_plus_tax' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price + Tax' value='<?=$data[0]->net_plus_tax;?>'></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='delivery_cost' name='delivery_cost' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Delivery Cost' value='<?=$data[0]->delivery_cost;?>'></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'></td>
+                        <td class='text-right mid'><b>GRAND TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'><input type="text" id='grand_total' name='grand_total' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Grand Total' value='<?=$data[0]->total_price;?>'></td>
+                    </tr>
 				</tbody>
 			</table>
 		</div>
@@ -225,7 +243,8 @@
 	$(document).ready(function(){
 		swal.close();
 		$('.datepicker').datepicker();
-		$('.maskM').maskMoney();
+		$('.maskM').autoNumeric('init', {mDec: '2', aPad: false});
+		$(".autoNumeric").autoNumeric('init', {mDec: '2', aPad: false});
 		$('#alert-max').hide();
 		$('.chosen_select').chosen();
 		var kurs = $('#current').val();
@@ -257,15 +276,6 @@
 			  });
 			}
 		 });
-	});
-	
-	$(document).on('keyup', '.ch_qty', function(){
-		var id 		= $(this).attr('id');
-		var det_id	= id.split('_');
-		var a		= det_id[1];
-		sum_total(a);
-		change_kurs2();
-		
 	});
 	
 	$(document).on('keyup', '.progress_term', function(){
@@ -347,27 +357,54 @@
 		}
 	});
 	
-	function sum_total(a){
-		var qty 	= getNum($('#qty_'+a).val().split(",").join(""));
-		var harga 	= getNum($('#price_'+a).val().split(",").join(""));
-		
-		var total	= qty * harga;
-		// console.log(total);
-		$('#qtytot_'+a).html(number_format(total));
-		
-		var SUM = 0;
-		$(".sum_tot" ).each(function() {
-			SUM += Number(getNum($(this).html().split(",").join("")));
+	$(document).on('keyup', '#discount, #delivery_cost, .ch_qty', function(){
+        sumTotal();
+	});
+
+    $(document).on('change', '#tax', function(){
+        sumTotal();
+	});
+
+	let sumTotal = () => {
+        let discount        =  getNum($('#discount').val().split(",").join(""))
+        let tax             =  getNum($('#tax').val().split(",").join(""))
+        let delivery_cost   =  getNum($('#delivery_cost').val().split(",").join(""))
+
+		let sum_total = 0
+        let total
+		let id
+		let det_id
+		let a
+		let qtyPurchase
+		let pricePurchase
+		let totalPurchase
+        $(".changePrice" ).each(function() {
+			id 		= $(this).attr('id');
+			det_id	= id.split('_');
+			a		= det_id[1];
+			qtyPurchase 	= Number(getNum($('#qty_'+a).val().split(",").join("")));
+			pricePurchase 	= Number(getNum($('#price_'+a).val().split(",").join("")));
+			totalPurchase	= qtyPurchase * pricePurchase;
+
+			$('#qtytot_'+a).val(number_format(totalPurchase,2))
+			console.log(totalPurchase)
+			sum_total 		+= totalPurchase;
 		});
-		
-		$('#total').html(number_format(SUM));
-		
-		
-		
+		// console.log(sum_total)
+
+        $('#total_po').val(number_format(sum_total,2))
+        let net_price = sum_total - (sum_total * discount / 100)
+        $('#net_price').val(number_format(net_price,2))
+        let net_plus_tax = net_price + (net_price * tax / 100)
+        $('#net_plus_tax').val(number_format(net_plus_tax,2))
+        let grand_total = net_plus_tax + delivery_cost
+        $('#grand_total').val(number_format(grand_total,2))
+
+		change_kurs2();
 	}
 	
 	function term_process(a){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
@@ -386,7 +423,7 @@
 	}
 	
 	function change_kurs(){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);
@@ -413,7 +450,7 @@
 	}
 	
 	function change_kurs2(){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);

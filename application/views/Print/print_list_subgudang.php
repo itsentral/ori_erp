@@ -40,6 +40,20 @@ if($rest_data[0]['no_ipp'] == 'resin mixing'){
 $id_milik 			= get_name('production_detail','id_milik','no_spk',$NO_SPK);
 $TGL_PLANNING = (!empty($TGL_PLANNING_))?date('d-M-Y',strtotime($TGL_PLANNING_)):'';
 $QTY_SPK = (!empty($rest_data[0]['qty_spk']))?'( Qty: '.number_format($rest_data[0]['qty_spk']).')':'';
+
+$nm_project = get_name('production','project','no_ipp',$rest_data[0]['no_ipp']);
+$nm_product = strtoupper(get_name('so_detail_header','id_category','id',$id_milik));
+$spec       = spec_bq2($id_milik);
+
+$NOMOR_IPP = $rest_data[0]['no_ipp'];
+$tandaTanki = substr($NOMOR_IPP,0,4);
+if($tandaTanki == 'IPPT'){
+    $NO_SO      = get_name('planning_tanki','no_so','no_ipp',$rest_data[0]['no_ipp']);
+    $nm_project = get_name('planning_tanki','project','no_ipp',$rest_data[0]['no_ipp']);
+    $getnameTanki = $this->db->like('id_produksi','IPPT')->get_where('production_detail',array('id_milik'=>$id_milik))->result_array();
+    $nm_product = (!empty($getnameTanki[0]['id_product']))?$getnameTanki[0]['id_product']:'';
+    $spec       = $tanki->get_spec($id_milik);
+}
 ?>
 
 <table class="gridtable2" border='1' width='100%' cellpadding='2'>
@@ -55,12 +69,12 @@ $QTY_SPK = (!empty($rest_data[0]['qty_spk']))?'( Qty: '.number_format($rest_data
 <table class="gridtable2" width="100%" border='0'>
     <thead>
         <tr>
-            <td class="mid" width='15%'>Dari Gudang</td>
-            <td class="mid" width='2%'>:</td>
-            <td class="mid" width='25%'><?= get_name('warehouse', 'nm_gudang', 'id', $rest_data[0]['id_gudang_dari']);?></td>
-            <td class="mid" width='15%'>Ke Gudang</td>
-            <td class="mid" width='2%'>:</td>
-            <td class="mid" width='41%'><?= get_name('warehouse', 'nm_gudang', 'id', $rest_data[0]['id_gudang_ke']);?></td>
+            <td class="mid" width='12%'>Dari Gudang</td>
+            <td class="mid" width='1%'>:</td>
+            <td class="mid"><?= get_name('warehouse', 'nm_gudang', 'id', $rest_data[0]['id_gudang_dari']);?></td>
+            <td class="mid" width='12%'>Ke Gudang</td>
+            <td class="mid" width='1%'>:</td>
+            <td class="mid" width='35%'><?= get_name('warehouse', 'nm_gudang', 'id', $rest_data[0]['id_gudang_ke']);?></td>
         </tr>
         <tr>
             <td class="mid">No Transaksi</td>
@@ -68,7 +82,7 @@ $QTY_SPK = (!empty($rest_data[0]['qty_spk']))?'( Qty: '.number_format($rest_data
             <td class="mid"><?= $kode_trans;?></td>
             <td class="mid">No SO / Project</td>
             <td class="mid">:</td>
-            <td class="mid"><?= $NO_SO;?> / <?=strtoupper(get_name('production','project','no_ipp',$rest_data[0]['no_ipp']));?></td>
+            <td class="mid"><?= $NO_SO;?> / <?= strtoupper($nm_project);?></td>
         </tr>
         <tr>
             <td class="mid">Tanggal Request</td>
@@ -81,7 +95,7 @@ $QTY_SPK = (!empty($rest_data[0]['qty_spk']))?'( Qty: '.number_format($rest_data
         <tr>
             <td class="mid">Product / Spec</td>
             <td class="mid">:</td>
-            <td class="mid"><?=strtoupper(get_name('so_detail_header','id_category','id',$id_milik)).' / '.strtoupper(spec_bq2($id_milik));?></td>
+            <td class="mid"><?=strtoupper($nm_product).' / '.$spec;?></td>
             <td class="mid">Tgl Planning</td>
             <td class="mid">:</td>
             <td class="mid"><?= $TGL_PLANNING;?></td>
@@ -154,7 +168,7 @@ $QTY_SPK = (!empty($rest_data[0]['qty_spk']))?'( Qty: '.number_format($rest_data
         margin-bottom: 1cm;
     }
     .mid{
-        vertical-align: middle !important;
+        vertical-align: top !important;
     }
     table.gridtable {
         font-family: verdana,arial,sans-serif;

@@ -248,6 +248,13 @@ foreach($ListIPP AS $val => $valx){
 		window.open(Links,'_blank');
 	});
 
+	$(document).on('click', '.download_excel_tanki', function(){
+		var id_bq		= $(this).data('id_bq');
+		
+		var Links		= base_url + active_controller+'/ExcelBudgetSoTanki/'+id_bq;
+		window.open(Links,'_blank');
+	});
+
 	$(document).on('click', '.download_excel_est', function(){
 		var id_bq		= $(this).data('id_bq');
 		

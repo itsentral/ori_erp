@@ -31,6 +31,7 @@
 			<thead id='head_table'>
 				<tr class='bg-blue'>
 					<th class="text-center" style='vertical-align:middle;' width='5%'>No</th>
+					<th class="text-center" style='vertical-align:middle;' width='10%'>Code</th>
 					<th class="text-center" style='vertical-align:middle;'>Name Barang</th>
 					<th class="text-center" style='vertical-align:middle;' width='10%'>Qty PO</th>
 					<th class="text-center" style='vertical-align:middle;' width='10%'>Qty Diterima</th>
@@ -60,6 +61,7 @@
 						
 						echo "<tr>";
 							echo "<td align='center'>".$No."</td>";
+							echo "<td align='center'>".$valx['id_material']."</td>";
 							echo "<td>".strtoupper($nama_barang)."</td>";
 							echo "<td align='right'>".number_format($valx['qty_order'],2)."</td>";
 							echo "<td align='right'>".$qty_oke."</td>";

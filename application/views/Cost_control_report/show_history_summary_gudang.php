@@ -2,7 +2,8 @@
     <thead>
         <tr class='bg-blue'>
             <th class="text-center" width='8%'>#</th>
-            <th class="text-center" >NM MATERIAL</th>
+            <th class="text-center">ID MATERIAL</th>
+            <th class="text-center">NM MATERIAL</th>
             <th class="text-center no-sort" width='20%'>Total IN</th>
             <th class="text-center no-sort" width='20%'>Total OUT</th>
         </tr>
@@ -19,6 +20,7 @@
                 $NM_MATERIAL   = (!empty($GET_MATERIAL[$value['id_material']]['nm_material']))?$GET_MATERIAL[$value['id_material']]['nm_material']:'-';
                 echo "<tr>";
                     echo "<td align='center'>".$key."</td>";
+                    echo "<td align='center'>".$value['id_material']."</td>";
                     echo "<td>".$NM_MATERIAL."</td>";
                     echo "<td class='text-right text-bold text-green' style='padding-right:50px;'><span class='text-green text-bold detail_material' style='cursor:pointer;' data-type='in' data-id_material='".$value['id_material']."'>".$IN_MATERIAL."</span></td>";
                     echo "<td class='text-right text-bold text-red' style='padding-right:50px;'><span class='text-red text-bold detail_material' style='cursor:pointer;' data-type='out' data-id_material='".$value['id_material']."'>".$OUT_MATERIAL."</span></td>";

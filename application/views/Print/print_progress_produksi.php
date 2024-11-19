@@ -46,7 +46,7 @@ $today 		= date('l, d F Y [H:i:s]');
 					$a++;
 					//check selain field joint
 					if($valx['typeProduct'] != 'field'){
-						$sqlCheck2 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'daycode !='=>NULL))->result();
+						$sqlCheck2 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'daycode !='=>NULL,'daycode !='=>''))->result();
 						
 						//check delivery
 						$sqlCheck3 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'kode_delivery !='=>NULL))->result();

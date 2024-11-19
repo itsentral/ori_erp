@@ -71,8 +71,17 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td class='text-right mid'><b>TAX (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
-                        <td class='mid'><input type="text" id='tax' name='tax' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Tax (%)'></td>
+                        <td class='text-right mid'><b>TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='mid'>
+                            <select name="tax" id="tax" class='form-control chosen-select'>
+                                <?php
+                                foreach ($listPPN as $key => $value) {
+                                    echo "<option value='".$value['data1']."'>".$value['name']."</option>";
+                                }
+                                ?>
+                            </select>
+                            <!-- <input type="text" id='tax' name='tax' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Tax (%)'> -->
+                        </td>
                     </tr>
                     <tr>
                         <td></td>
@@ -139,7 +148,11 @@
 		sumTotal();
 	});
 
-    $(document).on('keyup', '#discount, #tax, #delivery_cost', function(){
+    $(document).on('keyup', '#discount, #delivery_cost', function(){
+        sumTotal();
+	});
+
+    $(document).on('change', '#tax', function(){
         sumTotal();
 	});
 

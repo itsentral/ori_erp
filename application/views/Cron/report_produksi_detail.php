@@ -15,6 +15,7 @@ $row		= $this->db->query($qSupplier)->result_array();
                 <th rowspan='2' class="text-center valignmid" width='80px'>SO</th>
                 <th rowspan='2' class="text-center valignmid" width='100px'>ID Category</th>
                 <th rowspan='2' class="text-center valignmid" width='350px'>ID Product</th>
+                <th rowspan='2' class="text-center valignmid">No SPK</th>
                 <th rowspan='2' class="text-center valignmid">Dim 1</th>
                 <th rowspan='2' class="text-center valignmid">Dim 2</th>
                 <th rowspan='2' class="text-center valignmid">Pressure</th>

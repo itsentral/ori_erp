@@ -29,7 +29,7 @@ $this->load->view('include/side_menu');
 				<thead id='head_table'>
 					<tr class='bg-blue'>
 						<th class="text-center" width="5%">#</th>
-						<th class="text-center" width="15%">Product Delivery</th>
+						<th class="text-center" width="15%">No SPK</th>
 						<th class="text-center" width="20%">Product Type</th>
 						<th class="text-center" width="35%">Product Name</th>
 						<th class="text-center no-sort" width="10%">Product To</th>
@@ -127,7 +127,7 @@ $this->load->view('include/side_menu');
 			
 			$.ajax({
 				type:'POST',
-				url: base_url + active_controller+'/modalDetailPriceDetail/'+$(this).data('id_milik')+'/'+$(this).data('id_produksi')+'/'+$(this).data('qty_awal')+'/'+$(this).data('qty_akhir')+'/'+$(this).data('qty')+'/'+$(this).data('id_product'),
+				url: base_url + active_controller+'/modalDetailPriceDetail/'+$(this).data('id_milik')+'/'+$(this).data('id_produksi')+'/'+$(this).data('qty_awal')+'/'+$(this).data('qty_akhir')+'/'+$(this).data('id_producktion')+'/'+$(this).data('id_product'),
 				success:function(data){
 					$("#ModalView").modal();
 					$("#view").html(data);

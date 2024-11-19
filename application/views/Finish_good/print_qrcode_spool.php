@@ -69,15 +69,36 @@
 	$spec 		= spec_bq2($spools->id_milik);
 	$NOMOR_SO 	= explode('-', $spools->product_code);
 	$Ipp 		= explode("-", $spools->id_produksi)[1];
+
+	$std_asme = (!empty($ArrProd[$Ipp]->std_asme))?$ArrProd[$Ipp]->std_asme:'x';
+	$std_ansi = (!empty($ArrProd[$Ipp]->std_ansi))?$ArrProd[$Ipp]->std_ansi:'x';
+	$std_astm = (!empty($ArrProd[$Ipp]->std_astm))?$ArrProd[$Ipp]->std_astm:'x';
+	$std_awwa = (!empty($ArrProd[$Ipp]->std_awwa))?$ArrProd[$Ipp]->std_awwa:'x';
+	$std_bsi = (!empty($ArrProd[$Ipp]->std_bsi))?$ArrProd[$Ipp]->std_bsi:'x';
+	$std_jis = (!empty($ArrProd[$Ipp]->std_jis))?$ArrProd[$Ipp]->std_jis:'x';
+	$std_sni = (!empty($ArrProd[$Ipp]->std_sni))?$ArrProd[$Ipp]->std_sni:'x';
+	$std_etc = (!empty($ArrProd[$Ipp]->std_etc))?$ArrProd[$Ipp]->std_etc:'x';
+
+	$project = (!empty($proj->project))?$proj->project:'';
+	$nm_customer = (!empty($spools->nm_customer))?$spools->nm_customer:'';
+
+	$tandaTanki = substr($Ipp,0,4);
+	// echo $tandaTanki; exit;
+	if($tandaTanki == 'IPPT'){
+		$GETTANKI 		= $tanki_model->get_ipp_detail($Ipp);
+		$project 		= (!empty($GETTANKI['nm_project']))?$GETTANKI['nm_project']:'';
+		$nm_customer 	= (!empty($GETTANKI['customer']))?$GETTANKI['customer']:'';
+	}
+
 	$STD = [
-		($ArrProd[$Ipp]->std_asme == 'N') ? '' : 'ASME',
-		($ArrProd[$Ipp]->std_ansi == 'N') ? '' : 'ANSI',
-		($ArrProd[$Ipp]->std_astm == 'N') ? '' : 'ASTM',
-		($ArrProd[$Ipp]->std_awwa == 'N') ? '' : 'AWWA',
-		($ArrProd[$Ipp]->std_bsi == 'N') ? '' : 'BSI',
-		($ArrProd[$Ipp]->std_jis == 'N') ? '' : 'JIS',
-		($ArrProd[$Ipp]->std_sni == 'N') ? '' : 'SNI',
-		($ArrProd[$Ipp]->std_etc == 'N') ? '' : 'ETC',
+		($std_asme == 'N') ? '' : 'ASME',
+		($std_ansi == 'N') ? '' : 'ANSI',
+		($std_astm == 'N') ? '' : 'ASTM',
+		($std_awwa == 'N') ? '' : 'AWWA',
+		($std_bsi == 'N') ? '' : 'BSI',
+		($std_jis == 'N') ? '' : 'JIS',
+		($std_sni == 'N') ? '' : 'SNI',
+		($std_etc == 'N') ? '' : 'ETC',
 	]; ?>
 
 	<?php if ($size == 'lg') : ?>
@@ -95,9 +116,9 @@
 						</td>
 						<td>
 							<div style="font-size: 12px;padding:3px;">
-								<p><?= "CUST : " . $spools->nm_customer; ?></p>
+								<p><?= "CUST : " . $nm_customer; ?></p>
 								<?php $Ipp = explode("-", $spools->id_produksi)[1]; ?>
-								<p><?= "PROJ : " . $proj->project; ?></p>
+								<p><?= "PROJ : " . $project; ?></p>
 							</div>
 						</td>
 					</tr>
@@ -139,9 +160,9 @@
 						</td>
 						<td>
 							<div style="font-size: 8px;padding-left:2px;">
-								<p><?= "CUST : " . $spools->nm_customer; ?></p>
+								<p><?= "CUST : " . $nm_customer; ?></p>
 								<?php $Ipp = explode("-", $spools->id_produksi)[1]; ?>
-								<p><?= "PROJ : " . $proj->project; ?></p>
+								<p><?= "PROJ : " . $project; ?></p>
 							</div>
 						</td>
 					</tr>
@@ -154,7 +175,7 @@
 						<td style="padding-left:2px;height:12mm;font-size: 8px;">
 							<p>DRAWING NO : <?= $spools->no_drawing; ?></p>
 							<!-- <input placeholder="-" style="dislpay:inline-block;font-size: 8px;border:none;width:70%" rows="1" maxlength="26"><br> -->
-							<p>SPOOL NO : <?= strtoupper($dycode->daycode); ?></p>
+							<p>SPOOL NO : <?= isset($dycode->sp_group_daycode)?strtoupper($dycode->sp_group_daycode):'-'; ?></p>
 							<!-- <input placeholder="-" style="dislpay:inline-block;font-size: 8px;border:none;width:75%" maxlength="26"> -->
 							<!-- <input placeholder="-" style="font-size: 12px;width: 100%;border:none;" maxlength="26"></input> -->
 						</td>
@@ -183,9 +204,9 @@
 						</td>
 						<td>
 							<div style="font-size: 4px;padding-left:2px;">
-								<p><?= "CUST : " . $spools->nm_customer; ?></p>
+								<p><?= "CUST : " . $nm_customer; ?></p>
 								<?php $Ipp = explode("-", $spools->id_produksi)[1]; ?>
-								<p><?= "PROJ : " . $proj->project; ?></p>
+								<p><?= "PROJ : " . $project; ?></p>
 							</div>
 						</td>
 					</tr>
@@ -198,7 +219,7 @@
 						<td style="padding-left:2px;height:6mm;font-size: 4px;">
 							<p>DRAWING NO : <?= $spools->no_drawing; ?></p>
 							<!-- <input placeholder="-" style="dislpay:inline-block;font-size: 5px;border:none;width:70%" rows="1" maxlength="26"><br> -->
-							<p>SPOOL NO : <?= strtoupper($dycode->daycode); ?></p>
+							<p>SPOOL NO : <?= isset($dycode->sp_group_daycode)?strtoupper($dycode->sp_group_daycode):'-'; ?></p>
 							<!-- <input placeholder="-" style="dislpay:inline-block;font-size: 5px;border:none;width:75%" maxlength="26"> -->
 							<!-- <input placeholder="-" style="font-size: 12px;width: 100%;border:none;" maxlength="26"></input> -->
 						</td>

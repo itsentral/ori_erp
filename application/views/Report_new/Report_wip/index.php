@@ -30,18 +30,20 @@ $this->load->view('include/side_menu');
                     <thead>
                         <tr class='bg-blue'>
                             <th class="text-center">#</th>
-                            <th class="text-center">TANGGAL</th>
-                            <th class="text-center">NO SO</th>
-                            <th class="text-center">PRODUCT</th>
-                            <th class="text-center">ID TRANS</th>
-                            <th class="text-center">NO TRANS</th>
-                            <th class="text-center">QTY</th>
-                            <th class="text-center">NILAI WIP</th>
-                            <th class="text-center">MATERIAL</th>
-                            <th class="text-center">WIP DIRECT</th>
-                            <th class="text-center">WIP INDIRECT</th>
-                            <th class="text-center">WIP CONSUMBALE</th>
-                            <th class="text-center">WIP FOH</th>
+                            <th class="text-center">Tanggal</th>
+                            <th class="text-center">No SO</th>
+                            <th class="text-center">No SPK</th>
+                            <th class="text-center">Product</th>
+                            <th class="text-center">Jenis Trans</th>
+                            <th class="text-center">Id Trans</th>
+                            <th class="text-center">No Trans</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-center">Nilai WIP</th>
+                            <th class="text-center">Gd. Produksi</th>
+                            <th class="text-center">Direct Labour<br>PC Payable</th>
+                            <th class="text-center">Indirect Labour<br>PC Payable</th>
+                            <th class="text-center">Consumable<br>PC Payable</th>
+                            <th class="text-center">FOH<br>PC Payable</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -73,6 +75,7 @@ $this->load->view('include/side_menu');
                             <th class="text-center">#</th>
                             <th class="text-center">TANGGAL</th>
                             <th class="text-center">NO SO</th>
+                            <th class="text-center">NO SPK</th>
                             <th class="text-center">PRODUCT</th>
                             <th class="text-center">ID TRANS</th>
                             <th class="text-center">NO TRANS</th>

@@ -1,49 +1,70 @@
 
 <div class="box-body"> 
-	<br>
-	<input type='hidden' name='no_rfq' value='<?=$data[0]->no_rfq;?>'>
-	<div class='form-group row'>
-		<label class='label-control col-sm-3'><b>Incoterms</b></label>
-		<div class='col-sm-9'>
-			<?php
-			 echo form_input(array('id'=>'incoterms','name'=>'incoterms','class'=>'form-control input-md','placeholder'=>'Incoterms'), strtoupper($data[0]->incoterms));
-			?>
+	<div class='form-group row'>		 	 
+		<label class='label-control col-sm-2'><b>Supplier Name</b></label>
+		<div class='col-sm-4'>              
+			<select id='id_supplier' name='id_supplier[]' class='form-control input-sm chosen-select' multiple>
+				<?php
+					foreach($supplierList AS $val => $valx){
+						$sel3 = '';
+						if(!empty($supplierChecked)){
+							$sel3 = (isset($supplierChecked) && in_array($valx['id_supplier'], $supplierChecked))?'selected':'';
+						}
+						echo "<option value='".$valx['id_supplier']."' ".$sel3.">".strtoupper($valx['nm_supplier'])."</option>";
+					}
+				?>
+			</select>
 		</div>
-	</div>
-	<div class='form-group row'>
-		<label class='label-control col-sm-3'><b>Term Of Payment</b></label>
-		<div class='col-sm-9'>
+	</div><br>
+	<input type="hidden" name='no_rfq' value='<?=$no_rfq;?>'>
+	<input type="hidden" name='category' value='<?=$result[0]['category'];?>'>
+	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
+		<thead id='head_table'>
+			<tr class='bg-blue'>
+				<th class="text-center no-sort" width='5%'>#</th>
+				<th class="text-center" width='10%'>No PR</th> 
+				<th class="text-center" width='10%'>Tanggal PR</th>
+				<th class="text-center">Nama Barang</th>
+				<th class="text-center" width='10%'>Qty</th>
+				<th class="text-center" width='10%'>Tgl Dibutuhkan</th>
+				<th class="text-center no-sort" width='7%'>#</th>
+			</tr>
+		</thead>
+		<tbody>
 			<?php
-			 echo form_input(array('id'=>'top','name'=>'top','class'=>'form-control input-md','placeholder'=>'Term Of Payment'), strtoupper($data[0]->top));
+            $No=0;
+			foreach($result AS $val => $valx){
+                $No++; 
+				
+				echo "<tr>";
+                    echo "<td align='center'>".$No."</td>";
+                    echo "<td align='center'>".$valx['no_pr']."</td>";
+					echo "<td align='center'>".date('d-M-Y', strtotime($valx['tgl_pr']))."</td>";
+					echo "<td align='left'>".strtoupper($valx['nm_barang'])."</td>";
+					echo "<td align='center'>".number_format($valx['qty'])."</td>";
+					echo "<td align='center'>".date('d-M-Y', strtotime($valx['tgl_dibutuhkan']))."
+							<input type='hidden' name='check[".$No."]' value='".$valx['no_pr']."'>
+						  </td>";
+					echo "<td align='center'><button type='button' class='btn btn-sm btn-danger deletePRMaterial' title='Delete' data-no_pr='".$valx['no_pr']."' data-no_rfq='".$valx['no_rfq']."' data-id_barang='".$valx['id_barang']."'>Delete</button></td>";
+				echo "</tr>";
+			}
 			?>
-		</div>
-	</div>
-	<div class='form-group row'>
-		<label class='label-control col-sm-3'><b>Remarks</b></label>
-		<div class='col-sm-9'>
-			<?php
-			 echo form_textarea(array('id'=>'remarks','name'=>'remarks','class'=>'form-control input-md','rows'=>'2','cols'=>'75','placeholder'=>'Remarks'), strtoupper($data[0]->remarks));
-			?>
-		</div>
-	</div>
-	<div class='form-group row'>
-		<label class='label-control col-sm-3'></label>
-		<div class='col-sm-9'>
-			<?php
-				echo form_button(array('type'=>'button','class'=>'btn btn-md btn-primary','value'=>'save','content'=>'Save','id'=>'edit_po'));
-			?>
-		</div>
-	</div>
+		</tbody>
+	</table>
+	<?php
+        echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Update','content'=>'Update','id'=>'updateSupplier'));
+    ?>
 </div>
 <style>
-	.datepicker{
-		cursor: pointer;
+	.chosen-container{
+		width: 100% !important;
+		text-align : left !important;
 	}
 </style>
 <script>
 	$(document).ready(function(){
 		swal.close();
-		$('.datepicker').datepicker();
-		$('.maskM').maskMoney();
+		$('.chosen-select').chosen();
 	});
+
 </script>

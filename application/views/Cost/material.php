@@ -81,6 +81,7 @@ if($value1 == 'eksport'){
 						<thead>
 							<tr class='bg-blue'>
 								<th class="text-center mid">#</th>
+								<th class="text-center mid">Code</th>
 								<th class="text-center mid">Material ID</th>
 								<th class="text-center mid">Material Name</th>
 								<th class="text-center mid">Category</th>
@@ -184,6 +185,7 @@ if($value1 == 'eksport'){
 
 									echo"<tr>";							
 										echo"<td align='center'>$int</td>";
+										echo"<td align='left'>".$datas->id_material."</td>";
 										echo"<td align='left'>".$datas->idmaterial."</td>";
 										echo"<td align='left'>".strtoupper($datas->nm_material)."</td>";
 										echo"<td align='left'>".$datas->nm_category."</td>";

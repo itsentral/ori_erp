@@ -15,9 +15,18 @@
 			<tbody>
                 <?php
                 foreach ($get_detail as $key => $value) { $key++;
+
+                    $no_ipp 		= $value['no_ipp'];
+                    $tandaTanki = substr($no_ipp,0,4);
+                    if($tandaTanki != 'IPPT'){
+                        $nm_product = $value['id_category'];
+                    }
+                    else{
+                        $nm_product = $value['id_product'];
+                    }
                     echo "<tr>";
                         echo "<td align='center'>".$key."</td>";
-                        echo "<td align='left'>".strtoupper($value['id_category'])."</td>";
+                        echo "<td align='left'>".strtoupper($nm_product)."</td>";
                         echo "<td align='center'>".strtoupper($value['no_spk'])."</td>";
                         echo "<td align='center' class='text-bold text-red'>".number_format($value['total_qty'])."</td>";
                         echo "<td align='center'>".number_format($value['diameter_1'])."</td>";

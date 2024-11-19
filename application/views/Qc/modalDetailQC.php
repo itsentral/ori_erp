@@ -25,11 +25,18 @@
                     if($BALANCE > 0){
                         $warna = 'bg-red';
                     }
+
+					$PRODUCT = strtoupper($valx['id_category']);
+                    $SPEC = spec_bq2($valx['id_milik'],'so_detail_header');
+					if($valx['product_code_cut'] == 'tanki'){
+                        $PRODUCT = strtoupper($valx['id_product']);
+                        $SPEC = $tanki_model->get_spec($valx['id_milik']);
+                    }
                     echo "<tr>";
 						echo "<td align='center'>".$no."</td>";
-						echo "<td align='left'>".strtoupper($valx['id_category'])."</td>";
+						echo "<td align='left'>".strtoupper($PRODUCT)."</td>";
 						echo "<td align='center'>".$valx['no_spk']."</td>";
-						echo "<td align='left'>".spec_bq2($valx['id_milik'],'so_detail_header')."</td>";
+						echo "<td align='left'>".$SPEC."</td>";
 						echo "<td align='center'><span class='badge bg-blue'>".$valx['qty']."</span></td>";
 						echo "<td align='center'><span class='badge bg-green'>".$QTY_QC."</span></td>";
 						echo "<td align='center'><span class='badge ".$warna."'>".$BALANCE."</span></td>";

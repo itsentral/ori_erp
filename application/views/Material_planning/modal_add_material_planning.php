@@ -46,7 +46,7 @@
 
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Min Stock</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Max Stcok</th>
-				<th class="text-center" style='vertical-align:middle;' width='9%'>Min Order</th>
+				<!-- <th class="text-center" style='vertical-align:middle;' width='9%'>Min Order</th> -->
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Purchase</th>
 			</tr>
 		</thead>
@@ -105,11 +105,13 @@
 			//   echo "<td align='right'>".number_format($qty_booking,2)." Kg</td>";
 	          echo "<td align='right'><span id='avl_$No'>".number_format($qty_stock - $qty_booking,2)."</span> Kg</td>";
 	          echo "<td align='right'><input type='text' name='addMatPlanning[$No][use_stock]' data-no='$No' class='form-control input-sm text-right maskM use_stock' value='".number_format($last_cost,2)."'></td>";
-				echo "<td align='right'><input type='text' name='addMatPlanning[$No][sisa_avl]' id='sisa_avl_$No' data-no='$No' class='form-control input-sm text-right maskM' readonly tabindex='-1' value='".number_format($availabel_sisa,2)."'></td>";
+				echo "<td align='right'><span  id='sisa_avllabel_$No'>".number_format($availabel_sisa,2)."</span>
+					<input type='hidden' name='addMatPlanning[$No][sisa_avl]' id='sisa_avl_$No' data-no='$No' class='form-control input-sm text-right maskM' readonly tabindex='-1' value='".number_format($availabel_sisa,2)."'>
+					</td>";
 				
 				echo "<td align='right'><input type='text' name='addMatPlanning[$No][reorder_point]' class='form-control input-sm text-right maskM' readonly tabindex='-1' value='".number_format($reorder,2)."'></td>";
 	          echo "<td align='right'>".number_format($max_stock2,2)." Kg</td>";
-			  echo "<td align='center'>".number_format($moq)."</td>";
+			//   echo "<td align='center'>".number_format($moq)."</td>";
 			  
 				echo "<td align='right'><input type='text' name='addMatPlanning[$No][purchase]' class='form-control input-sm text-right maskM' value='".number_format($purchasex,2)."'></td>";
 				// echo "<td align='left'><input type='text' name='addMatPlanning[$No][tanggal]' class='form-control input-sm tgl' readonly placeholder='Tgl DIbutuhkan'></td>";
@@ -121,7 +123,7 @@
 				<td><b></b></td>
 				<td><b>SUM TOTAL</b></td>
 				<td align='right'><b><?= number_format($Total1, 3);?> Kg</b></td>
-				<td colspan='10'><b></b></td>
+				<td colspan='9'><b></b></td>
 			</tr>
 			<?php
 			}
@@ -141,7 +143,7 @@
 	<table class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead id='head_table'>
 			<tr>
-				<td class='bg-blue' colspan='6'><b>ACCESSORIES </b></td>
+				<td class='bg-blue' colspan='9'><b>ACCESSORIES </b></td>
 			</tr>
 		</thead>
 		<thead id='head_table'>
@@ -151,6 +153,9 @@
 				<th class="text-center" style='vertical-align:middle;'>Material Name</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Est Material</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Unit</th>
+				<th class="text-center" style='vertical-align:middle;' width='9%'>Free Stock</th>
+				<th class="text-center" style='vertical-align:middle;' width='9%'>Kebutuhan 1 Bulan</th>
+				<th class="text-center" style='vertical-align:middle;' width='9%'>Max Stock</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Purchase</th>
 				<!-- <th class="text-center" style='vertical-align:middle;' width='9%'>Tgl Dibutuhkan</th> -->
 			</tr>
@@ -160,15 +165,23 @@
 			if(!empty($non_frp) OR !empty($pack_truck)){
 				$Total1 = 0;
 				$No=0;
+				$id_gudang_project = getGudangProject();
+				$GET_STOCK_PROJECT = get_warehouseStockProject($id_gudang_project);
+
 				foreach($non_frp AS $val => $valx){
 					$No++;
 					
 					$qty = $valx['qty'];
 					$satuan = $valx['satuan'];
 					if($valx['category'] == 'plate'){
-						$qty = $valx['berat'];
+						// $qty = $valx['berat'];
 						$satuan = '1';
 					}
+
+					$book_per_month = $this->db->select('SUM(kebutuhan_month) AS kebutuhan')->get_where('budget_rutin_detail', array('id_barang'=>$valx['code_group']))->result();
+					$b_permont = (!empty($book_per_month))?$book_per_month[0]->kebutuhan:0;
+					$max_stock = $b_permont * 1.5;
+					$stock = (!empty($GET_STOCK_PROJECT[$valx['code_group']]))?$GET_STOCK_PROJECT[$valx['code_group']]:0;
 					
 					$reorder 		= 0;
 					$qty_booking 	= 0;
@@ -179,6 +192,7 @@
 						echo "<td align='center'>".$No."
 								<input type='hidden' name='add_acc_planning[".$No."][no_ipp]' value='".str_replace('BQ-','',$valx['id_bq'])."'>
 								<input type='hidden' name='add_acc_planning[".$No."][id_material]' value='".$valx['id_material']."'>
+								<input type='hidden' name='add_acc_planning[".$No."][code_group]' value='".$valx['code_group']."'>
 								<input type='hidden' name='add_acc_planning[".$No."][jumlah_mat]' value='".$qty."'>
 								<input type='hidden' name='add_acc_planning[".$No."][qty_stock]' id='acc_stock_".$No."' value='".$valx['stock']."'>
 								<input type='hidden' name='add_acc_planning[".$No."][satuan]' value='".$valx['satuan']."'>
@@ -188,6 +202,9 @@
 						echo "<td>".strtoupper(get_name('accessories','material','id',$valx['id_material']))."</td>";
 						echo "<td align='right'>".number_format($qty,2)."</td>";
 						echo "<td align='center'>".strtoupper(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan))."</td>";
+						echo "<td align='right'>".number_format($stock,2)."</td>";
+						echo "<td align='right'>".number_format($b_permont,2)."</td>";
+						echo "<td align='right'>".number_format($max_stock,2)."</td>";
 						echo "<td align='right'><input type='text' name='add_acc_planning[".$No."][purchase]' class='form-control input-sm text-right maskM' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 						// echo "<td align='left'><input type='text' name='add_acc_planning[".$No."][tanggal]' class='form-control input-sm tgl' readonly placeholder='Tgl DIbutuhkan'></td>";
 					echo "</tr>";
@@ -210,6 +227,7 @@
 					echo "<tr>";
 						echo "<td align='center'>".$No."
 								<input type='hidden' name='add_acc_planning[".$No."][no_ipp]' value='".str_replace('BQ-','',$valx['id_bq'])."'>
+								<input type='hidden' name='add_acc_planning[".$No."][code_group]' value='non acc'>
 								<input type='hidden' name='add_acc_planning[".$No."][id_material]' value='".$valx['id']."'>
 								<input type='hidden' name='add_acc_planning[".$No."][jumlah_mat]' value='".$qty."'>
 								<input type='hidden' name='add_acc_planning[".$No."][qty_stock]' value='0'>
@@ -218,8 +236,12 @@
 								<input type='hidden' name='add_acc_planning[".$No."][qty_booking]' value='0'>
 								</td>";
 						echo "<td>".$nama_acc."</td>";
+						echo "<td></td>";
 						echo "<td align='right'>".number_format($qty,2)."</td>";
 						echo "<td align='center'>".strtoupper('-')."</td>";
+						echo "<td align='center'>-</td>";
+						echo "<td align='center'>-</td>";
+						echo "<td align='center'>-</td>";
 						echo "<td align='right'><input type='text' name='add_acc_planning[".$No."][purchase]' class='form-control input-sm text-right maskM' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 						// echo "<td align='left'><input type='text' name='add_acc_planning[".$No."][tanggal]' class='form-control input-sm tgl' readonly placeholder='Tgl DIbutuhkan'></td>";
 					echo "</tr>";
@@ -227,7 +249,7 @@
 			}
 			else{
 				echo "<tr>";
-					echo "<td colspan='6'>Data tidak ada</td>";
+					echo "<td colspan='9'>Data tidak ada</td>";
 				echo "</tr>";
 			}
 			?>
@@ -262,6 +284,7 @@
             var avl     = (stock - book) - use;
             // $('#avl_'+nomor).html(number_format(avl,2));
 			$('#sisa_avl_'+nomor).val(number_format(avl,2));
+			$('#sisa_avllabel_'+nomor).text(number_format(avl,2));
             // console.log(avl);
         });
 		

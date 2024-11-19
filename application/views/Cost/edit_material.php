@@ -342,7 +342,7 @@ $this->load->view('include/side_menu');
 		let price_from_supplier = getNum($('#price_from_supplier').val().split(",").join(""));
 		let exp_price_ref_sup 	= $('#exp_price_ref_sup').val();
 		// let profit 			= getNum($('#profit').val()) / 100;
-		let profit 				= 122.5 / 100;
+		let profit 				= 115 / 100;
 		
 		let new_price = price_from_supplier * profit;
 		

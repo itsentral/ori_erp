@@ -82,6 +82,7 @@ if($value1 == 'eksport'){
 						<thead>
 							<tr class='bg-blue'>
 								<th class="text-center" >#</th>
+								<th class="text-center" >Code</th>
 								<th class="text-center" >Material ID</th>
 								<th class="text-center" >Material Name</th>
 								<th class="text-center" >Category</th>
@@ -107,7 +108,7 @@ if($value1 == 'eksport'){
 									
 									//estimation
 									$date_now 	= date('Y-m-d');
-									$date_exp 	= $datas->exp_price_ref_sup;
+									$date_exp 	= $datas->exp_price_ref_pur;
 
 									$tgl1x = new DateTime($date_now);
 									$tgl2x = new DateTime($date_exp);
@@ -144,6 +145,7 @@ if($value1 == 'eksport'){
 									$PRE = (!empty($datas->price_from_supplier))?$datas->price_from_supplier:0;
 									echo"<tr>";							
 										echo"<td align='center'>$int</td>";
+										echo"<td align='left'>".$datas->id_material."</td>";
 										echo"<td align='left'>".$datas->idmaterial."</td>";
 										echo"<td align='left'>".strtoupper($datas->nm_material)."</td>";
 										echo"<td align='left'>".$datas->nm_category."</td>";

@@ -1,5 +1,5 @@
 <?php
-$qBQdetailHeader 	= "SELECT a.*, a.series, b.no_ipp FROM bq_detail_header a LEFT JOIN bq_header b ON a.id_bq=b.id_bq WHERE a.id_bq = '".$id_bq."' AND a.id_category <> 'pipe slongsong' ORDER BY a.id ASC";
+$qBQdetailHeader 	= "SELECT a.*, a.series, b.no_ipp FROM bq_detail_header a LEFT JOIN bq_header b ON a.id_bq=b.id_bq WHERE a.id_bq = '".$id_bq."' ORDER BY a.id ASC";
 $qBQdetailRest		= $this->db->query($qBQdetailHeader)->result_array();
 
 $ArrBQProduct = array();

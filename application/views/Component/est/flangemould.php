@@ -3797,7 +3797,8 @@ $this->load->view('include/side_menu');
 		});
 		
 		$(document).on('keyup', '#design_neck_1', function(){
-			var designNeck2	= 2 * parseFloat($(this).val());
+			var top_tebal_design	= parseFloat($('#top_tebal_design').val());
+			var designNeck2	= (0.5 * top_tebal_design) - parseFloat($(this).val());
 			
 			var liner		= parseFloat($('#acuhan_1').val());
 

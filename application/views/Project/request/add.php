@@ -4,9 +4,8 @@
 	<div class='form-group row'>
 		<label class='label-control col-sm-2'><b>Nama Customer</b></label>
 		<div class='col-sm-4'>
+			<input type="hidden" name='id_bq' value='<?=$id_bq;?>'>
 			<input type="hidden" name='id_customer' value='<?=$id_customer;?>'>
-			<input type="hidden" name='sub_gudang' value='<?=$sub_gudang;?>'>
-			<input type="hidden" name='defered' value='<?=$defered;?>'>
 			<?php
 				echo form_input(array('id'=>'nm_customer','name'=>'nm_customer','class'=>'form-control input-md','readonly'=>'readonly'),$nm_customer);
 			?>
@@ -24,7 +23,7 @@
 		<thead id='head_table'>
 			<tr class='bg-blue'>
 				<th class="text-center" style='vertical-align:middle;' width='3%'>#</th>
-				<!-- <th class="text-center" style='vertical-align:middle;' width='10%'>No IPP</th> -->
+				<th class="text-center" style='vertical-align:middle;' width='10%'>Code</th>
 				<th class="text-center" style='vertical-align:middle;'>Accessories Name</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Estimasi</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Tot Request</th>
@@ -50,7 +49,7 @@
                             <input type='hidden' name='add[".$No."][no_ipp]' value='".$valx['no_ipp']."'>
                             <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>
                             </td>";
-                    // echo "<td align='left'>".$valx['no_ipp']."</td>";
+                    echo "<td align='center'>".$valx['code_group']."</td>";
                     echo "<td>".get_name_by_code_group($valx['code_group'])."</td>";
                     echo "<td align='right'>".number_format($qty,2)."</td>";
                     echo "<td align='right'>".number_format($qty_req,2)."</td>";

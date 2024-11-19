@@ -74,7 +74,7 @@ $paths 	= base_url().'/assets/foto/'.$dataD[0]['foto'];
 					?>		
 			</div>
 			
-			<label class='label-control col-sm-2'><b>Tanggal Perolehan</b></label>
+			<label class='label-control col-sm-2'><b>Tangga Perolehan</b></label>
 			<div class='col-sm-4'>
 				<?php
 					echo form_input(array('id'=>'tgl_perolehan','class'=>'form-control input-md','autocomplete'=>'off','readonly'=>'readonly'),date('d F Y', strtotime($dataD[0]['tgl_perolehan'])));											
@@ -121,12 +121,6 @@ $paths 	= base_url().'/assets/foto/'.$dataD[0]['foto'];
 			<label class='label-control col-sm-2'><b>Foto</b></label>
 			<div class='col-sm-4'>
 				<img src="<?=$paths;?>" width='400px' height='400px'>
-			</div>
-			<label class='label-control col-sm-2'><b>Tanggal Mulai Penyusutan</b></label>
-			<div class='col-sm-4'>
-				<?php
-					echo form_input(array('id'=>'tgl_depresiasi','class'=>'form-control input-md','autocomplete'=>'off','readonly'=>'readonly'),date('d F Y', strtotime($dataD[0]['tgl_depresiasi'])));											
-				?>	
 			</div>
 		</div>
 	</div>

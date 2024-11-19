@@ -85,7 +85,7 @@ $next_process			= (!empty($get_spk))?$get_spk[0]->next_process:'';
 				$result2 = $this->db
 								->select('a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
 								->join('production_detail b','a.id_pro=b.id','left')
-								->get_where('spool_group a', 
+								->get_where('spool_group_all a', 
 									array(
 										'a.spool_induk'=>$spool_induk,
 										'a.kode_spool'=>$value2['kode_spool']

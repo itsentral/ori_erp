@@ -8,6 +8,7 @@ $this->load->view('include/side_menu');
 		<div class="box-tool pull-right">
 			<a href="<?php echo site_url($this->uri->segment(1).'/add_project') ?>" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> Add Project</a>
 			<a href="<?php echo site_url($this->uri->segment(1).'/list_retur') ?>" class="btn btn-sm btn-default"><i class="fa fa-reply"></i> List Retur</a>
+			<a href="<?php echo site_url($this->uri->segment(1).'/tanki') ?>" class="btn btn-sm btn-danger">PROJECT TANKI</a>
 		</div>
 	</div>
 	<!-- /.box-header -->

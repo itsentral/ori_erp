@@ -276,6 +276,29 @@ $this->load->view('include/side_menu');
 		$("#head_title").html("<b>EDIT RFQ PRINT ["+$(this).data('no_rfq')+"]</b>");
 		$.ajax({
 			type:'POST',
+			url: base_url + active_controller+'/modal_edit_rfq_print/'+$(this).data('no_rfq'),
+			success:function(data){
+				$("#ModalView").modal();
+				$("#view").html(data);
+
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '.edit_po2', function(e){
+		e.preventDefault();
+		loading_spinner();
+		$("#head_title").html("<b>EDIT SUPPLIER ["+$(this).data('no_rfq')+"]</b>");
+		$.ajax({
+			type:'POST',
 			url: base_url + active_controller+'/modal_edit_rfq/'+$(this).data('no_rfq'),
 			success:function(data){
 				$("#ModalView").modal();
@@ -287,10 +310,7 @@ $this->load->view('include/side_menu');
 				  title				: "Error Message !",
 				  text				: 'Connection Timed Out ...',
 				  type				: "warning",
-				  timer				: 5000,
-				  showCancelButton	: false,
-				  showConfirmButton	: false,
-				  allowOutsideClick	: false
+				  timer				: 5000
 				});
 			}
 		});
@@ -573,6 +593,144 @@ $this->load->view('include/side_menu');
 							showCancelButton	: false,
 							showConfirmButton	: false,
 							allowOutsideClick	: false
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
+		});
+	});
+
+	//EditPurchase
+	$(document).on('click', '#updateSupplier', function(){
+
+		swal({ 
+			title: "Are you sure?",
+			text: "You will booking material planning be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_proses_bro')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/update_rfq_supplier',
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000,
+									showCancelButton	: false,
+									showConfirmButton	: false,
+									allowOutsideClick	: false
+								});
+							window.location.href = base_url + active_controller+'/material_purchase';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000,
+								showCancelButton	: false,
+								showConfirmButton	: false,
+								allowOutsideClick	: false
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title				: "Error Message !",
+							text				: 'An Error Occured During Process. Please try again..',						
+							type				: "warning",								  
+							timer				: 7000,
+							showCancelButton	: false,
+							showConfirmButton	: false,
+							allowOutsideClick	: false
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
+		});
+	});
+
+	$(document).on('click', '.deletePRMaterial', function(){
+		var no_pr 		= $(this).data('no_pr');
+		var id_material = $(this).data('id_barang');
+		var no_rfq = $(this).data('no_rfq');
+		// alert(no_po);
+		// return false;
+
+		swal({ 
+			title: "Are you sure?",
+			text: "You will delete material planning be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_proses_bro')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/cancel_sebagian_rfq/'+no_pr+'/'+id_material+'/'+no_rfq,
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+								title	: "Save Success!",
+								text	: data.pesan,
+								type	: "success",
+								timer	: 7000
+							});
+							DataTables();
+							$("#head_title").html("<b>EDIT SUPPLIER ["+data.no_rfq+"]</b>");
+							$("#view").load(base_url + active_controller+'/modal_edit_rfq/'+data.no_rfq);
+							$("#ModalView").modal();
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title	: "Error Message !",
+							text	: 'An Error Occured During Process. Please try again..',						
+							type	: "warning",								  
+							timer	: 7000
 						});
 					}
 				});

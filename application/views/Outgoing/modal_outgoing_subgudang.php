@@ -15,6 +15,19 @@
 	// echo "out: ".$QTY_DONE."<br>";
 	// print_r($result);
 	?>
+	<table width="100%">
+		<thead>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;' width='15%'></td>
+				<td class="text-left" style='vertical-align:middle;' width='2%'></td>
+				<td class="text-left" style='vertical-align:middle;'></td> 
+				<td rowspan='2' width='20%'>
+					<span class='text-bold'>Upload Enginnering Change</span>
+					<input type='file' id='upload_spk' name='upload_spk' class='form-control input-md' placeholder='Upload Enginnering Change'>
+				</td>
+			</tr>
+		</thead>
+	</table><br>
 	<?php if($tipe_out != 'non-so'){ ?>
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead id='head_table'>

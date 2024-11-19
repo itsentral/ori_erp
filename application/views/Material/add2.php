@@ -54,10 +54,25 @@ $this->load->view('include/side_menu');
 					 ?>
 					</select>
 				</div>
-				<label class='label-control col-sm-2'><b>Kemasan <span class='text-red'>*</span></b></label>
+				<label class='label-control col-sm-2'><b>Min Stock (Day) <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
+					<?php
+						echo form_input(array('id'=>'safety_stock','name'=>'safety_stock','class'=>'form-control input-md maskM','autocomplete'=>'off','placeholder'=>'Min Stock','data-decimal'=>".", 'data-thousand'=>"" , 'data-precision'=>"0", 'data-allow-zero'=>""));
+					?>
+				</div>
+				
+			</div>
+			<div class='form-group row'>
+				<label class='label-control col-sm-2' hidden><b>Kilogram per kemasan <span class='text-red'>*</span></b></label>
+				<div class='col-sm-4' hidden>
+					<?php
+						echo form_input(array('id'=>'satuan_kg','name'=>'satuan_kg','class'=>'form-control input-md autoNumeric','autocomplete'=>'off','placeholder'=>'Piece Of Kilogram'));
+					?>
+				</div>
+				<label class='label-control col-sm-2'><b>Unit Measurement <span class='text-red'>*</span></b></label>
+				<div class='col-sm-2'>
 					<select name='id_satuan' id='id_satuan' class='form-control input-md'>
-						<option value=''>Select An Pieces</option>
+						<option value=''>Select An Unit</option>
 					<?php
 						foreach($data_pieces AS $val => $valx){
 							echo "<option value='".$valx['id_satuan']."'>".ucwords(strtolower($valx['nama_satuan']))." (".ucwords(strtolower($valx['kode_satuan'])).")</option>";
@@ -65,32 +80,35 @@ $this->load->view('include/side_menu');
 					 ?>
 					</select>
 				</div>
-			</div>
-			<div class='form-group row'>
-				<label class='label-control col-sm-2'><b>Kilogram per kemasan <span class='text-red'>*</span></b></label>
-				<div class='col-sm-4'>
+				<div class='col-sm-2'>
 					<?php
-						echo form_input(array('id'=>'satuan_kg','name'=>'satuan_kg','class'=>'form-control input-md autoNumeric','autocomplete'=>'off','placeholder'=>'Piece Of Kilogram'));
+						echo form_input(array('id'=>'nilai_konversi','name'=>'nilai_konversi','class'=>'form-control input-md autoNumeric','autocomplete'=>'off','placeholder'=>'Conversion Value'));
 					?>
 				</div>
-				<label class='label-control col-sm-2'><b>Kilogram Saldo <span class='text-red'>*</span></b></label>
+				<label class='label-control col-sm-2'><b>Max Stock (Day)</b></label>
 				<div class='col-sm-4'>
 					<?php
-						echo form_input(array('id'=>'saldo_kg','name'=>'saldo_kg','class'=>'form-control input-md autoNumeric','autocomplete'=>'off','placeholder'=>'Kilogram Balance'));
+						echo form_input(array('id'=>'max_stock','name'=>'max_stock','class'=>'form-control input-md maskM','autocomplete'=>'off','placeholder'=>'Max Stock','data-decimal'=>".", 'data-thousand'=>"" , 'data-precision'=>"0", 'data-allow-zero'=>""));
 					?>
 				</div>
 			</div>
 			<div class='form-group row'>
-				<label class='label-control col-sm-2'><b>Conversion Value <span class='text-red'>*</span></b></label>
-				<div class='col-sm-4'>
+				<label class='label-control col-sm-2'><b>Unit Packing <span class='text-red'>*</span></b></label>
+				<div class='col-sm-2'>
+					<select name='id_packing' id='id_packing' class='form-control input-md'>
+						<option value=''>Select An Unit Packing</option>
 					<?php
-						echo form_input(array('id'=>'nilai_konversi','name'=>'nilai_konversi','class'=>'form-control input-md maskM','autocomplete'=>'off','placeholder'=>'Conversion Value','data-decimal'=>".", 'data-thousand'=>"" , 'data-precision'=>"0", 'data-allow-zero'=>""));
-					?>
+						foreach($data_pieces_pack AS $val => $valx){
+							echo "<option value='".$valx['id_satuan']."'>".ucwords(strtolower($valx['nama_satuan']))." (".ucwords(strtolower($valx['kode_satuan'])).")</option>";
+						}
+					 ?>
+					</select>
 				</div>
-				<label class='label-control col-sm-2'><b>Safety Stock (Day) <span class='text-red'>*</span></b></label>
+				<div class='col-sm-2'></div>
+				<label class='label-control col-sm-2'><b>Kebutuhan Per Bulan (Kg)</b></label>
 				<div class='col-sm-4'>
 					<?php
-						echo form_input(array('id'=>'safety_stock','name'=>'safety_stock','class'=>'form-control input-md maskM','autocomplete'=>'off','placeholder'=>'Safety Stock','data-decimal'=>".", 'data-thousand'=>"" , 'data-precision'=>"0", 'data-allow-zero'=>""));
+						echo form_input(array('id'=>'kg_per_bulan','name'=>'kg_per_bulan','class'=>'form-control input-md autoNumeric','autocomplete'=>'off','placeholder'=>'Kebutuhan Per Bulan'));
 					?>
 				</div>
 			</div>
@@ -101,12 +119,7 @@ $this->load->view('include/side_menu');
 						echo form_textarea(array('id'=>'descr','name'=>'descr','class'=>'form-control input-md','rows'=>'2','cols'=>'75','autocomplete'=>'off','placeholder'=>'Description'));
 					?>
 				</div>
-				<label class='label-control col-sm-2'><b>Max Stock (Day) <span class='text-red'>*</span></b></label>
-				<div class='col-sm-4'>
-					<?php
-						echo form_input(array('id'=>'max_stock','name'=>'max_stock','class'=>'form-control input-md maskM','autocomplete'=>'off','placeholder'=>'Max Stock','data-decimal'=>".", 'data-thousand'=>"" , 'data-precision'=>"0", 'data-allow-zero'=>""));
-					?>
-				</div>
+				
 			</div>
 			<div class='form-group row'>
 				<label class='label-control col-sm-2'><b>Warehouse <span class='text-red'>*</span></b></label>
@@ -114,7 +127,8 @@ $this->load->view('include/side_menu');
 					<select name='id_warehouse' id='id_warehouse' class='form-control input-md'>
 					<?php
 						foreach($getWarehouse AS $val => $valx){
-							echo "<option value='".$valx['id']."'>".strtoupper(strtolower($valx['nm_gudang']))."</option>";
+							$selected=($valx['id'] == 2)?'selected':'';
+							echo "<option value='".$valx['id']."' ".$selected.">".strtoupper(strtolower($valx['nm_gudang']))."</option>";
 						}
 					 ?>
 					</select>
@@ -294,6 +308,7 @@ $this->load->view('include/side_menu');
 			var nm_international		= $('#nm_international').val();
 			var id_category				= $('#id_category').val();
 			var id_satuan				= $('#id_satuan').val();
+			var id_packing				= $('#id_packing').val();
 			var satuan_kg				= $('#satuan_kg').val();
 			var saldo_kg				= $('#saldo_kg').val();
 			var nilai_konversi			= $('#nilai_konversi').val();
@@ -349,33 +364,25 @@ $this->load->view('include/side_menu');
 				return false;
 
 			}
+			if(safety_stock == '' || safety_stock == null){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'Min Stock Empty, please input first ...',
+				  type	: "warning"
+				});
+				$('#simpan-bro').prop('disabled',false);
+				return false;
+			}
 			if(id_satuan == '' || id_satuan == null){
 				swal({
 				  title	: "Error Message!",
-				  text	: 'Pieces Type is Empty, please input first ...',
+				  text	: 'Unit is Empty, please input first ...',
 				  type	: "warning"
 				});
 				$('#simpan-bro').prop('disabled',false);
 				return false;
 			}
-			if(satuan_kg == '' || satuan_kg == null){
-				swal({
-				  title	: "Error Message!",
-				  text	: 'Pieces of Kilogram is Empty, please input first ...',
-				  type	: "warning"
-				});
-				$('#simpan-bro').prop('disabled',false);
-				return false;
-			}
-			if(saldo_kg == '' || saldo_kg == null){
-				swal({
-				  title	: "Error Message!",
-				  text	: 'Kilogram Balance is Empty, please input first ...',
-				  type	: "warning"
-				});
-				$('#simpan-bro').prop('disabled',false);
-				return false;
-			}
+			
 			if(nilai_konversi == '' || nilai_konversi == null){
 				swal({
 				  title	: "Error Message!",
@@ -385,16 +392,17 @@ $this->load->view('include/side_menu');
 				$('#simpan-bro').prop('disabled',false);
 				return false;
 			}
-
-			if(safety_stock == '' || safety_stock == null){
+			if(id_packing == '' || id_packing == null){
 				swal({
 				  title	: "Error Message!",
-				  text	: 'Safety STock Empty, please input first ...',
+				  text	: 'Unit Packing is Empty, please input first ...',
 				  type	: "warning"
 				});
 				$('#simpan-bro').prop('disabled',false);
 				return false;
 			}
+
+			
 
 			//validasi supplier
 			var intL = 0;

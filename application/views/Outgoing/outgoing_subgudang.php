@@ -103,13 +103,15 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center">No</th> 
+					<th class="text-center">#</th> 
 					<th class="text-center">No Trans</th>
-					<th class="text-center">Warehouse</th>
-					<th class="text-center">Total Material</th>
-					<th class="text-center">Receiver</th>
-					<th class="text-center">Outgoing Date</th>
-					<th class="text-center">Option</th>
+					<th class="text-center">No SO</th>
+					<th class="text-center">No SPK</th>
+					<th class="text-center no-sort">Warehouse</th>
+					<th class="text-center no-sort">Total Material</th>
+					<th class="text-center no-sort">Receiver</th>
+					<th class="text-center no-sort">Outgoing Date</th>
+					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>

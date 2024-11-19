@@ -8,13 +8,6 @@ foreach($customer AS $val => $valx){
 	$ArrCostcenter[$valx['id_customer']] = strtoupper(strtolower($valx['nm_customer']));
 }
 
-
-$ArrSubgudang = array();
-$ArrSubgudang[0]	= 'Select An COA';
-foreach($coa AS $val => $valc){
-	$ArrSubgudang[$valc['no_perkiraan']] = $valc['no_perkiraan'].'|'.strtoupper(strtolower($valc['nama']));
-}
-
 ?>
 <form action="#" method="POST" id="form_ct" enctype="multipart/form-data" autocomplete='off'> 
 <div class="box box-primary">
@@ -33,26 +26,6 @@ foreach($coa AS $val => $valc){
             <div class="col-md-4">
                 <?php
                     echo form_dropdown('id_customer', $ArrCostcenter, '', array('id'=>'id_customer','class'=>'form-control input-md chosen-select'));
-                ?>
-            </div>
-        </div>
-		<div class="form-group row">
-            <div class="col-md-2">
-                <label for="sub_gudang">Sub Gudang project <span class='text-red'>*</span></label>
-            </div>
-            <div class="col-md-4">
-                <?php
-                    echo form_dropdown('sub_gudang', $ArrSubgudang, '', array('id'=>'sub_gudang','class'=>'form-control input-md chosen-select'));
-                ?>
-            </div>
-        </div>
-		<div class="form-group row">
-            <div class="col-md-2">
-                <label for="deffered">Deffered <span class='text-red'>*</span></label>
-            </div>
-            <div class="col-md-4">
-                <?php
-                    echo form_dropdown('defered', $ArrSubgudang, '', array('id'=>'defered','class'=>'form-control input-md chosen-select'));
                 ?>
             </div>
         </div>

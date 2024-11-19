@@ -427,7 +427,7 @@ if(!empty($data_header[0]->amount_words)){
 	$html = ob_get_contents();
 	// exit;
 	ob_end_clean();
-	// $mpdf->showImageErrors = true;
+
 	$mpdf->SetWatermarkImage(
 			$sroot.'/assets/images/ori_logo2.png',
 			1,

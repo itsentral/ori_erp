@@ -12,7 +12,7 @@ $this->load->view('include/side_menu');
         <br>
         <?php
         foreach ($result as $key2 => $value2) { $key2++;
-		    $result2 = $this->db->get_where('spool_group_release', array('spool_induk'=>$spool_induk,'kode_spool'=>$value2['kode_spool']))->result_array();
+		    $result2 = $this->db->get_where('spool_group_all', array('spool_induk'=>$spool_induk,'kode_spool'=>$value2['kode_spool']))->result_array();
 		    
             ?>  
                 <h4><?=$key2?>. Kode Spool : <?=$value2['kode_spool'];?></h4>
@@ -23,6 +23,7 @@ $this->load->view('include/side_menu');
                             <th class="text-center">IPP</th>
                             <th class="text-center">Product</th>
                             <th class="text-center">Spec</th>
+                            <th class="text-center">Length</th>
                             <th class="text-center">Code</th>
                             <th class="text-center">No SPK</th>
                             <th class="text-center">No Drawing</th>
@@ -31,23 +32,31 @@ $this->load->view('include/side_menu');
                     <tbody>
                         <?php
                         foreach ($result2 as $key => $value) { $key++;
-                            $result3 = $this->db->get_where('so_detail_header', array('id'=>$value['id_milik']))->result();
+                            
+                            $SPEC = $value['kode_spk'];
+                            $product_code = $value['product_code'];
 
-                            $IMPLODE = explode('.', $value['product_code']);
-                            $product_code = $IMPLODE[0].'.'.$value['product_ke'];
+                            $CUTTING_KE = (!empty($value['cutting_ke']))?'.'.$value['cutting_ke']:'';
+                            $LENGTH = (!empty($value['length']))?number_format($value['length']):'';
 
-                            $LENGTH = (!empty($value['length']))?$value['length']:$result3[0]->length;
+                            if($value['sts'] == 'loose' OR $value['sts'] == 'cut'){
+                                $SPEC = spec_bq2($value['id_milik']);
+                                $IMPLODE = explode('.', $value['product_code']);
+                                $product_code = $IMPLODE[0].'.'.$value['product_ke'].$CUTTING_KE;
+                            }
 
-                            $SPEC = spec_bq3($value['id_milik']);
-                            if($value['sts'] == 'deadstok'){
-                                $SPEC = $value['kode_spk'].' x '.$value['length'];
+                            $product_name = $value['id_category'];
+                            if($value['status_tanki'] == 'tanki'){
+                                $product_name = $value['nm_tanki'];
+                                $SPEC = $tanki_model->get_spec($value['id_milik']);
                             }
 
                             echo "<tr>";
                                 echo "<td align='center'>".$key."</td>";
                                 echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
-                                echo "<td align='left'>".strtoupper($value['id_category'])."</td>";
-                                echo "<td align='left'>".$SPEC." x ".number_format($LENGTH)."</td>";
+                                echo "<td align='left'>".strtoupper($product_name)."</td>";
+                                echo "<td align='left'>".$SPEC."</td>";
+                                echo "<td align='right'>".$LENGTH."</td>";
                                 echo "<td align='center'>".$product_code."</td>";
                                 echo "<td align='center'>".$value['no_spk']."</td>";
                                 echo "<td align='left'>".$value['no_drawing']."</td>";

@@ -23,22 +23,35 @@ $project 		= $header_del[0]->project;
 $nomorSO = array();
 $nomorPO = array();
 foreach($result	 AS $val => $valx){ $val++;
-	$EXPLODE = explode('-',$valx['product_code']);
-	$nomorSO[] = $EXPLODE[0];
+	$EXPLODE 	= explode('-',$valx['product_code']);
+	$no_so 		= $EXPLODE[0];
+	if(empty($valx['product_code'])){
+		$no_so 	= $valx['no_drawing'];
+	}
+	$nomorSO[] 	= $no_so;
 
 	$no_ipp = str_replace('PRO-','',$valx['id_produksi']);
-	$no_po = get_name('billing_so','no_po','no_ipp',$no_ipp);
-
+	$tandaTanki = substr($no_ipp,0,4);
+	if($tandaTanki != 'IPPT'){
+		$no_po = get_name('billing_so','no_po','no_ipp',$no_ipp);
+	}else{
+		$no_po = $tanki_model->get_ipp_detail($no_ipp)['no_po'];
+	}
 	$nomorPO[] = $no_po;
 }
 
 $NOS_OS = implode('/',array_unique($nomorSO));
 $NOS_PO = implode('/',array_unique($nomorPO));
 
+$linkImage = $sroot."/assets/images/ori_logo.jpg";
+
 
 $HTML_HEADER = '<table class="gridtable2" width="100%" border="0" style="border-bottom:none; margin-top:0px;">';
 $HTML_HEADER .= '<tr>';
-$HTML_HEADER .= '<td rowspan="7" align="center"  style="border-bottom:none;">';
+$HTML_HEADER .= '<td rowspan="7" style="border-right:none; border-bottom:none; ">';
+$HTML_HEADER .= '<img src="'.$linkImage.'" alt="" height="90" width="80" >';
+$HTML_HEADER .= '</td>';
+$HTML_HEADER .= '<td rowspan="7" align="center"  style="border-bottom:none; border-left:none;">';
 $HTML_HEADER .= '<b>PT. ORI POLYTEC COMPOSITES</b><br>';
 $HTML_HEADER .= 'Jl. Akasia II Block A9/3<br>';
 $HTML_HEADER .= 'Cikarang - Bekasi - Indonesia<br>';
@@ -216,7 +229,7 @@ $HTML_HEADER .= '</table>';
 			$DESC 		= (!empty($valx['desc']))?$valx['desc']:strtoupper($valx['product']);
 		}
 		
-        if($valx['type_product'] != 'spool'){
+        if($valx['type_product'] != 'spool' AND $valx['type_product'] != 'spool_tanki'){
             echo "<tr>";
                 echo "<td align='".$ALIGN."'>".$QTY."</td>";
                 echo "<td align='center'>".strtolower($SATUAN)."</td>";
@@ -229,7 +242,7 @@ $HTML_HEADER .= '</table>';
             $getSpoolDetail = $this->db
                                     ->order_by('a.id', 'asc')
                                     ->group_by('a.id_milik, a.sts, a.cutting_ke')
-                                    ->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
+                                    ->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki, b.nm_tanki')
                                     ->where('(a.berat > 0 OR a.berat IS NULL)')
 									->join('production_detail b','a.id_pro=b.id','left')
                                     ->get_where('delivery_product_detail a', array(
@@ -239,6 +252,7 @@ $HTML_HEADER .= '</table>';
                                         'a.kode_spool'=>$valx['kode_spool'],
                                     ))->result_array();
             $DEAT = "";
+            $NO_DRAWING = [];
             foreach ($getSpoolDetail as $key => $value) {
                 $series 	= get_name('so_detail_header','series','id',$value['id_milik']);
 		        $product 	= "<b>".strtoupper($value['product'])."</b>, ".$series.", DIA ".spec_bq2($value['id_milik']);
@@ -251,7 +265,42 @@ $HTML_HEADER .= '</table>';
 				if($value['type_product'] == 'tanki'){
 					$product 	= "<b>".strtoupper($value['product_tanki'])."</b>, ".$tanki_model->get_spec($value['id_milik'])."</i>";
 				}
-                $DEAT .= ", (<b>".$value['qty_product']."</b> ". $product.")";
+				$DEAT .= ", (<b>".$value['qty_product']."</b> ". $product.")";
+				$NO_DRAWING[] = $value['no_drawing'];
+            }
+
+			$NODraw = '';
+			if(!empty($NO_DRAWING)){
+				$ARrUniq = array_unique($NO_DRAWING);
+				$NODraw = implode(',',$ARrUniq);
+			}
+
+
+            $DESC 	= $valx['spool_induk'].'-'.$valx['kode_spool'].$DEAT.' - '.$NODraw;
+            echo "<tr>";
+                echo "<td align='".$ALIGN."'>".$QTY."</td>";
+                echo "<td align='center'>".strtolower($SATUAN)."</td>";
+                // echo "<td align='left'>".$GET_DESC."</td>";
+                echo "<td align='left'>".$DESC."</td>";
+            echo "</tr>";
+        }
+
+		if($valx['type_product'] == 'spool_tanki'){
+            $getSpoolDetail = $this->db
+                                    ->order_by('a.id', 'asc')
+                                    ->group_by('a.spool_induk, a.kode_spool')
+                                    ->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki, b.nm_tanki')
+                                    ->where('(a.berat > 0 OR a.berat IS NULL)')
+									->join('production_detail b','a.id_pro=b.id','left')
+                                    ->get_where('delivery_product_detail a', array(
+                                        'a.kode_delivery' => $kode_delivery, 
+                                        'a.sts_product' => NULL,
+                                        'a.spool_induk'=>$valx['spool_induk'],
+                                        'a.kode_spool'=>$valx['kode_spool'],
+                                    ))->result_array();
+            $DEAT = "";
+            foreach ($getSpoolDetail as $key => $value) {
+				$DEAT .= ", ".$value['nm_tanki'];
             }
 
 
@@ -410,6 +459,7 @@ $HTML_HEADER .= '</table>';
 
 <?php
 $html = ob_get_contents();
+// echo $HTML_HEADER;
 // exit;
 ob_end_clean();
 $mpdf->SetHeader($HTML_HEADER);
