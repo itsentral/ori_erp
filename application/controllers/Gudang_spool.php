@@ -7,6 +7,7 @@ class Gudang_spool extends CI_Controller {
 		parent::__construct();
 		$this->load->model('master_model');
 		$this->load->model('produksi_model');
+		$this->load->model('tanki_model');
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
@@ -75,18 +76,37 @@ class Gudang_spool extends CI_Controller {
 			$ArrNo_SPK      = [];
 			$ArrNo_Drawing  = [];
             if(empty($DATEFILTER)){
-                $get_split_ipp  = $this->db->select('id_produksi, id_milik, kode_spool, product_code, no_drawing')->get_where('spool_group_release',array('spool_induk'=>$row['spool_induk']))->result_array();
-                $get_split_ipp2  = $this->db->select('kode_spool, product_code, id_category as product, COUNT(id) AS qty, sts, id_milik')->group_by('sts,kode_spool,id_milik')->get_where('spool_group_release',array('spool_induk'=>$row['spool_induk']))->result_array();
-                foreach ($get_split_ipp as $key => $value) { $key++;
-                    $ArrNo_Spool[]  = $value['kode_spool'];
-                    $ArrNo_IPP[]    = str_replace('PRO-','',$value['id_produksi']);
-                    $ArrNo_Drawing[]= $value['no_drawing'];
-                }
-                foreach ($get_split_ipp2 as $key => $value) { $key++;
-					$no_spk         = (!empty($GET_NO_SPK[$value['id_milik']]['no_spk']))?$GET_NO_SPK[$value['id_milik']]['no_spk']:'not set';
-                    $IMPLODE        = explode('-', $value['product_code']);
-                    $ArrNo_SPK[]    = $key.'. '.$value['kode_spool'].'/'.$IMPLODE[0].'/'.strtoupper($value['product']).' <b class="text-blue">['.$value['qty'].' PCS]</b>/'.$no_spk.'/'.strtoupper($value['sts']);
-                }
+                $get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length, status_tanki, nm_tanki')->group_by('sts, id_milik')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
+				$ArrNo_Spool = [];
+				$ArrNo_IPP = [];
+				$ArrNo_Drawing = [];
+				$ArrNo_SPK = [];
+				foreach ($get_split_ipp as $key => $value) { $key++;
+
+					$no_spk 		= $value['no_spk'];
+					$ArrNo_IPP[] 	= str_replace('PRO-','',$value['id_produksi']);
+					$ArrNo_Spool[] 	= $value['kode_spool'];
+
+					$ArrNo_Drawing[] = $value['no_drawing'];
+					
+					$CUTTING_KE = (!empty($value['cutting_ke']))?'.'.$value['cutting_ke']:'';
+					
+					$IMPLODE = explode('-', $value['kode_spool']);
+
+					$sts = $value['sts'];
+
+					$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']);
+					if($sts == 'cut'){
+						$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']).', cut '.number_format($value['length']);
+					}
+					if($value['status_tanki'] == 'tanki'){
+						$product 	= strtoupper($value['nm_tanki']);
+					}
+
+					$no = sprintf('%02s', $key);
+
+					$ArrNo_SPK[] = $no.'. <span class="text-bold text-primary">['.$IMPLODE[0].'/'.$no_spk.']</span> <span class="text-bold text-success">'.strtoupper($sts).'</span><span class="text-bold"> ['.$value['qty'].' pcs]</span> '.$product;
+				}
             }
             else{
                 $get_split_ipp  = $this->db->select('no_ipp, id_milik, kode_spool, no_drawing')->get_where('stock_spool_per_day',array('spool_induk'=>$row['spool_induk']))->result_array();
@@ -238,16 +258,21 @@ class Gudang_spool extends CI_Controller {
 						b.nm_customer AS customer,
 						b.project AS project,
 						a.id_milik AS id_milik,
-						COUNT(id) AS qty,
+						COUNT(a.id) AS qty,
 						a.no_drawing AS no_drawing,
 						a.product_code,
 						a.product_ke,
 						a.length,
 						a.sts,
-						a.kode_spk
+						a.kode_spk,
+						c.customer AS customer_tanki,
+						c.project AS project_tanki,
+						d.id_product AS product_tanki
 					FROM
 						spool_group_release a
 						LEFT JOIN production b ON REPLACE(a.id_produksi,'PRO-','')=b.no_ipp
+						LEFT JOIN planning_tanki c ON REPLACE(a.id_produksi,'PRO-','')=c.no_ipp
+						LEFT JOIN production_detail d ON d.id=a.id_pro
 					WHERE 1=1
 						AND a.kode_delivery IS NULL
 					GROUP BY
@@ -266,15 +291,20 @@ class Gudang_spool extends CI_Controller {
 						a.nm_project AS project,
 						a.spec AS spec,
 						a.id_milik AS id_milik,
-						COUNT(id) AS qty,
+						COUNT(a.id) AS qty,
 						a.no_drawing AS no_drawing,
 						a.product_code,
 						a.product_ke,
 						a.length,
 						a.sts,
-						a.kode_spk
+						a.kode_spk,
+						c.customer AS customer_tanki,
+						c.project AS project_tanki,
+						d.id_product AS product_tanki
 					FROM
 						stock_spool_per_day a
+						LEFT JOIN planning_tanki c ON a.no_ipp=c.no_ipp
+						LEFT JOIN production_detail d ON d.id=a.id_pro
 					WHERE 1=1
 						AND DATE(a.hist_date) = '".$date_filter."'
 					GROUP BY
@@ -381,20 +411,29 @@ class Gudang_spool extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $no_spk);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-				$awal_col++;
+				$FLAG_TANKI = substr($no_spk,0,3);
 				$product	= strtoupper($row_Cek['product']);
+				$customer	= strtoupper($row_Cek['customer']);
+				$project	= strtoupper($row_Cek['project']);
+				if($FLAG_TANKI == '90T'){
+					$product	= strtoupper($row_Cek['product_tanki']);
+					$customer	= strtoupper($row_Cek['customer_tanki']);
+					$project	= strtoupper($row_Cek['project_tanki']);
+				}
+
+
+
+				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $product);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$customer	= strtoupper($row_Cek['customer']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $customer);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$project	= strtoupper($row_Cek['project']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $project);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
@@ -403,16 +442,20 @@ class Gudang_spool extends CI_Controller {
 
 				$IMPLODE = explode('.', $row_Cek['product_code']);
 				$product_code = $IMPLODE[0].'.'.$row_Cek['product_ke'];
+				$length3 = (!empty($result3[0]->length))?$result3[0]->length:0;
+				$LENGTH = (!empty($row_Cek['length']))?$row_Cek['length']:$length3;
 
-				$LENGTH = (!empty($row_Cek['length']))?$row_Cek['length']:$result3[0]->length;
-
-				$SPEC = spec_bq3($row_Cek['id_milik']);
+				$SPEC = (!empty(spec_bq3($row_Cek['id_milik'])))?spec_bq3($row_Cek['id_milik']):'';
 				if($row_Cek['sts'] == 'deadstok'){
 					$SPEC = $value['kode_spk'].' x '.$row_Cek['length'];
 				}
-				
-				$awal_col++;
 				$spec	= $SPEC." x ".number_format($LENGTH);
+				if($FLAG_TANKI == '90T'){
+					$spec	= $this->tanki_model->get_spec($row_Cek['id_milik']);
+				}
+
+				$awal_col++;
+				
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $spec);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);

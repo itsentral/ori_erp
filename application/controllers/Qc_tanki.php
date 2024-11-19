@@ -473,7 +473,9 @@ class Qc_tanki extends CI_Controller
 
 		$UpdateData = [];
 		$ArrHistFG = [];
+		$ArrIdPro = [];
 		foreach ($detail as $key => $value) {
+			$ArrIdPro[] = $value;
 			$UpdateData[$key]['id'] = $value;
 			$UpdateData[$key]['status'] = $detail_data[$key]['status'];
 			$UpdateData[$key]['daycode'] = $detail_data[$key]['daycode'];
@@ -774,8 +776,71 @@ class Qc_tanki extends CI_Controller
 				'id_pro_detail' => $first_id
 			);
 			history('Release QC to FG = ' . $data['id_produksi'] . ' / ' . $data['id_milik'] . ' / ' . $data['id_product']);
+			$this->close_jurnal_finish_good($ArrIdPro,$kode_pro,$first_id);
 		}
 		echo json_encode($Arr_Kembali);
+	}
+
+	public function close_jurnal_finish_good($ArrIdPro, $kode_trans, $id_pro_det){
+		$data 			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$username = $this->session->userdata['ORI_User']['username'];
+		$datetime = date('Y-m-d H:i:s');
+		
+		//GROUP DATA
+		$ArrGroup = [];
+		if(!empty($ArrIdPro)){
+			foreach ($ArrIdPro as $value) {
+				$getSummary = $this->db->select('*')->get_where('data_erp_wip_group',array('kode_trans'=>$kode_trans,'id_pro_det'=>$id_pro_det))->result_array();
+
+				$qty 		= (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:0;
+
+				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
+				$ArrGroup[$value]['keterangan'] = 'WIP to Finish Good';
+				$ArrGroup[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+				$ArrGroup[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+				$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+				$ArrGroup[$value]['kode_trans'] = $kode_trans;
+				$ArrGroup[$value]['id_pro_det'] = $id_pro_det;
+				$ArrGroup[$value]['qty'] = $qty;
+
+				$nilai_wip 		= (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+				$material 		= (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+				$wip_direct 	= (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+				$wip_indirect 	= (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+				$wip_consumable = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+				$wip_foh 		= (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+				$id_trans 		= (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
+
+				$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
+				$ArrGroup[$value]['material'] = $material;
+				$ArrGroup[$value]['wip_direct'] =  $wip_direct;
+				$ArrGroup[$value]['wip_indirect'] =  $wip_indirect;
+				$ArrGroup[$value]['wip_consumable'] =  $wip_consumable;
+				$ArrGroup[$value]['wip_foh'] =  $wip_foh;
+				$ArrGroup[$value]['created_by'] = $username;
+				$ArrGroup[$value]['created_date'] = $datetime;
+				$ArrGroup[$value]['id_trans'] = $id_trans;
+
+				//tambahan finish good
+				$getDetail = $this->db->get_where('production_detail',array('id'=>$value))->result_array();
+				$ArrGroup[$value]['id_pro'] = $value;
+				$ArrGroup[$value]['qty_ke'] = (!empty($getDetail[0]['product_ke']))?$getDetail[0]['product_ke']:0;
+
+				$nilai_unit = 0;
+				if($nilai_wip > 0 AND $qty > 0){
+					$nilai_unit = $nilai_wip / $qty;
+				}
+				$ArrGroup[$value]['nilai_unit'] = $nilai_unit;
+				
+			}
+		}
+
+		if(!empty($ArrGroup)){
+			$this->db->insert_batch('data_erp_fg',$ArrGroup);
+		}
+
+
 	}
 
 }

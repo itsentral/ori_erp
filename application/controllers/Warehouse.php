@@ -3375,7 +3375,7 @@ class Warehouse extends CI_Controller {
 		$kode_trans = $this->uri->segment(3);
 		$tanda     	= $this->uri->segment(4);
 
-		$result			= $this->db->group_by('update_date')->select('update_by, update_date, SUM(qty_oke) AS qty_aktual, no_ipp')->get_where('warehouse_adjustment_check',array('kode_trans'=>$kode_trans))->result_array();
+		$result			= $this->db->group_by('update_date')->select('update_by, update_date, SUM(qty_oke) AS qty_aktual, no_ipp')->get_where('warehouse_adjustment_check',array('kode_trans'=>$kode_trans,'update_by <>'=>'json'))->result_array();
 		$result_header	= $this->db->get_where('warehouse_adjustment',array('kode_trans'=>$kode_trans))->result();
 
 		$data = array(

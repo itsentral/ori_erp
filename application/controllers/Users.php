@@ -113,11 +113,12 @@ class Users extends CI_Controller {
 			);
 
 			## CEK USER ##
-			$countUser				= $this->master_model->getCount('users','username',$UserCek);
+			$getList = $this->db->get_where('users',array('username'=>$UserCek))->result_array();
+			$countUser				= COUNT($getList);
 			if($countUser > 0){
 				$Arr_Kembali		= array(
 					'status'		=> 2,
-					'pesan'			=> 'Username Already Exists. Please input different username......'
+					'pesan'			=> 'Username '.$UserCek.', sudah digunakan atas nama '.$getList[0]['nm_lengkap']
 				);
 			}else{
 				if($this->master_model->simpan('users',$Data_Insert)){
@@ -231,7 +232,7 @@ class Users extends CI_Controller {
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-danger\" id=\"flash-message\">This Account Can't Be Deleted...........!!</div>");
 
 		}else{
-			$this->db->update("users",array('deleted'=>1),array('id_user'=>$id));
+			$this->db->delete("users",array('id_user'=>$id));
 			if($this->db->affected_rows()>0){
 				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-success\" id=\"flash-message\">Data has been successfully deleted...........!!</div>");
 				history('Delete Data Username : '.$rows_data[0]->username);

@@ -490,11 +490,12 @@ class Pembelian extends CI_Controller {
 
 			$result		= $this->db
 							->select('a.*, b.currency')
-							->order_by('a.nm_barang, a.id','ASC')
+							->order_by('a.nm_supplier, a.id','ASC')
 							->join('tran_rfq_header b','a.hub_rfq=b.hub_rfq','left')
 							->get_where('tran_rfq_detail a',array(
 								'a.no_rfq' => $no_rfq,
-								'a.deleted' => 'N'
+								'a.deleted' => 'N',
+								// 'a.status' => 'SETUJU'
 							))
 							->result_array();
 			
@@ -573,9 +574,18 @@ class Pembelian extends CI_Controller {
 				'tgl_dibutuhkan' 	=> $REQ_DATE,
 				'tax' 			=> str_replace(',','',$data['tax']),
 				'pph' 			=> str_replace(',','',$data['pph']),
+				'total_po' 		=> str_replace(',','',$data['total_po']),
+				'discount' 		=> str_replace(',','',$data['discount']),
+				'net_price' 	=> str_replace(',','',$data['net_price']),
+				'net_plus_tax' 	=> str_replace(',','',$data['net_plus_tax']),
+				'delivery_cost' => str_replace(',','',$data['delivery_cost']),
+				'total_price' 	=> str_replace(',','',$data['grand_total']),
+
 				'remarks' 		=> strtolower($data['remarks']),
 				'buyer' 		=> strtolower($data['buyer']),
 				'top' 			=> $data['top'],
+				'id_supplier' 	=> $data['id_supplier'],
+				'nm_supplier' 	=> get_name('supplier','nm_supplier','id_supplier',$data['id_supplier']),
 				'mata_uang' 	=> $data['current'],
 				'amount_words' 	=> $data['amount_words'],
 				'updated_by' 	=> $userName,
@@ -584,9 +594,15 @@ class Pembelian extends CI_Controller {
 			
 			$ArrEdit = array();
 			foreach($detail AS $val => $valx){
+				$QTY = str_replace(',','',$valx['qty']);
+				$PRICE = str_replace(',','',$valx['price']);
+
 				$ArrEdit[$val]['id'] = $valx['id'];
 				$ArrEdit[$val]['nm_barang'] = $valx['nm_barang'];
-			//				$ArrEdit[$val]['qty_po'] = $valx['qty'];
+				$ArrEdit[$val]['qty_po'] = $QTY;
+				$ArrEdit[$val]['price_ref_sup'] = $PRICE;
+				$ArrEdit[$val]['net_price'] = $PRICE;
+				$ArrEdit[$val]['total_price'] = $PRICE * $QTY;
 			}
 			
 			$ArrEditPO = array();
@@ -602,7 +618,7 @@ class Pembelian extends CI_Controller {
 						$ArrEditPO[$val]['value_usd'] 	= str_replace(',','',$valx['value_usd']);
 						$ArrEditPO[$val]['value_idr'] 	= str_replace(',','',$valx['value_idr']);
 						$ArrEditPO[$val]['keterangan'] 	= strtolower($valx['keterangan']);
-						$ArrEditPO[$val]['jatuh_tempo'] = $valx['jatuh_tempo'];
+						$ArrEditPO[$val]['jatuh_tempo'] = date('Y-m-d',strtotime($valx['jatuh_tempo']));
 						$ArrEditPO[$val]['syarat'] 		= strtolower($valx['syarat']);
 						$ArrEditPO[$val]['created_by'] 	= $userName;
 						$ArrEditPO[$val]['created_date']= $dateTime;
@@ -690,9 +706,13 @@ class Pembelian extends CI_Controller {
 			$data_kurs 		= $this->db->query("SELECT * FROM kurs WHERE kode_dari='USD' LIMIT 1")->result();
 			
 			$payment = $this->db->get_where('list_help', array('group_by'=>'top'))->result_array();
+			$listPPN = $this->db->get_where('list_help',array('group_by'=>'ppn'))->result_array();
+			$listSupplier = $this->db->order_by('nm_supplier','asc')->get_where('supplier', array('deleted'=>'0'))->result_array();
 			
 			$data = array(
 				'data' => $result,
+				'listSupplier' => $listSupplier,
+				'listPPN' => $listPPN,
 				'data_top' => $data_top,
 				'data_kurs' => $data_kurs,
 				'result' => $result_det,
@@ -723,7 +743,7 @@ class Pembelian extends CI_Controller {
 
 		$data = array(
 			'Nama_Beda' => $Nama_Beda,
-			'printby' => $printby,
+			'printby' => $printby, 
 			'no_po' => $no_po
 		);
 		history('Print Purchase Order '.$no_po);
@@ -943,6 +963,10 @@ class Pembelian extends CI_Controller {
 		$dateTime		= date('Y-m-d H:i:s');
 		$id				= $data['id_top'];
 		$total			= $data['invoice_total'];
+		 
+		// print_r($data['group_top']);
+		// exit;
+		
 		$ArrUpdate = [
 			'invoice_no' => $data['invoice_no'],
 			'nilai_ppn' => $data['nilai_ppn'],
@@ -1026,7 +1050,6 @@ class Pembelian extends CI_Controller {
 			$tanggal = $data['tgl_terima'];
 			$Bln	= substr($tanggal,5,2);
 			$Thn	= substr($tanggal,0,4);
-			$total	= 0;
 			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tanggal);
 			foreach ($det_Jurnaltes1 as $vals) {
 				$datadetail = array(

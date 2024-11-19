@@ -70,10 +70,22 @@ class Gudang_produksi extends CI_Controller
 			}
 
 			$no_ipp 		= $row['no_ipp'];
-			$spec 			= spec_bq2($row['id_milik']);
-			$nm_customer 	= (!empty($GET_DET_IPP[$no_ipp]['nm_customer']))?$GET_DET_IPP[$no_ipp]['nm_customer']:'';
-			$nm_project 	= (!empty($GET_DET_IPP[$no_ipp]['nm_project']))?$GET_DET_IPP[$no_ipp]['nm_project']:'';
-			$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+			$tandaTanki = substr($no_ipp,0,4);
+			if($tandaTanki != 'IPPT'){
+				$spec 			= spec_bq2($row['id_milik']);
+				$nm_customer 	= (!empty($GET_DET_IPP[$no_ipp]['nm_customer']))?$GET_DET_IPP[$no_ipp]['nm_customer']:'';
+				$nm_project 	= (!empty($GET_DET_IPP[$no_ipp]['nm_project']))?$GET_DET_IPP[$no_ipp]['nm_project']:'';
+				$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+				$nm_product		= $row['id_category'];
+			}
+			else{
+				$spec 			= $this->tanki_model->get_spec($row['id_milik']);
+				$GET_DET_TANKI	= $this->tanki_model->get_ipp_detail($no_ipp);
+				$nm_customer 	= (!empty($GET_DET_TANKI['customer']))?$GET_DET_TANKI['customer']:'';
+				$nm_project 	= (!empty($GET_DET_TANKI['nm_project']))?$GET_DET_TANKI['nm_project']:'';
+				$no_so 			= (!empty($GET_DET_TANKI['no_so']))?$GET_DET_TANKI['no_so']:'';
+				$nm_product		= $row['nm_tanki'];
+			}
 
 			$Spool_create = (!empty($row['created_spool_date']))?date('d-M-Y',strtotime($row['created_spool_date'])):'';
 			$Spool_Lock = (!empty($row['created_spoolLock_date']))?date('d-M-Y',strtotime($row['created_spoolLock_date'])):'';
@@ -84,7 +96,7 @@ class Gudang_produksi extends CI_Controller
 			$nestedData[]	= "<div align='center'>".$Spool_Lock."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper($row['spool_induk'])."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_spk']."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['id_category'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_product)."</div>";
 			$nestedData[]	= "<div align='center'>".$no_so."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_customer)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_project)."</div>";
@@ -148,6 +160,7 @@ class Gudang_produksi extends CI_Controller
 					a.no_spk,
 					a.sts,
 					a.spool_induk,
+					a.product AS nm_tanki,
 					COUNT(a.id) AS qty_product,
 					MAX(a.spool_in) AS created_spool_date,
 					MAX(a.spool_out) AS created_spoolLock_date
@@ -236,6 +249,7 @@ class Gudang_produksi extends CI_Controller
 					a.no_spk,
 					a.sts,
 					a.product AS id_category,
+					a.product AS nm_tanki,
 					a.spool_induk,
 					COUNT(a.id) AS qty_product,
 					MAX(a.spool_in) AS created_spool_date,
@@ -336,13 +350,24 @@ class Gudang_produksi extends CI_Controller
 				$awal_row++;
 				$awal_col	= 0;
 
-				$product 		= $row_Cek['id_category'];
 				$no_ipp 		= $row_Cek['no_ipp'];
-				$spec 			= spec_bq2($row_Cek['id_milik']);
-				$nm_customer 	= (!empty($GET_DET_IPP[$no_ipp]['nm_customer']))?$GET_DET_IPP[$no_ipp]['nm_customer']:'';
-				$nm_project 	= (!empty($GET_DET_IPP[$no_ipp]['nm_project']))?$GET_DET_IPP[$no_ipp]['nm_project']:'';
-				$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+				$tandaTanki = substr($no_ipp,0,4);
+				if($tandaTanki != 'IPPT'){
 
+					$product 		= $row_Cek['id_category'];
+					$spec 			= spec_bq2($row_Cek['id_milik']);
+					$nm_customer 	= (!empty($GET_DET_IPP[$no_ipp]['nm_customer']))?$GET_DET_IPP[$no_ipp]['nm_customer']:'';
+					$nm_project 	= (!empty($GET_DET_IPP[$no_ipp]['nm_project']))?$GET_DET_IPP[$no_ipp]['nm_project']:'';
+					$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+				}
+				else{
+					$spec 			= $this->tanki_model->get_spec($row_Cek['id_milik']);
+					$GET_DET_TANKI	= $this->tanki_model->get_ipp_detail($no_ipp);
+					$nm_customer 	= (!empty($GET_DET_TANKI['customer']))?$GET_DET_TANKI['customer']:'';
+					$nm_project 	= (!empty($GET_DET_TANKI['nm_project']))?$GET_DET_TANKI['nm_project']:'';
+					$no_so 			= (!empty($GET_DET_TANKI['no_so']))?$GET_DET_TANKI['no_so']:'';
+					$product		= $row_Cek['nm_tanki'];
+				}
 				$Spool_create 	= (!empty($row_Cek['created_spool_date']))?date('d-M-Y',strtotime($row_Cek['created_spool_date'])):'';
 				$Spool_Lock 		= (!empty($row_Cek['created_spoolLock_date']))?date('d-M-Y',strtotime($row_Cek['created_spoolLock_date'])):'';
 

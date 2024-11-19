@@ -76,12 +76,20 @@ class Report_wip extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['no_spk']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['berat'],4)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['costbook'],2)."</div>";
+
+			$berat = number_format($row['berat'],4);
+			$costbook = number_format($row['costbook'],4);
+			if($row['nm_material'] == 'WIP Direct labour' OR $row['nm_material'] == 'WIP Indirect labour' OR $row['nm_material'] == 'WIP Consumable' OR $row['nm_material'] == 'WIP FOH' OR $row['nm_material'] == 'WIP Total'){
+				$berat = '';
+				$costbook = '';
+			}
+			$nestedData[]	= "<div align='right'>".$berat."</div>";
+			$nestedData[]	= "<div align='right'>".$costbook."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
 			$data[] = $nestedData;
             $urut1++;
@@ -116,6 +124,7 @@ class Report_wip extends CI_Controller {
                         OR a.id_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				    )";
 		// echo $sql; exit;
 
@@ -126,7 +135,7 @@ class Report_wip extends CI_Controller {
 			1 => 'no_ipp'
 		);
 
-		$sql .= " ORDER BY a.id DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.kode_trans DESC, a.id DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
@@ -168,7 +177,7 @@ class Report_wip extends CI_Controller {
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(10);
+		$Col_Akhir	= $Cols	= getColsChar(11);
 		$sheet->setCellValue('A'.$Row, 'REPORT WIP');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
@@ -196,40 +205,40 @@ class Report_wip extends CI_Controller {
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
-		$sheet->setCellValue('E'.$NewRow, 'ID TRANS');
+		$sheet->setCellValue('E'.$NewRow, 'NO SPK');
 		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
-		$sheet->setCellValue('F'.$NewRow, 'NO TRANS');
+		$sheet->setCellValue('F'.$NewRow, 'ID TRANS');
 		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 		
-		$sheet->setCellValue('G'.$NewRow, 'NM MATERIAL');
+		$sheet->setCellValue('G'.$NewRow, 'NO TRANS');
 		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-        $sheet->setCellValue('H'.$NewRow, 'BERAT');
+        $sheet->setCellValue('H'.$NewRow, 'NM MATERIAL');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-        $sheet->setCellValue('I'.$NewRow, 'COST BOOK');
+        $sheet->setCellValue('I'.$NewRow, 'BERAT');
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
 
-        $sheet->setCellValue('J'.$NewRow, 'TOTAL');
+        $sheet->setCellValue('J'.$NewRow, 'COST BOOK');
 		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
 
-		// $sheet->setCellValue('K'.$NewRow, 'COST BOOK');
-		// $sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
-		// $sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
-		// $sheet->getColumnDimension('K')->setWidth(20);
+		$sheet->setCellValue('K'.$NewRow, 'TOTAL');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+		$sheet->getColumnDimension('K')->setWidth(20);
 
 
 		// echo $qDetail1; exit;
@@ -262,6 +271,12 @@ class Report_wip extends CI_Controller {
 				$product	= $row['product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $product);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$no_spk	= $row['no_spk'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
@@ -362,7 +377,9 @@ class Report_wip extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['no_spk']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['qty']."</div>";
@@ -405,6 +422,7 @@ class Report_wip extends CI_Controller {
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.id_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.product LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				    )";
 		// echo $sql; exit;
 
@@ -455,7 +473,7 @@ class Report_wip extends CI_Controller {
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(13);
+		$Col_Akhir	= $Cols	= getColsChar(15);
 		$sheet->setCellValue('A'.$Row, 'REPORT WIP GROUP');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
@@ -527,6 +545,16 @@ class Report_wip extends CI_Controller {
 		$sheet->getStyle('M'.$NewRow.':M'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow);
 		$sheet->getColumnDimension('M')->setWidth(20);
+
+		$sheet->setCellValue('N'.$NewRow, 'NO SPK');
+		$sheet->getStyle('N'.$NewRow.':N'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow);
+		$sheet->getColumnDimension('N')->setWidth(20);
+
+		$sheet->setCellValue('O'.$NewRow, 'JENIS');
+		$sheet->getStyle('O'.$NewRow.':O'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow);
+		$sheet->getColumnDimension('O')->setWidth(20);
 
 
 		// echo $qDetail1; exit;
@@ -614,6 +642,18 @@ class Report_wip extends CI_Controller {
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $wip_foh);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$no_spk	= $row['no_spk'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$jenis	= $row['jenis'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $jenis);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 			}
 		}

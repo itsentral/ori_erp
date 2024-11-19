@@ -229,6 +229,7 @@ class Gudang_wg extends CI_Controller {
 					AND a.release_to_costing_date IS NULL
 					AND a.fg_date IS NULL
 					AND a.id_category NOT IN ".DirectFinishGood()."
+					AND a.id_deadstok_dipakai IS NULL
 					".$where."
 					".$where2."
 					AND (
@@ -296,8 +297,6 @@ class Gudang_wg extends CI_Controller {
 			redirect(site_url('dashboard'));
 		}
 		$tanda = $this->uri->segment(3);
-		
-		
 		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
 			'title'			=> 'Gudang Finish Good '.ucfirst($this->uri->segment(3)),
@@ -410,7 +409,7 @@ class Gudang_wg extends CI_Controller {
 			$LEFT_JOIN 		= "";
 			$FIELD_CUTTING 	= "";
 			if($status == 'pipe'){
-				$where = " AND c.id_category='pipe' ";
+				$where = " AND c.id_category='pipe' AND a.sts_cutting != 'Y' ";
 				$LEFT_JOIN = ",";
 				$FIELD_CUTTING = "0 AS length_awal, c.length, NULL AS cutting_ke,";
 				$LIKE_PRODUCT_CODE = "CONCAT(SUBSTRING_INDEX(a.product_code, '.', 1),'.', a.product_ke)";
@@ -1049,14 +1048,13 @@ class Gudang_wg extends CI_Controller {
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
-		
 		$where = "";
 		if($date_filter == '0'){
 			$where2 		= " AND a.id_produksi NOT IN ".filter_not_in()." ";
 			$LEFT_JOIN 		= "";
 			$FIELD_CUTTING 	= "";
 			if($status == 'pipe'){
-				$where = " AND c.id_category='pipe' ";
+				$where = " AND c.id_category='pipe' AND a.sts_cutting !='Y' ";
 				$LEFT_JOIN = "";
 				$FIELD_CUTTING = "0 AS length_awal, c.length, NULL AS cutting_ke,";
 			}
@@ -1137,46 +1135,46 @@ class Gudang_wg extends CI_Controller {
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, 'No');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
 		$sheet->setCellValue('B'.$NewRow, 'No SO');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
 		$sheet->setCellValue('C'.$NewRow, 'No SPK');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
 		$sheet->setCellValue('D'.$NewRow, 'Product');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
 		$sheet->setCellValue('E'.$NewRow, 'Customer');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setAutoSize(true);
 
 		$sheet->setCellValue('F'.$NewRow, 'Project');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setAutoSize(true);
 		
 		$sheet->setCellValue('G'.$NewRow, 'Spec');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
 		$sheet->setCellValue('H'.$NewRow, 'QTY');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableBodyCenter);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-		$DETAIL_IPP = get_detail_ipp();
+		$GET_IPP = get_detail_ipp();
 		// echo $qDetail1; exit;
 
 		if($restDetail1){
@@ -1187,10 +1185,12 @@ class Gudang_wg extends CI_Controller {
 				$awal_row++;
 				$awal_col	= 0;
 
+				$NO_IPPX = str_replace('PRO-','',$row_Cek['no_ipp']);
+
 				if($date_filter=='0'){
-					$customer 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['nm_customer']))?$GET_IPP[$row_Cek['no_ipp']]['nm_customer']:'';
-					$project 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['nm_project']))?$GET_IPP[$row_Cek['no_ipp']]['nm_project']:'';
-					$NOMOR_SO 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['so_number']))?$GET_IPP[$row_Cek['no_ipp']]['so_number']:'';
+					$customer 	= (!empty($GET_IPP[$NO_IPPX]['nm_customer']))?$GET_IPP[$NO_IPPX]['nm_customer']:'';
+					$project 	= (!empty($GET_IPP[$NO_IPPX]['nm_project']))?$GET_IPP[$NO_IPPX]['nm_project']:'';
+					$NOMOR_SO 	= (!empty($GET_IPP[$NO_IPPX]['so_number']))?$GET_IPP[$NO_IPPX]['so_number']:'';
 					$product 	= $row_Cek['id_category'];
 					$spec 		= spec_bq2($row_Cek['id_milik']);
 				}
@@ -1350,6 +1350,7 @@ class Gudang_wg extends CI_Controller {
 					AND a.release_to_costing_date IS NULL
 					AND a.fg_date IS NULL
 					AND a.id_category NOT IN ".DirectFinishGood()."
+					AND a.id_deadstok_dipakai IS NULL
 					".$where."
 					".$where2."
 					GROUP BY ".$GROUP_BY."
@@ -1436,8 +1437,8 @@ class Gudang_wg extends CI_Controller {
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
 
-		$DETAIL_IPP = get_detail_ipp();
-		// echo $qDetail1; exit;
+		$GET_IPP = get_detail_ipp();
+		// echo $sql; exit;
 
 		if($restDetail1){
 			$awal_row	= $NextRow;
@@ -1448,9 +1449,10 @@ class Gudang_wg extends CI_Controller {
 				$awal_col	= 0;
 
 				if($date_filter=='0'){
-					$customer 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['nm_customer']))?$GET_IPP[$row_Cek['no_ipp']]['nm_customer']:'';
-					$project 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['nm_project']))?$GET_IPP[$row_Cek['no_ipp']]['nm_project']:'';
-					$NOMOR_SO 	= (!empty($GET_IPP[$row_Cek['no_ipp']]['so_number']))?$GET_IPP[$row_Cek['no_ipp']]['so_number']:'';
+					$no_ipp		= str_replace('PRO-','',$row_Cek['id_produksi']);
+					$customer 	= (!empty($GET_IPP[$no_ipp]['nm_customer']))?$GET_IPP[$no_ipp]['nm_customer']:'';
+					$project 	= (!empty($GET_IPP[$no_ipp]['nm_project']))?$GET_IPP[$no_ipp]['nm_project']:'';
+					$NOMOR_SO 	= (!empty($GET_IPP[$no_ipp]['so_number']))?$GET_IPP[$no_ipp]['so_number']:'';
 					$product 	= $row_Cek['id_category'];
 					$spec 		= spec_bq2($row_Cek['id_milik']);
 				}
@@ -1463,9 +1465,10 @@ class Gudang_wg extends CI_Controller {
 				}
 
 				if($status == 'tanki'){
-					$customer 	= $this->tanki_model->get_ipp_detail($row_Cek['no_ipp'])['customer'];
-					$project 	= $this->tanki_model->get_ipp_detail($row_Cek['no_ipp'])['nm_project'];
-					$NOMOR_SO 	= $this->tanki_model->get_ipp_detail($row_Cek['no_ipp'])['no_so'];
+					$no_ipp		= str_replace('PRO-','',$row_Cek['id_produksi']);
+					$customer 	= $this->tanki_model->get_ipp_detail($no_ipp)['customer'];
+					$project 	= $this->tanki_model->get_ipp_detail($no_ipp)['nm_project'];
+					$NOMOR_SO 	= $this->tanki_model->get_ipp_detail($no_ipp)['no_so'];
 					$product 	= $row_Cek['id_product'];
 					$spec 		= $this->tanki_model->get_spec($row_Cek['id_milik']);
 				}

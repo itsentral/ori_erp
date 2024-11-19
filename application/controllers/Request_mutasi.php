@@ -413,9 +413,9 @@ class Request_mutasi extends CI_Controller {
         $dari = $this->input->post('dari');
 		$ke = $this->input->post('ke');
         
-        $bankasal    = $this->db->query("SELECT * FROM gl_ori_dummy.coa_master WHERE no_perkiraan='$dari'")->row();
+        $bankasal    = $this->db->query("SELECT * FROM gl.coa_master WHERE no_perkiraan='$dari'")->row();
 		
-		$banktujuan  = $this->db->query("SELECT * FROM gl_ori_dummy.coa_master WHERE no_perkiraan='$ke'")->row();
+		$banktujuan  = $this->db->query("SELECT * FROM gl.coa_master WHERE no_perkiraan='$ke'")->row();
 
 		$bank_asal    = $bankasal ->nama;
 		$bank_tujuan  = $banktujuan->nama;

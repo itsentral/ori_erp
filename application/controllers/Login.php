@@ -16,6 +16,8 @@ class Login extends CI_Controller {
 			$Password			= $this->input->post('password');
 			$PassData			= cryptSHA1($Password);
 			$WHERE				= array(
+				'deleted'			=> 0,
+				'st_aktif'			=> 1,
 				'username'			=> $UserName,
 				'password'			=> $PassData
 			);

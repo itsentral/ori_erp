@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Report_fg extends CI_Controller {
+class Report_in_transit extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
@@ -25,13 +25,13 @@ class Report_fg extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Report Finish Good',
+			'title'			=> 'Report In Transit',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
 		);
 
-		$this->load->view('Report_new/Report_fg/index',$data);
+		$this->load->view('Report_new/Report_in_transit/index',$data);
 	}
 
     //GROUP
@@ -81,53 +81,8 @@ class Report_fg extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
-			$QTY = (!empty($row['id_material']))?'':1;
-			$nestedData[]	= "<div align='right'>".$QTY."</div>";
-
-			$qty = $row['qty'];
-
-			$nilai_wip	= 0;
-			// if($row['nilai_wip'] > 0 AND $qty > 0){
-				$nilai_wip	= $row['nilai_wip'];
-			// }
-			$material	= 0;
-			// if($row['material'] > 0 AND $qty > 0){
-				$material	= $row['material'];
-			// }
-			$wip_direct	= 0;
-			// if($row['wip_direct'] > 0 AND $qty > 0){
-				$wip_direct	= $row['wip_direct'];
-			// }
-			$wip_indirect	= 0;
-			// if($row['wip_indirect'] > 0 AND $qty > 0){
-				$wip_indirect	= $row['wip_indirect'];
-			// }
-			$wip_consumable	= 0;
-			// if($row['wip_consumable'] > 0 AND $qty > 0){
-				$wip_consumable	= $row['wip_consumable'];
-			// }
-			$wip_foh	= 0;
-			// if($row['wip_foh'] > 0 AND $qty > 0){
-				$wip_foh	= $row['wip_foh'];
-			// }
-			$material = (empty($row['id_material']))?number_format($material,2):'';
-			$wip_direct = (empty($row['id_material']))?number_format($wip_direct,2):'';
-			$wip_indirect = (empty($row['id_material']))?number_format($wip_indirect,2):'';
-			$wip_consumable = (empty($row['id_material']))?number_format($wip_consumable,2):'';
-			$wip_foh = (empty($row['id_material']))?number_format($wip_foh,2):'';
-
-			$nestedData[]	= "<div align='right'>".number_format($nilai_wip,2)."</div>";
-			$nestedData[]	= "<div align='right'>".$material."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_direct."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_indirect."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_consumable."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_foh."</div>";
-
-			$QTY = (!empty($row['id_material']))?number_format($row['qty_mat'],4):'';
-			$cost_book = (!empty($row['id_material']))?number_format($row['cost_book'],2):'';
-			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='right'>".$QTY."</div>";
-			$nestedData[]	= "<div align='right'>".$cost_book."</div>";
+			$nestedData[]	= "<div align='center'>1</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_unit'],2)."</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -153,7 +108,7 @@ class Report_fg extends CI_Controller {
                     (@row:=@row+1) AS nomor,
                     a.*
                 FROM
-                    data_erp_fg a,
+                    data_erp_in_transit a,
                     (SELECT @row:=0) r
                 WHERE 1=1 ".$WHERE_DATE." 
                     AND (
@@ -206,14 +161,14 @@ class Report_fg extends CI_Controller {
 			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
 		}
 
-        $sql = "SELECT a.* FROM data_erp_fg a WHERE 1=1 ".$WHERE_DATE;
+        $sql = "SELECT a.* FROM data_erp_in_transit a WHERE 1=1 ".$WHERE_DATE;
 		// echo $qDetail1; exit;
 		$restDetail1	= $this->db->query($sql)->result_array();
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(14);
-		$sheet->setCellValue('A'.$Row, 'REPORT FINISH GOOD');
+		$Col_Akhir	= $Cols	= getColsChar(10);
+		$sheet->setCellValue('A'.$Row, 'REPORT IN TRANSIT');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 
@@ -255,66 +210,20 @@ class Report_fg extends CI_Controller {
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-        $sheet->setCellValue('H'.$NewRow, 'NO SPK');
+        $sheet->setCellValue('H'.$NewRow, 'NILAI IN TRANSIT');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-        $sheet->setCellValue('I'.$NewRow, 'Nilai FG');
+        $sheet->setCellValue('I'.$NewRow, 'NO SPK');
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
 
-        $sheet->setCellValue('J'.$NewRow, 'Material');
+		$sheet->setCellValue('J'.$NewRow, 'JENIS TRANS');
 		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
-
-		$sheet->setCellValue('K'.$NewRow, 'Direct Labour PC');
-		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
-		$sheet->getColumnDimension('K')->setWidth(20);
-
-		$sheet->setCellValue('L'.$NewRow, 'Indirect Labour PC');
-		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
-		$sheet->getColumnDimension('L')->setWidth(20);
-
-		$sheet->setCellValue('M'.$NewRow, 'Consumable PC');
-		$sheet->getStyle('M'.$NewRow.':M'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow);
-		$sheet->getColumnDimension('M')->setWidth(20);
-
-		$sheet->setCellValue('N'.$NewRow, 'FOH PC');
-		$sheet->getStyle('N'.$NewRow.':N'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow);
-		$sheet->getColumnDimension('N')->setWidth(20);
-
-		$sheet->setCellValue('O'.$NewRow, 'JENIS');
-		$sheet->getStyle('O'.$NewRow.':O'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow);
-		$sheet->getColumnDimension('O')->setWidth(20);
-
-		$sheet->setCellValue('P'.$NewRow, 'ID MATERIAL');
-		$sheet->getStyle('P'.$NewRow.':P'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('P'.$NewRow.':P'.$NextRow);
-		$sheet->getColumnDimension('P')->setWidth(20);
-
-		$sheet->setCellValue('Q'.$NewRow, 'NM MATERIAL');
-		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('Q'.$NewRow.':Q'.$NextRow);
-		$sheet->getColumnDimension('Q')->setWidth(20);
-
-		$sheet->setCellValue('R'.$NewRow, 'WEIGHT');
-		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('R'.$NewRow.':R'.$NextRow);
-		$sheet->getColumnDimension('R')->setWidth(20);
-
-		$sheet->setCellValue('S'.$NewRow, 'COSTBOOK');
-		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('S'.$NewRow.':S'.$NextRow);
-		$sheet->getColumnDimension('S')->setWidth(20);
-
 
 		// echo $qDetail1; exit;
 		if($restDetail1){
@@ -360,17 +269,16 @@ class Report_fg extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $kode_trans);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-				$QTY = (!empty($row['id_material']))?'':1;
                 $awal_col++;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $QTY);
+				$sheet->setCellValue($Cols.$awal_row, 1);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
-				// $awal_col++;
-				// $nilai_unit	= $row['nilai_unit'];
-				// $Cols			= getColsChar($awal_col);
-				// $sheet->setCellValue($Cols.$awal_row, $nilai_unit);
-				// $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				$awal_col++;
+				$nilai_unit	= $row['nilai_unit'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nilai_unit);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
 				$no_spk	= $row['no_spk'];
@@ -378,98 +286,17 @@ class Report_fg extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $no_spk);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-
-				$qty	= $row['qty'];
-
-                $awal_col++;
-				// $nilai_wip	= 0;
-				// if($row['nilai_wip'] > 0 AND $qty > 0){
-					$nilai_wip	= $row['nilai_wip'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nilai_wip);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				// $material	= 0;
-				// if($row['material'] > 0 AND $qty > 0){
-					$material	= $row['material'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $material);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				// $wip_direct	= 0;
-				// if($row['wip_direct'] > 0 AND $qty > 0){
-					$wip_direct	= $row['wip_direct'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $wip_direct);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				// $wip_indirect	= 0;
-				// if($row['wip_indirect'] > 0 AND $qty > 0){
-					$wip_indirect	= $row['wip_indirect'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $wip_indirect);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				// $wip_consumable	= 0;
-				// if($row['wip_consumable'] > 0 AND $qty > 0){
-					$wip_consumable	= $row['wip_consumable'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $wip_consumable);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				// $wip_foh	= 0;
-				// if($row['wip_foh'] > 0 AND $qty > 0){
-					$wip_foh	= $row['wip_foh'];
-				// }
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $wip_foh);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
 				$awal_col++;
 				$jenis	= $row['jenis'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $jenis);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-				$awal_col++;
-				$id_material	= $row['id_material'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $id_material);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
-
-				$awal_col++;
-				$nm_material	= $row['nm_material'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nm_material);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
-
-				$awal_col++;
-				$qty_mat	= $row['qty_mat'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $qty_mat);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
-				$awal_col++;
-				$cost_book	= $row['cost_book'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $cost_book);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-
 			}
 		}
 
 
-		$sheet->setTitle('Report FG');
+		$sheet->setTitle('Report IT');
 		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5
 		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 		ob_end_clean();
@@ -480,7 +307,7 @@ class Report_fg extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="report-finish good.xls"');
+		header('Content-Disposition: attachment;filename="report-in-transit.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}

@@ -11,7 +11,6 @@ class Qc extends CI_Controller
 		$this->load->model('produksi_model');
 		$this->load->model('tanki_model');
 		$this->load->model('Jurnal_model');
-		$this->load->model('Acc_model');
 		// Your own constructor code
 		if (!$this->session->userdata('isORIlogin')) {
 			redirect('login');
@@ -783,6 +782,7 @@ class Qc extends CI_Controller
 		$no_ipp			= str_replace('PRO-', '', $data['id_produksi']);
 		$id_product		= $data['id_product'];
 		$id_milik		= $data['id_milik'];
+		$id_milik2		= $data['id_milik2'];
 		$time_uniq				= $data['time_uniq'];
 		$first_id				= $data['first_id'];
 
@@ -1092,9 +1092,9 @@ class Qc extends CI_Controller
 		$this->db->trans_start();
 		// $this->db->where_in('id',$detail);
 		// $this->db->update('production_detail',$ArrEditHeader);
-		// if (!empty($detail)) {
-			// insert_jurnal_qc($detail, $kode_pro);
-		// }
+		if (!empty($detail)) {
+			//insert_jurnal_qc($detail, $kode_pro);
+		}
 
 		if (!empty($ArrHistFG)) {
 			$this->db->insert_batch('history_product_fg', $ArrHistFG);
@@ -1158,7 +1158,7 @@ class Qc extends CI_Controller
 				'id_pro_detail' => $first_id
 			);
 			history('Release QC to FG = ' . $data['id_produksi'] . ' / ' . $data['id_milik'] . ' / ' . $data['id_product']);
-			$this->close_jurnal_finish_good($ArrIdPro,$kode_pro,$first_id);
+			$this->close_jurnal_finish_good($ArrIdPro,$kode_pro,$id_milik2);
 		}
 		echo json_encode($Arr_Kembali);
 	}
@@ -4238,6 +4238,7 @@ class Qc extends CI_Controller
 		
 		//GROUP DATA
 		$ArrGroup = [];
+		$ArrOutWIP = [];
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value) {
 				$getSummary = $this->db->select('*')->get_where('data_erp_wip_group',array('kode_trans'=>$kode_trans,'id_pro_det'=>$id_pro_det))->result_array();
@@ -4262,15 +4263,16 @@ class Qc extends CI_Controller
 				$id_trans 		= (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
 				
 				$nilai_wip 		= round($material)+round($wip_direct)+round($wip_indirect)+round($wip_consumable)+round($wip_foh);
-				$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
-				$ArrGroup[$value]['material'] = round($material);
-				$ArrGroup[$value]['wip_direct'] =  round($wip_direct);
-				$ArrGroup[$value]['wip_indirect'] =  round($wip_indirect);
-				$ArrGroup[$value]['wip_consumable'] =  round($wip_consumable);
-				$ArrGroup[$value]['wip_foh'] =  round($wip_foh);
+				$ArrGroup[$value]['nilai_wip'] = ($nilai_wip > 0 AND $qty > 0)?round($nilai_wip/$qty):0;
+				$ArrGroup[$value]['material'] = ($material > 0 AND $qty > 0)?round($material/$qty):0;
+				$ArrGroup[$value]['wip_direct'] =  ($wip_direct > 0 AND $qty > 0)?round($wip_direct/$qty):0;
+				$ArrGroup[$value]['wip_indirect'] =  ($wip_indirect > 0 AND $qty > 0)?round($wip_indirect/$qty):0;
+				$ArrGroup[$value]['wip_consumable'] =  ($wip_consumable > 0 AND $qty > 0)?round($wip_consumable/$qty):0;
+				$ArrGroup[$value]['wip_foh'] =  ($wip_foh > 0 AND $qty > 0)?round($wip_foh/$qty):0;
 				$ArrGroup[$value]['created_by'] = $username;
 				$ArrGroup[$value]['created_date'] = $datetime;
 				$ArrGroup[$value]['id_trans'] = $id_trans;
+
 
 				//tambahan finish good
 				$getDetail = $this->db->get_where('production_detail',array('id'=>$value))->result_array();
@@ -4284,11 +4286,47 @@ class Qc extends CI_Controller
 				$ArrGroup[$value]['nilai_unit'] = $nilai_unit;
 				
 			}
+			//Out WIP
+			$getSummary = $this->db->select('*')->get_where('data_erp_wip_group',array('kode_trans'=>$kode_trans,'id_pro_det'=>$id_pro_det))->result_array();
+			if(!empty($getSummary)){
+				$qty         = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:0;
+				$qty_fg     = COUNT($ArrIdPro);
+				$ArrOutWIP[$value]['tanggal'] = date('Y-m-d');
+				$ArrOutWIP[$value]['keterangan'] = 'WIP to Finish Good';
+				$ArrOutWIP[$value]['no_so']     = (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+				$ArrOutWIP[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+				$ArrOutWIP[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+				$ArrOutWIP[$value]['kode_trans'] = $kode_trans;
+				$ArrOutWIP[$value]['id_pro_det'] = $id_pro_det;
+				$ArrOutWIP[$value]['qty'] = $qty_fg;
+				$ArrOutWIP[$value]['jenis'] = 'out';
+
+				$nilai_wip         = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip'] / $qty * $qty_fg:0;
+				$material         = (!empty($getSummary[0]['material']))?$getSummary[0]['material'] / $qty * $qty_fg:0;
+				$wip_direct     = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct'] / $qty * $qty_fg:0;
+				$wip_indirect     = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect'] / $qty * $qty_fg:0;
+				$wip_consumable = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable'] / $qty * $qty_fg:0;
+				$wip_foh         = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh'] / $qty * $qty_fg:0;
+				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
+
+				$ArrOutWIP[$value]['nilai_wip'] = round($nilai_wip);
+				$ArrOutWIP[$value]['material'] = round($material);
+				$ArrOutWIP[$value]['wip_direct'] =  round($wip_direct);
+				$ArrOutWIP[$value]['wip_indirect'] =  round($wip_indirect);
+				$ArrOutWIP[$value]['wip_consumable'] =  round($wip_consumable);
+				$ArrOutWIP[$value]['wip_foh'] =  round($wip_foh);
+				$ArrOutWIP[$value]['created_by'] = $username;
+				$ArrOutWIP[$value]['created_date'] = $datetime;
+				$ArrOutWIP[$value]['id_trans'] = $id_trans;
+			}
 		}
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroup);
 			$this->jurnalFG($id_trans);
+		}
+		if(!empty($ArrOutWIP)){
+			$this->db->insert_batch('data_erp_wip_group',$ArrOutWIP);
 		}
 
 
@@ -4296,14 +4334,16 @@ class Qc extends CI_Controller
 	
 	
 	function jurnalFG($idtrans){
+		
 		$data_session	= $this->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
 		
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, SUM(nilai_wip) as wip, SUM(material) as material, SUM(wip_direct) as wip_direct, SUM(wip_indirect) as wip_indirect,  SUM(wip_foh) as wip_foh, SUM(wip_consumable) as wip_consumable, SUM(nilai_unit) as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."'")->result();
 			
 			$totalfg =0;
 			  
@@ -4314,7 +4354,7 @@ class Qc extends CI_Controller
 				$nm_material = $data->product;	
 				$tgl_voucher = $data->tanggal;	
 				$spasi       = ',';
-				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$id          = $data->id_trans;
                	$no_request  = $data->no_spk;	
 				
@@ -4475,7 +4515,7 @@ class Qc extends CI_Controller
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='wip finishgood' and no_reff ='$id'");
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='wip finishgood' and no_reff ='$id' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			

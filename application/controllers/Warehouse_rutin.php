@@ -952,7 +952,7 @@ class Warehouse_rutin extends CI_Controller {
 				".$table." a
 				LEFT JOIN con_nonmat_new b ON a.code_group=b.code_group,
 				(SELECT @row:=0) r
-		    WHERE 1=1 ".$where_gudang." ".$where_date." AND b.status='1' AND b.deleted = 'N'
+		    WHERE 1=1 AND a.gudang IN ('".getGudangIndirect()."','".getGudangHouseHold()."') ".$where_gudang." ".$where_date." AND b.status='1' AND b.deleted = 'N'
 		";
 		$restDetail1	= $this->db->query($sql)->result_array();
 		
@@ -960,7 +960,7 @@ class Warehouse_rutin extends CI_Controller {
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(9);
+		$Col_Akhir	= $Cols	= getColsChar(10);
 		$sheet->setCellValue('A'.$Row, 'STOCK - '.$tanggal_update);
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
@@ -1012,6 +1012,11 @@ class Warehouse_rutin extends CI_Controller {
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
+
+		$sheet->setCellValue('J'.$NewRow, 'GUDANG');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+		$sheet->getColumnDimension('J')->setWidth(20);
 
 
 		// echo $qDetail1; exit;
@@ -1078,6 +1083,11 @@ class Warehouse_rutin extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $rusak);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 
+				$gudang = strtoupper(get_name('warehouse', 'nm_gudang', 'id', $row_Cek['gudang']));
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $gudang);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 			}
 		}
 

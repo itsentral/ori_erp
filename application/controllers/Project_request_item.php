@@ -157,8 +157,14 @@ class Project_request_item extends CI_Controller {
             $username       = $data_session['ORI_User']['username'];
             $datetime       = date('Y-m-d H:i:s');
 			$id_customer	= $data['id_customer'];
-			$defered	    = $data['defered'];
-			$sub_gudang  	= $data['sub_gudang'];
+			$id_bq	= $data['id_bq'];
+
+			$tandaTanki = substr($id_bq,0,4);
+
+			$TableUpdate = 'warehouse_planning_detail_acc';
+			if($tandaTanki == 'IPPT'){
+				$TableUpdate = 'planning_tanki_detail';
+			}
 			
 			if(!empty($data['add'])){
 				$dataDetail	= $data['add'];
@@ -184,11 +190,9 @@ class Project_request_item extends CI_Controller {
                     $ArrDeatil[$val]['qty_request']     = $QTY;
                     $ArrDeatil[$val]['created_by']    	= $username;
                     $ArrDeatil[$val]['created_date']    = $datetime;
-                    $ArrDeatil[$val]['id_customer']     = $id_customer;
-					$ArrDeatil[$val]['sub_gudang']      = $sub_gudang;
-					$ArrDeatil[$val]['defered']         = $defered;
+                    $ArrDeatil[$val]['id_customer']    = $id_customer;
 
-                    $GET_REQ        = $this->db->get_where('warehouse_planning_detail_acc',array('id' => $valx['id']))->result();
+                    $GET_REQ        = $this->db->get_where($TableUpdate,array('id' => $valx['id']))->result();
                     $QTY_REQUEST    = $GET_REQ[0]->request + $QTY;
 
                     $ArrDeatilUpdate[$val]['id']          = $valx['id'];
@@ -205,7 +209,7 @@ class Project_request_item extends CI_Controller {
 					$this->db->insert_batch('request_accessories', $ArrDeatil);
 				}
                 if(!empty($ArrDeatilUpdate)){
-					$this->db->update_batch('warehouse_planning_detail_acc', $ArrDeatilUpdate,'id');
+					$this->db->update_batch($TableUpdate, $ArrDeatilUpdate,'id');
 				}
 			$this->db->trans_complete();
 			if($this->db->trans_status() === FALSE){
@@ -227,6 +231,7 @@ class Project_request_item extends CI_Controller {
 		}
 		else{
 			$id_bq              = $this->uri->segment(3);
+			$tandaTanki = substr($id_bq,0,4);
 			$result_aksesoris   = $this->db
                                         ->select('a.*, b.nm_customer, b.id_customer')
                                         // ->where('a.request < a.jumlah_mat')
@@ -238,14 +243,27 @@ class Project_request_item extends CI_Controller {
                                                 )
                                             )
                                         ->result_array();
+			if($tandaTanki == 'IPPT'){
+				$result_aksesoris   = $this->db
+                                        ->select('a.*, b.customer as nm_customer, e.id_customer AS id_customer, a.berat as jumlah_mat, c.id_material AS code_group')
+                                        ->where('a.close_sts','0')
+                                        ->join('planning_tanki b','a.no_ipp=b.no_ipp','left')
+                                        ->join('accessories c','a.id_material=c.id_acc_tanki','left')
+										->join('customer e','b.customer=e.nm_customer','left')
+                                        ->get_where('planning_tanki_detail a',
+                                            array(
+                                                'a.no_ipp'=>$id_bq,
+												'a.category'=>'acc'
+                                                )
+                                            )
+                                        ->result_array();
+			}
 
 			$data = array(
 				'id_bq' 		    => $id_bq,
 				'result_aksesoris' 	=> $result_aksesoris,
                 'nm_customer' => (!empty($result_aksesoris[0]['nm_customer']))?$result_aksesoris[0]['nm_customer']:'',
                 'id_customer' => (!empty($result_aksesoris[0]['id_customer']))?$result_aksesoris[0]['id_customer']:'',
-				'sub_gudang' => (!empty($result_aksesoris[0]['sub_gudang']))?$result_aksesoris[0]['sub_gudang']:'',
-                'defered'    => (!empty($result_aksesoris[0]['defered']))?$result_aksesoris[0]['defered']:'',
 			);
 			$this->load->view('Project/request/add', $data);
 		}
@@ -259,11 +277,17 @@ class Project_request_item extends CI_Controller {
             $username       = $data_session['ORI_User']['username'];
             $datetime       = date('Y-m-d H:i:s');
 			$id_customer	= $data['id_customer'];
+			$id_bq	= $data['id_bq'];
+
+			$tandaTanki = substr($id_bq,0,4);
+
+			$TableUpdate = 'warehouse_planning_detail_acc';
+			if($tandaTanki == 'IPPT'){
+				$TableUpdate = 'planning_tanki_detail';
+			}
 
 			$gudang_before 	= (!empty(getSubGudangCustomer($id_customer)))?getSubGudangCustomer($id_customer):getSubGudangProject();
-			
-			$gudang_before2 = getGudangProject();
-		    $gudang_after   = getSubGudangProject();
+			$gudang_after = getGudangFG();
 			
 			if(!empty($data['add'])){
 				$dataDetail	= $data['add'];
@@ -279,10 +303,6 @@ class Project_request_item extends CI_Controller {
             $kode			= "X".$Ym.$urut2;
 
 			$Ym 			= date('ym');
-			
-			// print_r($kode);
-			// exit;
-			
 			//pengurutan kode
 			$srcMtr			= "SELECT MAX(kode_trans) as maxP FROM warehouse_adjustment WHERE kode_trans LIKE 'TRO".$Ym."%' ";
 			$numrowMtr		= $this->db->query($srcMtr)->num_rows();
@@ -299,7 +319,7 @@ class Project_request_item extends CI_Controller {
             foreach($dataDetail AS $val => $valx){
                 $QTY = str_replace(',','',$valx['request']);
                 if($QTY > 0){
-                    $GET_REQ        = $this->db->get_where('warehouse_planning_detail_acc',array('id' => $valx['id']))->result();
+                    $GET_REQ        = $this->db->get_where($TableUpdate,array('id' => $valx['id']))->result();
                     $QTY_REQUEST    = $GET_REQ[0]->pemakaian + $QTY;
 
                     $ArrDeatilUpdate[$val]['id']          = $valx['id'];
@@ -336,8 +356,8 @@ class Project_request_item extends CI_Controller {
 				'no_so' 			=> $kode,
 				'id_gudang_dari' 	=> $gudang_before,
 				'kd_gudang_dari' 	=> get_name('warehouse', 'kd_gudang', 'id', $gudang_before),
-				'id_gudang_ke' 		=> NULL,
-				'kd_gudang_ke' 		=> 'PEMAKAIAN',
+				'id_gudang_ke' 		=> $gudang_after,
+				'kd_gudang_ke' 		=> get_name('warehouse', 'kd_gudang', 'id', $gudang_after),
 				'checked'			=> 'Y',
 				'created_by' 		=> $username,
 				'created_date' 		=> $datetime,
@@ -357,7 +377,6 @@ class Project_request_item extends CI_Controller {
 
 				$grouping_temp[$value['id']]['id'] 			= $value['id'];
 				$grouping_temp[$value['id']]['qty'] 	= $temp[$value['id']]['good'];
-				$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']]['good'];
 			}
 
 			//tansaksi
@@ -373,7 +392,7 @@ class Project_request_item extends CI_Controller {
 					$this->db->insert_batch('warehouse_adjustment_detail', $ArrDeatilAdj);
 				}
                 if(!empty($ArrDeatilUpdate)){
-					$this->db->update_batch('warehouse_planning_detail_acc', $ArrDeatilUpdate,'id');
+					$this->db->update_batch($TableUpdate, $ArrDeatilUpdate,'id');
 				}
 			$this->db->trans_complete();
 			if($this->db->trans_status() === FALSE){
@@ -390,17 +409,15 @@ class Project_request_item extends CI_Controller {
 					'status'	=> 1
 				);
 				if(!empty($grouping_temp)){
-					move_warehouse_barang_stok($grouping_temp, $gudang_before, NULL, $kode_trans);
+					move_warehouse_barang_stok($grouping_temp, $gudang_before, $gudang_after, $kode_trans);
 				}
-				if(!empty($grouping_temp)){
-				    insert_jurnal($grouping_temp,$gudang_before2,$gudang_after,$kode_trans,'pemakaian gudangproject - subgudang project','pengurangan subgudang project','penambahan project customer');
-			}
 				history('Request subgudang accessoeries '.$kode);
 			}
 			echo json_encode($Arr_Data);
 		}
 		else{
 			$id_bq              = $this->uri->segment(3);
+			$tandaTanki = substr($id_bq,0,4);
 			$result_aksesoris   = $this->db
                                         ->select('a.*, b.nm_customer, b.id_customer')
                                         // ->where('a.request < a.jumlah_mat')
@@ -412,6 +429,21 @@ class Project_request_item extends CI_Controller {
                                                 )
                                             )
                                         ->result_array();
+			if($tandaTanki == 'IPPT'){
+				$result_aksesoris   = $this->db
+										->select('a.*, b.customer as nm_customer, e.id_customer AS id_customer, a.berat as jumlah_mat, c.id_material AS code_group')
+										->where('a.close_sts','0')
+										->join('planning_tanki b','a.no_ipp=b.no_ipp','left')
+										->join('accessories c','a.id_material=c.id_acc_tanki','left')
+										->join('customer e','b.customer=e.nm_customer','left')
+										->get_where('planning_tanki_detail a',
+											array(
+												'a.no_ipp'=>$id_bq,
+												'a.category'=>'acc'
+												)
+											)
+										->result_array();
+			}
 
 			$data = array(
 				'id_bq' 		    => $id_bq,
@@ -718,8 +750,6 @@ class Project_request_item extends CI_Controller {
             // print_r($data); exit;
 			//header
 			$id_customer 	= $data['id_customer'];
-			$sub_gudang 	= $data['sub_gudang'];
-			$defered     	= $data['defered'];
 			$Detail 		= $data['detail'];
 			$Ym				= date('ym');
 
@@ -740,8 +770,6 @@ class Project_request_item extends CI_Controller {
 					$nm_accessories = get_name_by_code_group($code_group);
 
 					$ArrDetail[$val]['no_ipp'] 			= $id_customer;
-					$ArrDetail[$val]['defered'] 		= $defered;
-					$ArrDetail[$val]['sub_gudang'] 		= $sub_gudang;
 					$ArrDetail[$val]['jumlah_mat'] 		= $qty_booking;
 					$ArrDetail[$val]['ket_request'] 	= $valx['ket'];
 					$ArrDetail[$val]['code_group'] 		= $code_group;
@@ -871,14 +899,11 @@ class Project_request_item extends CI_Controller {
 			}
 	
 			$customer		= $this->db->order_by('nm_customer','asc')->get_where('customer',array('deleted_date'=>NULL))->result_array();
-			$query 	= "SELECT * FROM  ".DBACC.".coa_master";
-			$coa    = $this->db->query($query)->result_array();
-						
+		
 			$data = array(
 				'title'		=> 'Add Project & Plan Pemakaian Barang',
 				'action'	=> 'add_project',
-				'customer'=> $customer,
-				'coa'=> $coa
+				'customer'=> $customer
 			);
 			$this->load->view('Project/request/add_project',$data);
 		}
@@ -894,8 +919,8 @@ class Project_request_item extends CI_Controller {
 				$d_Header .= "<select name='detail[".$id."][product]' class='chosen_select form-control input-sm inline-blockd'>";
 				$d_Header .= "<option value='0'>Select Accessories</option>";
 				foreach(get_detail_consumable() AS $val => $valx){
-					$d_Header .= "<option value='".$val."'>".$val." - ".$valx['nm_barang']."</option>";
-				  }
+				  $d_Header .= "<option value='".$val."'>".$val." - ".$valx['nm_barang']."</option>";
+				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left'><input type='text' name='detail[".$id."][qty]' class='form-control input-sm text-center autoNumeric'></td>";
@@ -918,6 +943,7 @@ class Project_request_item extends CI_Controller {
 
 	public function laporan(){
 		$id_bq              = $this->uri->segment(3);
+		$tandaTanki = substr($id_bq,0,4);
 		$result_aksesoris   = $this->db
 									->select('a.*, b.nm_customer, b.id_customer')
 									// ->where('a.request < a.jumlah_mat')
@@ -928,6 +954,21 @@ class Project_request_item extends CI_Controller {
 											)
 										)
 									->result_array();
+		if($tandaTanki == 'IPPT'){
+			$result_aksesoris   = $this->db
+									->select('a.*, b.customer as nm_customer, e.id_customer AS id_customer, a.berat as jumlah_mat, c.id_material AS code_group')
+									// ->where('a.close_sts','0')
+									->join('planning_tanki b','a.no_ipp=b.no_ipp','left')
+									->join('accessories c','a.id_material=c.id_acc_tanki','left')
+									->join('customer e','b.customer=e.nm_customer','left')
+									->get_where('planning_tanki_detail a',
+										array(
+											'a.no_ipp'=>$id_bq,
+											'a.category'=>'acc'
+											)
+										)
+									->result_array();
+		}
 
 		$data = array(
 			'id_bq' 		    => $id_bq,
@@ -944,6 +985,12 @@ class Project_request_item extends CI_Controller {
 		$username       = $data_session['ORI_User']['username'];
 		$datetime       = date('Y-m-d H:i:s');
 		$id_customer	= $data['id_customer'];
+		$tandaTanki = substr($id_customer,0,4);
+
+		$TableUpdate = 'warehouse_planning_detail_acc';
+		if($tandaTanki == 'IPPT'){
+			$TableUpdate = 'planning_tanki_detail';
+		}
 
 		$ArrInsertH = array(
 			'close_sts'		=> 1,
@@ -954,7 +1001,7 @@ class Project_request_item extends CI_Controller {
 		$this->db->trans_start();
 			$this->db->where('close_date', NULL);
 			$this->db->where('no_ipp', $id_customer);
-			$this->db->update('warehouse_planning_detail_acc', $ArrInsertH);
+			$this->db->update($TableUpdate, $ArrInsertH);
 		$this->db->trans_complete();
 		if($this->db->trans_status() === FALSE){
 			$this->db->trans_rollback();
@@ -972,6 +1019,147 @@ class Project_request_item extends CI_Controller {
 			history('Close gudang project '.$id_customer);
 		}
 		echo json_encode($Arr_Data);
+	}
+
+	//Tanki
+	public function tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+		  $this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+		  redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+		  'title'			=> 'Request Item Project Tanki',
+		  'action'		    => 'index',
+		  'row_group'		=> $data_Group,
+		  'akses_menu'	    => $Arr_Akses
+		);
+		history('View request item project tanki');
+		$this->load->view('Project/request/tanki',$data);
+	}
+
+    public function server_side_request_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_json_request_tanki(
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			// $nestedData[]	= "<div align='center'>".str_replace('BQ-','',$row['id_bq'])."</div>";
+			// $nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['no_so'].' - '.$row['nm_customer'])."</div>";
+			// $nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($row['qtyCount'])."</div>";
+			
+
+            $stock	= "";
+            $create	= "";
+            $pemaikaian	= "";
+            $retur	= "";
+            $laporan	= "";
+            $close	= "";
+
+			$sts_close = "<span class='badge bg-red'>Close</span>";
+            if($Arr_Akses['create']=='1'){
+				if($row['close_sts'] == '0'){
+					$create		= "<button type='button' class='btn btn-sm btn-success request' title='Request' data-id_bq='".$row['id_customer']."'><i class='fa fa-plus'></i></button>";
+					$pemaikaian	= "&nbsp;<button type='button' class='btn btn-sm btn-primary pemakaian' title='Pemakaian' data-id_bq='".$row['id_customer']."'><i class='fa fa-edit'></i></button>";
+				}
+				$stock		= "&nbsp;<button type='button' class='btn btn-sm btn-default stock' title='Stock' data-id_bq='".$row['id_customer']."'><i class='fa fa-area-chart'></i></button>";
+                $retur		= "&nbsp;<button type='button' class='btn btn-sm btn-danger retur' title='Retur' data-id_bq='".$row['id_customer']."'><i class='fa fa-reply'></i></button>";
+                $laporan	= "&nbsp;<button type='button' class='btn btn-sm btn-primary laporan' title='Laporan Pemakaian' data-id_bq='".$row['id_customer']."'><i class='fa fa-file'></i></button>";
+                if($row['close_sts'] == '0'){
+					$sts_close = "<span class='badge bg-blue'>On Progress</span>";
+					$close		= "&nbsp;<button type='button' class='btn btn-sm btn-danger closed' title='Close' data-id_bq='".$row['id_customer']."'><i class='fa fa-times'></i></button>";
+				}
+			}
+
+			$nestedData[]	= "<div align='center'>".$sts_close."</div>";
+
+            $nestedData[]	= "<div align='left'>".$create.$pemaikaian.$stock.$retur.$laporan.$close."</div>";
+
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_json_request_tanki($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+                a.no_ipp as id_customer,
+                c.customer as nm_customer,
+				c.no_so,
+                COUNT(a.id) AS qtyCount,
+				MIN(close_sts) AS close_sts
+			FROM
+				planning_tanki_detail a
+                LEFT JOIN planning_tanki c ON a.no_ipp = c.no_ipp,
+				(SELECT @row:=0) r
+		    WHERE a.category IN ('acc') 
+                AND (
+                    a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
+                    OR c.customer LIKE '%".$this->db->escape_like_str($like_value)."%'
+                    OR c.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+                )
+            GROUP BY a.no_ipp, a.close_date
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'c.customer'
+		);
+
+		$sql .= " ORDER BY a.id DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
 	}
 
 }

@@ -1514,16 +1514,11 @@ class Machine extends CI_Controller {
 		$Arr_Kembali	= array();
 		$data			= $this->input->post();
 		$detailBQ		= $data['detailBQ'];
-		
-		
 
 		// $id_bq			= $data['id_bq'];
 		$id_bq			= "BQ-".$data['no_ipp'];
 		$no_ipp			= $data['no_ipp'];
 		$pembeda		= $data['pembeda'];
-		
-		// print_r($no_ipp);
-		// exit;
 		
 		$ArrDetBq		= array();
 		foreach($detailBQ AS $val => $valx){
@@ -1544,9 +1539,9 @@ class Machine extends CI_Controller {
 			}
 		}
 
-		//print_r($valx);
+		// print_r($ArrDetBq);
 		// print_r($ArrDetBq2);
-		//exit;
+		// exit;
 		// $ArrHeader 		= array_unique(array_column($ArrDetBq, "id_product"));
 		// echo "<pre>";
 
@@ -2316,8 +2311,6 @@ class Machine extends CI_Controller {
 			'est_date'	=> date('Y-m-d H:i:s')
 		);
 
-
-      
 		$this->db->trans_start();
 			$this->db->update_batch('bq_detail_header', $ArrDetBq2, 'id');
 

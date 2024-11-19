@@ -445,7 +445,7 @@ class Report_subgudang extends CI_Controller {
             }
 
             $nomor_ipp = $row['no_ipp'];
-            $nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:'';
+            $nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:$nomor_ipp;
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
@@ -632,7 +632,7 @@ class Report_subgudang extends CI_Controller {
 				$awal_col	= 0;
 
                 $nomor_ipp = $row['no_ipp'];
-           	 	$nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:'';
+           	 	$nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:$nomor_ipp;
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);

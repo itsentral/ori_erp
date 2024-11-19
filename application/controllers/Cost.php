@@ -1849,6 +1849,7 @@ class Cost extends CI_Controller {
 				'price_ref_purchase' 	=> str_replace(',', '', $price_from_supplier),
 				'exp_price_ref_est' 	=> $exp_price_ref_est,
 				'exp_price_ref_pur' 	=> $exp_price_ref_sup,
+				'exp_price_ref_sup' 	=> $exp_price_ref_sup,
 				'ket_price' 			=> $ket_price,
 				'reject_reason' 		=> NULL,
 				'app_price_sup' 		=> 'N',

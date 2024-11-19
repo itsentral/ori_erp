@@ -65,13 +65,21 @@ class Request_aksesoris_gudang extends CI_Controller {
 
 			$nm_customer = (!empty($row['nm_customer']))?$row['nm_customer']:$row['nm_customer2'];
 			$project = (!empty($row['project']))?$row['project']:$row['kode_trans'];
+			$so_number = $row['so_number'];
 			$tandaKode = substr($row['kode'],0,1);
+
+			$tandaTanki = substr($row['no_ipp'],0,4);
+			if($tandaTanki == 'IPPT'){
+				$nm_customer = $row['nm_customer_tanki'];
+				$project = $row['project_tanki'];
+				$so_number = $row['so_number_tanki'];
+			}
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
-			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
+			$nestedData[]	= "<div align='center'>".$so_number."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_customer)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($project)."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper($row['created_by'])."</div>";
@@ -133,19 +141,24 @@ class Request_aksesoris_gudang extends CI_Controller {
                 COUNT(a.id) AS qtyCount,
                 SUM(a.qty_out) AS qty_out,
                 SUM(a.qty_request) AS qty_req,
-				e.kode_trans
+				e.kode_trans,
+				f.no_so AS so_number_tanki,
+				f.customer AS nm_customer_tanki,
+				f.project AS project_tanki
 			FROM
 				request_accessories a
                 LEFT JOIN so_number b ON CONCAT('BQ-',a.no_ipp) = b.id_bq
                 LEFT JOIN production c ON a.no_ipp = c.no_ipp
 				LEFT JOIN customer d ON a.no_ipp = d.id_customer
-				LEFT JOIN warehouse_adjustment e ON a.kode=e.no_so AND e.kode_trans LIKE 'TRN%',
+				LEFT JOIN warehouse_adjustment e ON a.kode=e.no_so AND e.kode_trans LIKE 'TRN%'
+				LEFT JOIN planning_tanki f ON a.no_ipp=f.no_ipp,
 				(SELECT @row:=0) r
 		    WHERE a.deleted_date IS NULL
                 AND (
                     a.kode LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR b.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
+                    OR f.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR c.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR c.project LIKE '%".$this->db->escape_like_str($like_value)."%'
                 )
@@ -179,10 +192,11 @@ class Request_aksesoris_gudang extends CI_Controller {
             $username       = $data_session['ORI_User']['username'];
             $datetime       = date('Y-m-d H:i:s');
             $kode	        = $data['kode'];
+			$no_ipp 		= (!empty($data['no_ipp']))?$data['no_ipp']:null;
 
-			$gudang_before = getGudangProject();
-			$gudang_before = getGudangIndirect();
-			$gudang_after = 15;
+			$gudang_before 	= getGudangProject();
+			$gudang_before 	= getGudangIndirect(); //sementara indirect
+			$gudang_after	= getGudangFG();
 			
 			if(!empty($data['add'])){
 				$dataDetail	= $data['add'];
@@ -336,6 +350,7 @@ class Request_aksesoris_gudang extends CI_Controller {
 				);
 				if(!empty($grouping_temp)){
 					move_warehouse_barang_stok($grouping_temp, $gudang_before, $gudang_after, $kode_trans);
+					insertDataGroupReport_GudangStok($grouping_temp, $gudang_before, $gudang_after, $kode_trans,$no_ipp,$kode,null);
 				}
 				history('Outgoing aksesoris '.$kode);
 			}
@@ -343,13 +358,25 @@ class Request_aksesoris_gudang extends CI_Controller {
 		}
 		else{
 			$kode   = $this->uri->segment(3);
+			$getDetail = $this->db->get_where('request_accessories',array('kode'=>$kode))->result_array();
+			$no_ipp = $getDetail[0]['no_ipp'];
+			$tandaTanki = substr($no_ipp,0,4);
+
 			$tanda	= substr($kode,0,1);
 			if($tanda == 'P'){
 				$result_aksesoris   = $this->db
-                                        ->select('b.id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
+                                        ->select('b.id_material2 AS id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
                                         ->join('so_acc_and_mat b','a.id_milik=b.id')
                                         ->get_where('request_accessories a',array('a.kode'=>$kode))
                                         ->result_array();
+				if($tandaTanki == 'IPPT'){
+					$result_aksesoris   = $this->db
+											->select('c.id_material as code_group, c.id as id_material, b.berat AS qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
+											->join('planning_tanki_detail b','a.id_milik=b.id')
+											->join('accessories c','b.id_material=c.id_acc_tanki','left')
+											->get_where('request_accessories a',array('a.kode'=>$kode))
+											->result_array();
+				}
 			}
 			else{
 				$result_aksesoris   = $this->db
@@ -357,15 +384,21 @@ class Request_aksesoris_gudang extends CI_Controller {
                                         ->join('warehouse_planning_detail_acc b','a.id_milik=b.id')
                                         ->get_where('request_accessories a',array('a.kode'=>$kode))
                                         ->result_array();
+				if($tandaTanki == 'IPPT'){
+					$result_aksesoris   = $this->db
+											->select('c.id_material as code_group, b.id_material, b.berat AS qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
+											->join('planning_tanki_detail b','a.id_milik=b.id')
+											->join('accessories c','b.id_material=c.id_acc_tanki','left')
+											->get_where('request_accessories a',array('a.kode'=>$kode))
+											->result_array();
+				}
 			}
 
 			$id_gudang_project = getGudangProject();
-			$id_gudang_indirect = getGudangIndirect(); // sementara indirect
-			
-			// print_r(get_warehouseStockProject($id_gudang_project));
-			// exit;
+			$id_gudang_project = getGudangIndirect(); // sementara indirect
 
 			$data = array(
+				'tandaTanki' 		=> $tandaTanki,
 				'kode' 		        => $kode,
 				'tanda' 		    => $tanda,
 				'GET_STOK' 		    => get_warehouseStockProject($id_gudang_project),
@@ -387,7 +420,7 @@ class Request_aksesoris_gudang extends CI_Controller {
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 
         $result_aksesoris   = $this->db
-                                        ->select('b.id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, b.berat, b.category, a.no_ipp, a.created_date')
+                                        ->select('b.id_material2 AS id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, b.berat, b.category, a.no_ipp, a.created_date')
                                         ->join('so_acc_and_mat b','a.id_milik=b.id')
                                         ->get_where('request_accessories a',array('a.kode'=>$kode))
                                         ->result_array();
@@ -410,8 +443,6 @@ class Request_aksesoris_gudang extends CI_Controller {
 		$datetime       = date('Y-m-d H:i:s');
 		$kode	        = $data['kode'];
 		$no_surat_jalan	        = $data['no_surat_jalan'];
-		// print_r($data);
-		// exit;
 
 		$gudang_before = getGudangProject();
 		$gudang_after = getSubGudangProject();
@@ -542,14 +573,13 @@ class Request_aksesoris_gudang extends CI_Controller {
 
 			$grouping_temp[$value['id']]['id'] 			= $value['id'];
 			$grouping_temp[$value['id']]['qty'] 	= $temp[$value['id']]['good'];
-			$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']]['good'];
 		}
 		
-		//print_r($grouping_temp);
+		// print_r($ArrInsertH);
 		// print_r($ArrStock);
 		// print_r($ArrInsertH);
 		// print_r($ArrDeatilAdj);
-		//exit();
+		// exit();
 		$this->db->trans_start();
 			if(!empty($ArrDeatil)){
 				$this->db->update_batch('request_accessories', $ArrDeatil, 'id');
@@ -580,11 +610,6 @@ class Request_aksesoris_gudang extends CI_Controller {
 			if(!empty($grouping_temp)){
 				move_warehouse_barang_stok($grouping_temp, $gudang_before, $gudang_after, $kode_trans);
 			}
-			
-			if(!empty($grouping_temp)){
-				insert_jurnal($grouping_temp,$gudang_before,$gudang_after,$kode_trans,'transfer gudangproject - subgudang project','pengurangan gudangproject','penambahan subgudang project');
-			}
-
 			history('Outgoing aksesoris '.$kode);
 		}
 		echo json_encode($Arr_Data);

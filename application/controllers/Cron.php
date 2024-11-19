@@ -6,6 +6,7 @@ class Cron extends CI_Controller {
         parent::__construct();
 		$this->load->model('master_model');
 		$this->load->model('cron_model');
+		$this->load->model('tanki_model');
 		$this->load->database();
         if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
@@ -482,9 +483,9 @@ class Cron extends CI_Controller {
             $nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$view."".$pdf."".$excel."</div>";
             $nestedData[]	= "<div align='center'>".date('d-m-Y', strtotime($row['date']))."</div>";
-            $nestedData[]	= "<div align='right' class='text-blue'>".number_format($row['est_material'],2)."</div>";
+            $nestedData[]	= "<div align='right' class='text-blue'>".number_format($row['est_material'],4)."</div>";
             $nestedData[]	= "<div align='right' class='text-blue'><b>".number_format($row['est_harga'],2)."</b></div>";
-            $nestedData[]	= "<div align='right' class='text-green'>".number_format($row['real_material'],2)."</div>";
+            $nestedData[]	= "<div align='right' class='text-green'>".number_format($row['real_material'],4)."</div>";
 			$nestedData[]	= "<div align='right' class='text-green'><b>".number_format($row['real_harga'],2)."</b></div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['real_harga_rp'],2)."</div>"; 
 			$nestedData[]	= "<div align='right'>".number_format($row['kurs'],2)."</div>"; 
@@ -596,7 +597,20 @@ class Cron extends CI_Controller {
 			
 			$qty = $row['qty_akhir'] - $row['qty_awal'] + 1;
 
-			$get_revenue = $this->db
+			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
+			$tandaIPP = substr($NO_IPP,0,4);
+			
+			$no_so = $row['no_so'];
+			$no_spk = $row['no_spk'];
+			$revenue = 0;
+			$estimasi_material 	= $row['est_material'];
+			$estimasi_price 	= $row['est_harga'];
+			$real_material 		= $row['real_material'];
+			if($tandaIPP != 'IPPT'){
+				$no_so = get_detail_ipp()[$NO_IPP]['so_number'];
+				$no_spk = $row['no_spk2'];
+
+				$get_revenue = $this->db
 							->select('(d.price_total / e.qty) AS revenue')
 							->from('laporan_per_hari a')
 							->join('so_detail_header b','a.id_milik=b.id')
@@ -607,26 +621,25 @@ class Cron extends CI_Controller {
 							->limit(1)
 							->get()
 							->result();
-			$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-			$revenue 	= $revenue2 * $qty;
-			// $revenue = 	$row['est_harga'] 
-			// 			+ $row['direct_labour'] 
-			// 			+ $row['indirect_labour']
-			// 			+ $row['consumable']
-			// 			+ $row['machine']
-			// 			+ $row['mould_mandrill']
-			// 			+ $row['foh_depresiasi']
-			// 			+ $row['biaya_rutin_bulanan']
-			// 			+ $row['foh_consumable']
-			// 			+ $row['biaya_gaji_non_produksi']
-			// 			+ $row['biaya_non_produksi'];
-			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
+				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+				$revenue 	= $revenue2 * $qty;
+
+				$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty, $row['id_production_detail']);
+
+				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+				// $real_material 		= $row['real_material'];
+			}
+
             $nestedData 	= array();
             $nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='left'>".$row['id']."</div>";
             $nestedData[]	= "<div align='left'>".$NO_IPP."</div>";
-            $nestedData[]	= "<div align='left'>".get_detail_ipp()[$NO_IPP]['so_number']."</div>";
+            $nestedData[]	= "<div align='left'>".$no_so."</div>";
             $nestedData[]	= "<div align='left'>".$row['id_category']."</div>";
             $nestedData[]	= "<div align='left'>".$row['id_product']."</div>";
+            $nestedData[]	= "<div align='left'>".$no_spk."</div>";
             $nestedData[]	= "<div align='right'>".$row['diameter']."</div>";
             $nestedData[]	= "<div align='right'>".$row['diameter2']."</div>";
             $nestedData[]	= "<div align='center'>".$row['pressure']."</div>";
@@ -634,17 +647,13 @@ class Cron extends CI_Controller {
             $nestedData[]	= "<div align='right'>".$qty."</div>";
             $nestedData[]	= "<div align='right'>".number_format($revenue,2)."</div>";
 
-			$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty);
+			
 
-			$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-			$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-			$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price'] / $row['qty'] * $qty:0;
-
-            $nestedData[]	= "<div align='right'>".number_format($estimasi_material,2)."</div>";
+            $nestedData[]	= "<div align='right'>".number_format($estimasi_material,4)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($estimasi_price,2)."</div>";
-            $nestedData[]	= "<div align='right'>".number_format($real_material,2)."</div>";
-//            $nestedData[]	= "<div align='right'>".number_format($row['real_harga'],2)."</div>";
-            $nestedData[]	= "<div align='right'>".number_format(($row['real_harga_rp']/$row['kurs']),2)."</div>";
+            $nestedData[]	= "<div align='right'>".number_format($real_material,4)."</div>";
+           	$nestedData[]	= "<div align='right'>".number_format($row['real_harga'],2)."</div>";
+            // $nestedData[]	= "<div align='right'>".number_format(($row['real_harga_rp']/$row['kurs']),2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['direct_labour'],2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['indirect_labour'],2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['consumable'],2)."</div>";
@@ -673,13 +682,18 @@ class Cron extends CI_Controller {
 	public function queryDataJSONDetail($tanggal, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		$sql = "
 			SELECT
-				*
+				a.*,
+				b.no_spk as no_spk2
 			FROM
-				laporan_per_hari
-		    WHERE `date`='".$tanggal."' AND (
-				`id_produksi` LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR `id_category` LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR `id_product` LIKE '%".$this->db->escape_like_str($like_value)."%'
+				laporan_per_hari a
+				LEFT JOIN so_detail_header b ON a.id_milik=b.id
+		    WHERE a.date='".$tanggal."' AND (
+				a.id_produksi LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -688,11 +702,11 @@ class Cron extends CI_Controller {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'date'
+			1 => 'a.date'
 			
 		);
 
-		$sql .= " ORDER BY id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
@@ -709,233 +723,162 @@ class Cron extends CI_Controller {
 		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();
 		
-		$style_header = array(
-			'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			),
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$style_header2 = array(	
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$styleArray = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		$styleArray3 = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );  
-		 $styleArray4 = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );  
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
-		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
 		 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
 		$sheet 		= $objPHPExcel->getActiveSheet();
 		
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(23);
+		$Col_Akhir	= $Cols	= getColsChar(2243);
 		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI ('.date('d F Y', strtotime($tanggal)).')');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
 		$NewRow	= $NewRow +2;
 		$NextRow= $NewRow;
 		$NextRow1= $NewRow +1;
 		
-		$sheet->setCellValue('A'.$NewRow, 'IPP');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($style_header);
+		$sheet->setCellValue('A'.$NewRow, 'ID');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
+		$sheet->getColumnDimension('A')->setAutoSize(true);
+		
+		$sheet->setCellValue('A'.$NewRow, 'IPP'); 
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
 		$sheet->getColumnDimension('A')->setAutoSize(true);
 		
 		$sheet->setCellValue('B'.$NewRow, 'Product');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow1);
 		$sheet->getColumnDimension('B')->setAutoSize(true);
 		
 		$sheet->setCellValue('C'.$NewRow, 'ID Product');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow1);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 		
 		$sheet->setCellValue('D'.$NewRow, 'Dim');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow1);
 		$sheet->getColumnDimension('D')->setWidth(16);
 		
 		$sheet->setCellValue('E'.$NewRow, 'Dim 2');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow1);
 		$sheet->getColumnDimension('E')->setWidth(16);
 		
 		$sheet->setCellValue('F'.$NewRow, 'Pressure');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow1);
 		$sheet->getColumnDimension('F')->setWidth(16);
 		
 		$sheet->setCellValue('G'.$NewRow, 'Liner');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow1);
 		$sheet->getColumnDimension('G')->setWidth(16);
 		
 		$sheet->setCellValue('H'.$NewRow, 'Est Material (kg)');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow1);
         $sheet->getColumnDimension('H')->setWidth(16);
         
         $sheet->setCellValue('I'.$NewRow, 'Est Price ($)');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow1);
         $sheet->getColumnDimension('I')->setWidth(16);
         
         $sheet->setCellValue('J'.$NewRow, 'Aktual Material (kg)');
-		$sheet->getStyle('J'.$NewRow.':J'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow1);
         $sheet->getColumnDimension('J')->setWidth(16);
         
         $sheet->setCellValue('K'.$NewRow, 'Aktual Price ($)');
-		$sheet->getStyle('K'.$NewRow.':K'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow1);
         $sheet->getColumnDimension('K')->setWidth(16);
         
         $sheet->setCellValue('L'.$NewRow, 'Qty');
-		$sheet->getStyle('L'.$NewRow.':L'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow1);
         $sheet->getColumnDimension('L')->setWidth(16);
         
         $sheet->setCellValue('M'.$NewRow, 'Revenue');
-		$sheet->getStyle('M'.$NewRow.':M'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('M'.$NewRow.':M'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow1);
         $sheet->getColumnDimension('M')->setWidth(16);
         
         $sheet->setCellValue('N'.$NewRow, 'Direct Labour');
-		$sheet->getStyle('N'.$NewRow.':N'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('N'.$NewRow.':N'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow1);
         $sheet->getColumnDimension('N')->setWidth(16);
         
         $sheet->setCellValue('O'.$NewRow, 'Indirect Labour');
-		$sheet->getStyle('O'.$NewRow.':O'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('O'.$NewRow.':O'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow1);
         $sheet->getColumnDimension('O')->setWidth(16);
         
 
 
         $sheet->setCellValue('P'.$NewRow, 'Consumable');
-		$sheet->getStyle('P'.$NewRow.':P'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('P'.$NewRow.':P'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('P'.$NewRow.':P'.$NextRow1);
         $sheet->getColumnDimension('P')->setWidth(16);
 
         $sheet->setCellValue('Q'.$NewRow, 'FOH');
-		$sheet->getStyle('Q'.$NewRow.':U'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('Q'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('Q'.$NewRow.':U'.$NextRow);
         $sheet->getColumnDimension('Q')->setWidth(16);
 
 		$sheet->setCellValue('V'.$NewRow, 'Sales & Marketing');
-		$sheet->getStyle('V'.$NewRow.':V'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('V'.$NewRow.':V'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('V'.$NewRow.':V'.$NextRow1);
 		$sheet->getColumnDimension('V')->setWidth(16);
 
 		$sheet->setCellValue('W'.$NewRow, 'Umum & Admin');
-		$sheet->getStyle('W'.$NewRow.':W'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('W'.$NewRow.':W'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('W'.$NewRow.':W'.$NextRow1);
 		$sheet->getColumnDimension('W')->setWidth(16);
+
+		$sheet->setCellValue('X'.$NewRow, 'No SPK');
+		$sheet->getStyle('X'.$NewRow.':X'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('X'.$NewRow.':X'.$NextRow1);
+		$sheet->getColumnDimension('X')->setWidth(16);
 
 		$NewRow	= $NewRow +1;
 		$NextRow= $NewRow;
         
         $sheet->setCellValue('Q'.$NewRow, 'Machine Cost');
-		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('Q'.$NewRow.':Q'.$NextRow);
         $sheet->getColumnDimension('Q')->setWidth(16);
         
         $sheet->setCellValue('R'.$NewRow, 'Mold mandril Cost');
-		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('R'.$NewRow.':R'.$NextRow);
         $sheet->getColumnDimension('R')->setWidth(16);
         
 
         $sheet->setCellValue('S'.$NewRow, 'Depreciation FOH');
-		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('S'.$NewRow.':S'.$NextRow);
         $sheet->getColumnDimension('S')->setWidth(16);
         
         $sheet->setCellValue('T'.$NewRow, 'Factory Overhead');
-		$sheet->getStyle('T'.$NewRow.':T'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('T'.$NewRow.':T'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('T'.$NewRow.':T'.$NextRow);
         $sheet->getColumnDimension('T')->setWidth(16);
         
         $sheet->setCellValue('U'.$NewRow, 'Salary Factory Management');
-		$sheet->getStyle('U'.$NewRow.':U'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('U'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('U'.$NewRow.':U'.$NextRow);
 		$sheet->getColumnDimension('U')->setWidth(16);
 
@@ -954,169 +897,190 @@ class Cron extends CI_Controller {
 				$awal_row++;
 				$awal_col	= 0;
 				
+				
+				$awal_col++;
+				$id	= $row_Cek['id'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
 				$awal_col++;
 				$id_produksi	= $row_Cek['id_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_produksi);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$id_category	= $row_Cek['id_category'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_category);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$id_product	= $row_Cek['id_product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_product);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$diameter	= $row_Cek['diameter'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $diameter);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$diameter2	= $row_Cek['diameter2'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $diameter2);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$pressure	= $row_Cek['pressure'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $pressure);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$liner	= $row_Cek['liner'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $liner);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
+				$tandaIPP = substr($NO_IPP,0,4);
+
 				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
-				$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty);
 
-				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price'] / $row_Cek['qty'] * $qty:0;
+				$estimasi_material 	= $row_Cek['est_material'];
+				$estimasi_price 	= $row_Cek['est_harga'];
+				$real_material 		= $row_Cek['real_material'];
+				$no_spk 			= $row_Cek['no_spk'];
+				$revenue 			= $row_Cek['est_harga'];
 
+				if($tandaIPP != 'IPPT'){
+					$get_revenue = $this->db
+								->select('(d.price_total / e.qty) AS revenue, b.no_spk')
+								->from('laporan_per_hari a')
+								->join('so_detail_header b','a.id_milik=b.id')
+								->join('so_bf_detail_header c','b.id_milik=c.id')
+								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+								->join('bq_detail_header e','c.id_milik=e.id')
+								->where('a.id_milik', $row_Cek['id_milik'])
+								->limit(1)
+								->get()
+								->result();
+					$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+					$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
+					$revenue 	= $revenue2 * $qty;
+					
+					$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
+
+					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+					$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+					// $real_material 		= $row_Cek['real_material'];
+				}
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_material);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_price);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $real_material);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$real_harga	= ($row_Cek['real_harga_rp']/$row_Cek['kurs']);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $real_harga);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
-				
-				$get_revenue = $this->db
-							->select('(d.price_total / e.qty) AS revenue')
-							->from('laporan_per_hari a')
-							->join('so_detail_header b','a.id_milik=b.id')
-							->join('so_bf_detail_header c','b.id_milik=c.id')
-							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('a.id_milik', $row_Cek['id_milik'])
-							->limit(1)
-							->get()
-							->result();
-				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-				$revenue 	= $revenue2 * $qty;
-
                 $awal_col++;
 				$direct_labour	= $qty;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
 				$direct_labour	= $revenue;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
 				$awal_col++;
 				$direct_labour	= $row_Cek['direct_labour'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 
                 $awal_col++;
 				$indirect_labour	= $row_Cek['indirect_labour'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $indirect_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
 				$consumable	= $row_Cek['consumable'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $consumable);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
 				$machine	= $row_Cek['machine'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $machine);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$mould_mandrill	= $row_Cek['mould_mandrill'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $mould_mandrill);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
                 $awal_col++;
 				$foh_depresiasi	= $row_Cek['foh_depresiasi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $foh_depresiasi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$biaya_rutin_bulanan	= $row_Cek['biaya_rutin_bulanan'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_rutin_bulanan);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$foh_consumable	= $row_Cek['foh_consumable'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $foh_consumable);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
-
-
                 $awal_col++;
 				$biaya_non_produksi	= $row_Cek['biaya_non_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_non_produksi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$biaya_gaji_non_produksi	= $row_Cek['biaya_gaji_non_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_gaji_non_produksi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 			}
 		}
 		
@@ -1132,7 +1096,7 @@ class Cron extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="Report Produksi '.date('d-m-Y', strtotime($tanggal)).'_'.date('YmdHis').'.xls"');
+		header('Content-Disposition: attachment;filename="report-produksi-'.date('d-m-Y', strtotime($tanggal)).'.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
@@ -3280,25 +3244,35 @@ class Cron extends CI_Controller {
 		$sheet->mergeCells('AG'.$NewRow.':AH'.$NewRow);
 		$sheet->getColumnDimension('AG')->setAutoSize(true);
 
-		$sheet->setCellValue('AI'.$NewRow, 'Total Material (Kg)');
-		$sheet->getStyle('AI'.$NewRow.':AI'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('AI'.$NewRow.':AI'.$NextRow);
+		$sheet->setCellValue('AI'.$NewRow, 'Lainnya');
+		$sheet->getStyle('AI'.$NewRow.':AJ'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AI'.$NewRow.':AJ'.$NewRow);
 		$sheet->getColumnDimension('AI')->setAutoSize(true);
 
-		$sheet->setCellValue('AJ'.$NewRow, 'Work Hour');
-		$sheet->getStyle('AJ'.$NewRow.':AJ'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('AJ'.$NewRow.':AJ'.$NextRow);
-		$sheet->getColumnDimension('AJ')->setAutoSize(true);
-
-		$sheet->setCellValue('AK'.$NewRow, 'Man Power');
-		$sheet->getStyle('AK'.$NewRow.':AK'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('AK'.$NewRow.':AK'.$NextRow);
+		$sheet->setCellValue('AK'.$NewRow, 'Add');
+		$sheet->getStyle('AK'.$NewRow.':AL'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AK'.$NewRow.':AL'.$NewRow);
 		$sheet->getColumnDimension('AK')->setAutoSize(true);
 
-		$sheet->setCellValue('AL'.$NewRow, 'Man Hour');
-		$sheet->getStyle('AL'.$NewRow.':AL'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('AL'.$NewRow.':AL'.$NextRow);
-		$sheet->getColumnDimension('AL')->setAutoSize(true);
+		$sheet->setCellValue('AM'.$NewRow, 'Total Material (Kg)');
+		$sheet->getStyle('AM'.$NewRow.':AM'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AM'.$NewRow.':AM'.$NextRow);
+		$sheet->getColumnDimension('AM')->setAutoSize(true);
+
+		$sheet->setCellValue('AN'.$NewRow, 'Work Hour');
+		$sheet->getStyle('AN'.$NewRow.':AN'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AN'.$NewRow.':AN'.$NextRow);
+		$sheet->getColumnDimension('AN')->setAutoSize(true);
+
+		$sheet->setCellValue('AO'.$NewRow, 'Man Power');
+		$sheet->getStyle('AO'.$NewRow.':AO'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AO'.$NewRow.':AO'.$NextRow);
+		$sheet->getColumnDimension('AO')->setAutoSize(true);
+
+		$sheet->setCellValue('AP'.$NewRow, 'Man Hour');
+		$sheet->getStyle('AP'.$NewRow.':AP'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AP'.$NewRow.':AP'.$NextRow);
+		$sheet->getColumnDimension('AP')->setAutoSize(true);
 
 		$NewRow	= $NextRow;
 		$NextRow= $NewRow +1;
@@ -3383,10 +3357,32 @@ class Cron extends CI_Controller {
 		$sheet->mergeCells('AH'.$NewRow.':AH'.$NewRow);
 		$sheet->getColumnDimension('AH')->setAutoSize(true);
 
+		$sheet->setCellValue('AI'.$NewRow, 'Material');
+		$sheet->getStyle('AI'.$NewRow.':AI'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AI'.$NewRow.':AI'.$NewRow);
+		$sheet->getColumnDimension('AI')->setAutoSize(true);
+
+		$sheet->setCellValue('AJ'.$NewRow, 'Berat');
+		$sheet->getStyle('AJ'.$NewRow.':AJ'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AJ'.$NewRow.':AJ'.$NewRow);
+		$sheet->getColumnDimension('AJ')->setAutoSize(true);
+
+		$sheet->setCellValue('AK'.$NewRow, 'Material');
+		$sheet->getStyle('AK'.$NewRow.':AK'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AK'.$NewRow.':AK'.$NewRow);
+		$sheet->getColumnDimension('AK')->setAutoSize(true);
+
+		$sheet->setCellValue('AL'.$NewRow, 'Berat');
+		$sheet->getStyle('AL'.$NewRow.':AL'.$NewRow)->applyFromArray($style_header);
+		$sheet->mergeCells('AL'.$NewRow.':AL'.$NewRow);
+		$sheet->getColumnDimension('AL')->setAutoSize(true);
+
 		$SERACH_DETAIL_IPP 			= get_detail_ipp();
 		$SERACH_DETAIL_SPEC 		= get_detail_spec_fd();
 		$SEARCH_DETAIL_BERAT 		= get_input_produksi_detail();
 		$SEARCH_DETAIL_BERAT_PLUS 	= get_input_produksi_plus();
+		$SEARCH_DETAIL_BERAT_ADD 	= get_input_produksi_add();
+		$SEARCH_DETAIL_BERAT_PLUS_EX 	= get_input_produksi_plus_exclude();
 	
 	  if($product){
 		  $awal_row	= $NewRow;
@@ -3420,20 +3416,34 @@ class Cron extends CI_Controller {
 			  $sheet->setCellValue($Cols.$awal_row, $warehouse);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
+			  $tandaIPP = substr($NO_IPP,0,4);
+			  if($tandaIPP != 'IPPT'){
+				$customer		= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
+				$project		= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
+				$so_number		= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
+				$length			= $SERACH_DETAIL_SPEC[$id_milik]['length'];
+				$thickness		= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
+			  }
+			  else{
+				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
+				$customer		= $getDetailTanki['customer'];
+				$project		= $getDetailTanki['nm_project'];
+				$so_number		= $getDetailTanki['no_so'];
+				$length			= '';
+				$thickness		= '';
+			  }
+
 			  $awal_col++;
-			  $customer	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $customer);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
-			  $project	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $project);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
-			  $so_number	= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $so_number);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
@@ -3481,13 +3491,13 @@ class Cron extends CI_Controller {
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 
 			  $awal_col++;
-			  $length	= $SERACH_DETAIL_SPEC[$id_milik]['length'];
+			  
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $length);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 
 			  $awal_col++;
-			  $thickness	= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
+			  
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $thickness);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
@@ -3595,8 +3605,10 @@ class Cron extends CI_Controller {
 
 			  $awal_col++;
 			  $berat_resin	= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
+			  $berat_resin_tc	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
+			  $berat_resin_sum = $berat_resin + $berat_resin_tc;
 			  $Cols			= getColsChar($awal_col);
-			  $sheet->setCellValue($Cols.$awal_row, $berat_resin);
+			  $sheet->setCellValue($Cols.$awal_row, $berat_resin_sum);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 
 			  $awal_col++;
@@ -3611,7 +3623,33 @@ class Cron extends CI_Controller {
 			  $sheet->setCellValue($Cols.$awal_row, $berat_catalys);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 
-			  $TOTAL_MATERIAL = $berat_veil+$berat_cms+$berat_rooving+$berat_wr+$berat_resin+$berat_catalys;
+			$berat_lainnya	= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']:0;
+			$berat_add		= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']:0;
+			$nm_lainnya		= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']:'';
+			$nm_add			= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']:'';
+
+			$awal_col++;
+			$Cols			= getColsChar($awal_col);
+			$sheet->setCellValue($Cols.$awal_row, $nm_lainnya);
+			$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+
+			$awal_col++;
+			$Cols			= getColsChar($awal_col);
+			  $sheet->setCellValue($Cols.$awal_row, $berat_lainnya);
+			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+
+			  $awal_col++;
+			  $Cols			= getColsChar($awal_col);
+			$sheet->setCellValue($Cols.$awal_row, $nm_add);
+			$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+
+			$awal_col++;
+			$Cols			= getColsChar($awal_col);
+			  $sheet->setCellValue($Cols.$awal_row, $berat_add);
+			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+
+
+			  $TOTAL_MATERIAL = $berat_veil+$berat_cms+$berat_rooving+$berat_wr+$berat_resin_sum+$berat_catalys+$berat_lainnya+$berat_add;
 
 			  $awal_col++;
 			  $Cols			= getColsChar($awal_col);
@@ -3792,7 +3830,7 @@ class Cron extends CI_Controller {
 			SELECT
 				*
 			FROM
-				laporan_wip_per_hari_action
+				laporan_wip_per_bulan
 		    WHERE 1=1 ".$where_bln." ".$where_thn." AND (
 				`date` LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
@@ -3824,104 +3862,23 @@ class Cron extends CI_Controller {
 		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();
 		
-		$style_header = array(
-			'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			),
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$style_header2 = array(	
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$styleArray = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		$styleArray3 = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );  
-		 $styleArray4 = array(					  
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );  
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
-		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
 		 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
 		$sheet 		= $objPHPExcel->getActiveSheet();
 		
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(23);
+		$Col_Akhir	= $Cols	= getColsChar(2243);
 		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI WIP ('.date('d F Y', strtotime($tanggal)).')');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
 		$NewRow	= $NewRow +2;
@@ -3929,133 +3886,138 @@ class Cron extends CI_Controller {
 		$NextRow1= $NewRow +1;
 		
 		$sheet->setCellValue('A'.$NewRow, 'IPP');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
 		$sheet->getColumnDimension('A')->setAutoSize(true);
 		
 		$sheet->setCellValue('B'.$NewRow, 'Product');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow1);
 		$sheet->getColumnDimension('B')->setAutoSize(true);
 		
 		$sheet->setCellValue('C'.$NewRow, 'ID Product');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow1);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 		
 		$sheet->setCellValue('D'.$NewRow, 'Dim');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow1);
 		$sheet->getColumnDimension('D')->setWidth(16);
 		
 		$sheet->setCellValue('E'.$NewRow, 'Dim 2');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow1);
 		$sheet->getColumnDimension('E')->setWidth(16);
 		
 		$sheet->setCellValue('F'.$NewRow, 'Pressure');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow1);
 		$sheet->getColumnDimension('F')->setWidth(16);
 		
 		$sheet->setCellValue('G'.$NewRow, 'Liner');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow1);
 		$sheet->getColumnDimension('G')->setWidth(16);
 		
 		$sheet->setCellValue('H'.$NewRow, 'Est Material (kg)');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow1);
         $sheet->getColumnDimension('H')->setWidth(16);
         
         $sheet->setCellValue('I'.$NewRow, 'Est Price ($)');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow1);
         $sheet->getColumnDimension('I')->setWidth(16);
         
         $sheet->setCellValue('J'.$NewRow, 'Aktual Material (kg)');
-		$sheet->getStyle('J'.$NewRow.':J'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow1);
         $sheet->getColumnDimension('J')->setWidth(16);
         
         $sheet->setCellValue('K'.$NewRow, 'Aktual Price ($)');
-		$sheet->getStyle('K'.$NewRow.':K'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow1);
         $sheet->getColumnDimension('K')->setWidth(16);
         
         $sheet->setCellValue('L'.$NewRow, 'Qty');
-		$sheet->getStyle('L'.$NewRow.':L'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow1);
         $sheet->getColumnDimension('L')->setWidth(16);
         
         $sheet->setCellValue('M'.$NewRow, 'Revenue');
-		$sheet->getStyle('M'.$NewRow.':M'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('M'.$NewRow.':M'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow1);
         $sheet->getColumnDimension('M')->setWidth(16);
         
         $sheet->setCellValue('N'.$NewRow, 'Direct Labour');
-		$sheet->getStyle('N'.$NewRow.':N'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('N'.$NewRow.':N'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow1);
         $sheet->getColumnDimension('N')->setWidth(16);
         
         $sheet->setCellValue('O'.$NewRow, 'Indirect Labour');
-		$sheet->getStyle('O'.$NewRow.':O'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('O'.$NewRow.':O'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow1);
         $sheet->getColumnDimension('O')->setWidth(16);
         
 
 
         $sheet->setCellValue('P'.$NewRow, 'Consumable');
-		$sheet->getStyle('P'.$NewRow.':P'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('P'.$NewRow.':P'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('P'.$NewRow.':P'.$NextRow1);
         $sheet->getColumnDimension('P')->setWidth(16);
 
         $sheet->setCellValue('Q'.$NewRow, 'FOH');
-		$sheet->getStyle('Q'.$NewRow.':U'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('Q'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('Q'.$NewRow.':U'.$NextRow);
         $sheet->getColumnDimension('Q')->setWidth(16);
 
 		$sheet->setCellValue('V'.$NewRow, 'Sales & Marketing');
-		$sheet->getStyle('V'.$NewRow.':V'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('V'.$NewRow.':V'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('V'.$NewRow.':V'.$NextRow1);
 		$sheet->getColumnDimension('V')->setWidth(16);
 
 		$sheet->setCellValue('W'.$NewRow, 'Umum & Admin');
-		$sheet->getStyle('W'.$NewRow.':W'.$NextRow1)->applyFromArray($style_header);
+		$sheet->getStyle('W'.$NewRow.':W'.$NextRow1)->applyFromArray($tableHeader);
 		$sheet->mergeCells('W'.$NewRow.':W'.$NextRow1);
 		$sheet->getColumnDimension('W')->setWidth(16);
+
+		$sheet->setCellValue('X'.$NewRow, 'No SPK');
+		$sheet->getStyle('X'.$NewRow.':X'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('X'.$NewRow.':X'.$NextRow1);
+		$sheet->getColumnDimension('X')->setWidth(16);
 
 		$NewRow	= $NewRow +1;
 		$NextRow= $NewRow;
         
         $sheet->setCellValue('Q'.$NewRow, 'Machine Cost');
-		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('Q'.$NewRow.':Q'.$NextRow);
         $sheet->getColumnDimension('Q')->setWidth(16);
         
         $sheet->setCellValue('R'.$NewRow, 'Mold mandril Cost');
-		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('R'.$NewRow.':R'.$NextRow);
         $sheet->getColumnDimension('R')->setWidth(16);
         
 
         $sheet->setCellValue('S'.$NewRow, 'Depreciation FOH');
-		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('S'.$NewRow.':S'.$NextRow);
         $sheet->getColumnDimension('S')->setWidth(16);
         
         $sheet->setCellValue('T'.$NewRow, 'Factory Overhead');
-		$sheet->getStyle('T'.$NewRow.':T'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('T'.$NewRow.':T'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('T'.$NewRow.':T'.$NextRow);
         $sheet->getColumnDimension('T')->setWidth(16);
         
         $sheet->setCellValue('U'.$NewRow, 'Salary Factory Management');
-		$sheet->getStyle('U'.$NewRow.':U'.$NextRow)->applyFromArray($style_header);
+		$sheet->getStyle('U'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('U'.$NewRow.':U'.$NextRow);
 		$sheet->getColumnDimension('U')->setWidth(16);
 
 
-		$qSupplier	    = "	SELECT * FROM laporan_wip_per_hari WHERE `date` = '".$tanggal."' ORDER BY id_produksi ASC ";
+		$qSupplier	    = "	SELECT a.*, b.no_spk AS no_spk2 FROM laporan_wip_per_hari a LEFT JOIN so_detail_header b ON a.id_milik = b.id WHERE a.date = '".$tanggal."' ORDER BY a.id_produksi ASC ";
 		$restDetail1	= $this->db->query($qSupplier)->result_array();
         // echo "<pre>";
         // print_r($restDetail1);        
@@ -4068,82 +4030,86 @@ class Cron extends CI_Controller {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
+
+				$NO_IPP 				= str_replace('PRO-','',$row_Cek['id_produksi']);
+				$tandaIPP = substr($NO_IPP,0,4);
 				
 				$awal_col++;
 				$id_produksi	= $row_Cek['id_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_produksi);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$id_category	= $row_Cek['id_category'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_category);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$id_product	= $row_Cek['id_product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_product);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$diameter	= $row_Cek['diameter'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $diameter);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$diameter2	= $row_Cek['diameter2'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $diameter2);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$pressure	= $row_Cek['pressure'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $pressure);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$awal_col++;
 				$liner	= $row_Cek['liner'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $liner);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
 				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
-				$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty);
+				$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
 
 				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
 				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price'] / $row_Cek['qty'] * $qty:0;
+				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+				// $real_material 		= $row_Cek['real_material'];
 
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_material);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_price);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $real_material);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$real_harga	= ($row_Cek['real_harga_rp']/$row_Cek['kurs']);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $real_harga);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 				
 				$get_revenue = $this->db
-							->select('(d.price_total / e.qty) AS revenue')
+							->select('(d.price_total / e.qty) AS revenue, b.no_spk')
 							->from('laporan_wip_per_hari a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
@@ -4154,89 +4120,97 @@ class Cron extends CI_Controller {
 							->get()
 							->result();
 				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+				$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
 				$revenue 	= $revenue2 * $qty;
+
+				if($tandaIPP == 'IPPT'){
+					$no_spk 	= $row_Cek['no_spk'];
+				}
 
                 $awal_col++;
 				$direct_labour	= $qty;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
 				$direct_labour	= $revenue;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
 				$awal_col++;
 				$direct_labour	= $row_Cek['direct_labour'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 
                 $awal_col++;
 				$indirect_labour	= $row_Cek['indirect_labour'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $indirect_labour);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
 				$consumable	= $row_Cek['consumable'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $consumable);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
 				$machine	= $row_Cek['machine'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $machine);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$mould_mandrill	= $row_Cek['mould_mandrill'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $mould_mandrill);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
                 $awal_col++;
 				$foh_depresiasi	= $row_Cek['foh_depresiasi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $foh_depresiasi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$biaya_rutin_bulanan	= $row_Cek['biaya_rutin_bulanan'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_rutin_bulanan);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$foh_consumable	= $row_Cek['foh_consumable'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $foh_consumable);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
-
-
                 $awal_col++;
 				$biaya_non_produksi	= $row_Cek['biaya_non_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_non_produksi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
                 $awal_col++;
 				$biaya_gaji_non_produksi	= $row_Cek['biaya_gaji_non_produksi'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $biaya_gaji_non_produksi);
-                $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 			}
 		}
 		
 		
-		$sheet->setTitle('Report Produksi '.date('d-m-Y', strtotime($tanggal)));
+		$sheet->setTitle('Report Produksi WIP '.date('d-m-Y', strtotime($tanggal)));
 		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5          
 		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 		ob_end_clean();
@@ -4663,44 +4637,67 @@ class Cron extends CI_Controller {
 			
 			$qty = $row['qty_akhir'] - $row['qty_awal'] + 1;
 
-			$get_revenue = $this->db
-							->select('(d.price_total / e.qty) AS revenue')
-							->from('laporan_wip_per_hari a')
-							->join('so_detail_header b','a.id_milik=b.id')
-							->join('so_bf_detail_header c','b.id_milik=c.id')
-							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('a.id_milik', $row['id_milik'])
-							->limit(1)
-							->get()
-							->result();
-			$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-			$revenue 	= $revenue2 * $qty;
+			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
+			$tandaIPP = substr($NO_IPP,0,4);
+			
+			$no_so = $row['no_so'];
+			$no_spk = $row['no_spk'];
+			$revenue = 0;
+			$estimasi_material 	= $row['est_material'];
+			$estimasi_price 	= $row['est_harga'];
+			$real_material 		= $row['real_material'];
+			if($tandaIPP != 'IPPT'){
+				$no_so = get_detail_ipp()[$NO_IPP]['so_number'];
+				$no_spk = $row['no_spk2'];
+
+				$get_revenue = $this->db
+								->select('(d.price_total / e.qty) AS revenue')
+								->from('laporan_wip_per_hari a')
+								->join('so_detail_header b','a.id_milik=b.id')
+								->join('so_bf_detail_header c','b.id_milik=c.id')
+								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+								->join('bq_detail_header e','c.id_milik=e.id')
+								->where('a.id_milik', $row['id_milik'])
+								->limit(1)
+								->get()
+								->result();
+				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+				$revenue 	= $revenue2 * $qty;
+				$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty, $row['id_production_detail']);
+
+				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+			}
 
 			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
             $nestedData 	= array();
             $nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='left'>".$row['id']."</div>";
             $nestedData[]	= "<div align='left'>".$NO_IPP."</div>";
-            $nestedData[]	= "<div align='left'>".get_detail_ipp()[$NO_IPP]['so_number']."</div>";
+            $nestedData[]	= "<div align='left'>".$no_so."</div>";
             $nestedData[]	= "<div align='left'>".$row['id_category']."</div>";
             $nestedData[]	= "<div align='left'>".$row['id_product']."</div>";
-            $nestedData[]	= "<div align='right'>".$row['diameter']."</div>";
+            $nestedData[]	= "<div align='right'>".$no_spk."</div>";
+            $nestedData[]	= "<div align='right'>".$row['diameter']."</div>"; 
             $nestedData[]	= "<div align='right'>".$row['diameter2']."</div>";
             $nestedData[]	= "<div align='center'>".$row['pressure']."</div>";
             $nestedData[]	= "<div align='center'>".$row['liner']."</div>";
             $nestedData[]	= "<div align='right'>".$qty."</div>";
             $nestedData[]	= "<div align='right'>".number_format($revenue,2)."</div>";
 
-			$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty);
+			$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty, $row['id_production_detail']);
 
 			$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
 			$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-			$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price'] / $row['qty'] * $qty:0;
+			$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+			// $real_material 		= $row['real_material'];
 
             $nestedData[]	= "<div align='right'>".number_format($estimasi_material,2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($estimasi_price,2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($real_material,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format(($row['real_harga_rp']/$row['kurs']),2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['real_harga'],2)."</div>";
+			// $nestedData[]	= "<div align='right'>".number_format(($row['real_harga_rp']/$row['kurs']),2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['direct_labour'],2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['indirect_labour'],2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($row['consumable'],2)."</div>";
@@ -4729,13 +4726,17 @@ class Cron extends CI_Controller {
 	public function queryDataJSONDetail_WIP($tanggal, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		$sql = "
 			SELECT
-				*
+				a.*,
+				b.no_spk as no_spk2
 			FROM
-				laporan_wip_per_hari
-		    WHERE `date`='".$tanggal."' AND (
-				`id_produksi` LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR `id_category` LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR `id_product` LIKE '%".$this->db->escape_like_str($like_value)."%'
+				laporan_wip_per_hari a
+				LEFT JOIN so_detail_header b ON a.id_milik=b.id
+		    WHERE a.date='".$tanggal."' AND (
+				a.id_produksi LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -4748,7 +4749,7 @@ class Cron extends CI_Controller {
 			
 		);
 
-		$sql .= " ORDER BY id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);

@@ -231,25 +231,17 @@ class Qc_deadstok extends CI_Controller
 		// print_r($data);
 		// exit;
 
-		$getIdDeadstok = $this->db->get_where('deadstok',array('id_product'=>$id_product,'id_milik'=>$id_milik,'process_next'=>'1'))->result_array();
-		$ArrID = [];
-		foreach ($getIdDeadstok as $key => $value) {
-			$ArrID[] = $value['id'];
-		}
-
 		$this->db->trans_start();
 		$this->db->where('id_product', $id_product);
 		$this->db->where('id_milik', $id_milik);
 		$this->db->where('process_next', '1');
 		$this->db->update('deadstok', $ArrUpdateDeadstok);
 
-		if(!empty($ArrID)){
-			$this->db->where_in('id_deadstok_dipakai', $ArrID);
-			$this->db->where('id_product_deadstok', $id_product);
-			$this->db->where('id_milik', $id_milik);
-			$this->db->where('booking_date !=', NULL);
-			$this->db->update('production_detail', $ArrUpdateProduksi);
-		}
+
+		$this->db->where('id_product_deadstok', $id_product);
+		$this->db->where('id_milik', $id_milik);
+		$this->db->where('booking_date !=', NULL);
+		$this->db->update('production_detail', $ArrUpdateProduksi);
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -444,7 +436,8 @@ class Qc_deadstok extends CI_Controller
 			'id_milik' => NULL,
 			'no_so' => NULL,
 			'no_spk' => NULL,
-			'no_ipp' => NULL
+			'no_ipp' => NULL,
+			'id_booking' => NULL,
 		];
 
 		$ArrUpdateProduksi = [
@@ -474,12 +467,6 @@ class Qc_deadstok extends CI_Controller
 		$id_product 		= (!empty($getDeadstok[0]['id_product']))?$getDeadstok[0]['id_product']:0;
 		$id_milik 			= (!empty($getDeadstok[0]['id_milik']))?$getDeadstok[0]['id_milik']:0;
 
-		$getIdDeadstok = $this->db->get_where('deadstok',array('id_product'=>$id_product,'id_milik'=>$id_milik,'process_next'=>'4'))->result_array();
-		$ArrID = [];
-		foreach ($getIdDeadstok as $key => $value) {
-			$ArrID[] = $value['id'];
-		}
-
 		// print_r($getDeadstok);
 		// exit;
 
@@ -493,13 +480,10 @@ class Qc_deadstok extends CI_Controller
 			$this->db->where('process_next', '4');
 			$this->db->update('deadstok', $ArrUpdateDeadstok);
 
-			if(!empty($ArrID)){
-				$this->db->where_in('id_deadstok_dipakai', $ArrID);
-				$this->db->where('id_product_deadstok', $id_product);
-				$this->db->where('id_milik', $id_milik);
-				$this->db->where('booking_date !=', NULL);
-				$this->db->update('production_detail', $ArrUpdateProduksi);
-			}
+			$this->db->where('id_product_deadstok', $id_product);
+			$this->db->where('id_milik', $id_milik);
+			$this->db->where('booking_date !=', NULL);
+			$this->db->update('production_detail', $ArrUpdateProduksi);
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {

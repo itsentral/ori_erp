@@ -56,6 +56,7 @@ class History_pembelian extends CI_Controller {
 		$Arr_Akses			= getAcccesmenu($controller);
 		$requestData	= $_REQUEST;
 		$fetch			= $this->queryDataJSON(
+			$requestData['range'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -121,6 +122,7 @@ class History_pembelian extends CI_Controller {
 			$IMPLODE = implode("<br>", $DATE_INCOMING);
 
 			$nestedData[]	= "<div align='center'>".$IMPLODE."</div>";
+			$nestedData[]	= "<div align='left'>".$row['created_by']."</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -136,14 +138,23 @@ class History_pembelian extends CI_Controller {
 		echo json_encode($json_data);
 	}
 
-	public function queryDataJSON($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
- 
+	public function queryDataJSON($range=null, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$where_range = "";
+        if($range > 0){
+			$exP = explode(' - ', $range);
+			$date_awal = date('Y-m-d', strtotime($exP[0]));
+			$date_akhir = date('Y-m-d', strtotime($exP[1]));
+			// echo $exP[0];exit;
+            $where_range = "AND DATE(z.created_date) BETWEEN '".$date_awal."' AND '".$date_akhir."' ";
+        }
+
 		$sql = "	SELECT
                         (@row:=@row+1) AS nomor,
                         z.category,
                         c.no_pr_group AS no_pr,
                         a.no_po,
                         DATE(z.created_date) AS tgl_po,
+						z.created_by,
                         z.nm_supplier,
                         a.tgl_dibutuhkan,
                         a.id_barang,
@@ -159,11 +170,12 @@ class History_pembelian extends CI_Controller {
                         LEFT JOIN tran_pr_detail c ON b.no_rfq = c.no_rfq  AND b.id_barang = c.id_barang,
                         (SELECT @row:=0) r
                     WHERE
-                        a.deleted = 'N' 
+                        a.deleted = 'N' ".$where_range ."
                         AND b.deleted = 'N'
                         AND c.app_status = 'Y'
                         AND (
                             z.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+                            OR z.created_by LIKE '%".$this->db->escape_like_str($like_value)."%'
                             OR c.no_pr_group LIKE '%".$this->db->escape_like_str($like_value)."%'
                             OR a.no_po LIKE '%".$this->db->escape_like_str($like_value)."%'
                         )
@@ -195,6 +207,7 @@ class History_pembelian extends CI_Controller {
 		$Arr_Akses			= getAcccesmenu($controller);
 		$requestData	= $_REQUEST;
 		$fetch			= $this->queryDataJSONMaterial(
+			$requestData['range'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -252,6 +265,7 @@ class History_pembelian extends CI_Controller {
 			$IMPLODE = implode("<br>", $DATE_INCOMING);
 
 			$nestedData[]	= "<div align='center'>".$IMPLODE."</div>";
+			$nestedData[]	= "<div align='left'>".$row['created_by']."</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -267,13 +281,23 @@ class History_pembelian extends CI_Controller {
 		echo json_encode($json_data);
 	}
 
-	public function queryDataJSONMaterial($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
- 
+	public function queryDataJSONMaterial($range=null, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		
+		$where_range = "";
+        if($range > 0){
+			$exP = explode(' - ', $range);
+			$date_awal = date('Y-m-d', strtotime($exP[0]));
+			$date_akhir = date('Y-m-d', strtotime($exP[1]));
+			// echo $exP[0];exit;
+            $where_range = "AND DATE(z.created_date) BETWEEN '".$date_awal."' AND '".$date_akhir."' ";
+        }
+
 		$sql = "	SELECT
                         (@row:=@row+1) AS nomor,
                         c.no_pr AS no_pr,
                         a.no_po,
                         DATE(z.created_date) AS tgl_po,
+						z.created_by,
                         z.nm_supplier,
                         a.tgl_dibutuhkan,
                         a.id_material AS id_barang,
@@ -290,10 +314,12 @@ class History_pembelian extends CI_Controller {
                         (SELECT @row:=0) r
                     WHERE
                         a.deleted = 'N' 
+						".$where_range."
                         AND b.deleted = 'N'
                         AND c.deleted_date IS NULL
                         AND (
                             z.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+                            OR z.created_by LIKE '%".$this->db->escape_like_str($like_value)."%'
                             OR c.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
                             OR a.no_po LIKE '%".$this->db->escape_like_str($like_value)."%'
                         )
@@ -388,179 +414,124 @@ class History_pembelian extends CI_Controller {
 		$this->load->view('History/modal_detail', $data);
 	}
 
-	public function excel_non_material(){
+	public function excel_non_material($tgl_awal, $tgl_akhir){
 		//membuat objek PHPExcel
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
 
 		$this->load->library("PHPExcel");
-		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();
 
-		$style_header = array(
-			'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			),
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'CCFF99'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$style_header2 = array(
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'FFB266'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$styleArray = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		$styleArray3 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		  $styleArray5 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		 $styleArray4 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
-		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(9);
-		$sheet->setCellValue('A'.$Row, 'HISTORY PEMBELIAN NON-MATERIAL');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$Col_Akhir	= $Cols	= getColsChar(10);
+		$sheet->setCellValue('A'.$Row, 'HISTORY PEMBELIAN NON-MATERIAL ('.$tgl_awal.' sd '.$tgl_akhir.')');
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 
 		$NewRow	= $NewRow +2;
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, '#');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
 		$sheet->setCellValue('B'.$NewRow, 'Category');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
 		$sheet->setCellValue('C'.$NewRow, 'No PR');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
 		$sheet->setCellValue('D'.$NewRow, 'No PO');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
 		$sheet->setCellValue('E'.$NewRow, 'Tgl PO');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
 		$sheet->setCellValue('F'.$NewRow, 'Supplier');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 		
-		$sheet->setCellValue('G'.$NewRow, 'Total PO');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('G'.$NewRow, 'Tgl Permintaan');
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-		$sheet->setCellValue('H'.$NewRow, 'Tgl Permintaan');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('H'.$NewRow, 'Aktual Kedatangan');
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-		$sheet->setCellValue('I'.$NewRow, 'Aktual Kedatangan');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('I'.$NewRow, 'Created');
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
+
+		$sheet->setCellValue('J'.$NewRow, 'Department');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+		$sheet->getColumnDimension('J')->setWidth(20);
+
+		$sheet->setCellValue('K'.$NewRow, 'Kode');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+		$sheet->getColumnDimension('K')->setWidth(20);
+
+		$sheet->setCellValue('L'.$NewRow, 'Nama Barang');
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+		$sheet->getColumnDimension('L')->setWidth(20);
+
+		$sheet->setCellValue('M'.$NewRow, 'Qty');
+		$sheet->getStyle('M'.$NewRow.':M'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow);
+		$sheet->getColumnDimension('M')->setWidth(20);
+
+		$sheet->setCellValue('N'.$NewRow, 'Unit Price');
+		$sheet->getStyle('N'.$NewRow.':N'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow);
+		$sheet->getColumnDimension('N')->setWidth(20);
+
+		$sheet->setCellValue('O'.$NewRow, 'Total Price');
+		$sheet->getStyle('O'.$NewRow.':O'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow);
+		$sheet->getColumnDimension('O')->setWidth(20);
+
+		// $sheet->setCellValue('P'.$NewRow, 'Total Price');
+		// $sheet->getStyle('P'.$NewRow.':P'.$NextRow)->applyFromArray($tableHeader);
+		// $sheet->mergeCells('P'.$NewRow.':P'.$NextRow);
+		// $sheet->getColumnDimension('P')->setWidth(20);
 
 
 		$sql = "	SELECT
                         z.category,
                         c.no_pr_group AS no_pr,
+						c.no_pr AS no_pr_planning,
                         a.no_po,
                         DATE(z.created_date) AS tgl_po,
+						z.created_by,
                         z.nm_supplier,
                         a.tgl_dibutuhkan,
                         a.id_barang,
@@ -568,7 +539,7 @@ class History_pembelian extends CI_Controller {
                         a.qty_po,
                         a.qty_in,
                         a.net_price AS unit_price,
-                        SUM(a.total_price) AS total_price
+                        a.total_price AS total_price
                     FROM
                         tran_po_detail a
                         LEFT JOIN tran_po_header z ON a.no_po = z.no_po
@@ -578,9 +549,9 @@ class History_pembelian extends CI_Controller {
                         a.deleted = 'N' 
                         AND b.deleted = 'N'
                         AND c.app_status = 'Y'
-                    GROUP BY
-                        a.no_po
+						AND DATE(z.created_date) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."'
 		";
+		// echo $sql; exit;
 		$restDetail1	= $this->db->query($sql)->result_array();
 
 		if($restDetail1){
@@ -596,7 +567,7 @@ class History_pembelian extends CI_Controller {
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$NAMA = $row['category'];
@@ -609,42 +580,36 @@ class History_pembelian extends CI_Controller {
 				$category		= $NAMA;
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $category);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_pr		= $row['no_pr'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_pr);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_po		= $row['no_po'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_po);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$tgl_po		= date('d-M-Y', strtotime($row['tgl_po']));
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $tgl_po);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$nm_supplier	= $row['nm_supplier'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_supplier);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
-
-				$awal_col++;
-				$total_price	= $row['total_price'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $total_price);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $TGL_DIBUTUHKAN);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$QUERY = "	SELECT 
 							c.tanggal 
@@ -666,7 +631,52 @@ class History_pembelian extends CI_Controller {
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $IMPLODE);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$created_by	= $row['created_by'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $created_by);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$getPRDept = $this->db->get_where('rutin_non_planning_header',array('no_pr'=>$row['no_pr_planning']))->result_array();
+				$id_dept = (!empty($getPRDept[0]['id_dept']))?$getPRDept[0]['id_dept']:0;
+				$nm_dept = get_name('department','nm_dept','id',$id_dept);
+				
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nm_dept);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$id_barang	= $row['id_barang'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_barang);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$nm_barang	= $row['nm_barang'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nm_barang);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$qty_po	= $row['qty_po'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $qty_po);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				
+				$awal_col++;
+				$unit_price	= $row['unit_price'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $unit_price);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$total_price	= $row['total_price'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $total_price);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 
 			}
@@ -689,7 +699,7 @@ class History_pembelian extends CI_Controller {
 		$objWriter->save("php://output");
 	}
 
-	public function excel_material(){
+	public function excel_material($tgl_awal, $tgl_akhir){
 		//membuat objek PHPExcel
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
@@ -698,164 +708,99 @@ class History_pembelian extends CI_Controller {
 		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();
 
-		$style_header = array(
-			'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			),
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'CCFF99'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$style_header2 = array(
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'FFB266'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$styleArray = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		$styleArray3 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		  $styleArray5 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		 $styleArray4 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
-		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= $Cols	= getColsChar(8);
-		$sheet->setCellValue('A'.$Row, 'HISTORY PEMBELIAN MATERIAL');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$Col_Akhir	= $Cols	= getColsChar(9);
+		$sheet->setCellValue('A'.$Row, 'HISTORY PEMBELIAN MATERIAL ('.$tgl_awal.' sd '.$tgl_akhir.')');
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 
 		$NewRow	= $NewRow +2;
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, '#');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
 		$sheet->setCellValue('B'.$NewRow, 'No PR');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
 		$sheet->setCellValue('C'.$NewRow, 'No PO');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
 		$sheet->setCellValue('D'.$NewRow, 'Tgl PO');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
 		$sheet->setCellValue('E'.$NewRow, 'Supplier');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
-		$sheet->setCellValue('F'.$NewRow, 'Total PO');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('F'.$NewRow, 'Tgl Permintaan');
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 		
-		$sheet->setCellValue('G'.$NewRow, 'Tgl Permintaan');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('G'.$NewRow, 'Aktual Kedatangan');
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-		$sheet->setCellValue('H'.$NewRow, 'Aktual Kedatangan');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray);
+		$sheet->setCellValue('H'.$NewRow, 'Created By');
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
+
+		$sheet->setCellValue('I'.$NewRow, 'Kode');
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+		$sheet->getColumnDimension('I')->setWidth(20);
+
+		$sheet->setCellValue('J'.$NewRow, 'Nm Material');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+		$sheet->getColumnDimension('J')->setWidth(20);
+
+		$sheet->setCellValue('K'.$NewRow, 'Qty');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+		$sheet->getColumnDimension('K')->setWidth(20);
+
+		$sheet->setCellValue('L'.$NewRow, 'Unit Price');
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+		$sheet->getColumnDimension('L')->setWidth(20);
+
+		$sheet->setCellValue('M'.$NewRow, 'Total Price');
+		$sheet->getStyle('M'.$NewRow.':M'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow);
+		$sheet->getColumnDimension('M')->setWidth(20);
 
 
 		$sql = "	SELECT
                         c.no_pr AS no_pr,
                         a.no_po,
                         DATE(z.created_date) AS tgl_po,
+						z.created_by,
                         z.nm_supplier,
                         a.tgl_dibutuhkan,
                         a.id_material AS id_barang,
@@ -863,7 +808,7 @@ class History_pembelian extends CI_Controller {
                         a.qty_purchase AS qty_po,
                         a.qty_in,
                         a.net_price AS unit_price,
-                        SUM(a.total_price) AS total_price
+                        a.total_price AS total_price
                     FROM
                         tran_material_po_detail a
                         LEFT JOIN tran_material_po_header z ON a.no_po = z.no_po
@@ -873,8 +818,7 @@ class History_pembelian extends CI_Controller {
                         a.deleted = 'N' 
                         AND b.deleted = 'N'
                         AND c.deleted_date IS NULL
-                    GROUP BY
-                        a.no_po
+						AND DATE(z.created_date) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."'
 		";
 		$restDetail1	= $this->db->query($sql)->result_array();
 
@@ -891,42 +835,38 @@ class History_pembelian extends CI_Controller {
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_pr		= $row['no_pr'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_pr);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_po		= $row['no_po'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_po);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$tgl_po		= date('d-M-Y', strtotime($row['tgl_po']));
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $tgl_po);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$nm_supplier	= $row['nm_supplier'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_supplier);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-				$awal_col++;
-				$total_price	= $row['total_price'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $total_price);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
-				
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $TGL_DIBUTUHKAN);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				
 
 				$QUERY = "	SELECT 
 							(c.checked_date) AS tanggal 
@@ -948,8 +888,44 @@ class History_pembelian extends CI_Controller {
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $IMPLODE);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
+				$awal_col++;
+				$created_by	= $row['created_by'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $created_by);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				
+				$awal_col++;
+				$id_material	= $row['id_barang'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_material);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$nm_material	= $row['nm_barang'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nm_material);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$qty_purchase	= $row['qty_po'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $qty_purchase);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				
+				$awal_col++;
+				$unit_price	= $row['unit_price'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $unit_price);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$total_price	= $row['total_price'];
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $total_price);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 			}
 		}

@@ -680,39 +680,11 @@ class Purchase extends CI_Controller {
 	}
 	function receive_invoice_save(){
 		$data = $this->input->post();
-		
-		// print_r($data);
-		    // exit;
-		
-		
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
-        
+
 		$id				= $data['id_top'];
-		
-			$matauang2 = $data['matauang2'];
-			$kurs=$data['kurs'];
-			
-			if($matauang2=='IDR'){
-			$coa_um='1111-01-01';
-			$coa_ap='2101-01-01';
-			$nilai_um = $data['invoice_total']-$data['nilai_ppn'];
-			$nilai_ap = $data['invoice_total'];
-			$nilai_ppn = $data['nilai_ppn'];
-			$nilai_unbill = $data['invoice_total']-$data['nilai_ppn'];
-			}
-			elseif($matauang2=='USD'){
-			$coa_um='1111-01-02';
-			$coa_ap='2101-01-04';
-			$nilai_um = ($data['invoice_total']*$kurs)-($data['nilai_ppn']*$kurs);
-			$nilai_ap = ($data['invoice_total']*$kurs);
-			$nilai_ppn = ($data['nilai_ppn']*$kurs);
-			$nilai_unbill = ($data['invoice_total']*$kurs)-($data['nilai_ppn']*$kurs);
-			}
-			
-			
-			
 		$ArrUpdate = [
 			'invoice_no' => $data['invoice_no'],
 			'nilai_ppn' => $data['nilai_ppn'],
@@ -721,9 +693,6 @@ class Purchase extends CI_Controller {
 			'surat_jalan' => $data['surat_jalan'],
 			'lainnya' => $data['lainnya'],
 			'tgl_terima' => $data['tgl_terima'],
-			'kurs_receive_invoice' => $data['kurs'],
-			'matauang_receive_invoice' => $matauang2,
-			'invoice_receive_idr' => $data['invoice_total']*$kurs,
 			'created_date_invoice' => $dateTime,
 //			'invoice_dokumen' => $data['invoice_dokumen'],
 			'created_by_invoice' => $Username,
@@ -736,8 +705,6 @@ class Purchase extends CI_Controller {
 		$no_po=$data['no_po'];
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
-		
-		
 		if($datapo->total_terima_barang_idr>0){
 			$jenis_jurnal='JV041';
 			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' order by parameter_no")->result();
@@ -745,46 +712,25 @@ class Purchase extends CI_Controller {
 			$payment_date=$data['tgl_terima']; // date("Y-m-d")
 			$det_Jurnaltes1=array();
 			$total=($datapo->total_terima_barang_idr);
-		    $nilai_unbill = ($datapo->hutang_idr);
-			
-			$selisih = $nilai_unbill - $nilai_ap;
-			if( $selisih > 1){
-			$selisihdebet   = 0;
-			$selisihkredit  = $selisih;
-			}else{
-			$selisihdebet   = $selisih*(-1);
-			$selisihkredit	= 0;
-			}
-			
-			
 			if($total!=0) {
 			  foreach ($datajurnal1 as $rec) {
 				if($rec->parameter_no=="1"){
-					
-					$coaunbill=$rec->no_perkiraan;
-					if($kurs>1) $coaunbill='2101-01-05';
-					
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coaunbill, 'keterangan' => 'PO '.$datapo->no_po.' '.$id, 'no_request' => $datapo->no_po, 'debet' => $nilai_unbill, 'kredit' => 0,'nilai_valas_debet' => $data['invoice_total']-$data['nilai_ppn'], 'nilai_valas_kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $data['invoice_total']-$data['nilai_ppn'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
 					);
-					
-					
+					$totalunbill=$data['invoice_total']-$data['nilai_ppn'];
+					$coaunbill=$rec->no_perkiraan;	
 				}
 				if($rec->parameter_no=="2"){
-					
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_ap, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => $nilai_ap,'nilai_valas_debet' => 0, 'nilai_valas_kredit' => $data['invoice_total'], 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => $data['invoice_total'], 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
 					);
-					
+					$no_perkiraan= $rec->no_perkiraan;
+					$totalap=$data['invoice_total'];
 				}
 				if($rec->parameter_no=="3"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $nilai_ppn, 'kredit' => 0,'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
-					);
-				}
-				if($rec->parameter_no=="7"){
-					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih Kurs '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $selisihdebet, 'kredit' => $selisihkredit,'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $data['nilai_ppn'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
 					);
 				}
 			  }
@@ -806,13 +752,11 @@ class Purchase extends CI_Controller {
 						'no_reff'		=> $vals['no_reff'],
 						'debet'			=> $vals['debet'],
 						'kredit'		=> $vals['kredit'],
-						'nilai_valas_debet'			=> $vals['nilai_valas_debet'],
-						'nilai_valas_kredit'		=> $vals['nilai_valas_kredit'],
 						);
 					$total=($total+$vals['debet']);
 					$this->db->insert(DBACC.'.jurnal',$datadetail);
 				}
-				$keterangan		= 'Receive Invoice Progress'.$data['invoice_no'];
+				$keterangan		= 'Receive Invoice '.$data['invoice_no'];
 				$dataJVhead = array(
 					'nomor' 	    	=> $Nomor_JV,
 					'tgl'	         	=> $tanggal,
@@ -834,7 +778,7 @@ class Purchase extends CI_Controller {
 					'keterangan'     => $keterangan,
 					'no_reff'     	 => $no_po,
 					'kredit'      	 => 0,
-					'debet'          => $nilai_unbill,
+					'debet'          => $totalunbill,
 					'id_supplier'    => $datapo->id_supplier,
 					'nama_supplier'  => $datapo->nm_supplier,
 					'no_request'     => $data['invoice_no'],
@@ -844,116 +788,16 @@ class Purchase extends CI_Controller {
 					'tipe'       	 => 'JV',
 					'nomor'       	 => $Nomor_JV,
 					'tanggal'        => $tanggal,
-					'no_perkiraan'   => $coa_ap,
+					'no_perkiraan'   => $no_perkiraan,
 					'keterangan'     => $keterangan,
 					'no_reff'     	 => $no_po,
-					'kredit'         => $nilai_ap,
+					'kredit'         => $data['invoice_total'],
 					'debet'      	 => 0,
 					'id_supplier'    => $datapo->id_supplier,
 					'nama_supplier'  => $datapo->nm_supplier,
 					'no_request'     => $data['invoice_no'],
 					'debet_usd'		 => 0,
 					'kredit_usd'	 => 0,
-				);
-				$this->db->insert('tr_kartu_hutang',$datahutang);
-				//end auto jurnal
-			}
-		}
-		
-		else {
-			$jenis_jurnal='JV053';
-			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' order by parameter_no")->result();
-			$nomor_jurnal=$jenis_jurnal.$no_po.rand(100,999);
-			$payment_date=$data['tgl_terima']; // date("Y-m-d")
-			$det_Jurnaltes1=array();
-			$total=$data['invoice_total'];
-				
-			
-			if($total!=0) {
-			  foreach ($datajurnal1 as $rec) {
-				if($rec->parameter_no=="1"){
-					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_um, 'keterangan' => 'PO '.$datapo->no_po.' '.$id, 'no_request' => $datapo->no_po, 'debet' => $nilai_um, 'kredit' => 0,'nilai_valas_debet' => $data['invoice_total']-$data['nilai_ppn'], 'nilai_valas_kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
-					);
-				}
-				if($rec->parameter_no=="3"){
-					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $nilai_ppn, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
-					);
-				}
-				if($rec->parameter_no=="2"){
-					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_ap, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => $nilai_ap,'nilai_valas_debet' => 0, 'nilai_valas_kredit' => $data['invoice_total'],  'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
-					);
-				}
-			  }
-			  $this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
-				//auto jurnal
-
-				$tanggal = $data['tgl_terima'];
-				$Bln	= substr($tanggal,5,2);
-				$Thn	= substr($tanggal,0,4);
-				$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tanggal);
-				foreach ($det_Jurnaltes1 as $vals) {
-					$datadetail = array(
-						'tipe'			=> 'JV',
-						'nomor'			=> $Nomor_JV,
-						'tanggal'		=> $tanggal,
-						'no_perkiraan'	=> $vals['no_perkiraan'],
-						'keterangan'	=> $vals['keterangan'],
-						'no_reff'		=> $vals['no_reff'],
-						'debet'			=> $vals['debet'],
-						'kredit'		=> $vals['kredit'],
-						'nilai_valas_debet'			=> $vals['nilai_valas_debet'],
-						'nilai_valas_kredit'		=> $vals['nilai_valas_kredit'],
-						);
-					$total=($total+$vals['kredit']);
-					$this->db->insert(DBACC.'.jurnal',$datadetail);
-				}
-				$keterangan		= 'Receive Invoice Uang Muka '.$data['invoice_no'];
-				$dataJVhead = array(
-					'nomor' 	    	=> $Nomor_JV,
-					'tgl'	         	=> $tanggal,
-					'jml'	            => $total,
-					'bulan'	            => $Bln,
-					'tahun'	            => $Thn,
-					'kdcab'				=> '101',
-					'jenis'			    => 'JV',
-					'keterangan'		=> $keterangan,
-					'user_id'			=> $Username,
-					'ho_valid'			=> '',
-				);
-				$this->db->insert(DBACC . '.javh', $dataJVhead);
-				$datahutang = array(
-					'tipe'       	 => 'JV',
-					'nomor'       	 => $Nomor_JV,
-					'tanggal'        => $tanggal,
-					'no_perkiraan'   => $coa_um,
-					'keterangan'     => $keterangan,
-					'no_reff'     	 => $no_po,
-					'kredit'      	 => 0,
-					'debet'          => $nilai_um,
-					'id_supplier'    => $datapo->id_supplier,
-					'nama_supplier'  => $datapo->nm_supplier,
-					'no_request'     => $data['invoice_no'],
-					'debet_usd'		 => $data['invoice_total']-$data['nilai_ppn'],
-					'kredit_usd'	 => 0,
-				);
-				$this->db->insert('tr_kartu_hutang',$datahutang);	
-				$datahutang = array(
-					'tipe'       	 => 'JV',
-					'nomor'       	 => $Nomor_JV,
-					'tanggal'        => $tanggal,
-					'no_perkiraan'   => $coa_ap,
-					'keterangan'     => $keterangan,
-					'no_reff'     	 => $no_po,
-					'kredit'         => $nilai_ap,
-					'debet'      	 => 0,
-					'id_supplier'    => $datapo->id_supplier,
-					'nama_supplier'  => $datapo->nm_supplier,
-					'no_request'     => $data['invoice_no'],
-					'debet_usd'		 => 0,
-					'kredit_usd'	 => $data['invoice_total'],
 				);
 				$this->db->insert('tr_kartu_hutang',$datahutang);
 				//end auto jurnal
@@ -1030,7 +874,6 @@ class Purchase extends CI_Controller {
 		$id_supplier = $this->input->post("id_supplier");
 		$nilai_ppn = $this->input->post("nilai_ppn");
 		$curs_header = $this->input->post("curs_header");
-		$kurs_receive_invoice = $this->input->post("kurs");
 		$nilai_total = $this->input->post("nilai_total");
 		$total_bayar = $this->input->post("total_bayar");
 		$po_belum_dibayar = $this->input->post("po_belum_dibayar");
@@ -1076,7 +919,6 @@ class Purchase extends CI_Controller {
 				'req_payment_date'=>$req_payment_date,
 				'status' => '0',
 				'curs_header' => $curs_header,
-				'kurs_receive_invoice' => $kurs_receive_invoice,
 				'nilai_total' => $nilai_total,
 				'total_bayar' => $total_bayar,
 				'po_belum_dibayar' => $po_belum_dibayar,

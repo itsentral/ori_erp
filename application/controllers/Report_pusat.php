@@ -79,7 +79,7 @@ class Report_pusat extends CI_Controller {
             }
 
 			$TipeInOut = 'IN';
-			if($row['id_gudang_dari'] == '3' OR $row['id_gudang_dari'] == '4'){
+			if($row['id_gudang_dari'] == '1' OR $row['id_gudang_dari'] == '2'){
                 $TipeInOut = 'OUT';
             }
 
@@ -101,7 +101,12 @@ class Report_pusat extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['cost_book'],2)."</div>";
+			if($row['category_type'] == 'incoming material'){
+				$nestedData[]	= "<div align='right'>".number_format($row['price_incoming'],2)."</div>";
+			}
+			else{
+				$nestedData[]	= "<div align='right'>".number_format($row['cost_book'],2)."</div>";
+			}
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -140,6 +145,8 @@ class Report_pusat extends CI_Controller {
                     a.qty_oke AS qty,
 					b.id_gudang_dari,
 					b.id_gudang_ke,
+					b.category AS category_type,
+					a.unit_price_idr AS price_incoming,
                     (SELECT z.price_book FROM price_book z WHERE z.id_material=a.id_material and z.updated_date <= a.update_date ORDER BY z.id DESC LIMIT 1) AS cost_book 
                 FROM
                     warehouse_adjustment_check a 
@@ -317,7 +324,7 @@ class Report_pusat extends CI_Controller {
                 $no_spk = (!empty($row['no_spk']))?$row['no_spk']:$row['no_spk2'];
 
 				$TipeInOut = 'IN';
-				if($row['id_gudang_dari'] == '3' OR $row['id_gudang_dari'] == '4'){
+				if($row['id_gudang_dari'] == '1' OR $row['id_gudang_dari'] == '2'){
 					$TipeInOut = 'OUT';
 				}
 

@@ -69,6 +69,7 @@ class Cron_job extends CI_Controller {
                     AND a.release_to_costing_date IS NOT NULL
                     AND a.fg_date IS NOT NULL
                     AND a.lock_delivery_date IS NULL
+                    AND a.id_deadstok_dipakai IS NULL
             ";
 
             $RESULT = $this->db->query($SQL)->result_array();
@@ -286,6 +287,7 @@ class Cron_job extends CI_Controller {
 					AND a.release_to_costing_date IS NULL
 					AND a.fg_date IS NULL
 					AND a.id_category NOT IN ".DirectFinishGood()."
+                    AND a.id_deadstok_dipakai IS NULL
             ";
 
             // echo $SQL; exit;
@@ -389,8 +391,7 @@ class Cron_job extends CI_Controller {
         //INSERT JURNAL TEMP
         $SQL = "SELECT
                     a.category AS category,
-                    a.nm_asset AS nm_asset,
-					a.nm_category AS nm_category,
+                    a.nm_category AS nm_category,
                     sum( a.nilai_susut ) AS sisa_nilai,
                     a.kdcab AS kdcab,
 					b.id_coa,
@@ -450,7 +451,8 @@ class Cron_job extends CI_Controller {
 				$this->db->insert_batch('asset_jurnal_temp', $ArrDebit);
 				$this->db->insert_batch('asset_jurnal_temp', $ArrKredit);
 
-				$this->db->trans_complete();
+				$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='".$BULAN."' AND tahun='".$TAHUN."' ");
+			$this->db->trans_complete();
 
 			if($this->db->trans_status() === FALSE){
 				$this->db->trans_rollback();
@@ -458,16 +460,195 @@ class Cron_job extends CI_Controller {
 			else{
 				$this->db->trans_commit();
 				$this->saved_jurnal_erp();
-				$this->saved_jurnal_depresiasi();
-				$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='".$BULAN."' AND tahun='".$TAHUN."' ");
-		
 			}
 			echo "Update";
 		}else{
 			echo "Empty";
 		}
 	}
-   
+    
+    public function depresiasi_assets_old(){
+        //SAVE JURNAL TO TEMP
+		$DATE_NOW	= date('Y-m-d');
+		// $DATE_NOW	= date('2022-09-01');
+        $TANGGAL    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
+		$TAHUN		= date('Y',strtotime($TANGGAL));
+		$BULAN		= date('m',strtotime($TANGGAL));
+        $username   = 'system';
+	    $datetime   = date('Y-m-d H:i:s');
+
+        //INSERT JURNAL TEMP
+        $SQL = "SELECT
+                    a.category AS category,
+                    a.nm_category AS nm_category,
+                    sum( a.nilai_susut ) AS sisa_nilai,
+                    a.kdcab AS kdcab
+                FROM
+                    asset_generate a
+					LEFT JOIN asset b ON a.kd_asset=b.kd_asset
+                WHERE
+                    (a.bulan = '$BULAN' AND a.tahun = '$TAHUN') AND b.deleted_date IS NULL
+                GROUP BY 
+                    a.category, 
+                    a.kdcab";
+        // echo $SQL;
+
+        $ArrJurnal = $this->db->query($SQL)->result_array();
+        
+        $ArrDebit = array();
+        $ArrKredit = array();
+        $ArrJavh = array();
+        $Loop = 0;
+		foreach($ArrJurnal AS $val => $valx){
+			$coa_category = $this->db->query("select * from asset_category where id='".$valx['category']."' and deleted='N'")->result();
+			$totalall=0;
+			if($coa_category){
+				foreach($coa_category as $rec){
+					$array_debit=explode(";",$rec->coa_debit);
+					foreach ($array_debit as $coa_rec){
+						$Loop++;
+						$array_coa=explode("/",$coa_rec);
+						$totalrow=floor($valx['sisa_nilai']*$array_coa[1]/100);
+						$coa_data=$this->db->query("select * from ".DBACC.".coa_master where no_perkiraan='".$array_coa[0]."'")->row();
+						$ArrDebit[$Loop]['id_category'] 	= $valx['category'];
+						$ArrDebit[$Loop]['category'] 		= $valx['nm_category'];
+						$ArrDebit[$Loop]['tipe'] 			= "JV";
+						$ArrDebit[$Loop]['nomor'] 			= $Loop;
+						$ArrDebit[$Loop]['tanggal'] 		= $TANGGAL;
+						$ArrDebit[$Loop]['no_perkiraan'] 	= $coa_data->no_perkiraan;
+						$ArrDebit[$Loop]['keterangan'] 		= $coa_data->nama;
+						$ArrDebit[$Loop]['kdcab'] 			= $valx['kdcab'];
+						$ArrDebit[$Loop]['debet'] 			= $totalrow;
+						$ArrDebit[$Loop]['kredit'] 			= 0;
+						$ArrDebit[$Loop]['created_by'] 		= $username;
+						$ArrDebit[$Loop]['created_date'] 	= $datetime;
+						$totalall=($totalall+$totalrow);
+					}
+				}
+			}else{
+				$Loop++;
+				$ArrDebit[$Loop]['id_category'] 	= $valx['category'];
+				$ArrDebit[$Loop]['category'] 		= $valx['nm_category'];
+				$ArrDebit[$Loop]['tipe'] 			= "JV";
+				$ArrDebit[$Loop]['nomor'] 			= $Loop;
+				$ArrDebit[$Loop]['tanggal'] 		= $TANGGAL;
+				$ArrDebit[$Loop]['no_perkiraan'] 	= '0000-00-00';
+				$ArrDebit[$Loop]['keterangan'] 		= "BELUM DI SETTING";
+				$ArrDebit[$Loop]['kdcab'] 			= $valx['kdcab'];
+				$ArrDebit[$Loop]['debet'] 			= $valx['sisa_nilai'];
+				$ArrDebit[$Loop]['kredit'] 			= 0;
+				$ArrDebit[$Loop]['created_by'] 		= $username;
+				$ArrDebit[$Loop]['created_date'] 	= $datetime;
+			}
+			if($coa_category){
+				foreach($coa_category as $rec){
+					$array_kredit=explode(";",$rec->coa_kredit);
+					foreach ($array_kredit as $coa_rec){
+						$Loop++;
+						$array_coa=explode("/",$coa_rec);
+						$coa_data=$this->db->query("select * from ".DBACC.".coa_master where no_perkiraan='".$array_coa[0]."'")->row();
+						$ArrKredit[$Loop]['id_category'] 	= $valx['category'];
+						$ArrKredit[$Loop]['category'] 		= $valx['nm_category'];
+						$ArrKredit[$Loop]['tipe'] 			= "JV";
+						$ArrKredit[$Loop]['nomor'] 			= $Loop;
+						$ArrKredit[$Loop]['tanggal'] 		= $TANGGAL;
+						$ArrKredit[$Loop]['no_perkiraan'] 	= $coa_data->no_perkiraan;
+						$ArrKredit[$Loop]['keterangan'] 	= $coa_data->nama;
+						$ArrKredit[$Loop]['kdcab'] 			= $valx['kdcab'];
+						$ArrKredit[$Loop]['debet'] 			= 0;
+						$ArrKredit[$Loop]['kredit'] 		= floor($totalall*$array_coa[1]/100);
+						$ArrKredit[$Loop]['created_by'] 	= $username;
+						$ArrKredit[$Loop]['created_date'] 	= $datetime;
+					}
+				}
+			}else{
+				$Loop++;
+				$ArrKredit[$Loop]['id_category'] 	= $valx['category'];
+				$ArrKredit[$Loop]['category'] 		= $valx['nm_category'];
+				$ArrKredit[$Loop]['tipe'] 			= "JV";
+				$ArrKredit[$Loop]['nomor'] 			= $Loop;
+				$ArrKredit[$Loop]['tanggal'] 		= $TANGGAL;
+				$ArrKredit[$Loop]['no_perkiraan'] 	= '0000-00-00';
+				$ArrKredit[$Loop]['keterangan']		= "BELUM DI SETTING";
+				$ArrKredit[$Loop]['kdcab'] 			= $valx['kdcab'];
+				$ArrKredit[$Loop]['debet'] 			= 0;
+				$ArrKredit[$Loop]['kredit'] 		= $valx['sisa_nilai'];
+				$ArrKredit[$Loop]['created_by'] 	= $username;
+				$ArrKredit[$Loop]['created_date'] 	= $datetime;
+			}
+		}
+        /*        
+        foreach($ArrJurnal AS $val => $valx){
+            $Loop++;
+            
+            if($valx['category'] == 1){
+                $coaD 	= "6831-02-01";
+                $ketD	= "BIAYA PENYUSUTAN KENDARAAN";
+                $coaK 	= "1309-05-01";
+                $ketK	= "AKUMULASI PENYUSUTAN KENDARAAN";
+            }
+            else if($valx['category'] == 2){
+                $coaD 	= "6831-06-01";
+                $ketD	= "BIAYA PENYUSUTAN HARTA LAINNYA";
+                $coaK 	= "1309-08-01";
+                $ketK	= "AKUMULASI PENYUSUTAN HARTA LAINNYA";
+            }
+            else if($valx['category'] == 3){
+                $coaD 	= "6831-01-01";
+                $ketD	= "BIAYA PENYUSUTAN BANGUNAN";
+                $coaK 	= "1309-07-01";
+                $ketK	= "AKUMULASI PENYUSUTAN BANGUNAN";
+            }
+            else{
+                $coaD 	= "0000-00-00";
+                $ketD	= "BELUM DI SETTING";
+                $coaK 	= "0000-00-00";
+                $ketK	= "BELUM DI SETTING";
+            }
+            
+            $ArrDebit[$Loop]['id_category'] 	= $valx['category'];
+            $ArrDebit[$Loop]['category'] 		= $valx['nm_category'];
+            $ArrDebit[$Loop]['tipe'] 			= "JV";
+            $ArrDebit[$Loop]['nomor'] 			= $Loop;
+            $ArrDebit[$Loop]['tanggal'] 		= $TANGGAL;
+            $ArrDebit[$Loop]['no_perkiraan'] 	= $coaD;
+            $ArrDebit[$Loop]['keterangan'] 		= $ketD;
+            $ArrDebit[$Loop]['kdcab'] 			= $valx['kdcab'];
+            $ArrDebit[$Loop]['debet'] 			= $valx['sisa_nilai'];
+            $ArrDebit[$Loop]['kredit'] 			= 0;
+            $ArrDebit[$Loop]['created_by'] 		= $username;
+            $ArrDebit[$Loop]['created_date'] 	= $datetime;
+            
+            $ArrKredit[$Loop]['id_category'] 	= $valx['category'];
+            $ArrKredit[$Loop]['category'] 		= $valx['nm_category'];
+            $ArrKredit[$Loop]['tipe'] 			= "JV";
+            $ArrKredit[$Loop]['nomor'] 			= $Loop;
+            $ArrKredit[$Loop]['tanggal'] 		= $TANGGAL;
+            $ArrKredit[$Loop]['no_perkiraan'] 	= $coaK;
+            $ArrKredit[$Loop]['keterangan'] 	= $ketK;
+            $ArrKredit[$Loop]['kdcab'] 			= $valx['kdcab'];
+            $ArrKredit[$Loop]['debet'] 			= 0;
+            $ArrKredit[$Loop]['kredit'] 		= $valx['sisa_nilai'];
+            $ArrKredit[$Loop]['created_by'] 	= $username;
+            $ArrKredit[$Loop]['created_date'] 	= $datetime;
+        }
+        */        
+        $this->db->trans_start();
+            $this->db->delete('asset_jurnal_temp',array('created_by'=>$username));
+            $this->db->insert_batch('asset_jurnal_temp', $ArrDebit);
+            $this->db->insert_batch('asset_jurnal_temp', $ArrKredit);
+
+			$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='".$BULAN."' AND tahun='".$TAHUN."' ");
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+            $this->saved_jurnal_erp();
+		}
+	}
 
     public function saved_jurnal_erp(){
 		$username = 'system';
@@ -498,93 +679,6 @@ class Cron_job extends CI_Controller {
 			$this->db->trans_commit();
 		}
 	}
-	
-	
-	 public function saved_jurnal_depresiasi(){
-		$username = 'system';
-		$datetime = date('Y-m-d H:i:s');
-		
-		$this->db->trans_start();
-
-		
-		$bulan=date("m");
-		$tahun=date("Y");
-		
-		$DATE_NOW	= date('Y-m-d');
-		$date    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
-
-		$sqlHeader	= "select * from asset_jurnal_temp WHERE tanggal='".$date."'";
-		$Q_Awal	= $this->db->query($sqlHeader)->result();
-
-		//echo $sqlHeader."<hr>";
-
-				
-			$det_Jurnaltes1=array();
-			$jenis_jurnal = 'DEPRESIASI';
-			$nomor_jurnal = $jenis_jurnal . $tahun.$bulan . rand(100, 999);
-			$payment_date=$date;
-			foreach($Q_Awal AS $val => $valx){
-				
-
-				$sqlinsert="insert into jurnaltras (nomor, tanggal, tipe, no_perkiraan, keterangan, no_request, debet, kredit, jenis_jurnal)
-				VALUE 
-				('".$nomor_jurnal."','".$payment_date."','JV','".$valx->no_perkiraan."','".$valx->keterangan."','-','".$valx->debet."','".$valx->kredit."','".$valx->tipe."')";
-				$this->db->query($sqlinsert);
-
-		//		echo $sqlinsert.'<hr>';
-
-		   }
-
-			$nocab	= 'A';
-			$Cabang	= '101';
-			$bulan_Proses	= date('Y',strtotime($payment_date));
-			$Urut			= 1;
-			$Pros_Cab		= $this->db->query("SELECT subcab,nomorJC FROM ".DBACC.".pastibisa_tb_cabang WHERE nocab='".$Cabang."' limit 1");
-			$det_Cab		= $Pros_Cab->row();
-			
-			
-			if($det_Cab){
-				$nocab		= $det_Cab ->subcab;
-				$Urut		= intval($det_Cab ->nomorJC) + 1;
-			}
-			$Format			= $Cabang.'-'.$nocab.'JV'.date('y',strtotime($payment_date));
-			$Nomor_JV		= $Format.str_pad($Urut, 5, "0", STR_PAD_LEFT);
-			$this->db->query("UPDATE ".DBACC.".pastibisa_tb_cabang SET nomorJC=(nomorJC + 1),lastupdate='".date("Y-m-d")."' WHERE nocab='".$Cabang."'");
-
-
-			$Bln	= substr($payment_date,5,2);
-			$Thn	= substr($payment_date,0,4);
-			$Q_Detail = "select * from jurnaltras where jenis_jurnal='JV' and stspos='0' and nomor='".$nomor_jurnal."'";
-			$DtJurnal = $this->db->query($Q_Detail)->result();
-			
-            $total = 0;
-			foreach($DtJurnal AS $keys => $vals){
-				$total += $vals->debet;
-			
-				$sqlinsert1="insert into ".DBACC.".jurnal (nomor, tipe, tanggal, no_reff, no_perkiraan, keterangan, debet, kredit )
-				VALUE 
-				('".$Nomor_JV."','JV','".$payment_date."','".$vals->no_request."','".$vals->no_perkiraan."','".$vals->keterangan."','".$vals->debet."','".$vals->kredit."')";
-				$this->db->query($sqlinsert1);
-			}
-
-			$sqlinsert="insert into ".DBACC.".javh (nomor, tgl, jml, kdcab, jenis, keterangan, bulan, tahun, user_id, ho_valid )
-			VALUE 
-			('".$Nomor_JV."','".$payment_date."','".$total."','101','JV','Depresiasi ".$Bln." - ".$Thn."','".$Bln."','".$Thn."','system','')";
-			$this->db->query($sqlinsert);
-
-		
-		
-		$this->db->trans_complete();
-
-		if($this->db->trans_status() === FALSE){
-			$this->db->trans_rollback();
-		}
-		else{
-			$this->db->trans_commit();
-		}
-		
-	
-	 }
 
     public function balancing_accesories(){
 		$getAksesorisPF = $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki <>'=>NULL))->result_array();

@@ -6,6 +6,7 @@ class Outgoing extends CI_Controller {
         parent::__construct();
 		$this->load->model('master_model');
 		$this->load->model('All_model');
+		$this->load->model('Jurnal_model');
 		$this->load->database();
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
@@ -106,7 +107,9 @@ class Outgoing extends CI_Controller {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['kode_trans'].' / '.$type)."</div>"; 
+			$nestedData[]	= "<div align='center'>".strtoupper($row['kode_trans'])."</div>"; 
+			$nestedData[]	= "<div align='center'>".strtoupper($type)."</div>"; 
+			$nestedData[]	= "<div align='center'>".strtoupper($row['no_spk'])."</div>"; 
 
 			$WHEREHOUSE = get_name('warehouse', 'nm_gudang', 'id', $row['id_gudang_dari']);
 			if($requestData['tipe'] == 'subgudang'){
@@ -183,6 +186,7 @@ class Outgoing extends CI_Controller {
 				a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.kd_gudang_ke LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
@@ -192,7 +196,9 @@ class Outgoing extends CI_Controller {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'no_ipp'
+			1 => 'no_ipp',
+			2 => 'b.so_number',
+			3 => 'a.no_spk'
 		);
 
 		$sql .= " ORDER BY created_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
@@ -1004,6 +1010,28 @@ class Outgoing extends CI_Controller {
 		if($field_joint == 'yes'){
 			$table_utama = 'request_outgoing';
 		}
+
+		//UPLOAD DOCUMENT
+		$file_name = '';
+		$ArrEndChange = [];
+		if(!empty($_FILES["upload_spk"]["name"])){
+			$target_dir     = "assets/file/produksi/";
+			$target_dir_u   = $_SERVER['DOCUMENT_ROOT']."/assets/file/produksi/";
+			$name_file      = 'qc_eng_change_req_'.date('Ymdhis');
+			$target_file    = $target_dir . basename($_FILES["upload_spk"]["name"]);
+			$name_file_ori  = basename($_FILES["upload_spk"]["name"]);
+			$imageFileType  = strtolower(pathinfo($target_file,PATHINFO_EXTENSION)); 
+			$nama_upload    = $target_dir_u.$name_file.".".$imageFileType;
+			$file_name    	= $name_file.".".$imageFileType;
+
+			if(!empty($_FILES["upload_spk"]["tmp_name"])){
+				move_uploaded_file($_FILES["upload_spk"]["tmp_name"], $nama_upload);
+			}
+
+			$ArrEndChange = array(
+				'file_eng_change' 	=> $file_name
+			);
+		}
 		// echo $no_po;
 		// print_r($addInMat);
 		// exit;
@@ -1092,9 +1120,18 @@ class Outgoing extends CI_Controller {
 				$ArrGrouping[$value['gudang']][$key]['qty'] = $value['qty'];
 			}
 
+			$no_ipp = null;
+			$nm_product = null;
+			if(!empty($no_spk)){
+				$getDetSPK	= $this->db->get_where('so_detail_header',array('no_spk'=>$no_spk))->result_array();
+				$no_ipp 	= (!empty($getDetSPK[0]['id_bq']))?str_replace('BQ-','',$getDetSPK[0]['id_bq']):null;
+				$nm_product = (!empty($getDetSPK[0]['id_category']))?$getDetSPK[0]['id_category']:null;
+			}
+
 			$gudang_dari = $gudang;
 			foreach ($ArrGrouping as $key => $value) {
 				move_warehouse($value,$key,NULL,$kode_trans);
+				insertDataGroupReport($value, $key, null, $kode_trans, $no_ipp, $no_spk, $nm_product);
 			}
 
 			// print_r($ArrGrouping);
@@ -1107,6 +1144,7 @@ class Outgoing extends CI_Controller {
 				'category' 			=> 'outgoing subgudang',
 				'jumlah_mat' 		=> $SumMat,
 				'id_gudang_dari' 	=> $gudang_dari,
+				'file_eng_change' 	=> $file_name,
 				'kd_gudang_dari' 	=> 'SUBGUDANG',
 				'kd_gudang_ke' 		=> 'OUT',
 				'no_spk' 			=> $no_spk,
@@ -1523,9 +1561,11 @@ class Outgoing extends CI_Controller {
 		$data 			= $this->input->post();
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
+		$DateTime		= date('Y-m-d H:i:s');
 		$tanda			= $data['tanda'];
 		$tipe_out		= $data['tipe_out'];
-		$gudang			= $data['gudang'];
+		$tipe_out		= $data['tipe_out'];
+		$gudang			= $data['gudang'];		
 		$tujuan_out		= $data['tujuan_out'];
 		$nm_gudang_ke 	= get_name('warehouse', 'kd_gudang', 'id', $gudang);
 		$addInMat		= $data['addInMat'];
@@ -1547,6 +1587,28 @@ class Outgoing extends CI_Controller {
 		// print_r($addInMat);
 		// exit;
         $histHlp = "Material outgoing (subgudang): ".$tipe_out;
+
+		//UPLOAD DOCUMENT
+		$file_name = '';
+		$ArrEndChange = [];
+		if(!empty($_FILES["upload_spk"]["name"])){
+			$target_dir     = "assets/file/produksi/";
+			$target_dir_u   = $_SERVER['DOCUMENT_ROOT']."/assets/file/produksi/";
+			$name_file      = 'qc_eng_change_req_'.date('Ymdhis');
+			$target_file    = $target_dir . basename($_FILES["upload_spk"]["name"]);
+			$name_file_ori  = basename($_FILES["upload_spk"]["name"]);
+			$imageFileType  = strtolower(pathinfo($target_file,PATHINFO_EXTENSION)); 
+			$nama_upload    = $target_dir_u.$name_file.".".$imageFileType;
+			$file_name    	= $name_file.".".$imageFileType;
+
+			if(!empty($_FILES["upload_spk"]["tmp_name"])){
+				move_uploaded_file($_FILES["upload_spk"]["tmp_name"], $nama_upload);
+			}
+
+			$ArrEndChange = array(
+				'file_eng_change' 	=> $file_name
+			);
+		}
 
 		if($adjustment == 'OUT'){
 			//pengurutan kode
@@ -1687,7 +1749,7 @@ class Outgoing extends CI_Controller {
 			}
 
 			$gudang_dari = $gudang;
-			$gudang_ke = 15;
+			$gudang_ke = getGudangFG();
 			// agus insert jurnal
 			// $tgl_voucher=date('Y-m-d');
 			// $this->load->model('jurnal_model');
@@ -1759,6 +1821,7 @@ class Outgoing extends CI_Controller {
 				'category' 			=> 'outgoing subgudang',
 				'jumlah_mat' 		=> $SumMat,
 				'id_gudang_dari' 	=> $gudang_dari,
+				'file_eng_change' 	=> $file_name,
 				'kd_gudang_dari' 	=> 'SUBGUDANG',
 				'kd_gudang_ke' 		=> 'OUT',
 				'no_spk' 			=> $no_spk,
@@ -1818,7 +1881,7 @@ class Outgoing extends CI_Controller {
 			$this->db->trans_start();
 				// jurnal di off masuk ke jurnal helper
 				// agus insert jurnal
-				// $UserName=$data_session['ORI_User']['username'];
+				$UserName=$data_session['ORI_User']['username'];
 				// $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $SUM_PRICE, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kode_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 				// if(!empty($datadetail)){
 				// 	$this->db->insert(DBACC.'.javh',$dataJVhead);
@@ -1845,6 +1908,15 @@ class Outgoing extends CI_Controller {
 					}
 				}
 
+				$tempx = [];
+				$no_ipp = null;
+				$nm_product = null;
+				if(!empty($no_spk)){
+					$getDetSPK	= $this->db->get_where('so_detail_header',array('no_spk'=>$no_spk))->result_array();
+					$no_ipp 	= (!empty($getDetSPK[0]['id_bq']))?str_replace('BQ-','',$getDetSPK[0]['id_bq']):null;
+					$nm_product = (!empty($getDetSPK[0]['id_category']))?$getDetSPK[0]['id_category']:null;
+				}
+
 				if(!empty($ArrGrouping)){
 					foreach ($ArrGrouping as $key => $valueParent) {
 						$grouping_temp = [];
@@ -1858,14 +1930,92 @@ class Outgoing extends CI_Controller {
 			
 							$grouping_temp[$value['id']]['id'] 			= $value['id'];
 							$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']]['good'];
+							
+							
+							
+							$id_material = $value['id'];
+							$id_gudang   = $gudang; 
+
+							$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
+							$coa_gudang = $coa_1->coa_1;
+							$kategori_gudang = $coa_1->category;				 
+								
+							$stokjurnalakhir=0;
+							$nilaijurnalakhir=0;
+							$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+							if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+							
+							if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+							
+							$tanggal		= date('Y-m-d');
+							$Bln 			= substr($tanggal,5,2);
+							$Thn 			= substr($tanggal,0,4);
+							$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+							
+							
+							
+							$GudangFrom = $kategori_gudang;
+							if($GudangFrom == 'pusat'){
+								$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+								$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+								$bmunit = 0;
+								$bm = 0;
+							}elseif($GudangFrom == 'subgudang'){
+								$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+								$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+								$bmunit = 0;
+								$bm = 0;
+							}elseif($GudangFrom == 'produksi'){
+								$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+								$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+								$bmunit = 0;
+								$bm = 0;
+								
+							}
+							$QTY_OKE  = $temp[$value['id']]['good'];
+							$ACTUAL_MAT = $id_material;
+							
+							$restWhDetail2	= $this->db->get_where('raw_materials',array('id_material'=>$id_material))->result();
+							$DateTime		= date('Y-m-d H:i:s');
+							
+								
+							
+							$ArrJurnalNew[$value['id']]['id_material'] 		= $ACTUAL_MAT;
+							$ArrJurnalNew[$value['id']]['idmaterial'] 		= $restWhDetail2[0]->id_material;
+							$ArrJurnalNew[$value['id']]['nm_material'] 		= $restWhDetail2[0]->nm_material;
+							$ArrJurnalNew[$value['id']]['id_category'] 		= $restWhDetail2[0]->id_category;
+							$ArrJurnalNew[$value['id']]['nm_category'] 		= $restWhDetail2[0]->nm_category;
+							$ArrJurnalNew[$value['id']]['id_gudang'] 			= $id_gudang;
+							$ArrJurnalNew[$value['id']]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
+							$ArrJurnalNew[$value['id']]['id_gudang_dari'] 	    = $id_gudang;
+							$ArrJurnalNew[$value['id']]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
+							$ArrJurnalNew[$value['id']]['id_gudang_ke'] 		= $gudang_ke;
+							$ArrJurnalNew[$value['id']]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $gudang_ke);
+							$ArrJurnalNew[$value['id']]['qty_stock_awal'] 		= $stokjurnalakhir;
+							$ArrJurnalNew[$value['id']]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+							$ArrJurnalNew[$value['id']]['kode_trans'] 			= $kode_trans;
+							$ArrJurnalNew[$value['id']]['tgl_trans'] 			= $DateTime;
+							$ArrJurnalNew[$value['id']]['qty_out'] 			= $QTY_OKE;
+							$ArrJurnalNew[$value['id']]['ket'] 				= 'outgoing subgudang - finisgood';
+							$ArrJurnalNew[$value['id']]['harga'] 			= $PRICE;
+							$ArrJurnalNew[$value['id']]['harga_bm'] 		= 0;
+							$ArrJurnalNew[$value['id']]['nilai_awal_rp']	= $nilaijurnalakhir;
+							$ArrJurnalNew[$value['id']]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+							$ArrJurnalNew[$value['id']]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+							$ArrJurnalNew[$value['id']]['update_by'] 		= $UserName;
+							$ArrJurnalNew[$value['id']]['update_date'] 		= $DateTime;
+							$ArrJurnalNew[$value['id']]['no_jurnal'] 		= $Nojurnal;
+							$ArrJurnalNew[$value['id']]['coa_gudang'] 		= $coa_gudang;
 
 							$grouping_tempGudang[$value['id']]['id'] 	= $value['id'];
 							$grouping_tempGudang[$value['id']]['qty'] 	= $temp[$value['id']]['good'];
 						}
 						
 						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
+						insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
 						if(!empty($grouping_temp)){
 							insert_jurnal($grouping_temp,$key,15,$kode_trans,'material to FG','pengurangan subgudang','penambahan gudang finish good');
+							$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 						}
 					}
 				}

@@ -19,13 +19,15 @@ class Satuan extends CI_Controller {
 			redirect(site_url('dashboard'));
 		}
 		
-		$get_Data			= $this->master_model->getData('raw_pieces');
+		$get_Data			= $this->master_model->getDataArrayMultiple('raw_pieces',array('delete_date'=>null,'tipe'=>'unit'));
+		$get_DataPacking	= $this->master_model->getDataArrayMultiple('raw_pieces',array('delete_date'=>null,'tipe'=>'packing'));
 		$menu_akses			= $this->master_model->getMenu();
 		
 		$data = array(
 			'title'			=> 'Indeks Of Type',
 			'action'		=> 'index',
 			'row'			=> $get_Data,
+			'row_packing'	=> $get_DataPacking,
 			'data_menu'		=> $menu_akses,
 			'akses_menu'	=> $Arr_Akses
 		);
@@ -40,20 +42,22 @@ class Satuan extends CI_Controller {
 			
 			$kode_satuan		= strtoupper($data['kode_satuan']);
 			$nama_satuan		= strtoupper($data['nama_satuan']);
+			$tipe				= $data['tipe'];
 			$descr				= $data['descr'];
 			
 			//check kode satuan
-			$qCodeSatu	= "SELECT * FROM raw_pieces WHERE kode_satuan = '".$kode_satuan."' ";
+			$qCodeSatu	= "SELECT * FROM raw_pieces WHERE kode_satuan = '".$kode_satuan."' AND tipe='".$tipe."' ";
 			$numCdSt	= $this->db->query($qCodeSatu)->num_rows();
 			
 			//check kode satuan
-			$qNmSatu	= "SELECT * FROM raw_pieces WHERE nama_satuan = '".$nama_satuan."' ";
+			$qNmSatu	= "SELECT * FROM raw_pieces WHERE nama_satuan = '".$nama_satuan."' AND tipe='".$tipe."' ";
 			$numNmSt	= $this->db->query($qNmSatu)->num_rows();
 			
 			// echo $numType; exit;
 			$data	= array(
 				'kode_satuan' 	=> $kode_satuan,
 				'nama_satuan' 	=> $nama_satuan,
+				'tipe' 			=> $tipe,
 				'descr' 		=> $descr,
 				'flag_active' 	=> 'Y',
 				'created_by' 	=> $data_session['ORI_User']['username'],

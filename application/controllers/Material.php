@@ -509,8 +509,10 @@ class Material extends CI_Controller {
 		$data_session			= $this->session->userdata;
 
 		$id_material		= $data['id_material'];
-		if($data['NmSupply'] != 0){
-			$detSUpplier		= $data['EdListDetail_sp'];
+		if(!empty($data['NmSupply'])){
+			if($data['NmSupply'] != 0){
+				$detSUpplier		= $data['EdListDetail_sp'];
+			}
 		}
 		if($data['NmdetailEn'] != 0){
 			$detListDetail_en	= $data['EdListDetail_en'];
@@ -526,36 +528,38 @@ class Material extends CI_Controller {
 		// print_r($detListDetail_en);
 		// print_r($detListDetail_bq);
 		// exit;
-		if($data['NmSupply'] != 0){
-			$ArrSup	= array();
-			$ArrSupLog	= array();
-			foreach($detSUpplier AS $val => $valx){
-				$flag = 'N';
-					if(!empty($valx['flag_active'])){
-						$flag = 'Y';
-					}
+		if(!empty($data['NmSupply'])){
+			if($data['NmSupply'] != 0){
+				$ArrSup	= array();
+				$ArrSupLog	= array();
+				foreach($detSUpplier AS $val => $valx){
+					$flag = 'N';
+						if(!empty($valx['flag_active'])){
+							$flag = 'Y';
+						}
 
 
-				$ArrSup[$val]['id_supplier_material'] 	= $valx['id_supplier_material'];
-				$ArrSup[$val]['price'] 					= str_replace(',', '', $valx['price']);
-				$ArrSup[$val]['valid_until'] 			= $valx['valid_until'];
-				$ArrSup[$val]['descr'] 					= $valx['descr'];
-				$ArrSup[$val]['flag_active'] 			= $flag;
-				$ArrSup[$val]['modify_by'] 				= $data_session['ORI_User']['username'];
-				$ArrSup[$val]['modify_date'] 			= date('Y-m-d H:i:s');
+					$ArrSup[$val]['id_supplier_material'] 	= $valx['id_supplier_material'];
+					$ArrSup[$val]['price'] 					= str_replace(',', '', $valx['price']);
+					$ArrSup[$val]['valid_until'] 			= $valx['valid_until'];
+					$ArrSup[$val]['descr'] 					= $valx['descr'];
+					$ArrSup[$val]['flag_active'] 			= $flag;
+					$ArrSup[$val]['modify_by'] 				= $data_session['ORI_User']['username'];
+					$ArrSup[$val]['modify_date'] 			= date('Y-m-d H:i:s');
 
-				$ArrSupLog[$val]['id_supplier_material'] 	= $valx['id_supplier_material'];
-				$ArrSupLog[$val]['id_material'] 			= $valx['id_material'];
-				$ArrSupLog[$val]['nm_material'] 			= $valx['nm_material'];
-				$ArrSupLog[$val]['id_supplier'] 			= $valx['id_supplier'];
-				$ArrSupLog[$val]['nm_supplier'] 			= $valx['nm_supplier'];
-				$ArrSupLog[$val]['price'] 					= str_replace(',', '', $valx['price']);
-				$ArrSupLog[$val]['valid_until'] 			= $valx['valid_until'];
-				$ArrSupLog[$val]['created_by'] 				= $data_session['ORI_User']['username'];
-				$ArrSupLog[$val]['created_date'] 			= date('Y-m-d H:i:s');
+					$ArrSupLog[$val]['id_supplier_material'] 	= $valx['id_supplier_material'];
+					$ArrSupLog[$val]['id_material'] 			= $valx['id_material'];
+					$ArrSupLog[$val]['nm_material'] 			= $valx['nm_material'];
+					$ArrSupLog[$val]['id_supplier'] 			= $valx['id_supplier'];
+					$ArrSupLog[$val]['nm_supplier'] 			= $valx['nm_supplier'];
+					$ArrSupLog[$val]['price'] 					= str_replace(',', '', $valx['price']);
+					$ArrSupLog[$val]['valid_until'] 			= $valx['valid_until'];
+					$ArrSupLog[$val]['created_by'] 				= $data_session['ORI_User']['username'];
+					$ArrSupLog[$val]['created_date'] 			= date('Y-m-d H:i:s');
+				}
+				// print_r($ArrSup);
+				// print_r($ArrSupLog);
 			}
-			// print_r($ArrSup);
-			// print_r($ArrSupLog);
 		}
 
 		if($data['NmdetailEn'] != 0){
@@ -614,9 +618,11 @@ class Material extends CI_Controller {
 		// exit;
 
 		$this->db->trans_start();
-		if($data['NmSupply'] != 0){
-			$this->db->insert_batch('raw_material_supplier_log', $ArrSupLog);
-			$this->db->update_batch('raw_material_supplier', $ArrSup, 'id_supplier_material');
+		if(!empty($data['NmSupply'])){
+			if($data['NmSupply'] != 0){
+				$this->db->insert_batch('raw_material_supplier_log', $ArrSupLog);
+				$this->db->update_batch('raw_material_supplier', $ArrSup, 'id_supplier_material');
+			}
 		}
 		if($data['NmdetailBQ'] != 0){
 			$this->db->update_batch('raw_material_bq_standard', $ArrdetListDetail_bq, 'id_standard');
@@ -855,16 +861,17 @@ class Material extends CI_Controller {
 			// echo $numberMax_en."-".$numberMax_bq;
 			// exit;
 
-			$nm_material			= strtoupper($data['nm_material']);
-			$nm_dagang				= strtoupper($data['nm_dagang']);
-			$nm_international		= strtoupper($data['nm_international']);
+			$nm_material			= $data['nm_material'];
+			$nm_dagang				= $data['nm_dagang'];
+			$nm_international		= $data['nm_international'];
 			$idmaterial				= $data['idmaterial'];
 			$id_accurate				= $data['id_accurate'];
 			$satuan_kg				= $data['satuan_kg'];
-			$saldo_kg				= $data['saldo_kg'];
+			$kg_per_bulan				= $data['kg_per_bulan'];
 			$id_category			= $data['id_category'];
 			$dataNmCty				= $this->db->query("SELECT*FROM raw_categories WHERE id_category='".$id_category."'")->result_array();
 			$id_satuan				= $data['id_satuan'];
+			$id_packing				= $data['id_packing'];
 			$dataNmSat				= $this->db->query("SELECT*FROM raw_pieces WHERE id_satuan='".$id_satuan."'")->result_array();
 			$nilai_konversi			= $data['nilai_konversi'];
 			$safety_stock			= $data['safety_stock'];
@@ -910,11 +917,13 @@ class Material extends CI_Controller {
 				'id_category' 			=> $id_category,
 				'nm_category' 			=> $dataNmCty[0]['category'],
 				'id_satuan' 			=> $id_satuan,
+				'id_packing' 			=> $id_packing,
 				'satuan_kg' 			=> $satuan_kg,
-				'saldo_kg' 				=> $saldo_kg,
+				'kg_per_bulan' 			=> str_replace(',', '', $kg_per_bulan),
 				'cost_satuan' 			=> strtoupper($dataNmSat[0]['kode_satuan']),
-				'safety_stock' 		=> str_replace(',', '', $safety_stock),
-				'max_stock' 		=> str_replace(',', '', $maxstock),
+				'safety_stock' 		=> str_replace(',', '', $safety_stock),				
+				'max_stock' 		=> str_replace(',', '', $max_stock),
+				'nilai_konversi' 		=> str_replace(',', '', $nilai_konversi),
 				// 'price_ref_estimation' 	=> str_replace(',', '', $price_ref_estimation),
 				// 'price_ref_purchase' 	=> str_replace(',', '', $price_ref_purchase),
 				// 'exp_price_ref_est' 	=> $exp_price_ref_est,
@@ -935,10 +944,11 @@ class Material extends CI_Controller {
 				'nm_category' 			=> $dataNmCty[0]['category'],
 				'id_satuan' 			=> $id_satuan,
 				'satuan_kg' 			=> str_replace(',', '', $satuan_kg),
-				'saldo_kg' 				=> str_replace(',', '', $saldo_kg),
+				// 'kg_per_bulan' 			=> str_replace(',', '', $kg_per_bulan),
 				'cost_satuan' 			=> strtoupper($dataNmSat[0]['kode_satuan']),
 				'nilai_konversi' 		=> str_replace(',', '', $nilai_konversi),
-				'nilai_konversi' 		=> str_replace(',', '', $nilai_konversi),
+				// 'safety_stock' 		=> str_replace(',', '', $safety_stock),				
+				// 'max_stock' 		=> str_replace(',', '', $max_stock),
 				// 'price_ref_estimation' 	=> str_replace(',', '', $price_ref_estimation),
 				// 'price_ref_purchase' 	=> str_replace(',', '', $price_ref_purchase),
 				// 'exp_price_ref_est' 	=> $exp_price_ref_est,
@@ -1062,14 +1072,16 @@ class Material extends CI_Controller {
 			// $getType			= $this->master_model->getArray('raw_categories',array(),'id_category','category');
 			$getType			= $this->db->query("SELECT*FROM raw_categories ORDER BY category ASC")->result_array();
 			// $getPiece			= $this->master_model->getArray('raw_pieces',array(),'id_satuan','nama_satuan');
-			$getPiece			= $this->db->query("SELECT*FROM raw_pieces ORDER BY nama_satuan ASC")->result_array();
-			$getWarehouse		= $this->db->query("SELECT*FROM warehouse WHERE category='pusat' ORDER BY id DESC")->result_array();
+			$getPiece			= $this->db->query("SELECT*FROM raw_pieces WHERE delete_date IS NULL and tipe='unit' ORDER BY nama_satuan ASC")->result_array();
+			$getPiecePacking	= $this->db->query("SELECT*FROM raw_pieces WHERE delete_date IS NULL and tipe='packing' ORDER BY nama_satuan ASC")->result_array();
+			$getWarehouse		= $this->db->query("SELECT*FROM warehouse WHERE category='pusat' ORDER BY id ASC")->result_array();
 			$data = array(
-				'title'			=> 'Add Type Material',
+				'title'			=> 'Add Material',
 				'action'		=> 'add',
 				'getWarehouse'	=> $getWarehouse,
 				'data_type'		=> $getType,
-				'data_pieces'	=> $getPiece
+				'data_pieces'	=> $getPiece,
+				'data_pieces_pack'	=> $getPiecePacking,
 			);
 			$this->load->view('Material/add2',$data);
 		}
@@ -1082,10 +1094,10 @@ class Material extends CI_Controller {
 			$Arr_Kembali	= array();
 			$data_session	= $this->session->userdata;
 
-			$id_material			= strtoupper($data['id_material']);
-			$nm_material			= strtoupper($data['nm_material']);
-			$nm_dagang				= strtoupper($data['nm_dagang']);
-			$nm_international		= strtoupper($data['nm_international']);
+			$id_material			= $data['id_material'];
+			$nm_material			= $data['nm_material'];
+			$nm_dagang				= $data['nm_dagang'];
+			$nm_international		= $data['nm_international'];
 			$id_category			= $data['id_category'];
 			$dataNmCty				= $this->db->query("SELECT*FROM raw_categories WHERE id_category='".$id_category."'")->result_array();
 			$id_accurate			= $data['id_accurate'];
@@ -1102,7 +1114,7 @@ class Material extends CI_Controller {
 			$descr					= $data['descr'];
 
 			$satuan_kg				= $data['satuan_kg'];
-			$saldo_kg				= $data['saldo_kg'];
+			$kg_per_bulan				= $data['kg_per_bulan'];
 
 			$numberMax_en			= $data['numberMax_en'];
 			$numberMax_bq			= $data['numberMax_bq'];
@@ -1156,7 +1168,7 @@ class Material extends CI_Controller {
 				'id_category' 			=> $id_category,
 				'nm_category' 			=> $dataNmCty[0]['category'],
 				'satuan_kg' 				=> str_replace(',', '', $satuan_kg),
-				'saldo_kg' 					=> str_replace(',', '', $saldo_kg),
+				'kg_per_bulan' 					=> str_replace(',', '', $kg_per_bulan),
 				'cost_satuan' 			=> strtolower($dataNmSat[0]['kode_satuan']),
 				'nilai_konversi' 		=> str_replace(',', '', $nilai_konversi),
 				'safety_stock' 			=> str_replace(',', '', $safety_stock),
@@ -1302,7 +1314,8 @@ class Material extends CI_Controller {
 
 			$detail			= $this->db->query("SELECT * FROM raw_materials WHERE id_material = '".$id."' ")->result_array();
 			$getType		= $this->db->query("SELECT * FROM raw_categories ORDER BY category ASC")->result_array();
-			$getPiece		= $this->db->query("SELECT * FROM raw_pieces ORDER BY nama_satuan ASC")->result_array();
+			$getPiece			= $this->db->query("SELECT*FROM raw_pieces WHERE delete_date IS NULL and tipe='unit' ORDER BY nama_satuan ASC")->result_array();
+			$getPiecePacking	= $this->db->query("SELECT*FROM raw_pieces WHERE delete_date IS NULL and tipe='packing' ORDER BY nama_satuan ASC")->result_array();
 			$detailBQ		= $this->db->query("SELECT * FROM raw_material_bq_standard WHERE id_material = '".$id."' ")->result_array();
 			$detailEn		= $this->db->query("SELECT * FROM raw_material_engineer_standard WHERE id_material = '".$id."' ")->result_array();
 			$Supply			= $this->db->query("SELECT * FROM raw_material_supplier WHERE id_material = '".$id."' ")->result_array();
@@ -1315,7 +1328,7 @@ class Material extends CI_Controller {
 			$NmSubMat		= $this->db->query("SELECT * FROM raw_material_subtitutions WHERE id_material = '".$id."' ")->num_rows();
 
 			$data = array(
-				'title'			=> 'Edit Type Material',
+				'title'			=> 'Edit Material',
 				'action'		=> 'edit',
 				'row'			=> $detail,
 				'data_type'		=> $getType,
@@ -1328,7 +1341,8 @@ class Material extends CI_Controller {
 				'NmdetailBQ'	=> $NmdetailBQ,
 				'NmdetailEn'	=> $NmdetailEn,
 				'NmSupply'		=> $NmSupply,
-				'NmSubMat'		=> $NmSubMat
+				'NmSubMat'		=> $NmSubMat,
+				'data_pieces_pack'	=> $getPiecePacking,
 			);
 
 			$this->load->view('Material/edit2',$data);
@@ -1492,7 +1506,7 @@ class Material extends CI_Controller {
         $dateX	= date('Y-m-d H:i:s');
         $Row        = 1;
         $NewRow     = $Row+1;
-        $Col_Akhir  = $Cols = getColsChar(7);
+        $Col_Akhir  = $Cols = getColsChar(13);
         $sheet->setCellValue('A'.$Row, "MASTER MATERIAL");
         $sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
         $sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
@@ -1535,10 +1549,35 @@ class Material extends CI_Controller {
         $sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($whiteCenterBold);
         $sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 
-		// $sheet ->getColumnDimension("H")->setAutoSize(true);
-		// $sheet->setCellValue('H'.$NewRow, 'Qty');
-        // $sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($whiteCenterBold);
-        // $sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
+		$sheet ->getColumnDimension("H")->setAutoSize(true);
+		$sheet->setCellValue('H'.$NewRow, 'Unit Packing');
+        $sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
+
+		$sheet ->getColumnDimension("I")->setAutoSize(true);
+		$sheet->setCellValue('I'.$NewRow, 'Konversi');
+        $sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+
+		$sheet ->getColumnDimension("J")->setAutoSize(true);
+		$sheet->setCellValue('J'.$NewRow, 'Unit');
+        $sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+
+		$sheet ->getColumnDimension("K")->setAutoSize(true);
+		$sheet->setCellValue('K'.$NewRow, 'Min Stock');
+        $sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+
+		$sheet ->getColumnDimension("L")->setAutoSize(true);
+		$sheet->setCellValue('L'.$NewRow, 'Max Stock');
+        $sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+
+		$sheet ->getColumnDimension("M")->setAutoSize(true);
+		$sheet->setCellValue('M'.$NewRow, 'Kebutuhan Per Bulan');
+        $sheet->getStyle('M'.$NewRow.':M'.$NextRow)->applyFromArray($whiteCenterBold);
+        $sheet->mergeCells('M'.$NewRow.':M'.$NextRow);
 
 		$SQL = "SELECT a.* FROM raw_materials a WHERE a.delete_date IS NULL";
 		$dataResult   = $this->db->query($SQL)->result_array();
@@ -1593,11 +1632,41 @@ class Material extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $flag_active);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
-				// $awal_col++;
-				// $qty_stock   = $vals['qty_stock'];
-				// $Cols       = getColsChar($awal_col);
-				// $sheet->setCellValue($Cols.$awal_row, $qty_stock);
-				// $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				$awal_col++;
+				$id_packing   = get_name('raw_pieces','kode_satuan','id_satuan',$vals['id_packing']);
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_packing);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$nilai_konversi   = $vals['nilai_konversi'];
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nilai_konversi);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$id_satuan   = get_name('raw_pieces','kode_satuan','id_satuan',$vals['id_satuan']);
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_satuan);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$nilai_konversi   = $vals['nilai_konversi'];
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $nilai_konversi);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$max_stock   = $vals['max_stock'];
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $max_stock);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$kg_per_bulan   = $vals['kg_per_bulan'];
+				$Cols       = getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $kg_per_bulan);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 			}
 		}

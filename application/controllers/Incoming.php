@@ -692,19 +692,6 @@ class Incoming extends CI_Controller {
 				$ArrJurnal[$val]['nm_barang'] 		= strtolower($valx['nm_barang']);
 				$ArrJurnal[$val]['id_barang'] 		= (!empty($GET_UNITPRICE[0]->id_barang))?$GET_UNITPRICE[0]->id_barang:NULL;
 				
-				$assetNew = array(
-				'kode_trans' 		=> $kode_trans,
-				'id_barang' 		=> (!empty($GET_UNITPRICE[0]->id_barang))?$GET_UNITPRICE[0]->id_barang:NULL,
-				'nama' 		        => strtolower($valx['nm_barang']),
-				'nilai_aset' 		=> (!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0,
-				'tanggal' 			=> $tanggal,
-				'created_by' 		=> $UserName,
-				'created_date' 		=> $dateTime,
-				
-				);
-				
-				$this->db->insert('asset_new', $assetNew);
-			
 			}
 
 			$file_name = NULL;
@@ -742,9 +729,6 @@ class Incoming extends CI_Controller {
 				'checked_by' 		=> $UserName,
 				'checked_date' 		=> $dateTime
 			);
-			
-			
-
 
 			$ArrHeader2 = array(
 				'status' => 'COMPLETE',
@@ -769,7 +753,6 @@ class Incoming extends CI_Controller {
 				$this->db->insert('warehouse_adjustment', $ArrInsertH);
 				$this->db->insert_batch('warehouse_adjustment_detail', $ArrDeatilAdj);
 				$this->db->insert_batch('warehouse_adjustment_check', $ArrDeatilChk);
-				
 			$this->db->trans_complete();
 		}
 

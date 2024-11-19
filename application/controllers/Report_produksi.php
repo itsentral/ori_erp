@@ -6,6 +6,7 @@ class Report_produksi extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->model('tanki_model');
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
@@ -154,6 +155,8 @@ class Report_produksi extends CI_Controller {
                     AND (
                         a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR c.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				    )";
 		// echo $sql; exit;
 
@@ -447,7 +450,14 @@ class Report_produksi extends CI_Controller {
             }
 
             $nomor_ipp = $row['no_ipp'];
-            $nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:'';
+			$cekTanki = substr($nomor_ipp,0,4);
+			if($cekTanki == 'IPPT'){
+				$GetDetTanki = $this->tanki_model->get_ipp_detail($nomor_ipp);
+				$nomor_so = (!empty($GetDetTanki['no_so']))?$GetDetTanki['no_so']:$nomor_ipp;
+			}
+			else{
+            	$nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:$nomor_ipp;
+			}
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
@@ -456,7 +466,8 @@ class Report_produksi extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".strtoupper($row['tipe'])."</div>";
 			$nestedData[]	= "<div align='center'>".$nomor_so."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_spk']."</div>";
-            $nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
+			$product_name = (!empty($row['no_spk']))?$row['product']:'';
+            $nestedData[]	= "<div align='left'>".strtoupper($product_name)."</div>";
 			$id_reff_jurnal = (!empty($row['id_reff_jurnal']))?$row['id_reff_jurnal']:'-';
 			$nestedData[]	= "<div align='center'>".$id_reff_jurnal."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
@@ -488,17 +499,19 @@ class Report_produksi extends CI_Controller {
         $sql = "SELECT 
                     (@row:=@row+1) AS nomor,
                     a.*,
-					b.id AS id_reff_jurnal
+					b.id_trans AS id_reff_jurnal
                 FROM
                     erp_data_subgudang a
-					LEFT JOIN production_detail c ON RIGHT ( a.kode_trans, 19 )= c.print_merge_date
-					LEFT JOIN laporan_per_hari b ON c.id = b.id_production_detail,
+					-- LEFT JOIN production_detail c ON RIGHT ( a.kode_trans, 19 )= c.print_merge_date
+					LEFT JOIN data_erp_wip_group b ON b.kode_trans = a.kode_trans,
                     (SELECT @row:=0) r
                 WHERE 1=1 ".$WHERE_DATE." AND a.gudang IN (".$this->gudang.")
 					AND DATE(a.tanggal) > '2023-10-30'
                     AND (
                         a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.tipe LIKE '%".$this->db->escape_like_str($like_value)."%'
 				    )
 				GROUP BY a.id";
 		// echo $sql; exit;
@@ -548,12 +561,12 @@ class Report_produksi extends CI_Controller {
 
         $sql = "SELECT 
                     a.*,
-					b.id AS id_reff_jurnal,
+					b.id_trans AS id_reff_jurnal,
                     'Subgudang to Gd. Produksi' AS category
                 FROM
                     erp_data_subgudang a
-					LEFT JOIN production_detail c ON RIGHT ( a.kode_trans, 19 )= c.print_merge_date
-					LEFT JOIN laporan_per_hari b ON c.id = b.id_production_detail
+					-- LEFT JOIN production_detail c ON RIGHT ( a.kode_trans, 19 )= c.print_merge_date
+					LEFT JOIN data_erp_wip_group b ON b.kode_trans = a.kode_trans
                 WHERE 1=1 ".$WHERE_DATE." AND a.gudang IN (".$this->gudang.")
 				GROUP BY a.id
                     ORDER BY a.tanggal DESC";
@@ -645,9 +658,16 @@ class Report_produksi extends CI_Controller {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
-
-                $nomor_ipp = $row['no_ipp'];
-           	 	$nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:'';
+				
+				$nomor_ipp = $row['no_ipp'];
+				$cekTanki = substr($nomor_ipp,0,4);
+				if($cekTanki == 'IPPT'){
+					$GetDetTanki = $this->tanki_model->get_ipp_detail($nomor_ipp);
+					$nomor_so = (!empty($GetDetTanki['no_so']))?$GetDetTanki['no_so']:$nomor_ipp;
+				}
+				else{
+					$nomor_so = (!empty($GET_DET_IPP[$nomor_ipp]['so_number']))?$GET_DET_IPP[$nomor_ipp]['so_number']:$nomor_ipp;
+				}
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
@@ -682,9 +702,11 @@ class Report_produksi extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $row['no_spk']);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
+				$product_name = (!empty($row['no_spk']))?$row['product']:'';
+
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, strtoupper($row['product']));
+				$sheet->setCellValue($Cols.$awal_row, strtoupper($product_name));
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$id_reff_jurnal = (!empty($row['id_reff_jurnal']))?$row['id_reff_jurnal']:'';

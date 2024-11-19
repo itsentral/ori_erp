@@ -540,11 +540,8 @@ class Project_incoming extends CI_Controller {
 		$category		= $data['category'];
 
 		$tanda = substr($no_po,0,3);
-		
-		// print_r($tanda);
-		// exit;
 
-		if($tanda == 'RTR'){
+		if($tanda = 'RTR'){
 			$sql 	= "	SELECT 
 							a.* 
 						FROM 
@@ -565,9 +562,6 @@ class Project_incoming extends CI_Controller {
 						AND a.qty_in < a.qty_po";
 		}
 		$result	= $this->db->query($sql)->result_array();
-		
-		
-		
 		
 		$data = array(
 			'no_po' => $no_po,
@@ -858,11 +852,11 @@ class Project_incoming extends CI_Controller {
 				'nilai_terima_barang_kurs' => $sum_totalprice,
 			);
 
-			//print_r($grouping_temp);
+			// print_r($ArrDeatil);
 			// print_r($ArrUpdate);
 			// print_r($ArrHist);
 			// print_r($ArrInsertH);
-			//exit;
+			// exit;
 			$this->db->trans_start();
 
 				$this->db->update_batch('tran_po_detail', $ArrUpdate, 'id');
@@ -893,9 +887,7 @@ class Project_incoming extends CI_Controller {
 			$this->db->trans_complete();
 		}
 
-        
-		
-		
+
 		if($this->db->trans_status() === FALSE){
 			$this->db->trans_rollback();
 			$Arr_Data	= array(
@@ -905,7 +897,7 @@ class Project_incoming extends CI_Controller {
 		}
 		else{
 			if(!empty($grouping_temp)){
-				insert_jurnal_stock($grouping_temp,NULL,10,$kode_trans,'incoming project','penambahan gudang project','incoming project');
+				insert_jurnal_stock($grouping_temp,NULL,$gudang,$kode_trans,'incoming project','penambahan gudang project','incoming project');
 			}
 			history($histHlp);
 			$this->db->trans_commit();

@@ -9,6 +9,7 @@ class Finish_good extends CI_Controller
 		parent::__construct();
 		$this->load->model('master_model');
 		$this->load->model('produksi_model');
+		$this->load->model('tanki_model');
 		// Your own constructor code
 		if (!$this->session->userdata('isORIlogin')) {
 			redirect('login');
@@ -162,7 +163,7 @@ class Finish_good extends CI_Controller
 		$LEFT_JOIN = "";
 		$FIELD_CUTTING = "";
 		if ($status == 'pipe') {
-			$where = " AND c.id_category='pipe' ";
+			$where = " AND c.id_category='pipe'  AND a.sts_cutting != 'Y' ";
 			$LEFT_JOIN = ",";
 			$FIELD_CUTTING = "0 AS length_awal, c.length, NULL AS cutting_ke,NULL as id_cutting,NULL as flag_qr_cutting,";
 		}
@@ -290,29 +291,42 @@ class Finish_good extends CI_Controller
 			$view = "<a href='" . base_url('finish_good/view_spool/' . $row['spool_induk']) . "' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 			$qr = "<button type='button' class='btn btn-sm btn-default qr' data-id_produksi='" . $row['id_produksi'] . "' data-id_milik='" . $row['id_milik'] . "' data-kode_spk='" . $row['kode_spk'] . "' data-id_pro_detail='" . $row['spool_induk'] . "' style='margin-bottom:2px;padding:2px 6px'><i class='fa fa-qrcode fa-2x'></i></button>";
 
-			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, no_drawing')->order_by('id', 'asc')->get_where('spool_group_release', array('spool_induk' => $row['spool_induk']))->result_array();
+			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length, status_tanki, nm_tanki')->group_by('sts, id_milik')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
 			$ArrNo_Spool = [];
 			$ArrNo_IPP = [];
-			$ArrNo_SPK = [];
 			$ArrNo_Drawing = [];
-			foreach ($get_split_ipp as $key => $value) {
-				$key++;
-				$no_spk_list = $this->db->select('no_spk')->get_where('so_detail_header', array('id' => $value['id_milik']))->result();
-				$no_spk = (!empty($no_spk_list)) ? $no_spk_list[0]->no_spk : 'not set';
+			$ArrNo_SPK = [];
+			foreach ($get_split_ipp as $key => $value) { $key++;
 
-				$ArrNo_IPP[] = str_replace('PRO-', '', $value['id_produksi']);
-				$ArrNo_Spool[] = $value['kode_spool'];
+				$no_spk 		= $value['no_spk'];
+				$ArrNo_IPP[] 	= str_replace('PRO-','',$value['id_produksi']);
+				$ArrNo_Spool[] 	= $value['kode_spool'];
 
-				$IMPLODE = explode('.', $value['product_code']);
-				$ArrNo_SPK[] = $key . '. ' . $IMPLODE[0] . '.' . $value['product_ke'] . ' / ' . $no_spk;
+                $ArrNo_Drawing[] = $value['no_drawing'];
+				
+				$CUTTING_KE = (!empty($value['cutting_ke']))?'.'.$value['cutting_ke']:'';
+				
+				$IMPLODE = explode('-', $value['kode_spool']);
 
-				$ArrNo_Drawing[] = $value['no_drawing'];
+				$sts = $value['sts'];
+
+				$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']);
+				if($sts == 'cut'){
+					$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']).', cut '.number_format($value['length']);
+				}
+				if($value['status_tanki'] == 'tanki'){
+					$product 	= strtoupper($value['nm_tanki']);
+				}
+
+				$no = sprintf('%02s', $key);
+
+				$ArrNo_SPK[] = $no.'. <span class="text-bold text-primary">['.$IMPLODE[0].'/'.$no_spk.']</span> <span class="text-bold text-success">'.strtoupper($sts).'</span><span class="text-bold"> ['.$value['qty'].' pcs]</span> '.$product;
 			}
 			// print_r($ArrGroup); exit;
-			$explode_spo = implode('<br>', array_unique($ArrNo_Spool));
-			$explode_ipp = implode('<br>', array_unique($ArrNo_IPP));
-			$explode_spk = implode('<br>', $ArrNo_SPK);
-			$explode_drawing = implode('<br>', array_unique($ArrNo_Drawing));
+			$explode_spo = implode('<br>',array_unique($ArrNo_Spool));
+			$explode_ipp = implode('<br>',array_unique($ArrNo_IPP));
+			$explode_drawing = implode('<br>',array_unique($ArrNo_Drawing));
+			$explode_spk = implode('<br>',$ArrNo_SPK);
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>" . $nomor . "</div>";
@@ -361,6 +375,7 @@ class Finish_good extends CI_Controller
 				AND (
 					a.kode_spk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					OR a.kode_spool LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR a.product_code LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					OR a.spool_induk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 				)
 			GROUP BY
@@ -394,6 +409,7 @@ class Finish_good extends CI_Controller
 			'title'			=> 'Detail Spool',
 			'action'		=> 'index',
 			'result'		=> $result,
+			'tanki_model'		=> $this->tanki_model,
 			'spool_induk'		=> $kode_spool,
 		);
 		$this->load->view('Finish_good/view_spool', $data);
@@ -577,6 +593,7 @@ class Finish_good extends CI_Controller
 			$LOGO = '';
 		}
 		$sql 		= "	SELECT * FROM production_req_sp WHERE no_ipp IN ('" . implode("','", $IPP) . "') ";
+		// echo $sql;exit;
 		$prod		= $this->db->query($sql)->result();
 		$ArrProd 	= [];
 		foreach ($prod as $p) {
@@ -598,7 +615,8 @@ class Finish_good extends CI_Controller
 			'logo' 		=> $LOGO,
 			'proj' 		=> $proj,
 			'size' 		=> $size,
-			'DN' 				=> $ArrDN,
+			'tanki_model'		=> $this->tanki_model,
+			// 'DN' 				=> $ArrDN,
 			'ArrProd' 	=> $ArrProd,
 			'dycode' 	=> $dycode,
 		];
