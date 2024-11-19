@@ -76,7 +76,7 @@ class Adjustment_rutin_model extends CI_Model {
 			
 			$nestedData[]	= "<div align='left'>".$gudang_dari."</div>";
 			$nestedData[]	= "<div align='left'>".$gudang_ke."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_material'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['id_material']." - ".$row['nm_material'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['spec'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['jumlah_mat'],2)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['pic'])."</div>";
@@ -120,6 +120,7 @@ class Adjustment_rutin_model extends CI_Model {
 				(@row:=@row+1) AS nomor,
 				a.*,
 				b.no_ba,
+				b.id_material,
 				b.nm_material,
 				b.expired_date,
 				c.spec
@@ -136,6 +137,7 @@ class Adjustment_rutin_model extends CI_Model {
 				OR a.pic LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_ba LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR c.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
@@ -247,7 +249,6 @@ class Adjustment_rutin_model extends CI_Model {
 			$ArrHistKeExp = array();
 			$ArrPlusExp = array();
 			$ArrPlusHistExp = array();
-			$grouping_temp = [];
 			
 			//MUTASI
 			if($adjustment_type == 'mutasi'){
@@ -333,9 +334,6 @@ class Adjustment_rutin_model extends CI_Model {
 					$ArrHistDari['update_date'] 		= date('Y-m-d H:i:s');
 					
 				}
-				
-				    $grouping_temp[$id_material]['id'] 		    = $id_material;
-					$grouping_temp[$id_material]['qty_good'] 	= $qty_oke;
 			}
 			//PLUS
 			if($adjustment_type == 'plus'){
@@ -369,8 +367,6 @@ class Adjustment_rutin_model extends CI_Model {
 					$ArrHistKe['ket'] 				= 'penambahan gudang mutasi';
 					$ArrHistKe['update_by'] 			= $data_session['ORI_User']['username'];
 					$ArrHistKe['update_date'] 		= date('Y-m-d H:i:s');
-					
-					
 
 				}
 				
@@ -407,16 +403,9 @@ class Adjustment_rutin_model extends CI_Model {
 					$ArrPlusHist['update_by'] 			= $data_session['ORI_User']['username'];
 					$ArrPlusHist['update_date'] 		= date('Y-m-d H:i:s');
 					
-					
-					
 				}
 				
-				$grouping_temp[$id_material]['id'] 		    = $id_material;
-				$grouping_temp[$id_material]['qty_good'] 	= $qty_oke;
 			}
-			
-			
-			
 			
 			// print_r($ArrHeader);
 			// print_r($ArrDetail);
@@ -432,10 +421,6 @@ class Adjustment_rutin_model extends CI_Model {
 			$this->db->trans_start();
 				$this->db->insert('warehouse_adjustment', $ArrHeader);
 				$this->db->insert('warehouse_adjustment_detail', $ArrDetail);
-				
-				if(!empty($grouping_temp)){
-				insert_jurnal_adjustment($grouping_temp,$id_gudang_ke,$id_gudang_ke,$kode_trans,'adjustment stok','adjustment stok',$adjustment_type);
-				}
 				
 				if(!empty($ArrStockDari)){
 					$this->db->where('id',$rest_gudang_dari[0]->id);

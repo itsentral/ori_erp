@@ -1321,11 +1321,13 @@ class Rutin_model extends CI_Model {
         $urut2  = 0;
 
 		$id_gudang = getGudangIndirect();
+		$id_gudang_P = null;
 		if($requestData['in_gudang'] == 'project'){
 			$id_gudang = getGudangProject();
+			$id_gudang_P = $id_gudang;
 		}
 
-		$GET_KEBUTUHAN_PER_MONTH = get_kebutuhanPerMonth();
+		$GET_KEBUTUHAN_PER_MONTH = get_kebutuhanPerMonthGudang($id_gudang_P);
 		$GET_WAREHOUSE_STOCK = get_warehouseStockProject($id_gudang);
 		
 		foreach($query->result_array() as $row){

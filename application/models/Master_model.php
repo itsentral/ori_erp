@@ -20,6 +20,16 @@ class Master_model extends CI_Model {
 
 		return $query->result();
 	}
+
+	public function getDataArrayMultiple($table,$ArrWhere=''){
+		if(!empty($ArrWhere)){
+			$query = $this->db->get_where($table, $ArrWhere);
+		}else{
+			$query = $this->db->get($table);
+		}
+
+		return $query->result();
+	}
 	
 	public function getDataOrderBy($table,$where_field='',$where_value='',$field_order){
 		if($where_field !='' && $where_value!=''){

@@ -37,13 +37,13 @@ class Project_process_model extends CI_Model {
 			// redirect(site_url('users'));
 		// }
 		$id_produksi 	= $this->uri->segment(3);
-
+		$no_ipp = str_replace('PRO-','',$id_produksi);
 		$qSupplier 	= "	SELECT * FROM production_header WHERE id_produksi = '".$id_produksi."' ";
-		$row	= $this->db->query($qSupplier)->result_array();
+		$row		= $this->db->query($qSupplier)->result_array();
 		
 		
 		$data = array(
-			'title'		=> 'Price Estimasi Detail SPK 1',
+			'title'		=> 'Progress '.$no_ipp,
 			'action'	=> 'updateReal',
 			'row'		=> $row
 		);
@@ -90,7 +90,7 @@ class Project_process_model extends CI_Model {
 
 			$nestedData 	= array(); 
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_ipp']."/".$row['so_number']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_customer']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['order_type']))."</div>";
 				$ListBQipp		= $this->db->query("SELECT series  FROM bq_detail_header WHERE id_bq = 'BQ-".$row['no_ipp']."' GROUP BY series")->result_array();

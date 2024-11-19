@@ -2022,10 +2022,19 @@ class Pembelian_model extends CI_Model {
 			// $dt_sup	= implode("<br>", $arr_sup);
 
 			//NO PR
-			$list_pr		= $this->db->select('no_pr')->get_where('tran_rfq_detail',array('no_po'=>$row['no_po']))->result_array();
+			$list_pr		= $this->db
+									->select('b.no_pr_group AS no_pr, b.no_pr AS no_pr_dept')
+									->join('tran_pr_detail b','a.id_barang=b.id_barang AND a.no_rfq=b.no_rfq')
+									->get_where('tran_rfq_detail a',array('a.no_po'=>$row['no_po']))
+									->result_array();
 			$arr_pr = array();
 			foreach($list_pr AS $val => $valx){
-				$arr_pr[$val] = $valx['no_pr'];
+				if($row['category'] == 'non rutin'){
+					$arr_pr[$val] = $valx['no_pr_dept'];
+				}
+				else{
+					$arr_pr[$val] = $valx['no_pr'];
+				}
 			}
 			$arr_pr = array_unique($arr_pr);
 			$dt_pr	= implode("<br>", $arr_pr);
@@ -3380,8 +3389,11 @@ class Pembelian_model extends CI_Model {
 							ORDER BY
 								b.nm_supplier ASC ";
 			$restQuery = $this->db->query($query)->result_array();
+			$listPPN = $this->db->get_where('list_help',array('group_by'=>'ppn'))->result_array();
+
 			$data = array(
-				'supList' => $restQuery
+				'supList' => $restQuery,
+				'listPPN' => $listPPN,
 			);
 			$this->load->view('Pembelian/modal_po', $data);
 		}

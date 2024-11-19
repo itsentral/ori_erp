@@ -90,12 +90,10 @@ class Asset_model extends CI_Model{
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_asset'])."</div>";
 
 				$edit 	= "";
-				$edit2 	= "";
 				$delete = "";
 				
 				if($Arr_Akses['update']=='1'){
-                    $edit	= "&nbsp;<a href='".site_url('asset/add/'.$row['id'])."' class='btn btn-sm btn-primary edit' data-code='".$row['id']."' title='Pindah Lokasi' data-role='qtip'><i class='fa fa-exchange'></i></a>";
-					 $edit2	= "&nbsp;<a href='".site_url('asset/edit/'.$row['id'])."' class='btn btn-sm btn-primary edit' data-code='".$row['id']."' title='Edit Coa' data-role='qtip'><i class='fa fa-edit'></i></a>";
+                    $edit	= "&nbsp;<a href='".site_url('asset/add/'.$row['id'])."' class='btn btn-sm btn-primary edit' data-code='".$row['id']."' title='Edit Data' data-role='qtip'><i class='fa fa-exchange'></i></a>";
 				}
 				if($Arr_Akses['delete']=='1'){
                     $delete = "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_asset' title='Hapus Asset' data-id='".$row['kd_asset']."' data-role='qtip'><i class='fa fa-trash'></i></button>";
@@ -104,7 +102,6 @@ class Asset_model extends CI_Model{
 			$nestedData[]	= "<div align='center'>
 									<button type='button' class='btn btn-sm btn-warning detail' title='Detail' data-id='".$row['id']."' data-role='qtip'><i class='fa fa-eye'></i></button>
 									".$edit."
-									".$edit2."
 									".$delete."
 									</div>";
 			$data[] = $nestedData;
@@ -1082,146 +1079,6 @@ class Asset_model extends CI_Model{
 		$data['query'] = $this->db->query($sql);
 		return $data;
     }
-	
-	
-	public function getDataJSON_new_asset(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
-		$Arr_Akses			= getAcccesmenu($controller);
-		$requestData	= $_REQUEST;
-		$fetch			= $this->queryDataJSON_new_asset(
-			$requestData['kategori'],
-			$requestData['search']['value'],
-			$requestData['order'][0]['column'],
-			$requestData['order'][0]['dir'],
-			$requestData['start'],
-			$requestData['length']
-		);
-		$totalData		= $fetch['totalData'];
-		$totalFiltered	= $fetch['totalFiltered'];
-		$query			= $fetch['query'];
-		$totalAset		= $fetch['totalAset'];
-
-		$data	= array();
-		$urut1  = 1;
-        $urut2  = 0;
-		$sumx	= 0;
-		foreach($query->result_array() as $row)
-		{
-			$total_data     = $totalData;
-            $start_dari     = $requestData['start'];
-            $asc_desc       = $requestData['order'][0]['dir'];
-            if($asc_desc == 'asc')
-            {
-                $nomor = $urut1 + $start_dari;
-            }
-            if($asc_desc == 'desc')
-            {
-                $nomor = ($total_data - $start_dari) - $urut2;
-            }
-
-			$KEL_PENYUSUTAN = (!empty($row['no_perkiraan']))?strtoupper($row['no_perkiraan'].' | '.$row['ket_coa']):'';
-
-			$nestedData 	= array();
-			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['kd_asset']))."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nm_asset']))."</div>";
-			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['nilai_asset'])."</div>";
-
-				$edit 	= "";
-				$edit2 	= "";
-				$delete = "";
-				
-				if($Arr_Akses['update']=='1'){
-                    $edit	= "&nbsp;<a href='".site_url('asset/add_new/'.$row['id'])."' class='btn btn-sm btn-primary edit' data-code='".$row['id']."' title='Create List Penyusutan Asset' data-role='qtip'><i class='fa fa-plus'></i></a>";
-					 
-				}
-				
-
-			$nestedData[]	= "<div align='center'>
-									
-									".$edit."
-								</div>";
-			$data[] = $nestedData;
-            $urut1++;
-            $urut2++;
-		}
-
-		$json_data = array(
-			"draw"            	=> intval( $requestData['draw'] ),
-			"recordsTotal"    	=> intval( $totalData ),
-			"recordsFiltered" 	=> intval( $totalFiltered ),
-			"data"            	=> $data,
-			"recordsAset"		=> intval($totalAset)
-		);
-
-		echo json_encode($json_data);
-	}
-
-	public function queryDataJSON_new_asset($kategori, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
-
-		
-
-		$sql = "
-				SELECT
-					a.id as id,
-					a.kode_trans as kd_asset,
-					a.nama as nm_asset,
-					a.nilai_aset as nilai_asset,
-					a.tanggal
-					
-				FROM
-					asset_new a 
-					
-				WHERE 1=1
-					
-					AND (
-						a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
-						OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
-						OR a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
-					)
-				
-			";
-
-			$Query_Sum	= "	SELECT
-								SUM(a.nilai_aset) AS total_aset
-							FROM
-								asset_new a
-							WHERE 1=1
-								
-								AND (
-									a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
-									OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
-									OR a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
-								)
-							";
-		
-		// echo $Query_Sum; exit;
-
-		$Total_Aset = 0;
-		$Hasil_SUM		   	= $this->db->query($Query_Sum)->result_array();
-		if($Hasil_SUM){
-			$Total_Aset		= $Hasil_SUM[0]['total_aset'];
-		}
-		$data['totalData'] 		= $this->db->query($sql)->num_rows();
-		$data['totalAset'] 		= $Total_Aset;
-		$data['totalFiltered'] 	= $this->db->query($sql)->num_rows();
-		$columns_order_by = array(
-			0 => 'id',
-			1 => 'kode_trans',
-			2 => 'nama',
-			3 => 'tanggal',
-			4 => 'nilai_asset'
-			
-
-		);
-
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
-		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
-
-		$data['query'] = $this->db->query($sql);
-		return $data;
-	}
 	
 
 }

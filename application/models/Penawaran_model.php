@@ -634,7 +634,7 @@ class Penawaran_model extends CI_Model {
 		$data_session	= $this->session->userdata;
 		$data	= $this->input->post();
 		
-		$MatCost	= (!empty($data['MatCost']))?$data['MatCost']:[]; 
+		$MatCost	= $data['MatCost'];
 		$EngCost	= $data['EngCost'];
 		$PackCost	= $data['PackCost'];
 		$ExportCost	= $data['ExportCost'];
@@ -852,9 +852,7 @@ class Penawaran_model extends CI_Model {
 			$this->db->delete('cost_project_detail', array('id_bq' => $data['id_bq'])); 
 			
 			$this->db->insert('cost_project_header', $ArrHeader);
-			if(!empty($ArrMatCost)){
 			$this->db->insert_batch('cost_project_detail', $ArrMatCost);
-			}
 			$this->db->insert_batch('cost_project_detail', $ArrEngCost);
 			$this->db->insert_batch('cost_project_detail', $ArrPackCost);
 			$this->db->insert_batch('cost_project_detail', $ArrExportCost);

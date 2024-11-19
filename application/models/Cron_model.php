@@ -3,6 +3,7 @@ class Cron_model extends CI_Model {
 
 	public function __construct() {
 		parent::__construct();
+		$this->load->model('tanki_model');
 	}
 
 	//==========================================================================================================================
@@ -35,6 +36,8 @@ class Cron_model extends CI_Model {
 		$SERACH_DETAIL_SPEC 		= get_detail_spec_fd();
 		$SEARCH_DETAIL_BERAT 		= get_input_produksi_detail();
 		$SEARCH_DETAIL_BERAT_PLUS 	= get_input_produksi_plus();
+		$SEARCH_DETAIL_BERAT_ADD 	= get_input_produksi_add();
+		$SEARCH_DETAIL_BERAT_PLUS_EX 	= get_input_produksi_plus_exclude();
 		foreach($query->result_array() as $row_Cek)
 		{
 			$total_data     = $totalData;
@@ -60,23 +63,42 @@ class Cron_model extends CI_Model {
 			$GET_PRODUKSI_PARSIAL 	= $this->db->get_where('production_spk_parsial',array('id_milik'=>$id_milik,'created_date'=>$kode_hist))->result();
 			$id_gudang				= (!empty($GET_PRODUKSI_PARSIAL[0]->id_gudang))?$GET_PRODUKSI_PARSIAL[0]->id_gudang:'-';
 			
+
+			$tandaIPP = substr($NO_IPP,0,4);
 			// $no_spk = (!empty($GET_PRODUKSI_DETAIL[0]->no_spk))?$GET_PRODUKSI_DETAIL[0]->no_spk:'-';
+			if($tandaIPP == 'IPPT'){
+				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
+				$nm_customer		= $getDetailTanki['customer'];
+				$nm_project		= $getDetailTanki['nm_project'];
+				$so_number		= $getDetailTanki['no_so'];
+				$length			= 0;
+				$thickness		= 0;
+				$no_spk		= $row_Cek['no_spk'];
+			}
+			else{
+				$nm_customer 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
+				$nm_project 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
+				$so_number 		= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
+				$length			= $SERACH_DETAIL_SPEC[$id_milik]['length'];
+				$thickness		= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
+				$no_spk		= $row_Cek['no_spk2'];
+			}
 
             $nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('warehouse','nm_gudang','id',$id_gudang)."</div>";
-			$nestedData[]	= "<div align='left'>".$SERACH_DETAIL_IPP[$NO_IPP]['nm_customer']."</div>";
-			$nestedData[]	= "<div align='left'>".$SERACH_DETAIL_IPP[$NO_IPP]['nm_project']."</div>";
-			$nestedData[]	= "<div align='center'>".$SERACH_DETAIL_IPP[$NO_IPP]['so_number']."</div>";
-			$nestedData[]	= "<div align='center'>".$row_Cek['no_spk']."</div>";
+			$nestedData[]	= "<div align='left'>".$nm_customer."</div>";
+			$nestedData[]	= "<div align='left'>".$nm_project."</div>";
+			$nestedData[]	= "<div align='center'>".$so_number."</div>";
+			$nestedData[]	= "<div align='center'>".$no_spk."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row_Cek['status_date']))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($START_PRODUKSI))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($SELESAI_PRODUKSI))."</div>";
 			$nestedData[]	= "<div align='left'>".$row_Cek['id_category']."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter'])."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter2'])."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($SERACH_DETAIL_SPEC[$id_milik]['length'])."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($SERACH_DETAIL_SPEC[$id_milik]['thickness'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($length)."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($thickness,2)."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row_Cek['liner'],2)."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($QTY_ORDER)."</div>";
 			$QTY = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
@@ -95,6 +117,12 @@ class Cron_model extends CI_Model {
 			$berat_resin	= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
 			$nm_catalys		= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['nm_material']:'';
 			$berat_catalys	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['terpakai']:0;
+			$berat_resin_tc	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
+			
+			$berat_lainnya	= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']:0;
+			$berat_add		= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']:0;
+			$nm_lainnya		= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']:'';
+			$nm_add			= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']:'';
 
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_veil)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($berat_veil,4)."</div>";
@@ -105,11 +133,15 @@ class Cron_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_wr)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($berat_wr,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_resin)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($berat_resin,4)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($berat_resin+$berat_resin_tc,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_catalys)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($berat_catalys,4)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_lainnya)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($berat_lainnya,4)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_add)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($berat_add,4)."</div>";
 
-			$TOTAL_MATERIAL = $berat_veil+$berat_cms+$berat_rooving+$berat_wr+$berat_resin+$berat_catalys;
+			$TOTAL_MATERIAL = $berat_veil+$berat_cms+$berat_rooving+$berat_wr+$berat_resin+$berat_catalys+$berat_resin_tc+$berat_lainnya+$berat_add;
 			$GET_DETAIL_SO = $this->db->get_where('so_detail_header',array('id'=>$id_milik))->result();
 			$WH = 0;
 			$MP = 0;
@@ -171,7 +203,7 @@ class Cron_model extends CI_Model {
 			SELECT
 				(@row:=@row+1) AS nomor,
 				a.*,
-				b.no_spk
+				b.no_spk AS no_spk2
 			FROM
 				laporan_per_hari a
 				LEFT JOIN so_detail_header b ON a.id_milik = b.id,

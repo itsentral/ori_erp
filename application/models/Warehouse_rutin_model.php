@@ -27,11 +27,14 @@ class Warehouse_rutin_model extends CI_Model {
 						tran_po_detail a
 						LEFT JOIN tran_po_header c ON a.no_po = c.no_po
 						LEFT JOIN con_nonmat_new b ON a.id_barang = b.code_group 
+						LEFT JOIN tran_rfq_detail x ON a.no_po=x.no_po AND a.id_barang=x.id_barang
+						LEFT JOIN tran_pr_detail y ON x.no_rfq=y.no_rfq AND x.id_barang=y.id_barang
 					WHERE
 						a.qty_in < a.qty_po 
 						AND c.category = 'rutin' 
 						AND c.status_id = '1'
 						AND b.category_awal IN ($CATEGORY)
+						AND (y.in_gudang != 'project' OR y.in_gudang IS NULL)
 					GROUP BY 
 						a.no_po, b.category_awal 
 					ORDER BY 
@@ -887,7 +890,7 @@ class Warehouse_rutin_model extends CI_Model {
 				".$table." a
 				LEFT JOIN con_nonmat_new b ON a.code_group=b.code_group,
 				(SELECT @row:=0) r
-		    WHERE 1=1 ".$where_gudang." ".$where_date." AND b.status='1' AND b.deleted = 'N' AND (
+		    WHERE 1=1 AND a.gudang IN ('".getGudangIndirect()."','".getGudangHouseHold()."') ".$where_gudang." ".$where_date." AND b.status='1' AND b.deleted = 'N' AND (
 				a.code_group LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.material_name LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
