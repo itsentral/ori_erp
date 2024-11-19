@@ -2129,9 +2129,9 @@ class Delivery extends CI_Controller
 		//SAMPAI SINI
 		// exit;
 		$this->db->trans_start();
-		// if (!empty($ArrKeyJurnal)) {
-			// insert_jurnal_delivery($ArrKeyJurnal, $kode_delivery);
-		// }
+		if (!empty($ArrKeyJurnal)) {
+			insert_jurnal_delivery($ArrKeyJurnal, $kode_delivery);
+		}
 
 		$this->db->where('kode_delivery', $kode_delivery);
 		$this->db->update('delivery_product', $ArrUpdate);
@@ -5484,13 +5484,24 @@ class Delivery extends CI_Controller
 			$CHECK = $this->db->get_where('delivery_temp', array('id_uniq' => $row['id_material']."-".$row['no_ipp'], 'category' => 'aksesoris'))->result();
 			$checked = (!empty($CHECK)) ? 'checked' : '';
 			$QTY = (!empty($CHECK)) ? $CHECK[0]->qty : '';
+			$TandaTanki = substr($row['no_ipp'],0,4);
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
-			$nestedData[]	= "<div align='left'>".get_name_acc($row['id_material'])."</div>";
+			if($TandaTanki == 'IPPT'){
+				$nestedData[]	= "<div align='center'>".$row['so_number_tanki']."</div>";
+				$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer_tanki'])."</div>";
+				$nestedData[]	= "<div align='left'>".strtoupper($row['project_tanki'])."</div>";
+				$nestedData[]	= "<div align='left'>".get_name_acc($row['id_material_tanki'])."</div>";
+			}
+			else{
+				$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
+				$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer'])."</div>";
+				$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
+				$nestedData[]	= "<div align='left'>".get_name_acc($row['id_material'])."</div>";
+			}
+			
+			
 			$nestedData[]	= "<div align='center' class='qty_stock'>".number_format($row['qty_fg'],2)."</div>";
 			$nestedData[]	= "<div align='center'>
 									<input type='text' name='spk_".$row['id']."' data-id='".$row['id']."' style='width:80px;' class='form-control text-center qty_delivery input-md numberOnly0' value='".$QTY."'><script>$('.numberOnly0').autoNumeric('init', {mDec: '2', aPad: false});</script>
@@ -5527,16 +5538,23 @@ class Delivery extends CI_Controller
                 a.created_by,
                 a.created_date,
 				b.so_number,
+				x.no_so AS so_number_tanki,
                 c.nm_customer,
+				x.customer AS nm_customer_tanki,
                 c.project,
+				x.project AS project_tanki,
                 d.id_material,
+				z.id AS id_material_tanki,
                 SUM(a.qty_out-a.qty_delivery) AS qty_fg
 			FROM
 				request_accessories a
                 LEFT JOIN so_number b ON CONCAT('BQ-',a.no_ipp) = b.id_bq
+				LEFT JOIN planning_tanki x ON a.no_ipp=x.no_ipp
                 LEFT JOIN production c ON a.no_ipp = c.no_ipp
                 LEFT JOIN so_acc_and_mat d ON a.id_milik = d.id
-                LEFT JOIN accessories e ON d.id_material = e.id,
+                LEFT JOIN planning_tanki_detail y ON a.id_milik = y.id
+                LEFT JOIN accessories e ON d.id_material = e.id
+                LEFT JOIN accessories z ON y.id_material = z.id_acc_tanki,
 				(SELECT @row:=0) r
 		    WHERE a.deleted_date IS NULL AND a.qty_out > 0
                 AND (
@@ -5601,10 +5619,23 @@ class Delivery extends CI_Controller
 				$ID_UNIQ 	= $value['id_uniq'];
 				$QTY		= $value['qty'];
 				if ($QTY > 0) {
-					$GET_DETAIL 	= $this->db
-											->select('a.*, b.id_material')
-											->join('so_acc_and_mat b','a.id_milik=b.id')
-											->get_where('request_accessories a', array('a.id'=>$ID_UNIQ))->result_array();
+					$CheckAsal 	= $this->db->get_where('request_accessories',array('id'=>$ID_UNIQ))->result_array();
+					$NoIPP 		= $CheckAsal[0]['no_ipp'];
+					$CheckTanki = substr($NoIPP,0,4);
+					if($CheckTanki == 'IPPT'){
+						$GET_DETAIL 	= $this->db
+						->select('a.*, c.id as id_material')
+						->join('planning_tanki_detail b','a.id_milik=b.id')
+						->join('accessories c','b.id_material=c.id_acc_tanki')
+						->get_where('request_accessories a', array('a.id'=>$ID_UNIQ))->result_array();
+					}
+					else{
+						$GET_DETAIL 	= $this->db
+						->select('a.*, b.id_material')
+						->join('so_acc_and_mat b','a.id_milik=b.id')
+						->get_where('request_accessories a', array('a.id'=>$ID_UNIQ))->result_array();
+					}
+					
 					$id_milik 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_milik'] : 0;
 					$id_material 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_material'] : 0;
 					$no_ipp 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['no_ipp'] : 0;
@@ -5804,7 +5835,7 @@ class Delivery extends CI_Controller
 		//GROUP DATA
 		$ArrGroup = [];
 		$ArrGroupOut = [];
-		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery))->result_array();
+		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose'))->result_array();
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_pro']))->result_array();
@@ -5857,76 +5888,6 @@ class Delivery extends CI_Controller
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
 		}
-		
-		$this->jurnalIntransit($kode_delivery);
-	}
-	
-	public function jurnalIntransit($kode_delivery){
-		
-		    $CI 	=& get_instance();
-			
-			$intransit = $this->db->query("SELECT * FROM  data_erp_fg WHERE keterangan='Finish Good to In Transit' AND kode_delivery='$kode_delivery' AND nilai_unit <>'0,0000'")->result();
-			$tgl_voucher = date('Y-m-d');
-			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
-			
-			
-			$totalAll = 0; 
-			foreach ($intransit as $vals=>$valx) {
-				
-				    $totalall2 = $valx->nilai_unit;
-					$no_so     = $valx->no_so;
-					$no_spk    = $valx->no_spk;
-					$product   = $valx->product;
-					
-					$totalAll += $valx->nilai_unit;
-					
-					
-					$no_request  = $kode_delivery;
-					$username 		= $this->session->userdata['ORI_User']['username'];
-					$datetime 		= date('Y-m-d H:i:s');
-					$Bln	= substr($tgl_voucher,5,2);
-					$Thn	= substr($tgl_voucher,0,4);
-					
-					$ket ='FINISH GOOD - TRANSIT';
-					$Keterangan_INV1=($ket).' ('.$no_so.' - '.$no_spk.' - '.$kode_delivery.')';
-					$Keterangan_INV=($ket).' ('.$no_so.' - '.$product.' - '.$no_spk.' - '.$kode_delivery.')';
-					$nokir1 = '1103-01-04';
-					$nokir2 = '1103-04-01';
-					
-										
-							$det_Jurnaltes    = array(
-							  'nomor'         => $Nomor_JV,
-							  'tanggal'       => $tgl_voucher,
-							  'tipe'          => 'JV',
-							  'no_perkiraan'  => $nokir1,
-							  'keterangan'    => $Keterangan_INV,
-							  'no_reff'       => $no_request,
-							  'debet'         => $totalall2,
-							  'kredit'        => 0,
-							 );		
-                            $CI->db->insert(DBACC.'.jurnal',$det_Jurnaltes);							 
-							$det_Jurnaltes1    = array(
-							  'nomor'         => $Nomor_JV,
-							  'tanggal'       => $tgl_voucher,
-							  'tipe'          => 'JV',
-							  'no_perkiraan'  => $nokir2,
-							  'keterangan'    => $Keterangan_INV,
-							  'no_reff'       => $no_request,
-							  'debet'         => 0,
-							  'kredit'        => $totalall2,
-							  
-							 );
-						
-					
-				          $CI->db->insert(DBACC.'.jurnal',$det_Jurnaltes1);
-					//$CI->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
-			
-			}
-			
-			       $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalAll, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV1, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $username, 'memo' => $kode_delivery, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-				   $CI->db->insert(DBACC.'.javh',$dataJVhead);
-					
-			
 	}
 
 	public function close_jurnal_in_customer($kode_delivery){

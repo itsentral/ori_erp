@@ -639,21 +639,25 @@ class Deadstok extends CI_Controller {
 		$srcPlant		= "SELECT MAX(kode) as maxP FROM deadstok_modif WHERE kode LIKE 'DMF" . $YM . "%' ";
 		$resultPlant	= $this->db->query($srcPlant)->result_array();
 		$angkaUrut2		= $resultPlant[0]['maxP'];
-		$urutan2		= (int)substr($angkaUrut2, 6, 3);
+		$urutan2		= (int)substr($angkaUrut2, 7, 3);
 		$urutan2++;
 		$urut2			= sprintf('%03s', $urutan2);
 		$kode_modif		= "DMF" . $YM . $urut2;
-
+		// echo  $kode_modif; exit;
 		$ArrUpdate = [];
 		$ArrInsertCutting = [];
 		$ArrInsertModif = [];
+		$ArrInsertToFG = [];
 		if(!empty($detail)){
 			foreach ($detail as $key => $value) {
 				$getDetail = $this->db->get_where('deadstok',array('id_product'=>$value['id_product'],'id_booking'=>NULL,'deleted_date'=>NULL))->result_array();
 				$deadstokDipakai = (!empty($getDetail[0]['id']))?$getDetail[0]['id']:NULL;
+				$deadstokDipakaiName = (!empty($getDetail[0]['product_name']))?$getDetail[0]['product_name']:NULL;
+				$deadstokDipakaiValue = (!empty($getDetail[0]['price_book']))?$getDetail[0]['price_book']:0;
 
 				if($deadstokDipakai != NULL){
-					$getDetailPro 	= $this->db->select('id_milik, id_produksi, product_ke')->get_where('production_detail',array('id'=>$value['id']))->result_array();
+					$getDetailPro 	= $this->db->select('id_milik, id_produksi, product_ke, id_category')->get_where('production_detail',array('id'=>$value['id']))->result_array();
+					$nm_product 	= (!empty($getDetailPro[0]['id_category']))?$getDetailPro[0]['id_category']:NULL;
 					$id_milik 		= (!empty($getDetailPro[0]['id_milik']))?$getDetailPro[0]['id_milik']:NULL;
 					$no_ipp 		= (!empty($getDetailPro[0]['id_produksi']))?str_replace('PRO-','',$getDetailPro[0]['id_produksi']):NULL;
 					$so_number		= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:NULL;
@@ -672,6 +676,37 @@ class Deadstok extends CI_Controller {
 					$ArrUpdate[$key]['fg_date'] = NULL;
 					$ArrUpdate[$key]['closing_produksi_date'] = $dateTime;
 					$ArrUpdate[$key]['sts_cutting'] = ($value['proses_next'] == '3')?'Y':'N';
+
+					if($value['proses_next'] == '1'){
+						$qty = 1;
+						$ArrInsertToFG[$key]['tanggal'] = date('Y-m-d');
+						$ArrInsertToFG[$key]['keterangan'] = 'Deadstok to Finish Good';
+						$ArrInsertToFG[$key]['no_so'] 	= $so_number;
+						$ArrInsertToFG[$key]['product'] = $deadstokDipakaiName;
+						$ArrInsertToFG[$key]['no_spk'] = $no_spk;
+						$ArrInsertToFG[$key]['kode_trans'] = null;
+						$ArrInsertToFG[$key]['id_pro_det'] = $deadstokDipakai;
+						$ArrInsertToFG[$key]['qty'] = $qty;
+		
+						$ArrInsertToFG[$key]['nilai_wip'] = $deadstokDipakaiValue * $qty;
+						$ArrInsertToFG[$key]['material'] = null;
+						$ArrInsertToFG[$key]['wip_direct'] =  null;
+						$ArrInsertToFG[$key]['wip_indirect'] =  null;
+						$ArrInsertToFG[$key]['wip_consumable'] =  null;
+						$ArrInsertToFG[$key]['wip_foh'] =  null;
+						$ArrInsertToFG[$key]['created_by'] = $username;
+						$ArrInsertToFG[$key]['created_date'] = $dateTime;
+						$ArrInsertToFG[$key]['id_trans'] = null;
+		
+						//tambahan finish good
+						$ArrInsertToFG[$key]['id_pro'] = $value['id'];
+						$ArrInsertToFG[$key]['qty_ke'] = $getDetailPro[0]['product_ke'];
+						$ArrInsertToFG[$key]['nilai_unit'] = $deadstokDipakaiValue;
+						$ArrInsertToFG[$key]['id_material'] = $id_milik;
+						$ArrInsertToFG[$key]['nm_material'] = 'pengganti: '.$nm_product;
+						$ArrInsertToFG[$key]['qty_mat'] = $qty;
+						$ArrInsertToFG[$key]['cost_book'] = $deadstokDipakaiValue;
+					}
 
 					$this->db->where('id',$deadstokDipakai);
 					$this->db->update('deadstok',array(
@@ -722,6 +757,9 @@ class Deadstok extends CI_Controller {
 			}
 			if(!empty($ArrInsertModif)){
 				$this->db->insert_batch('deadstok_modif', $ArrInsertModif);
+			}
+			if(!empty($ArrInsertToFG)){
+				$this->db->insert_batch('data_erp_fg',$ArrInsertToFG);
 			}
 		$this->db->trans_complete();
 

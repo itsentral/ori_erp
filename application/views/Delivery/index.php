@@ -30,7 +30,7 @@ $this->load->view('include/side_menu');
 					</a>
  -->
 					<a href="<?php echo site_url('delivery/add_aksesoris') ?>" class="btn btn-sm btn-success" style='float:right; margin-right:5px;'>
-						<i class="fa fa-plus"></i> &nbsp;&nbsp;Delivery Accessories
+						<i class="fa fa-plus"></i> &nbsp;&nbsp;Delivery Item Project
 					</a>
 
 					<a href="<?php echo site_url('delivery/create') ?>" class="btn btn-sm btn-primary" style='float:right; margin-right:5px;'>
