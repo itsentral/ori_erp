@@ -1,7 +1,7 @@
 
 <div class="box-body">
 	<?php if($tanda != 'request'){?>
-	<table id="my-grid" class="table" width="100%">
+	<table width="100%">
 		<thead>
 			<tr>
 				<td class="text-left" style='vertical-align:middle;' width='15%'>No PO</td>
@@ -23,6 +23,31 @@
 				<td class="text-left" style='vertical-align:middle;'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><?=$no_ros;?></td>
 			</tr>
+			<?php
+			$LINK = "-";
+			if(!empty($dokumen_file)){
+				$LINK = "<a href='".base_url($dokumen_file)."' target='_blank'>Download</a> ";
+			}
+			?>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;'>File Dokumen</td>
+				<td class="text-left" style='vertical-align:middle;'>:</td>
+				<td class="text-left" style='vertical-align:middle;'><?=$LINK;?></td>
+			</tr>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;'>File Eng. Change</td>
+				<td class="text-left" style='vertical-align:middle;'>:</td>
+				<td class="text-left" style='vertical-align:middle;'>
+				<?php
+                if(!empty($file_eng_change)){
+                    echo "<a href='".base_url('assets/file/produksi/').$file_eng_change."' target='_blank'>Download</a>";
+                }
+                else{
+                    echo "";
+                }
+                ?>
+				</td>
+			</tr>
 		</thead>
 	</table><br>
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
@@ -32,7 +57,7 @@
 				<th class="text-center" style='vertical-align:middle;'>Name Barang</th>
 				<th class="text-center" style='vertical-align:middle;' width='10%'>Qty Order</th>
                 <th class="text-center" style='vertical-align:middle;' width='10%'>Qty Diterima</th>
-                <th class="text-center" style='vertical-align:middle;' width='10%'>Qty Kurang</th> 
+                <!-- <th class="text-center" style='vertical-align:middle;' width='10%'>Qty Kurang</th>  -->
 				<th class="text-center" style='vertical-align:middle;' width='15%'>Keterangan</th> 
 				<th class="text-center" style='vertical-align:middle;' width='5'>QRCode</th> 
 			</tr>
@@ -59,7 +84,7 @@
 					echo "<td>".$valx['nm_material']."</td>";
 					echo "<td align='right'>".number_format($valx['qty_order'],4)."</td>";
 					echo "<td align='right'>".$qty_oke."</td>";
-					echo "<td align='right'>".$qty_kurang."</td>";
+					// echo "<td align='right'>".$qty_kurang."</td>";
 					echo "<td>".$keterangan."</td>";
 					echo "<td><a href='".base_url('warehouse/print_qrcode/'.$valx['id'])."' target='_blank' class='btn btn-xs btn-default'>QR</a></td>";
 				echo "</tr>";
@@ -70,7 +95,7 @@
 	<?php } ?>
 	
 	<?php if($tanda == 'request'){?>
-	<table id="my-grid" class="table" width="100%">
+	<table width="100%">
 		<thead>
 			<tr>
 				<td class="text-left" style='vertical-align:middle;' width='15%'>No Transaksi</td>

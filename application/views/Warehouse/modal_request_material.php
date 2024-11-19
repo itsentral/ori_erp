@@ -10,9 +10,11 @@
 				<tr class='bg-blue'>
 					<th class="text-center" style='vertical-align:middle;' width='5%'>No</th>
 					<th class="text-center" style='vertical-align:middle;'>Material Name</th>
-					<th class="text-center" style='vertical-align:middle;' width='15%'>Stock Pusat (Kg)</th>
-					<th class="text-center" style='vertical-align:middle;' width='15%'>Stock SubGudang (Kg)</th>
-					<th class="text-center" style='vertical-align:middle;' width='10%'>Request</th>
+					<th class="text-center" style='vertical-align:middle;' width='10%'>Stock Pusat<br>(Pack)</th>
+					<th class="text-center" style='vertical-align:middle;' width='10%'>Stock SubGudang<br>(Pack)</th>
+					<th class="text-center" style='vertical-align:middle;' width='10%'>Request<br>(Pack)</th>
+					<th class="text-center" style='vertical-align:middle;' width='7%'>Unit<br>(Pack)</th> 
+					<th class="text-center" style='vertical-align:middle;' width='7%'>Konversi</th> 
 					<th class="text-center" style='vertical-align:middle;' width='20%'>Keterangan</th> 
 				</tr>
 			</thead>

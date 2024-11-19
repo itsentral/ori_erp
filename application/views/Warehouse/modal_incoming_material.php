@@ -23,8 +23,34 @@
 	?>
 <form action="#" method="POST" id="form_adjustment" enctype="multipart/form-data" autocomplete='off'> 
 <div class="box-body"> 
-	No PO : <?= $no_po;?><br />
-	No ROS : <?= $no_ros;?><br />
+	<table width="100%">
+		<thead>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;' width='15%'>No PO</td>
+				<td class="text-left" style='vertical-align:middle;' width='2%'>:</td>
+				<td class="text-left" style='vertical-align:middle;'><?=$no_po;?></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+			</tr>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;'>No ROS</td>
+				<td class="text-left" style='vertical-align:middle;'>:</td>
+				<td class="text-left" style='vertical-align:middle;'><?=$no_ros;?></td>
+				<td class="text-left" style='vertical-align:middle;' width='15%'></td>
+				<td class="text-left" style='vertical-align:middle;' width='2%'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+			</tr>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;' width='15%'>File Dokumen</td>
+				<td class="text-left" style='vertical-align:middle;' width='2%'>:</td>
+				<td class="text-left" style='vertical-align:middle;'><input type='file' name='file_dokumen' class='form-control input-sm'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+				<td class="text-left" style='vertical-align:middle;'></td>
+			</tr>
+		</thead>
+	</table>
 	<br>
     <input type="hidden" name='no_po' id='no_po' value='<?= $no_po;?>'>
     <input type="hidden" name='gudang' id='gudang' value='<?= $gudang;?>'>
@@ -68,15 +94,6 @@
 				$Total2 += $valx['qty_purchase'];
                 
                 $totIn = $valx['qty_purchase'] - $valx['qty_in'];
-				$idpo  = $valx['id'];
-				$ros   = $this->db->query("SELECT bm FROM report_of_shipment_product WHERE idpo='$idpo'")->row();
-				
-				if($ros->bm > 0){
-					$bm = $ros->bm;
-				}
-				else{
-					$bm = 0;
-				}
 				
 				echo "<tr>";
                     echo "<td align='center'>".$No."
@@ -86,7 +103,6 @@
 						<input type='hidden' name='addInMat[$No][qty_rusak]' data-no='$No' class='form-control input-sm text-right maskM'>
 						<input type='hidden' name='addInMat[$No][expired]' data-no='$No' class='form-control input-sm text-left tanggal' readonly placeholder='Expired Date'>
 						<input type='hidden' name='addInMat[$No][harga]' value='".$valx['net_price']."'>
-						<input type='hidden' name='addInMat[$No][bm]' value='".$bm."'>
                     </td>";
                     echo "<td>".$valx['idmaterial']."</td>";
                     echo "<td>".$valx['nm_material']."</td>";

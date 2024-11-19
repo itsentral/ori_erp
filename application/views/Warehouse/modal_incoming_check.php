@@ -75,7 +75,6 @@
 					$ICON = "<i class='fa fa-clock-o text-orange' title='Parsial cek.'></i>";
 					$DISABLED = "";
 				}
-				$bm = $valx['bm'];
 				echo "<tr class='baris_".$No."'>";
 					echo "<td rowspan='1' class='id_".$No."' align='center'>".$No."<input type='hidden' name='detail[$No][id]' value='".$valx['id']."' $DISABLED><input type='hidden' name='detail[$No][id2]' value='".$valx['id2']."' $DISABLED></td>";
 					echo "<td rowspan='1' class='id_".$No."'>".$valx['nm_material']."</td>";
@@ -87,8 +86,7 @@
                     echo "<td align='center'><input type='text' name='detail[".$No."][detail][1][qty_rusak]' data-no='$No' class='form-control input-sm text-right maskM' $DISABLED></td>";
 					echo "<td align='center'><input type='text' name='detail[".$No."][detail][1][expired]' data-no='$No' class='form-control text-center input-sm text-left tanggal' readonly placeholder='Expired Date' $DISABLED></td>";
                     echo "<td align='center'><input type='text' name='detail[".$No."][detail][1][konversi]' data-no='$No' value='1' class='form-control input-sm text-center maskM' $DISABLED></td>";
-                    echo "<td align='center'><input type='text' name='detail[".$No."][detail][1][keterangan]' data-no='$No' class='form-control input-sm text-left' $DISABLED>
-					<input type='hidden' name='detail[".$No."][detail][1][bm]' data-no='$No' value='$bm' class='form-control input-sm text-left'</td>";
+                    echo "<td align='center'><input type='text' name='detail[".$No."][detail][1][keterangan]' data-no='$No' class='form-control input-sm text-left' $DISABLED></td>";
 					echo "<td align='center'>
 							<button type='button' class='btn btn-sm btn-primary plus' title='Plus' data-id='".$No."' $DISABLED><i class='fa fa-plus'></i></button>
 						</td>";

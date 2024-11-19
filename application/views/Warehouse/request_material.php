@@ -143,16 +143,29 @@ $this->load->view('include/side_menu');
 
 	$(document).on('keyup', '.checkRequest', function(e){
 		var nomor 	= $(this).data('no');
-		var request = getNum($(this).val().split(",").join(""))
-		var stock 	= getNum($('#stock_'+nomor).html().split(",").join(""))
-
+		var nomor2 	= $(this).data('no2');
+		var request 	= getNum($(this).val().split(",").join(""))
+		var stock 		= getNum($('#stock_'+nomor).vals().split(",").join(""))
+		var konversi 	= getNum($('#konversi_'+nomor).val().split(",").join(""))
+		// console.log(request)
+		// console.log(stock)
+		// console.log(konversi)
 		if(stock < request && stock > 0){
 			$(this).val(number_format(stock,4))
+			$('#cstk_'+nomor+'_'+nomor2).val(stock*konversi)
+			// console.log('1')
 		}
-
+		if(stock >= request && stock > 0){
+			$('#cstk_'+nomor+'_'+nomor2).val(request*konversi)
+			// console.log('2')
+		}
 		if(stock < 0){
 			$(this).val(0)
+			$('#cstk_'+nomor+'_'+nomor2).val(0)
+			// console.log('3s')
 		}
+		
+
 	});
 
 	$(document).on('click', '.detailAjust', function(e){
@@ -210,6 +223,34 @@ $this->load->view('include/side_menu');
 		});
 	});
 
+	$(document).on('click', '.createspk', function(e){
+		e.preventDefault();
+		// alert("not finished");
+		// return false;
+		loading_spinner();
+		$("#head_title2").html("<b>CREATE SPK</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url + active_controller+'/modal_create_spk_req/'+$(this).data('kode_trans'),
+			success:function(data){
+				$("#ModalView2").modal();
+				$("#view2").html(data);
+				$('.maskM').autoNumeric('init', {mDec: '4', aPad: false});
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000,
+				  showCancelButton	: false,
+				  showConfirmButton	: false,
+				  allowOutsideClick	: false
+				});
+			}
+		});
+	});
+
 	$(document).on('click', '.edit_material', function(e){
 		e.preventDefault();
 		// alert("not finished");
@@ -244,12 +285,15 @@ $this->load->view('include/side_menu');
 		var gudang 	= $(this).data('gudang');
 		var kolom	= parseFloat($(this).parent().parent().find("td:nth-child(1)").attr('rowspan')) + 1;
 		let list_expired = $(this).parent().parent().find(".list_expired").html();
-		$(this).parent().parent().find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4)").attr('rowspan', kolom);
+		$(this).parent().parent().find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5)").attr('rowspan', kolom);
 		
 		var Rows	= "<tr>";
-			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][qty_oke]' id='cstk_"+no+"_"+kolom+"' data-no='"+no+"' class='form-control input-sm text-right autoNumeric'></td>";
-			Rows	+= "<td align='center'><select id='sel_"+no+"_"+kolom+"' name='detail["+no+"][detail]["+kolom+"][expired]' class='form-control input-sm chosen_select'>"+list_expired+"</select></td>";
 			Rows	+= "<td align='center'>";
+			Rows	+= "<input type='text' name='detail["+no+"][detail]["+kolom+"][qty_pack]' id='cstkpack_"+no+"_"+kolom+"'  data-no2='"+kolom+"' data-no='"+no+"' class='form-control input-sm text-center autoNumeric checkRequest'>";
+			Rows	+= "<input type='hidden' name='detail["+no+"][detail]["+kolom+"][qty_oke]' id='cstk_"+no+"_"+kolom+"'  data-no2='"+kolom+"' data-no='"+no+"' class='form-control input-sm text-right autoNumeric checkRequest'>";
+			Rows	+= "</td>";
+			Rows	+= "<td align='center'><select id='sel_"+no+"_"+kolom+"' name='detail["+no+"][detail]["+kolom+"][expired]' class='form-control input-sm chosen_select'>"+list_expired+"</select></td>";
+			// Rows	+= "<td align='center'></td>";
 			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][check_keterangan]' data-no='"+no+"' class='form-control input-sm text-left'></td>";
 			Rows	+= "<td align='center'>";
 			Rows	+= "<button type='button' class='btn btn-sm btn-danger delete' title='Delete' data-id='"+no+"'><i class='fa fa-trash'></i></button>";
@@ -266,34 +310,12 @@ $this->load->view('include/side_menu');
 			changeMonth: true,
 			changeYear: true
 		});
-		
-		// $.ajax({
-		// 	type:'POST',
-		// 	url: base_url + active_controller+'/get_list_exp/'+material+'/'+gudang,
-		// 	dataType	: 'json',
-		// 	success:function(data){
-		// 		$(kol).html(data.option).trigger("chosen:updated");
-		// 	},
-		// 	error: function() {
-		// 		swal({
-		// 		  title				: "Error Message !",
-		// 		  text				: 'Connection Timed Out ...',
-		// 		  type				: "warning",
-		// 		  timer				: 5000,
-		// 		  showCancelButton	: false,
-		// 		  showConfirmButton	: false,
-		// 		  allowOutsideClick	: false
-		// 		});
-		// 	}
-		// });
-		
-		
 	});
 	
 	$(document).on('click','.delete', function(){
 		var no 		= $(this).data('id');
 		var kolom	= parseFloat($(".baris_"+no).find("td:nth-child(1)").attr('rowspan')) - 1;
-		$(".baris_"+no).find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4)").attr('rowspan', kolom);
+		$(".baris_"+no).find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5)").attr('rowspan', kolom);
 		
 		$(this).parent().parent().remove();
 	});
@@ -689,10 +711,16 @@ $this->load->view('include/side_menu');
 		});
 	}
 	
-	$(document).on('change','.qty, .ket', function(){
+	$(document).on('change','.qtypack, .ket', function(){
 		var no 				= $(this).data('no');
 		var id 				= $('#id_'+no).val();
-		var sudah_request 	= $('#sudah_request_'+no).val();
+		var konversi 		= $('#konversi_'+no).val();
+		var packing 		= $('#sudah_requestpack_'+no).val();
+		var sudah_request 	= 0;
+		if(packing > 0 && konversi > 0){
+			var sudah_request 	= packing * konversi;
+		}
+		$('#sudah_request_'+no).val(sudah_request);
 		var ket_request		= $('#ket_request_'+no).val();
 
 		$.ajax({
@@ -704,6 +732,174 @@ $this->load->view('include/side_menu');
 					"ket_request" 	: ket_request
 				},
 				cache		: false
+		});
+	});
+
+	$(document).on('click', '#create_spk', function(){
+		$('#create_spk').prop('disabled',true);
+
+		if($('.lotList:checked').length == 0){
+			swal({
+				title	: "Error Message!",
+				text	: 'Checklist Minimal 1',
+				type	: "warning"
+			});
+			$('#create_spk').prop('disabled',false);
+			return false;
+		}
+		
+		swal({
+			title: "Are you sure?",
+			text: "You will not be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_adjustment')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/modal_create_spk_req',
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000
+								});
+							window.location.href = base_url + active_controller+'/request_subgudang/pusat';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+							$('#create_spk').prop('disabled',false);
+						}
+					},
+					error: function() {
+						swal({
+							title	: "Error Message !",
+							text	: 'An Error Occured During Process. Please try again..',						
+							type	: "warning",								  
+							timer	: 7000
+						});
+						$('#create_spk').prop('disabled',false);
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			$('#create_spk').prop('disabled',false);
+			return false;
+			}
+		});
+	});
+
+	$(document).on('click', '.edit_material_new', function(e){
+		e.preventDefault();
+		loading_spinner();
+		$("#head_title2").html("<b>EDIT REQUEST MATERIAL</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url + active_controller+'/modal_request_edit_new/'+$(this).data('kode_trans'),
+			success:function(data){
+				$("#ModalView2").modal();
+				$("#view2").html(data);
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '#edit_material_new', function(){
+		var berat 			= $('.maskM').val();
+		var uri_tanda	 	= $('#uri_tanda').val();
+		if( berat == ''){
+			swal({
+			  title	: "Error Message!",
+			  text	: 'Request Check is empty, please input first ...',
+			  type	: "warning"
+			});
+			$('#edit_material_new').prop('disabled',false);
+			return false;
+		}
+		
+		swal({
+			title: "Are you sure?",
+			text: "You will not be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_adjustment')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/modal_request_edit_new',
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000
+								});
+							
+							window.location.href = base_url + active_controller+'/request_subgudang';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title				: "Error Message !",
+							text				: 'An Error Occured During Process. Please try again..',						
+							type				: "warning",								  
+							timer				: 7000
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
 		});
 	});
 	

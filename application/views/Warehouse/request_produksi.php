@@ -528,13 +528,13 @@ $this->load->view('include/side_menu');
 	});
 	
 	$(document).on('click', '#check_material', function(){
-		var berat 			= $('.maskM').val();
+		var berat 			= $('.autoNumeric4').val();
 		var uri_tanda	 	= $('#uri_tanda').val();
 		$('#check_material').prop('disabled',true);
 		if( berat == ''){
 			swal({
 			  title	: "Error Message!",
-			  text	: 'Request Check is empty, please input first ...',
+			  text	: 'Confirm Qty is empty, please input first ...',
 			  type	: "warning"
 			});
 			$('#check_material').prop('disabled',false);

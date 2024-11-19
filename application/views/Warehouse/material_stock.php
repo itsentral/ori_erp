@@ -14,6 +14,9 @@ $gudang = $this->uri->segment(3);
 				<select id='gudang' name='gudang' class='form-control input-sm'>
 					<!--<option value='0'>All Warehouse</option>-->
 					<?php
+						if($category == 'produksi'){
+							echo "<option value='0'>All Gudang Produksi</option>";
+						}
 						foreach($data_gudang AS $val => $valx){
 							echo "<option value='".$valx['id']."'>".strtoupper($valx['nm_gudang'])."</option>";
 						}
@@ -21,6 +24,7 @@ $gudang = $this->uri->segment(3);
 				</select>
 			</div>
 			<div class='col-sm-2'>
+					<input type="hidden" id='category' value='<?=$category;?>'>
 				<input type="text" name='date_filter' id='date_filter' class='form-control datepicker text-center' data-role="datepicker2" readonly placeholder='Change Date'>
 			</div>
 			<!-- <div class='col-sm-1'>
@@ -112,7 +116,8 @@ $gudang = $this->uri->segment(3);
 				document.getElementById(this.id).value = '';
 				var gudang = $('#gudang').val();
 				var date_filter = $('#date_filter').val();
-				DataTables(gudang, date_filter);
+				var category = $('#category').val();
+				DataTables(gudang, date_filter, category);
 			}
 		}
 	});
@@ -121,27 +126,35 @@ $gudang = $this->uri->segment(3);
 		e.preventDefault();
 		var gudang = $('#gudang').val();
 		var date_filter = $('#date_filter').val();
-		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+date_filter;
+		var category = $('#category').val();
+
+		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+category+'/'+date_filter;
 		window.open(Links,'_blank');
 	});
 
 	$(document).ready(function(){
         var gudang = $('#gudang').val();
         var date_filter = $('#date_filter').val();
-        DataTables(gudang, date_filter);
+		var category = $('#category').val();
+
+        DataTables(gudang, date_filter, category);
         
         $(document).on('change','#gudang, #date_filter', function(e){
 			e.preventDefault();
 			var gudang = $('#gudang').val();
 			var date_filter = $('#date_filter').val();
-        	DataTables(gudang, date_filter);
+			var category = $('#category').val();
+
+        	DataTables(gudang, date_filter, category);
 		});
 
 		$(document).on('click','#search', function(e){
 			e.preventDefault();
 			var gudang = $('#gudang').val();
 			var date_filter = $('#date_filter').val();
-        	DataTables(gudang, date_filter);
+			var category = $('#category').val();
+
+        	DataTables(gudang, date_filter, category);
 		});
 
 		$(document).on('click', '.look_history', function(e){
@@ -149,6 +162,14 @@ $gudang = $this->uri->segment(3);
             loading_spinner();
             $("#head_title2").html("<b>History "+$(this).data('nm_material')+"</b>");
             $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('id_material')+'/'+$(this).data('id_gudang')+'/<?=(isset($akses_menu)?$akses_menu['approve']:'0')?>');
+            $("#ModalView2").modal();
+        });
+
+		$(document).on('click', '.lot_history', function(e){
+            e.preventDefault();
+            loading_spinner();
+            $("#head_title2").html("<b>LOT "+$(this).data('nm_material')+"</b>");
+            $("#view2").load(base_url + active_controller + '/modal_history_lot/'+$(this).data('id_material')+'/'+$(this).data('id_gudang')+'/<?=(isset($akses_menu)?$akses_menu['approve']:'0')?>');
             $("#ModalView2").modal();
         });
 
@@ -163,7 +184,7 @@ $gudang = $this->uri->segment(3);
     
 
 		
-	function DataTables(gudang=null, date_filter=null){
+	function DataTables(gudang=null, date_filter=null, category=null){
 		let qty_stock	= 0;
 		let qty_booking	= 0;
 		let qty_available	= 0;
@@ -188,7 +209,8 @@ $gudang = $this->uri->segment(3);
 				type: "post",
 				data: function(d){
 					d.gudang = gudang,
-					d.date_filter = date_filter
+					d.date_filter = date_filter,
+					d.category = category
 				},
 				cache: false,
 				error: function(){

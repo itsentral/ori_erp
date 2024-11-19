@@ -27,6 +27,9 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
             </thead>
             <tbody>
                 <?php
+                $xyz_no_spk = [];
+                $xyz_no_so = [];
+                $xyz_product = [];
                     if(!empty($get_detail_spk2)){
                         foreach($get_detail_spk2 AS $key => $value){
                             $key++;
@@ -35,6 +38,10 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
                             if($value['id_product'] == 'deadstok'){
                                 $SPEC = "";
                             }
+
+                            $xyz_no_spk[] = $value['no_spk'];
+                            $xyz_no_so[] = $EXPLODE[0];
+                            $xyz_product[] = $value['product'];
                             echo "<tr>";
                                 echo "<td align='center'>".$key."</td>";
                                 echo "<td align='center'>".strtoupper($EXPLODE[0])."</td>";
@@ -56,9 +63,15 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
                             echo "<td colspan='6'>Tidak ada data yang ditampilkan, mungkin hanya penjualan material atau aksesoris saja.</td>";
                         echo "</tr>";
                     }
+                    $xyz_no_spk     = implode(', ', $xyz_no_spk);
+                    $xyz_no_so      = implode(', ', $xyz_no_so);
+                    $xyz_product    = implode(', ', $xyz_product);
                 ?>
             </tbody>
         </table>
+        <input type="hidden" name='xyz_no_spk' id='xyz_no_spk' value='<?=$xyz_no_spk;?>'>
+        <input type="hidden" name='xyz_no_so' id='xyz_no_so' value='<?=$xyz_no_so;?>'>
+        <input type="hidden" name='xyz_product' id='xyz_product' value='<?=$xyz_product;?>'>
         <br>
         <div class="form-group row">
             <div class='col-sm-2 '>

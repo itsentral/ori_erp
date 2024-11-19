@@ -106,7 +106,7 @@ $this->load->view('include/side_menu');
 		$("#head_title2").html("<b>DETAIL INCOMING</b>");
 		$.ajax({
 			type:'POST',
-			url: base_url + active_controller+'/modal_detail_adjustment/'+$(this).data('kode_trans')+'/'+$(this).data('tanda'),
+			url: base_url + active_controller+'/modal_detail_qr/'+$(this).data('kode_trans')+'/'+$(this).data('tanda'),
 			success:function(data){
 				$("#ModalView2").modal();
 				$("#view2").html(data);
@@ -246,6 +246,70 @@ $this->load->view('include/side_menu');
 			return false;
 			}
 		});
+	});
+
+	//NEW
+	$(document).on('click', '.checknew', function(e){
+		e.preventDefault();
+		loading_spinner();
+		$("#head_title2").html("<b>CHECK INCOMING MATERIAL</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url + active_controller+'/modal_incoming_check_new/'+$(this).data('kode_trans'),
+			success:function(data){
+				$("#ModalView2").modal();
+				$("#view2").html(data);
+
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
+
+	$(document).on('click','.plus2', function(){
+		var no 		= $(this).data('id');
+		var konv	= $('#konversi_'+no).text()
+		var kolom	= parseFloat($(this).parent().parent().find("td:nth-child(1)").attr('rowspan')) + 1;
+		
+		$(this).parent().parent().find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7)").attr('rowspan', kolom);
+		
+		var Rows	= "<tr>";
+			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][qty_oke]' data-no='"+no+"' data-kolom='"+kolom+"' class='form-control input-sm text-right maskM qtyDiterima'></td>";
+			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][qty_rusak]' data-no='"+no+"' class='form-control input-sm text-right maskM'></td>";
+			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][qty_pack]' data-no='"+no+"' id='pack_"+no+"_"+kolom+"' class='form-control input-sm text-right maskM' readonly></td>";
+			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][expired]' data-no='"+no+"' class='form-control text-center input-sm text-left tanggal' readonly placeholder='Expired Date'></td>";
+			Rows	+= "<td align='center'>";
+			Rows	+= "<input type='hidden' name='detail["+no+"][detail]["+kolom+"][konversi]' data-no='"+no+"' value='"+konv+"' class='form-control input-sm text-center maskM'>";
+			Rows	+= "<input type='file' name='file_"+no+"_"+kolom+"' class='form-control input-sm'>";
+			Rows	+= "</td>";
+			Rows	+= "<td align='center'><input type='text' name='detail["+no+"][detail]["+kolom+"][keterangan]' data-no='"+no+"' class='form-control input-sm text-left'></td>";
+			Rows	+= "<td align='center'>";
+			Rows	+= "<button type='button' class='btn btn-sm btn-danger delete2' title='Delete' data-id='"+no+"'><i class='fa fa-trash'></i></button>";
+			Rows	+= "</td>";
+			Rows	+= "</tr>";
+		// alert(Rows);
+		$(this).parent().parent().after(Rows);
+		
+		$('.maskM').autoNumeric('init', {mDec: '2', aPad: false});
+		$('.tanggal').datepicker({
+			dateFormat : 'yy-mm-dd',
+			changeMonth: true,
+			changeYear: true
+		});
+	});
+
+	$(document).on('click','.delete2', function(){
+		var no 		= $(this).data('id');
+		var kolom	= parseFloat($(".baris_"+no).find("td:nth-child(1)").attr('rowspan')) - 1;
+		$(".baris_"+no).find("td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7)").attr('rowspan', kolom);
+		
+		$(this).parent().parent().remove();
 	});
 
 

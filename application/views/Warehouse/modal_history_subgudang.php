@@ -1,6 +1,6 @@
 
 <div class="box-body">
-	<table id="my-grid" class="table" width="100%">
+	<table width="100%">
 		<thead>
 			<tr>
 				<td class="text-left" style='vertical-align:middle;' width='15%'>No Transaksi</td>
@@ -8,9 +8,23 @@
 				<td class="text-left" style='vertical-align:middle;'><?=$kode_trans;?></td>
 			</tr>
 			<tr>
-				<td class="text-left" style='vertical-align:middle;' width='2%'>Tanggal Penerimaan</td>
+				<td class="text-left" style='vertical-align:middle;'>Tanggal Penerimaan</td>
 				<td class="text-left" style='vertical-align:middle;'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><?=$resv;?></td>
+			</tr>
+			<tr>
+				<td class="text-left" style='vertical-align:middle;'>File Eng. Change</td>
+				<td class="text-left" style='vertical-align:middle;'>:</td>
+				<td class="text-left" style='vertical-align:middle;'>
+				<?php
+                if(!empty($file_eng_change)){
+                    echo "<a href='".base_url('assets/file/produksi/').$file_eng_change."' target='_blank'>Download</a>";
+                }
+                else{
+                    echo "";
+                }
+                ?>
+				</td>
 			</tr>
 		</thead>
 	</table><br>
