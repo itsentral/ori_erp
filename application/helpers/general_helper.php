@@ -201,14 +201,15 @@ function get_input_produksi_detail() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                b.nm_material AS nm_material,
+                -- b.nm_material AS nm_material,
+                GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
             FROM
                 production_real_detail a
                 LEFT JOIN raw_materials b ON a.actual_type = b.id_material 
             WHERE
-                a.actual_type LIKE 'MTL-%' 
+                a.actual_type LIKE 'MTL-%'  AND a.material_terpakai != '0'
             GROUP BY
                 b.id_category, 
                 a.id_production_detail 
@@ -230,14 +231,15 @@ function get_input_produksi_plus() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                b.nm_material AS nm_material,
+                -- b.nm_material AS nm_material,
+                GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
             FROM
                 production_real_detail_plus a
                 LEFT JOIN raw_materials b ON a.actual_type = b.id_material 
             WHERE
-                a.actual_type LIKE 'MTL-%' 
+                a.actual_type LIKE 'MTL-%'  AND a.material_terpakai != '0'
             GROUP BY
                 b.id_category, 
                 a.id_production_detail 
@@ -250,6 +252,64 @@ function get_input_produksi_plus() {
         $ArrGetCategory[$value['id']][$value['category_id']]['category'] = $value['category_id'];
         $ArrGetCategory[$value['id']][$value['category_id']]['terpakai'] = $value['terpakai'];
         $ArrGetCategory[$value['id']][$value['category_id']]['nm_material'] = $value['nm_material'];
+    }
+    return $ArrGetCategory;
+}
+
+function get_input_produksi_plus_exclude() {
+    $CI =& get_instance();
+    $SQL = "SELECT
+                a.id_production_detail AS id,
+                a.actual_type AS material_id,
+                -- b.nm_material AS nm_material,
+                GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
+                b.id_category AS category_id,
+                SUM( a.material_terpakai ) AS terpakai 
+            FROM
+                production_real_detail_plus a
+                LEFT JOIN raw_materials b ON a.actual_type = b.id_material 
+            WHERE
+                a.actual_type LIKE 'MTL-%' AND b.id_category NOT IN ('TYP-0001','TYP-0002','TYP-0003','TYP-0004','TYP-0005','TYP-0006') AND a.material_terpakai != '0'
+            GROUP BY
+                a.id_production_detail 
+            ORDER BY 
+                a.id_production_detail
+            ";
+    $listGetCategory = $CI->db->query($SQL)->result_array();
+    $ArrGetCategory = [];
+    foreach ($listGetCategory as $key => $value) {
+        $ArrGetCategory[$value['id']]['category'] = $value['category_id'];
+        $ArrGetCategory[$value['id']]['terpakai'] = $value['terpakai'];
+        $ArrGetCategory[$value['id']]['nm_material'] = $value['nm_material'];
+    }
+    return $ArrGetCategory;
+}
+
+function get_input_produksi_add() {
+    $CI =& get_instance();
+    $SQL = "SELECT
+                a.id_production_detail AS id,
+                a.actual_type AS material_id,
+                -- b.nm_material AS nm_material,
+                GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
+                b.id_category AS category_id,
+                SUM( a.material_terpakai ) AS terpakai 
+            FROM
+                production_real_detail_add a
+                LEFT JOIN raw_materials b ON a.actual_type = b.id_material 
+            WHERE
+                a.actual_type LIKE 'MTL-%' AND a.material_terpakai != '0'
+            GROUP BY
+                a.id_production_detail 
+            ORDER BY 
+                a.id_production_detail
+            ";
+    $listGetCategory = $CI->db->query($SQL)->result_array();
+    $ArrGetCategory = [];
+    foreach ($listGetCategory as $key => $value) {
+        $ArrGetCategory[$value['id']]['category'] = $value['category_id'];
+        $ArrGetCategory[$value['id']]['terpakai'] = $value['terpakai'];
+        $ArrGetCategory[$value['id']]['nm_material'] = $value['nm_material'];
     }
     return $ArrGetCategory;
 }
@@ -1507,71 +1567,88 @@ function getEstimasiDeadstok($kode,$qty,$layer,$category,$resin=null,$tanda=null
 
 function getEstimasiVsAktual($id_milik, $no_ipp, $qty, $id_production_detail) {
     $CI =& get_instance();
+
+    $restHeader		= $CI->db->get_where('so_component_header',array('id_milik'=>$id_milik))->result_array();
+    if ($restHeader[0]['parent_product']!='branch joint' && $restHeader[0]['parent_product']!='field joint' && $restHeader[0]['parent_product']!='shop joint'){
     $qDetail1		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'LINER THIKNESS / CB' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name IN ('LINER THIKNESS / CB','GLASS','RESIN AND ADD') GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'LINER THIKNESS / CB' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name IN ('LINER THIKNESS / CB','RESIN AND ADD') GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'LINER THIKNESS / CB' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'LINER THIKNESS / CB' GROUP BY a.id_material)
         UNION
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'LINER THIKNESS / CB' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name IN ('LINER THIKNESS / CB','GLASS','RESIN AND ADD') ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'LINER THIKNESS / CB' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name IN ('LINER THIKNESS / CB','RESIN AND ADD') ORDER BY a.id_detail DESC LIMIT 1)
         ";
+    }
+    else{
+        $qDetail1		= 	"
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name IN ('LINER THIKNESS / CB','GLASS','RESIN AND ADD') GROUP BY a.id_material)
+        UNION
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name IN ('LINER THIKNESS / CB','RESIN AND ADD') GROUP BY a.id_material)
+        UNION
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'LINER THIKNESS / CB' GROUP BY a.id_material)
+        UNION
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name IN ('LINER THIKNESS / CB','GLASS','RESIN AND ADD') ORDER BY a.id_detail)
+        UNION
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name IN ('LINER THIKNESS / CB','RESIN AND ADD') ORDER BY a.id_detail DESC LIMIT 1)
+        ";
+    }
     $qDetail2		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 1' GROUP BY a.id_material)
         UNION
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 1' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 1' ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 1' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 1' ORDER BY a.id_detail DESC LIMIT 1)
         ";
     $qDetail3		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR NECK 2' GROUP BY a.id_material)
         UNION
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 2' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 2' ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 2' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR NECK 2' ORDER BY a.id_detail DESC LIMIT 1)
         ";
     $qDetail4		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'STRUKTUR THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'STRUKTUR THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
         ";
     $qDetail5		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'EXTERNAL LAYER THICKNESS' GROUP BY a.id_material)
         UNION
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'EXTERNAL LAYER THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'EXTERNAL LAYER THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'EXTERNAL LAYER THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'EXTERNAL LAYER THICKNESS' ORDER BY a.id_detail DESC LIMIT 1)
         ";
     $qDetail6		= 	"
-        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
+        (SELECT 'detail' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail a LEFT JOIN production_real_detail b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE a.id_bq='BQ-".$no_ipp."'  AND b.id_production_detail='".$id_production_detail."'AND a.id_milik='".$id_milik."' AND a.id_category NOT IN ( 'TYP-0001', 'TYP-0030' ) AND a.detail_name = 'TOPCOAT' GROUP BY a.id_material)
         UNION
-        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'TOPCOAT' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'plus' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga, b.material_terpakai AS real_material FROM so_component_detail_plus a LEFT JOIN production_real_detail_plus b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'TOPCOAT' ORDER BY a.id_detail DESC LIMIT 1)
         UNION
-        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail AND b.id_production_detail='".$id_production_detail."' WHERE  a.id_bq='BQ-".$no_ipp."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'TOPCOAT' ORDER BY a.id_detail DESC LIMIT 1)
+        (SELECT 'add' AS tipe, a.id_detail, a.id_milik, a.id_bq, a.detail_name, a.nm_category, a.nm_material, (a.last_cost * ".$qty.") AS est_material, a.price_mat AS est_harga,  b.material_terpakai AS real_material FROM so_component_detail_add a LEFT JOIN production_real_detail_add b ON a.id_detail = b.id_detail WHERE  a.id_bq='BQ-".$no_ipp."' AND b.id_production_detail='".$id_production_detail."' AND a.id_milik='".$id_milik."' AND a.id_category IN ( 'TYP-0001') AND a.id_category NOT IN ('TYP-0030') AND a.detail_name = 'TOPCOAT' ORDER BY a.id_detail DESC LIMIT 1)
         ";
     // echo $qDetail1; exit;
     $restDetail1	= $CI->db->query($qDetail1)->result_array();
@@ -1595,14 +1672,14 @@ function getEstimasiVsAktual($id_milik, $no_ipp, $qty, $id_production_detail) {
         $estHargaReal   = $real_material * $est_harga;
 
         $SUM_MAT_EST += $est_material;
-        $SUM_MAT_ACT +=  $estHarga;
-        $SUM_PRC_EST += $real_material;
+        $SUM_PRC_EST +=  $estHarga;
+        $SUM_MAT_ACT += $real_material;
         $SUM_PRC_ACT += $estHargaReal;
     }
 
     $ArrayResult['est_mat']     = $SUM_MAT_EST;
-    $ArrayResult['act_mat']     = $SUM_MAT_ACT;
-    $ArrayResult['est_price']   = $SUM_PRC_EST;
+    $ArrayResult['act_mat']     = $SUM_PRC_EST;
+    $ArrayResult['est_price']   = $SUM_MAT_ACT;
     $ArrayResult['act_price']   = $SUM_PRC_ACT;
 
     return $ArrayResult;
@@ -1639,6 +1716,13 @@ function getSubGudangProject() {
 function getSubGudangCustomer($id_customer) {
     $CI =& get_instance();
     $getGudang    = $CI->db->limit(1)->get_where('warehouse',array('nm_gudang'=>$id_customer))->result_array();
+    $id_gudang = (!empty($getGudang[0]['id']))?$getGudang[0]['id']:NULL;
+    return $id_gudang;
+}
+
+function getGudangFG() {
+    $CI =& get_instance();
+    $getGudang    = $CI->db->limit(1)->get_where('warehouse',array('category'=>'fg'))->result_array();
     $id_gudang = (!empty($getGudang[0]['id']))?$getGudang[0]['id']:NULL;
     return $id_gudang;
 }

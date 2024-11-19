@@ -26,7 +26,9 @@
 		// print_r($getHeaderAdjust);
 		// exit;
 		
-		
+		$getGudang2 = $CI->db->get_where('warehouse', array('id'=>$GudangTo))->result();		
+		$gudang2 = $getGudang2[0]->category;
+
 // ok
 		if($category=='transfer pusat - subgudang'){
 			$kodejurnal = 'JV002';
@@ -280,6 +282,14 @@
 		}elseif($GudangFrom == '3'){
 			update_price_book_produksi($ArrData,$kode_trans);
 		}
+		
+		
+		// if($gudang2 == 'subgudang'){
+			// update_price_book_subgudang($ArrData,$kode_trans);
+		// }elseif($gudang2 == 'produksi'){
+			// update_price_book_produksi($ArrData,$kode_trans);
+		// }
+		
 	}
 	
 	
@@ -522,6 +532,7 @@
 			update_price_book_pusat_retur($ArrData,$kode_trans);
 		}
 	}
+	
 
 	function insert_jurnal_wip($ArrData,$GudangFrom,$GudangTo,$category,$ket_min,$ket_plus,$kode_trans){
 		$CI 	=& get_instance();
@@ -797,7 +808,7 @@
 		}
 	}
 
-	function insert_jurnal_delivery($ArrData, $kode_pro, $sts){
+	function insert_jurnal_delivery($ArrData, $kode_pro){
 		$CI 	=& get_instance();
 		$data_session	= $CI->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
@@ -809,22 +820,11 @@
 		$ArrUpdate = [];
 		$ArrDetailProduct = [];
 		$nomor = 0;
-		
+		$category = 'delivery';
 		$temp = [];
 
 		foreach ($ArrData as $key => $value) {$nomor++;
-		
-			// print_r($value);
-			// exit;
-			if($sts=='loose'){
-			$category = 'delivery';
 			$get_detProduksi	= $CI->db->select('id_produksi, kode_spk, print_merge_date AS data_uniq, id_milik, product_ke, product_code, no_spk, id_category AS product, amount, id')->get_where('production_detail',array('id'=>$value))->result();
-			}else{
-			$get_detProduksi	= $CI->db->select('id_produksi, kode_spk, print_merge_date AS data_uniq, id_milik, product_ke, product_code, no_spk, id_category AS product, amount, id')->get_where('production_detail',array('id_deadstok_dipakai'=>$value))->result();
-			$category = 'delivery';
-			}
-			
-			
 			$data_uniq 			= $get_detProduksi[0]->data_uniq;
 			$kode_spk 			= $get_detProduksi[0]->kode_spk;
 			$kode_trans 		= $kode_spk.'/'.$data_uniq;
@@ -1273,8 +1273,6 @@
 		foreach ($ArrData as $key => $value) { 
 			$SUM_WEIGHT += $value['qty_good'];
 		}
-				
-		
 
 		$ArrInsertPriceBook = [];
 		$nomor = 0;
@@ -1320,13 +1318,71 @@
 			$ArrInsertPriceBook[$key]['updated_date'] = $DateTime;
 			$ArrInsertPriceBook[$key]['kode_trans'] = $kode_trans;
 		}
-		
-		print_r($ArrInsertPriceBook);
-		exit;
 
 		$CI->db->insert_batch('price_book_subgudang',$ArrInsertPriceBook);
 	}
 	
+	
+	function update_price_book_produksi($ArrData,$kode_trans){
+		$CI 	=& get_instance();
+		$data_session	= $CI->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+
+		$SUM_WEIGHT = 0;
+		foreach ($ArrData as $key => $value) { 
+			$SUM_WEIGHT += $value['qty_good'];
+		}
+
+		$ArrInsertPriceBook = [];
+		$nomor = 0;
+		$DELIVERY = 1;
+		foreach ($ArrData as $key => $value) { $nomor++;
+			$KG_PUSAT 		= getWeightMaterialWarehouse($key,'pusat');
+			$KG_SUBGUDANG 	= getWeightMaterialWarehouse($key,'subgudang');
+			$KG_PRODUKSI 	= getWeightMaterialWarehouse($key,'produksi');
+			$KG_ALL 		= getWeightMaterialWarehouse($key,'all');
+
+			$get_price_book_subgudang = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
+			$PRICE_INCOMING = (!empty($get_price_book_subgudang[0]->price_book))?$get_price_book_subgudang[0]->price_book:0;
+			
+			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
+			$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+			$OLD_PRICE_BOOK = $KG_PRODUKSI * $PRICE;
+			$NEW_PRICE_BOOK = $value['qty_good'] * $PRICE_INCOMING; //anggap dulu 1k
+
+			$OLD_BERAT = $KG_PRODUKSI;
+			$NEW_BERAT = $value['qty_good'];
+
+			$LOGISTIC_PROPOSIONAL = 0;
+			if($NEW_BERAT > 0 AND $SUM_WEIGHT > 0){
+			$LOGISTIC_PROPOSIONAL = $DELIVERY*$NEW_BERAT/$SUM_WEIGHT;
+			}
+
+			$SUM_BERAT = $OLD_BERAT + $NEW_BERAT;
+			$SUM_PRICE = $OLD_PRICE_BOOK + $NEW_PRICE_BOOK; //+ $LOGISTIC_PROPOSIONAL; proporsional dihilangkan 20/juni/2024 hasil meeting bareng pak iman //nanti ditambah logistik namin proposional
+
+			$FINAL_PRICE_BOOK = 0;
+			if($SUM_PRICE > 0 AND $SUM_BERAT > 0){
+			$FINAL_PRICE_BOOK = $SUM_PRICE / $SUM_BERAT;
+			}
+
+			$ArrInsertPriceBook[$key]['id_material'] = $key;
+			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT;
+			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG;
+			$ArrInsertPriceBook[$key]['produksi'] = $KG_PRODUKSI+ $NEW_BERAT;
+			$ArrInsertPriceBook[$key]['price_book'] = $FINAL_PRICE_BOOK;
+			$ArrInsertPriceBook[$key]['delivery'] = $DELIVERY;
+			$ArrInsertPriceBook[$key]['delivery_proposional'] = $LOGISTIC_PROPOSIONAL;
+			$ArrInsertPriceBook[$key]['incoming'] = $NEW_BERAT;
+			$ArrInsertPriceBook[$key]['price'] = $PRICE_INCOMING;
+			$ArrInsertPriceBook[$key]['updated_by'] = $UserName;
+			$ArrInsertPriceBook[$key]['updated_date'] = $DateTime;
+			$ArrInsertPriceBook[$key]['kode_trans'] = $kode_trans;
+		}
+
+		$CI->db->insert_batch('price_book_produksi',$ArrInsertPriceBook);
+	}
 	
 	
 	function update_price_book_subgudang_retur($ArrData,$kode_trans){
@@ -1417,12 +1473,12 @@
 			
 			
 			$PRICE_INCOMING = $value['price'];
-			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
+			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
 			$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-			$OLD_PRICE_BOOK = $KG_PUSAT * $PRICE;
+			$OLD_PRICE_BOOK = $KG_SUBGUDANG * $PRICE;
 			$NEW_PRICE_BOOK = $value['qty_good'] * $PRICE_INCOMING; //anggap dulu 1k
 
-			$OLD_BERAT = $KG_PUSAT;
+			$OLD_BERAT = $KG_SUBGUDANG;
 			$NEW_BERAT = $value['qty_good'];
 			
 
@@ -1437,8 +1493,8 @@
 			}
 
 			$ArrInsertPriceBook[$key]['id_material'] = $key;
-			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT + $NEW_BERAT;;
-			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG;
+			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT;
+			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG + $NEW_BERAT;
 			$ArrInsertPriceBook[$key]['produksi'] = $KG_PRODUKSI;
 			$ArrInsertPriceBook[$key]['price_book'] = $FINAL_PRICE_BOOK;
 			$ArrInsertPriceBook[$key]['delivery'] = $DELIVERY;
@@ -1455,63 +1511,6 @@
 		$CI->db->insert_batch('price_book',$ArrInsertPriceBook);
 	}
 	
-	function update_price_book_produksi($ArrData,$kode_trans){
-		$CI 	=& get_instance();
-		$data_session	= $CI->session->userdata;
-		$UserName		= $data_session['ORI_User']['username'];
-		$DateTime		= date('Y-m-d H:i:s');
-
-		$SUM_WEIGHT = 0;
-		foreach ($ArrData as $key => $value) { 
-			$SUM_WEIGHT += $value['qty_good'];
-		}
-
-		$ArrInsertPriceBook = [];
-		$nomor = 0;
-		$DELIVERY = 1;
-		foreach ($ArrData as $key => $value) { $nomor++;
-			$KG_PUSAT 		= getWeightMaterialWarehouse($key,'pusat');
-			$KG_SUBGUDANG 	= getWeightMaterialWarehouse($key,'subgudang');
-			$KG_PRODUKSI 	= getWeightMaterialWarehouse($key,'produksi');
-			$KG_ALL 		= getWeightMaterialWarehouse($key,'all');
-
-			$get_price_book_subgudang = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-			$PRICE_INCOMING = (!empty($get_price_book_subgudang[0]->price_book))?$get_price_book_subgudang[0]->price_book:0;
-			
-			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
-			$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-			$OLD_PRICE_BOOK = $KG_PRODUKSI * $PRICE;
-			$NEW_PRICE_BOOK = $value['qty_good'] * $PRICE_INCOMING; //anggap dulu 1k
-
-			$OLD_BERAT = $KG_PRODUKSI;
-			$NEW_BERAT = $value['qty_good'];
-
-			$LOGISTIC_PROPOSIONAL = $DELIVERY*$NEW_BERAT/$SUM_WEIGHT;
-
-			$SUM_BERAT = $OLD_BERAT + $NEW_BERAT;
-			$SUM_PRICE = $OLD_PRICE_BOOK + $NEW_PRICE_BOOK; //+ $LOGISTIC_PROPOSIONAL; proporsional dihilangkan 20/juni/2024 hasil meeting bareng pak iman //nanti ditambah logistik namin proposional
-
-			$FINAL_PRICE_BOOK = 0;
-			if($SUM_PRICE > 0 AND $SUM_BERAT > 0){
-			$FINAL_PRICE_BOOK = $SUM_PRICE / $SUM_BERAT;
-			}
-
-			$ArrInsertPriceBook[$key]['id_material'] = $key;
-			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT;
-			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG;
-			$ArrInsertPriceBook[$key]['produksi'] = $KG_PRODUKSI+ $NEW_BERAT;
-			$ArrInsertPriceBook[$key]['price_book'] = $FINAL_PRICE_BOOK;
-			$ArrInsertPriceBook[$key]['delivery'] = $SUM_BERAT;
-			$ArrInsertPriceBook[$key]['delivery_proposional'] = $SUM_PRICE;
-			$ArrInsertPriceBook[$key]['incoming'] = $NEW_BERAT;
-			$ArrInsertPriceBook[$key]['price'] = $PRICE_INCOMING;
-			$ArrInsertPriceBook[$key]['updated_by'] = $UserName;
-			$ArrInsertPriceBook[$key]['updated_date'] = $DateTime;
-			$ArrInsertPriceBook[$key]['kode_trans'] = $kode_trans;
-		}
-
-		$CI->db->insert_batch('price_book_produksi',$ArrInsertPriceBook);
-	}
 
 
 	function getWeightMaterialWarehouse($id_material,$gudang){
@@ -2103,35 +2102,131 @@
 			unset($det_Jurnaltes);unset($datadetail);
 		  }
 		}
-		if($ket=='FINISH GOOD - TRANSIT'){
+		/*if($ket=='FINISH GOOD - TRANSIT'){
 		  $kodejurnal='JV006';
 		  foreach($ArrDetailProduct as $keys => $values) {
-			$id=$values['id_detail'];
-			$kdtrans=$values['kode_trans'];
-			
-			// print_r($ArrDetailProduct);
-			// exit;
-			
-			$datajurnal1 = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
-			if(!empty($datajurnal1)){
-            $datajurnal = $datajurnal1;
-			}else {
-			$datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join view_ms_category_part b on a.product=b.category WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
-			}				
-				
+			$id=$values['id_detail'];		
+			$datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
 			$id=$datajurnal->id;
 			$tgl_voucher = $datajurnal->tanggal;
 			$no_request = $id;
-            
-			if($kdtrans=='deadstok/'){
-			$dataproductiondetail=$CI->db->query("select * from production_detail where id_deadstok_dipakai='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1")->row();
-			}else{
+
 			$dataproductiondetail=$CI->db->query("select * from production_detail where id='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1")->row();
-			}
-			
 			if($dataproductiondetail->finish_good==0){
 				//$datasodetailheader = $CI->db->query("SELECT * FROM so_detail_header WHERE id ='".$datajurnal->id_milik."' limit 1" )->row();
 				$datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari_action WHERE id_milik ='".$datajurnal->id_milik."' limit 1" )->row();
+			
+				
+				$kurs=1;
+				$sqlkurs="select * from ms_kurs where tanggal <='".$datajurnal->tanggal."' and mata_uang='USD' order by tanggal desc limit 1";
+				$dtkurs	= $CI->db->query($sqlkurs)->row();
+				if(!empty($dtkurs)) $kurs=$dtkurs->kurs;
+				$wip_material=$datajurnal->total_nilai;
+				$pe_direct_labour=(($datasodetailheader->direct_labour*$datasodetailheader->man_hours)*$kurs);
+				$pe_indirect_labour=(($datasodetailheader->indirect_labour*$datasodetailheader->man_hours)*$kurs);
+				$foh=(($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable)*$kurs);
+				$pe_consumable=($datasodetailheader->consumable*$kurs);
+				$finish_good=($wip_material+$pe_direct_labour+$foh+$pe_indirect_labour+$pe_consumable);
+
+				$CI->db->query("update production_detail set wip_kurs='".$kurs."', wip_material='".$wip_material."' , wip_dl='".$pe_direct_labour."' , wip_foh='".$foh."', wip_il='".$pe_indirect_labour."', wip_consumable='".$pe_consumable."', finish_good='".$finish_good."' WHERE id='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1" );
+			
+				$totalall=$finish_good;
+			}else{
+				$totalall=$dataproductiondetail->finish_good;
+			}
+			$no_spk=$datajurnal->id_spk;
+			$Keterangan_INV=($ket).' ('.$datajurnal->no_so.' - '.$datajurnal->product.' - '.$no_spk.' - '.$datajurnal->no_surat_jalan.')';
+			$datajurnal  	 = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+			$det_Jurnaltes = [];
+			foreach($datajurnal AS $record){
+				$tabel  = $record->menu;
+				$posisi = $record->posisi;
+				$field  = $record->field;
+				$nokir  = $record->no_perkiraan;
+
+				$totalall2 = (!empty($totalall))?$totalall:0;
+				$param  = 'id';
+				if ($posisi=='D'){
+					$value_param  = $id;
+					$val = $CI->Acc_model->GetData($tabel,$field,$param,$value_param);
+					$nilaibayar = $val[0]->$field;
+					$det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $Keterangan_INV,
+					  'no_reff'       => $no_request,
+					  'debet'         => $totalall2,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'finish good intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		=>1
+					 );
+				} elseif ($posisi=='K'){
+					$coa = 	$CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.id ='$id'")->result();
+					$nokir=$coa[0]->coa_fg;
+					$det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $Keterangan_INV,
+					  'no_reff'       => $no_request,
+					  'debet'         => 0,
+					  'kredit'        => $totalall2,
+					  'jenis_jurnal'  => 'finish good intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		=>1
+					 );
+				}
+			}
+			$CI->db->query("delete from jurnaltras WHERE jenis_jurnal='finish good intransit' and no_reff ='$id'");
+			$CI->db->insert_batch('jurnaltras',$det_Jurnaltes);
+			$Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall2, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.'-'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$CI->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$CI->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			$CI->db->query("UPDATE jurnal_product SET status_jurnal='1',approval_by='".$UserName."',approval_date='".$DateTime."' WHERE id ='$id'");
+			unset($det_Jurnaltes);unset($datadetail);
+		  }
+		}*/
+		
+		if($ket=='FINISH GOOD - TRANSIT'){
+		  $kodejurnal='JV006';
+		  foreach($ArrDetailProduct as $keys => $values) {
+			$id=$values['id_detail'];		
+			
+			$datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
+			if(!empty($datajurnal)){
+            $datajurnal = $datajurnal;
+			}else {
+			$datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join view_ms_category_part b on a.product=b.id WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
+			}	
+			
+			$id=$datajurnal->id;
+			$tgl_voucher = $datajurnal->tanggal;
+			$no_request = $id;
+
+			$dataproductiondetail=$CI->db->query("select * from production_detail where id='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1")->row();
+			if($dataproductiondetail->finish_good==0){
+				//$datasodetailheader = $CI->db->query("SELECT * FROM so_detail_header WHERE id ='".$datajurnal->id_milik."' limit 1" )->row();
+				$datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari WHERE id_milik ='".$datajurnal->id_milik."' limit 1" )->row();
 			
 				
 				$kurs=1;
@@ -2184,7 +2279,15 @@
 					  'kredit'        => 0
 					 );
 				} elseif ($posisi=='K'){
-					$coa = 	$CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.id ='$id'")->result();
+					//$coa = 	$CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.id ='$id'")->result();
+					$coa = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.id ='$id'")->result();
+					if(!empty($coa)){
+					$coa = $coa;
+					}else {
+					$coa = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join view_ms_category_part b on a.product=b.id WHERE a.id ='$id'")->result();
+					}	
+					
+					
 					$nokir=$coa[0]->coa_fg;
 					$det_Jurnaltes[]  = array(
 					  'tipe'			=> 'JV',
@@ -2210,6 +2313,7 @@
 			unset($det_Jurnaltes);
 		  }
 		}
+		
 		if($ket=='TRANSIT - CUSTOMER'){
 		  $kodejurnal='JV007';
 		  foreach($ArrDetailProduct as $keys => $values) {
@@ -3248,7 +3352,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
+					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => $kredit,
@@ -3264,7 +3368,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
+					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => $kredit,
@@ -3280,7 +3384,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
+					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => $kredit,
@@ -3296,7 +3400,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
+					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => $kredit,
@@ -3312,7 +3416,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
+					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => $kredit,
@@ -3330,7 +3434,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
@@ -3346,7 +3450,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
@@ -3362,7 +3466,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
@@ -3378,7 +3482,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
@@ -3394,7 +3498,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan.' '.$id,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
@@ -3434,13 +3538,11 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 			unset($det_Jurnaltes);unset($datadetail);
 		  
 		}
-				
 		
-	
-	     
-	}
-	
-	function insert_jurnal_adjustment($ArrData,$GudangFrom,$GudangTo,$kode_trans,$category,$ket_min,$ket_plus){ 
+	}	
+		//SYAMSUDIN 29/08/2024
+		
+		function insert_jurnal_adjustment($ArrData,$GudangFrom,$GudangTo,$kode_trans,$category,$ket_min,$ket_plus){ 
 		$CI 	=& get_instance();
 		$data_session	= $CI->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
@@ -3653,5 +3755,6 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 		// end agus	
 
 	}
-		
+	     
+	
 	

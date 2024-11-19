@@ -5076,7 +5076,7 @@
 			$option .= "<option value='0'>Select An Expired</option>"; 
 			foreach($result AS $val => $valx){
 				if($valx['expired'] <> NULL AND $valx['expired'] <> '0000-00-00'){
-					$option .= "<option value='".$valx['expired']."'>".date('d F Y', strtotime($valx['expired']))."</option>";
+					$option .= "<option value='".$valx['expired']."'>".date('d-M-Y', strtotime($valx['expired']))."</option>";
 				}
 				else{
 					$option .= "<option value='0'>Expired not set</option>"; 
@@ -5364,7 +5364,22 @@
 		foreach($rowD AS $val => $valx){
 			//check selain shop joint & type field
 			if($valx['typeProduct'] != 'field'){
-				$sqlCheck2 	= $CI->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'daycode !='=>NULL))->result();
+				$sqlCheck2 	= $CI->db
+									->select('COUNT(*) as Numc')
+									->group_start()
+									->group_start()
+									->where('daycode !=', NULL)
+									->where('daycode !=', '')
+									->group_end()
+									->or_where('id_deadstok_dipakai !=', NULL)
+									->group_end()
+									->get_where('production_detail', 
+										array(
+											'id_milik'=>$valx['id_milik'],
+											'id_produksi'=>$valx['id_produksi']
+											)
+										)
+									->result();
 				$QTY 		= $valx['qty'];
 				$ACT 		= $sqlCheck2[0]->Numc;
 				
@@ -5910,10 +5925,6 @@
 		foreach ($temp as $key => $value) {
 			//PENGURANGAN GUDANG
 			$rest_pusat = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key))->result();
-			//ambil costbook terbaru
-			$theprice=0;
-			$price_book = $CI->db->order_by('id', 'desc')->get_where('price_book',array('id_material'=>$key),1)->row();
-			if(!empty($price_book)) $theprice=$price_book->price_book;
 
 			if(!empty($rest_pusat)){
 				$ArrStock[$key]['id'] 			= $rest_pusat[0]->id;
@@ -5943,14 +5954,6 @@
 				$ArrHist[$key]['ket'] 				= 'pengurangan gudang';
 				$ArrHist[$key]['update_by'] 		= $UserName;
 				$ArrHist[$key]['update_date'] 		= $dateTime;
-				//update agus
-				$ArrHist[$key]['harga'] 			= $theprice;
-				//ambil saldo akhir
-				$saldoakhir=0;
-				$saldo_akhir_gudang = $CI->db->order_by('id', 'desc')->get_where('warehouse_history',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-				if(!empty($saldo_akhir_gudang)) $saldoakhir=$saldo_akhir_gudang->saldo_akhir;
-				$ArrHist[$key]['saldo_awal']		= $saldoakhir;
-				$ArrHist[$key]['saldo_akhir']		= ($saldoakhir-($theprice*$value));
 			}
 			else{
 				$restMat	= $CI->db->get_where('raw_materials',array('id_material'=>$key))->result();
@@ -5988,10 +5991,6 @@
 				$ArrHistInsert[$key]['ket'] 			= 'pengurangan gudang (insert new)';
 				$ArrHistInsert[$key]['update_by'] 		= $UserName;
 				$ArrHistInsert[$key]['update_date'] 	= $dateTime;
-				//update agus
-				$ArrHistInsert[$key]['harga'] 			= $theprice;
-				$ArrHistInsert[$key]['saldo_awal']		= 0;
-				$ArrHistInsert[$key]['saldo_akhir']		= 0 - ($theprice*$value);
 			}
 
 			//PENAMBAHAN GUDANG
@@ -6026,14 +6025,6 @@
 					$ArrHist2[$key]['ket'] 				= 'penambahan gudang';
 					$ArrHist2[$key]['update_by'] 		= $UserName;
 					$ArrHist2[$key]['update_date'] 		= $dateTime;
-					//update agus
-					$ArrHist2[$key]['harga'] 			= $theprice;
-					//ambil saldo akhir 
-					$saldoakhir=0;
-					$saldo_akhir_gudang = $CI->db->order_by('id', 'desc')->get_where('warehouse_history',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-					if(!empty($saldo_akhir_gudang)) $saldoakhir=$saldo_akhir_gudang->saldo_akhir;
-					$ArrHist2[$key]['saldo_awal']		= $saldoakhir;
-					$ArrHist2[$key]['saldo_akhir']		= ($saldoakhir+($theprice*$value));
 				}
 				else{
 					$restMat	= $CI->db->get_where('raw_materials',array('id_material'=>$key))->result();
@@ -6071,10 +6062,6 @@
 					$ArrHistInsert2[$key]['ket'] 				= 'penambahan gudang (insert new)';
 					$ArrHistInsert2[$key]['update_by'] 		    = $UserName;
 					$ArrHistInsert2[$key]['update_date'] 		= $dateTime;
-					//update agus
-					$ArrHistInsert2[$key]['harga']				= $theprice;
-					$ArrHistInsert2[$key]['saldo_awal']			= 0;
-					$ArrHistInsert2[$key]['saldo_akhir']		= ($theprice*$value);
 				}
 			}
 		}
@@ -6216,6 +6203,315 @@
 		$query	= $CI->db->query("SELECT no_so so_number, no_ipp FROM ".DBTANKI.".ipp_header WHERE no_ipp='".$no_bq."' LIMIT 1")->result();
 		$data 	= (!empty($query[0]->so_number))?$query[0]->so_number:'';
 		return $data;
+	}
+
+	function insertDataGroupReport($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_trans=null, $no_ipp=null, $no_spk=null, $product_name=null){
+		$CI 	=& get_instance();
+		$dateTime		= date('Y-m-d H:i:s');
+		$UserName 		= $CI->session->userdata['ORI_User']['username'];
+		$kd_gudang_dari = get_name('warehouse', 'kode', 'id', $id_gudang_dari);
+		$kd_gudang_ke	= NULL;
+		if($id_gudang_ke != null){
+			$kd_gudang_ke 	= get_name('warehouse', 'kode', 'id', $id_gudang_ke);
+		}
+		//grouping sum
+		$temp = [];
+		foreach($ArrUpdateStock as $value) {
+			if(!array_key_exists($value['id'], $temp)) {
+				$temp[$value['id']] = 0;
+			}
+			$temp[$value['id']] += $value['qty'];
+		}
+
+		$GET_MAERIALS 			= get_detail_material();
+		$GET_COSTBOOK_PUSAT 	= getPriceBookByDate(date('Y-m-d'));
+		$GET_COSTBOOK_SUBGUDANG = getPriceBookByDatesubgudang(date('Y-m-d'));
+		$GET_COSTBOOK_PRODUKSI 	= getPriceBookByDateproduksi(date('Y-m-d'));
+
+		$tandaTanki = substr($no_spk,0,3);
+		$getProduct = $CI->db->limit(1)->get_where('production_detail',array('no_spk'=>$no_spk))->result_array();
+		$product 	= (!empty($getProduct[0]['id_category']))?$getProduct[0]['id_category']:null;
+		if($tandaTanki == '90T'){
+			$product 	= (!empty($getProduct[0]['id_product']))?$getProduct[0]['id_product']:null;
+		}
+		if($product_name == null){
+			$product 	= null;
+		}
+		//DATA GROUP Gudang Out
+		$tempMaterial = [];
+		$ArrFinishGood = [];
+
+		$GET_NO_SO = get_detail_ipp();
+		$nomor_so = (!empty($GET_NO_SO[$no_ipp]['so_number']))?$GET_NO_SO[$no_ipp]['so_number']:$no_ipp;
+		
+		foreach ($temp as $key => $value) {
+			if($value > 0 AND !empty($id_gudang_dari)){
+				$nm_material = (!empty($GET_MAERIALS[$key]['nm_material']))?$GET_MAERIALS[$key]['nm_material']:'';
+				
+				$checkGudang = $CI->db->get_where('warehouse',array('id'=>$id_gudang_dari))->result_array();
+				$categoryGudang = (!empty($checkGudang[0]['category']))?$checkGudang[0]['category']:0;
+
+				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
+					if($categoryGudang == 'pusat'){
+						$costbook 	= (!empty($GET_COSTBOOK_PUSAT[$key]))?$GET_COSTBOOK_PUSAT[$key]:0;
+					}
+					if($categoryGudang == 'subgudang'){
+						$costbook 	= (!empty($GET_COSTBOOK_SUBGUDANG[$key]))?$GET_COSTBOOK_SUBGUDANG[$key]:0;
+					}
+					if($categoryGudang == 'produksi'){
+						$costbook 	= (!empty($GET_COSTBOOK_PRODUKSI[$key]))?$GET_COSTBOOK_PRODUKSI[$key]:0;
+					}
+
+					$tempMaterial[$key]['tanggal'] 		= $dateTime;
+					$tempMaterial[$key]['keterangan'] 	= null;
+					$tempMaterial[$key]['no_ipp'] 		= $nomor_so;
+					$tempMaterial[$key]['no_spk'] 		= $no_spk;
+					$tempMaterial[$key]['product'] 		= $product;
+					$tempMaterial[$key]['kode_trans'] 		= $kode_trans;
+					$tempMaterial[$key]['id_material'] 		= $key;
+					$tempMaterial[$key]['nm_material'] 		= $nm_material;
+					$tempMaterial[$key]['qty'] 				= $value;
+					$tempMaterial[$key]['cost_book'] 		= $costbook;
+					$tempMaterial[$key]['created_by'] 		= $UserName;
+					$tempMaterial[$key]['created_date'] 	= $dateTime;
+					$tempMaterial[$key]['tipe'] 			= 'out';
+					$tempMaterial[$key]['gudang'] 			= $id_gudang_dari;
+					$tempMaterial[$key]['gudang_dari'] 		= $id_gudang_dari;
+					$tempMaterial[$key]['gudng_ke'] 		= $id_gudang_ke;
+
+					if($id_gudang_ke == getGudangFG()){
+						$ArrFinishGood[$key]['tanggal'] 		= $dateTime;
+						$ArrFinishGood[$key]['keterangan'] 		= 'Subgudang to Finish Good';
+						$ArrFinishGood[$key]['no_so'] 			= $nomor_so;
+						$ArrFinishGood[$key]['product'] 		= $product;
+						$ArrFinishGood[$key]['no_spk'] 			= $no_spk;
+						$ArrFinishGood[$key]['kode_trans'] 		= $kode_trans;
+						$ArrFinishGood[$key]['id_material'] 	= $key;
+						$ArrFinishGood[$key]['nm_material'] 	= $nm_material;
+						$ArrFinishGood[$key]['qty_mat'] 		= $value;
+						$ArrFinishGood[$key]['cost_book'] 		= $costbook;
+						$ArrFinishGood[$key]['nilai_unit'] 		= $costbook;
+						$ArrFinishGood[$key]['created_by'] 		= $UserName;
+						$ArrFinishGood[$key]['created_date'] 	= $dateTime;
+						$ArrFinishGood[$key]['gudang'] 			= $id_gudang_ke;
+						$ArrFinishGood[$key]['nilai_wip'] 		= $value * $costbook;
+					}
+				}
+			}
+		}
+
+		$tempMaterialIn = [];
+		foreach ($temp as $key => $value) {
+			if($value > 0 AND !empty($id_gudang_ke)){
+				$nm_material = (!empty($GET_MAERIALS[$key]['nm_material']))?$GET_MAERIALS[$key]['nm_material']:'';
+				
+				$gudangDariCostBook = (!empty($id_gudang_dari))?$id_gudang_dari:$id_gudang_ke;
+				$checkGudang = $CI->db->get_where('warehouse',array('id'=>$gudangDariCostBook))->result_array();
+				$categoryGudang = (!empty($checkGudang[0]['category']))?$checkGudang[0]['category']:0;
+
+				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
+					if($categoryGudang == 'pusat'){
+						$costbook 	= (!empty($GET_COSTBOOK_PUSAT[$key]))?$GET_COSTBOOK_PUSAT[$key]:0;
+					}
+					if($categoryGudang == 'subgudang'){
+						$costbook 	= (!empty($GET_COSTBOOK_SUBGUDANG[$key]))?$GET_COSTBOOK_SUBGUDANG[$key]:0;
+					}
+					if($categoryGudang == 'produksi'){
+						$costbook 	= (!empty($GET_COSTBOOK_PRODUKSI[$key]))?$GET_COSTBOOK_PRODUKSI[$key]:0;
+					}
+
+					$tempMaterialIn[$key]['tanggal'] 		= $dateTime;
+					$tempMaterialIn[$key]['keterangan'] 	= null;
+					$tempMaterialIn[$key]['no_ipp'] 		= $nomor_so;
+					$tempMaterialIn[$key]['no_spk'] 		= $no_spk;
+					$tempMaterialIn[$key]['product'] 		= $product;
+					$tempMaterialIn[$key]['kode_trans'] 		= $kode_trans;
+					$tempMaterialIn[$key]['id_material'] 		= $key;
+					$tempMaterialIn[$key]['nm_material'] 		= $nm_material;
+					$tempMaterialIn[$key]['qty'] 				= $value;
+					$tempMaterialIn[$key]['cost_book'] 		= $costbook;
+					$tempMaterialIn[$key]['created_by'] 		= $UserName;
+					$tempMaterialIn[$key]['created_date'] 	= $dateTime;
+					$tempMaterialIn[$key]['tipe'] 			= 'in';
+					$tempMaterialIn[$key]['gudang'] 			= $id_gudang_ke;
+					$tempMaterialIn[$key]['gudang_dari'] 		= $id_gudang_dari;
+					$tempMaterialIn[$key]['gudng_ke'] 		= $id_gudang_ke;
+				}
+			}
+		}
+
+		if(!empty($tempMaterial)){
+			$CI->db->insert_batch('erp_data_subgudang', $tempMaterial);
+		}
+		if(!empty($tempMaterialIn)){
+			$CI->db->insert_batch('erp_data_subgudang', $tempMaterialIn);
+		}
+		if(!empty($ArrFinishGood)){
+			$CI->db->insert_batch('data_erp_fg', $ArrFinishGood);
+		}
+		
+	}
+
+	function insertDataGroupReport_Incoming($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_trans=null, $no_ipp=null, $no_spk=null, $product=null){
+		$CI 	=& get_instance();
+		$dateTime		= date('Y-m-d H:i:s');
+		$UserName 		= $CI->session->userdata['ORI_User']['username'];
+
+		//grouping sum
+		$temp = [];
+		$Harga = [];
+		foreach($ArrUpdateStock as $value) {
+			if(!array_key_exists($value['id'], $temp)) {
+				$temp[$value['id']] = 0;
+			}
+			$temp[$value['id']] += $value['qty'];
+			$Harga[$value['id']] = $value['unit_price_idr'];
+		}
+
+		$GET_MAERIALS 			= get_detail_material();
+
+		$tempMaterialIn = [];
+		foreach ($temp as $key => $value) {
+			if($value > 0 AND !empty($id_gudang_ke)){
+				$nm_material = (!empty($GET_MAERIALS[$key]['nm_material']))?$GET_MAERIALS[$key]['nm_material']:'';
+				
+				$costbook 	= (!empty($Harga[$key]))?$Harga[$key]:0;
+
+				$tempMaterialIn[$key]['tanggal'] 		= $dateTime;
+				$tempMaterialIn[$key]['keterangan'] 	= 'incoming material';
+				$tempMaterialIn[$key]['no_ipp'] 		= $no_ipp;
+				$tempMaterialIn[$key]['no_spk'] 		= $no_spk;
+				$tempMaterialIn[$key]['product'] 		= null;
+				$tempMaterialIn[$key]['kode_trans'] 		= $kode_trans;
+				$tempMaterialIn[$key]['id_material'] 		= $key;
+				$tempMaterialIn[$key]['nm_material'] 		= $nm_material;
+				$tempMaterialIn[$key]['qty'] 				= $value;
+				$tempMaterialIn[$key]['cost_book'] 		= $costbook;
+				$tempMaterialIn[$key]['created_by'] 		= $UserName;
+				$tempMaterialIn[$key]['created_date'] 	= $dateTime;
+				$tempMaterialIn[$key]['tipe'] 			= 'in';
+				$tempMaterialIn[$key]['gudang'] 			= $id_gudang_ke;
+				$tempMaterialIn[$key]['gudang_dari'] 		= $id_gudang_dari;
+				$tempMaterialIn[$key]['gudng_ke'] 		= $id_gudang_ke;
+				
+			}
+		}
+		
+		if(!empty($tempMaterialIn)){
+			$CI->db->insert_batch('erp_data_subgudang', $tempMaterialIn);
+		}
+		
+	}
+
+	function insertDataGroupReport_GudangStok($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_trans=null, $no_ipp=null, $no_spk=null, $product_name=null){
+		$CI 	=& get_instance();
+		$dateTime		= date('Y-m-d H:i:s');
+		$UserName 		= $CI->session->userdata['ORI_User']['username'];
+		$kd_gudang_dari = get_name('warehouse', 'kode', 'id', $id_gudang_dari);
+		$kd_gudang_ke	= NULL;
+		if($id_gudang_ke != null){
+			$kd_gudang_ke 	= get_name('warehouse', 'kode', 'id', $id_gudang_ke);
+		}
+		//grouping sum
+		$temp = [];
+		foreach($ArrUpdateStock as $value) {
+			if(!array_key_exists($value['id'], $temp)) {
+				$temp[$value['id']] = 0;
+			}
+			$temp[$value['id']] += $value['qty'];
+		}
+
+		$GET_MAERIALS 			= get_detail_consumable();
+		$GET_COSTBOOK_PUSAT 	= getPriceBookByDate(date('Y-m-d'));
+
+		$product 	= null;
+		//DATA GROUP Gudang Out
+		$tempMaterial = [];
+		$ArrFinishGood = [];
+
+		$GET_NO_SO = get_detail_ipp();
+		$nomor_so = (!empty($GET_NO_SO[$no_ipp]['so_number']))?$GET_NO_SO[$no_ipp]['so_number']:$no_ipp;
+		
+		foreach ($temp as $key => $value) {
+			if($value > 0 AND !empty($id_gudang_dari)){
+				$nm_material = (!empty($GET_MAERIALS[$key]['nm_barang']))?$GET_MAERIALS[$key]['nm_barang']:'';
+				
+				$costbook 	= (!empty($GET_COSTBOOK_PUSAT[$key]))?$GET_COSTBOOK_PUSAT[$key]:0;
+				
+				$tempMaterial[$key]['tanggal'] 		= $dateTime;
+				$tempMaterial[$key]['keterangan'] 	= null;
+				$tempMaterial[$key]['no_ipp'] 		= $nomor_so;
+				$tempMaterial[$key]['no_spk'] 		= $no_spk;
+				$tempMaterial[$key]['product'] 		= $product;
+				$tempMaterial[$key]['kode_trans'] 	= $kode_trans;
+				$tempMaterial[$key]['id_material'] 	= $key;
+				$tempMaterial[$key]['nm_material'] 	= $nm_material;
+				$tempMaterial[$key]['qty'] 			= $value;
+				$tempMaterial[$key]['cost_book'] 	= $costbook;
+				$tempMaterial[$key]['created_by'] 	= $UserName;
+				$tempMaterial[$key]['created_date'] = $dateTime;
+				$tempMaterial[$key]['tipe'] 		= 'out';
+				$tempMaterial[$key]['gudang'] 		= $id_gudang_dari;
+				$tempMaterial[$key]['gudang_dari'] 	= $id_gudang_dari;
+				$tempMaterial[$key]['gudng_ke'] 	= $id_gudang_ke;
+
+				if($id_gudang_ke == getGudangFG()){
+					$ArrFinishGood[$key]['tanggal'] 		= $dateTime;
+					$ArrFinishGood[$key]['keterangan'] 		= 'Consumable to Finish Good';
+					$ArrFinishGood[$key]['no_so'] 			= $nomor_so;
+					$ArrFinishGood[$key]['product'] 		= $product;
+					$ArrFinishGood[$key]['no_spk'] 			= $no_spk;
+					$ArrFinishGood[$key]['kode_trans'] 		= $kode_trans;
+					$ArrFinishGood[$key]['id_material'] 	= $key;
+					$ArrFinishGood[$key]['nm_material'] 	= $nm_material;
+					$ArrFinishGood[$key]['qty_mat'] 		= $value;
+					$ArrFinishGood[$key]['cost_book'] 		= $costbook;
+					$ArrFinishGood[$key]['nilai_unit'] 		= $costbook;
+					$ArrFinishGood[$key]['created_by'] 		= $UserName;
+					$ArrFinishGood[$key]['created_date'] 	= $dateTime;
+					$ArrFinishGood[$key]['gudang'] 			= $id_gudang_ke;
+					$ArrFinishGood[$key]['nilai_wip'] 		= $value * $costbook;
+				}
+			}
+		}
+
+		$tempMaterialIn = [];
+		foreach ($temp as $key => $value) {
+			if($value > 0 AND !empty($id_gudang_ke)){
+				$nm_material = (!empty($GET_MAERIALS[$key]['nm_barang']))?$GET_MAERIALS[$key]['nm_barang']:'';
+
+				$costbook 	= (!empty($GET_COSTBOOK_PUSAT[$key]))?$GET_COSTBOOK_PUSAT[$key]:0;
+
+				$tempMaterialIn[$key]['tanggal'] 		= $dateTime;
+				$tempMaterialIn[$key]['keterangan'] 	= null;
+				$tempMaterialIn[$key]['no_ipp'] 		= $nomor_so;
+				$tempMaterialIn[$key]['no_spk'] 		= $no_spk;
+				$tempMaterialIn[$key]['product'] 		= $product;
+				$tempMaterialIn[$key]['kode_trans'] 	= $kode_trans;
+				$tempMaterialIn[$key]['id_material'] 	= $key;
+				$tempMaterialIn[$key]['nm_material'] 	= $nm_material;
+				$tempMaterialIn[$key]['qty'] 			= $value;
+				$tempMaterialIn[$key]['cost_book'] 		= $costbook;
+				$tempMaterialIn[$key]['created_by'] 	= $UserName;
+				$tempMaterialIn[$key]['created_date'] 	= $dateTime;
+				$tempMaterialIn[$key]['tipe'] 			= 'in';
+				$tempMaterialIn[$key]['gudang'] 		= $id_gudang_ke;
+				$tempMaterialIn[$key]['gudang_dari'] 	= $id_gudang_dari;
+				$tempMaterialIn[$key]['gudng_ke'] 		= $id_gudang_ke;
+				
+			}
+		}
+
+		if(!empty($tempMaterial)){
+			$CI->db->insert_batch('erp_data_subgudang', $tempMaterial);
+		}
+		if(!empty($tempMaterialIn)){
+			$CI->db->insert_batch('erp_data_subgudang', $tempMaterialIn);
+		}
+		if(!empty($ArrFinishGood)){
+			$CI->db->insert_batch('data_erp_fg', $ArrFinishGood);
+		}
+		
 	}
 
 ?>

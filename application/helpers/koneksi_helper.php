@@ -5,9 +5,9 @@
     function akses_server_side(){
 		$Arr_Balik	= array(
 			'hostname'	=> 'localhost',
-			'hostuser'	=> 'ori_dummy',
-			'hostpass'	=> 'root',
-			'hostdb'	=> 'sentral2022**'
+			'hostuser'	=> 'sentral',
+			'hostpass'	=> 'Sentral@2024**',
+			'hostdb'	=> 'sentralsistem'
 		);
 		return $Arr_Balik;
 	}
