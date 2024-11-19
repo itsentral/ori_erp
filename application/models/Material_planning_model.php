@@ -132,11 +132,13 @@ class Material_planning_model extends CI_Model {
 						// $SUM_MAT += (int)str_replace(',', '', $valx['jumlah_mat']);
 						$ArrDetAcc[$val]['no_ipp']         = $no_ipp;
 						$ArrDetAcc[$val]['id_material']    = $valx['id_material'];
+						$ArrDetAcc[$val]['code_group']    = $valx['code_group'];
 						$ArrDetAcc[$val]['idmaterial']     = (empty($valx['nm_material']))?get_name('accessories','category','id',$valx['id_material']):NULL;
 						$ArrDetAcc[$val]['nm_material']    = (empty($valx['nm_material']))?get_name('accessories','nama','id',$valx['id_material']):$valx['nm_material'];
 						$ArrDetAcc[$val]['jumlah_mat']     = str_replace(',', '', $valx['jumlah_mat']);
 						$ArrDetAcc[$val]['use_stock']      = 0;
 						$ArrDetAcc[$val]['purchase']       = str_replace(',', '', $valx['purchase']);
+						$ArrDetAcc[$val]['sudah_request']       = str_replace(',', '', $valx['purchase']);
 						$ArrDetAcc[$val]['moq']            = 0;
 						$ArrDetAcc[$val]['sisa_avl']       = 0;
 						$ArrDetAcc[$val]['reorder_point']  = 0;
@@ -146,6 +148,8 @@ class Material_planning_model extends CI_Model {
 						$ArrDetAcc[$val]['satuan']    		= $valx['satuan'];
 						$ArrDetAcc[$val]['created_by']    	= $data_session['ORI_User']['username'];
 						$ArrDetAcc[$val]['created_date']    = date('Y-m-d H:i:s');
+						$ArrDetAcc[$val]['in_gudang']    	= 'indirect';
+						// $ArrDetAcc[$val]['in_gudang']    	= 'project';
 					}
 				}
 			// }
@@ -259,10 +263,12 @@ class Material_planning_model extends CI_Model {
 								a.category,
 								a.satuan,
 								a.berat,
-								b.stock
+								y.id_material as code_group,
+								0 as stock
 							FROM
 								so_acc_and_mat a
-								LEFT JOIN warehouse_acc_stock b ON a.id_material = b.id_acc
+								LEFT JOIN accessories y ON a.id_material = y.id
+								-- LEFT JOIN warehouse_rutin_stock b ON y.id_material = b.code_group
 							WHERE
 								a.category <> 'mat'
 								AND a.id_bq='".$id_bq."'
@@ -321,7 +327,8 @@ class Material_planning_model extends CI_Model {
 										'tanki' AS category,
 										'pcs' AS satuan,
 										SUM(a.berat) AS berat,
-										b.stock
+										b.stock,
+										'' as code_group
 									FROM
 										planning_tanki_detail a
 										LEFT JOIN accessories c ON a.id_material=c.id_acc_tanki AND c.category = 5
@@ -404,10 +411,14 @@ class Material_planning_model extends CI_Model {
 			if(!empty($tanda)){
 				if(!empty($data['add_acc_planning'])){
 					foreach($add_acc_planning AS $val => $valx){
+						$sudahReq = 0;
 						if(!empty($check_acc)){
 						$SUM_PUR += (int)str_replace(',', '', $valx['purchase']);
-
+						
 						$ArrDetAcc[$val]['id'] 			= $valx['id'];
+
+						$getDet = $this->db->get_where('warehouse_planning_detail_acc',array('id'=>$valx['id']))->result_array();
+						$sudahReq = (!empty($getDet[0]['sudah_request']))?$getDet[0]['sudah_request']:0;
 						}
 						$ArrDetAcc[$val]['no_ipp']         = $no_ipp;
 						$ArrDetAcc[$val]['id_material']    = $valx['id_material'];
@@ -420,6 +431,7 @@ class Material_planning_model extends CI_Model {
 						$ArrDetAcc[$val]['jumlah_mat']     = str_replace(',', '', $valx['jumlah_mat']);
 						$ArrDetAcc[$val]['use_stock']      = 0;
 						$ArrDetAcc[$val]['purchase']       = str_replace(',', '', $valx['purchase']);
+						$ArrDetAcc[$val]['sudah_request']       = $sudahReq + str_replace(',', '', $valx['purchase']);
 						$ArrDetAcc[$val]['moq']            = 0;
 						$ArrDetAcc[$val]['sisa_avl']       = 0;
 						$ArrDetAcc[$val]['reorder_point']  = 0;
@@ -559,10 +571,12 @@ class Material_planning_model extends CI_Model {
 									a.category,
 									a.satuan,
 									a.berat,
-									b.stock
+									b.stock,
+									y.id_material as code_group
 								FROM
 									so_acc_and_mat a
-									LEFT JOIN warehouse_acc_stock b ON a.id_material = b.id_acc
+									LEFT JOIN accessories y ON a.id_material = y.id
+									LEFT JOIN warehouse_rutin_stock b ON y.id_material = b.code_group
 								WHERE
 									a.category <> 'mat'
 									AND a.id_bq='".$id_bq."'
@@ -590,8 +604,8 @@ class Material_planning_model extends CI_Model {
 								->where("(category = 'packing' OR category = 'export' OR category = 'lokal')")
 								->get()
 								->result_array();
-				}
-				else{
+			}
+			else{
 					$query	= "	SELECT
 									a.no_ipp AS id_bq,
 									a.id_material AS id_material,
@@ -619,7 +633,9 @@ class Material_planning_model extends CI_Model {
 											'tanki' AS category,
 											'pcs' AS satuan,
 											SUM(a.berat) AS berat,
-											b.stock
+											b.stock,
+											c.id_material as code_group,
+											0 as sudah_request
 										FROM
 											planning_tanki_detail a
 											LEFT JOIN accessories c ON a.id_material=c.id_acc_tanki AND c.category = 5
@@ -631,6 +647,7 @@ class Material_planning_model extends CI_Model {
 					// echo $sql_non_frp;
 					$non_frp_add		= $this->db->query($sql_non_frp)->result_array();
 					$pack_truck_add		= array();
+					$non_frp			= array();
 				}
 				// print_r($result);
 			$data = array(
@@ -654,6 +671,26 @@ class Material_planning_model extends CI_Model {
 		$data 			= $this->input->post();
 		$data_session	= $this->session->userdata;
 		$id_bq			= str_replace('BQ-','',$this->uri->segment(3));
+
+		$getDetailIPP = $this->db->get_where('production',array('no_ipp'=>$id_bq))->result_array();
+		$id_customer = (!empty($getDetailIPP[0]['id_customer']))?$getDetailIPP[0]['id_customer']:0;
+		// echo 'Cust:'.$id_customer;
+		$ArrInsertGudang = [];
+		if(!empty($getDetailIPP)){
+			$ArrInsertGudang = [
+				'kd_gudang' => $id_customer,
+				'kode' => $id_customer,
+				'nm_kode' => $id_customer,
+				'nm_gudang' => $id_customer,
+				'category' => 'customer'
+			];
+		}
+
+		// print_r($ArrInsertGudang);
+
+		$checkGudangCust = $this->db->get_where('warehouse',array('kd_gudang'=>$id_customer))->result_array();
+		
+		
 		// echo $id_bq;
 		// exit;
 		$sqlWhDetail	= "	SELECT
@@ -709,6 +746,83 @@ class Material_planning_model extends CI_Model {
 			$ArrHist[$val]['update_date'] 		= date('Y-m-d H:i:s');
 		}
 
+		//New Booking Aksesories
+		$getIDGudangProject = $this->db->get_where('warehouse',array('category'=>'project'))->result_array();
+		$id_gudang_project = (!empty($getIDGudangProject[0]['id']))?$getIDGudangProject[0]['id']:0;
+
+		$sqlGetAcc	= "	SELECT
+								a.*,
+								b.id AS id2,
+								b.booking as qty_booking,
+								b.gudang as id_gudang,
+								b.stock as qty_stock
+							FROM
+								warehouse_planning_detail_acc a
+								LEFT JOIN warehouse_rutin_stock b ON a.code_group=b.code_group AND b.gudang = '".$id_gudang_project."'
+							WHERE
+								a.no_ipp = '".$id_bq."'
+								AND a.code_group <> 'non acc'
+							";
+		$restGetAcc	= $this->db->query($sqlGetAcc)->result_array();
+
+		$ArrUpdateStockAcc		= array();
+		$ArrHistAcc		 		= array();
+		$ArrUpdateStockAccInsert		= array();
+		$ArrHistAccInsert		 		= array();
+		foreach($restGetAcc AS $val => $valx){
+			if(!empty($valx['id2'])){
+				$ArrUpdateStockAcc[$val]['id'] 			= $valx['id2'];
+				$ArrUpdateStockAcc[$val]['booking'] 	= $valx['qty_booking'] + $valx['jumlah_mat'];
+				$ArrUpdateStockAcc[$val]['update_by'] 	= $data_session['ORI_User']['username'];
+				$ArrUpdateStockAcc[$val]['update_date'] = date('Y-m-d H:i:s');
+			}
+			else{
+				$ArrUpdateStockAccInsert[$val]['code_group'] 	= $valx['code_group'];
+				$ArrUpdateStockAccInsert[$val]['material_name'] = $valx['nm_material'];
+				$ArrUpdateStockAccInsert[$val]['gudang'] 		= $id_gudang_project;
+				$ArrUpdateStockAccInsert[$val]['stock'] 		= 0;
+				$ArrUpdateStockAccInsert[$val]['booking'] 		= $valx['jumlah_mat'];
+				$ArrUpdateStockAccInsert[$val]['update_by'] 	= $data_session['ORI_User']['username'];
+				$ArrUpdateStockAccInsert[$val]['update_date'] 	= date('Y-m-d H:i:s');
+			}
+		}
+
+		foreach($restGetAcc AS $val => $valx){
+			if(!empty($valx['id2'])){
+				$ArrHistAcc[$val]['code_group'] 		= $valx['code_group'];
+				$ArrHistAcc[$val]['material_name'] 		= $valx['nm_material'];
+				$ArrHistAcc[$val]['id_gudang'] 			= $valx['id_gudang'];
+				$ArrHistAcc[$val]['id_gudang_dari'] 	= $valx['id_gudang'];
+				$ArrHistAcc[$val]['gudang_ke'] 		= 'BOOKING';
+				$ArrHistAcc[$val]['qty_stock_awal'] 	= $valx['qty_stock'];
+				$ArrHistAcc[$val]['qty_stock_akhir'] 	= $valx['qty_stock'];
+				$ArrHistAcc[$val]['qty_booking_awal'] 	= $valx['qty_booking'];
+				$ArrHistAcc[$val]['qty_booking_akhir'] 	= $valx['qty_booking'] + $valx['jumlah_mat'];
+				$ArrHistAcc[$val]['no_trans'] 			= $id_bq;
+				$ArrHistAcc[$val]['jumlah_qty'] 		= $valx['jumlah_mat'];
+				$ArrHistAcc[$val]['ket'] 				= 'booking accessories';
+				$ArrHistAcc[$val]['update_by'] 			= $data_session['ORI_User']['username'];
+				$ArrHistAcc[$val]['update_date'] 		= date('Y-m-d H:i:s');
+			}
+			else{
+				$ArrHistAccInsert[$val]['code_group'] 			= $valx['code_group'];
+				$ArrHistAccInsert[$val]['material_name'] 		= $valx['nm_material'];
+				$ArrHistAccInsert[$val]['id_gudang'] 			= $valx['id_gudang'];
+				$ArrHistAccInsert[$val]['id_gudang_dari'] 		= $valx['id_gudang'];
+				$ArrHistAccInsert[$val]['gudang_ke'] 			= 'BOOKING';
+				$ArrHistAccInsert[$val]['qty_stock_awal'] 		= 0;
+				$ArrHistAccInsert[$val]['qty_stock_akhir'] 		= 0;
+				$ArrHistAccInsert[$val]['qty_booking_awal'] 	= 0;
+				$ArrHistAccInsert[$val]['qty_booking_akhir'] 	= $valx['jumlah_mat'];
+				$ArrHistAccInsert[$val]['no_trans'] 			= $id_bq;
+				$ArrHistAccInsert[$val]['jumlah_qty'] 			= $valx['jumlah_mat'];
+				$ArrHistAccInsert[$val]['ket'] 					= 'booking accessories (insert new)';
+				$ArrHistAccInsert[$val]['update_by'] 			= $data_session['ORI_User']['username'];
+				$ArrHistAccInsert[$val]['update_date'] 			= date('Y-m-d H:i:s');
+			}
+		}
+
+
 		$ArrHeader = array(
 			'sts_booking' => 'Y',
 			'book_by' => $data_session['ORI_User']['username'],
@@ -719,10 +833,11 @@ class Material_planning_model extends CI_Model {
 			'sts_booking' => 'Y'
 		);
 
-		// print_r($ArrDeatil);
-		// print_r($ArrHist);
-		// print_r($ArrHeader);
-		// echo $id_bq;
+		// print_r($ArrUpdateStockAcc);
+		// print_r($ArrUpdateStockAccInsert);
+		// print_r($ArrHistAcc);
+		// print_r($ArrHistAccInsert);
+		// print_r($ArrInsertGudang);
 		// exit;
 		$this->db->trans_start();
 			if(!empty($ArrDeatil)){
@@ -732,11 +847,31 @@ class Material_planning_model extends CI_Model {
 				$this->db->insert_batch('warehouse_history', $ArrHist);
 			}
 
+			// if(!empty($ArrUpdateStockAcc)){
+			// 	$this->db->update_batch('warehouse_rutin_stock', $ArrUpdateStockAcc, 'id');
+			// }
+			// if(!empty($ArrUpdateStockAccInsert)){
+			// 	$this->db->insert_batch('warehouse_rutin_stock', $ArrUpdateStockAccInsert);
+			// }
+			// if(!empty($ArrHistAcc)){
+			// 	$this->db->insert_batch('warehouse_rutin_history', $ArrHistAcc);
+			// }
+			// if(!empty($ArrHistAccInsert)){
+			// 	$this->db->insert_batch('warehouse_rutin_history', $ArrHistAccInsert);
+			// }
+
 			$this->db->where('no_ipp', $id_bq);
 			$this->db->update('warehouse_planning_header', $ArrHeader);
 
 			$this->db->where('no_ipp', $id_bq);
 			$this->db->update('planning_tanki', $ArrHeader2);
+
+			$this->db->where('no_ipp', $id_bq);
+			$this->db->update('warehouse_planning_detail_acc', $ArrHeader2);
+
+			// if(empty($checkGudangCust) AND !empty($ArrInsertGudang)){
+			// 	$this->db->insert('warehouse', $ArrInsertGudang);
+			// }
 		$this->db->trans_complete();
 		if($this->db->trans_status() === FALSE){
 			$this->db->trans_rollback();
@@ -933,7 +1068,7 @@ class Material_planning_model extends CI_Model {
 					$booking	= "";
 					$spk_ambil_mat	= "";
 					$download_excel	= "";
-					if((is_null($row['sts_booking']) OR $row['sts_booking']=='N') AND $row['mp']=='Y'){
+					if((is_null($row['sts_booking']) OR $row['sts_booking']=='N') AND $row['mp']=='Y' AND $row['sts_booking']!='Y'){
 						if($row['mat_plan_sts']=='N' AND $row['mp']=='Y'){
 							if($Arr_Akses['create']=='1'){
 								$create	= "&nbsp;<button class='btn btn-sm btn-success createMat' title='Create Material Planning' data-id_bq='".$row['id_bq']."' data-type='".$row['type']."'><i class='fa fa-plus'></i></button>";
@@ -1004,11 +1139,12 @@ class Material_planning_model extends CI_Model {
 				LEFT JOIN so_number b ON a.id_bq = b.id_bq
 				left join table_sales_order c on a.id_bq = c.id_bq,
 				(SELECT @row:=0) r
-		    WHERE (a.mp = 'Y') AND (a.sts_booking = 'N' OR a.sts_booking IS NULL) AND (
+		    WHERE (a.mp = 'Y') AND (
 				a.id_bq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.project LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -1071,7 +1207,7 @@ class Material_planning_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='left'>".$row['idmaterial']." / ".$row['id_accurate']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['nm_category']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_category_master']."</div>";
 			// $nestedData[]	= "<div align='right'>".number_format($row['qty_stock'],2)."</div>";
 			
 			$nestedData[]	= "<div align='right'>".number_format($row['qty_stock'] - $row['qty_booking'],2)."</div>";
@@ -1084,11 +1220,12 @@ class Material_planning_model extends CI_Model {
 			
 			$reorder 		= ($safetystock/30) * $kg_per_bulan;
 			$max_stock2 	= ($max_stock/30) * $kg_per_bulan;
+			// $max_stock2 	= $safetystock;
 			$sisa_avl 		= $row['qty_stock'] - $row['qty_booking'];
 			$nestedData[]	= "<div align='right'>".number_format($reorder,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($max_stock2,2)."</div>";
 			// $nestedData[]	= "<div align='right'>".get_qty_pr($row['id_material'])."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['moq'],2)."</div>";
+			// $nestedData[]	= "<div align='right'>".number_format($row['moq'],2)."</div>";
 			$qtypr = get_qty_pr($row['id_material']);
 			$nestedData[]	= "<div align='right'>".number_format($qtypr,2)."</div>";
 			
@@ -1150,6 +1287,7 @@ class Material_planning_model extends CI_Model {
 				a.*,
 				c.moq,
 				d.request, d.id_accurate,
+				d.nm_category AS nm_category_master,
 				(SELECT d.purchase FROM check_book_per_month d WHERE d.id_material=a.id_material AND d.tahun='".$tahun."' AND d.bulan='".$bulan."') AS book_per_month
 			FROM
 				warehouse_stock a
@@ -1164,6 +1302,8 @@ class Material_planning_model extends CI_Model {
 					a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR d.nm_category LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR d.id_accurate LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
 		";
 		// echo $sql; exit;

@@ -515,7 +515,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew2['nm_material'] 		= $rest_gudang_ke[0]->nm_material;
 				$ArrJurnalNew2['id_category'] 		= $rest_gudang_ke[0]->id_category;
 				$ArrJurnalNew2['nm_category'] 		= $rest_gudang_ke[0]->nm_category;
-				$ArrJurnalNew2['id_gudang'] 			= $id_gudang_ke_m;
+				$ArrJurnalNew2['id_gudang'] 			= $id_gudang_dari_m;
 				$ArrJurnalNew2['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke_m);
 				$ArrJurnalNew2['id_gudang_dari'] 	= $id_gudang_dari_m;
 				$ArrJurnalNew2['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari_m);
@@ -1234,6 +1234,18 @@ class Adjustment_material_model extends CI_Model {
 					'pesan'		=>'Save process success. Thanks ...',
 					'status'	=> 1
 				);
+
+				$ArrUpdateStock[0]['id'] 	= $id_material;
+				$ArrUpdateStock[0]['qty'] 	= $qty_oke;
+				if($adjustment_type == 'mutasi'){
+					insertDataGroupReport($ArrUpdateStock, $id_gudang_dari_m, $id_gudang_ke_m, $kode_trans, null, null, null);
+				}
+				if($adjustment_type == 'minus'){
+					insertDataGroupReport($ArrUpdateStock, $id_gudang_ke, null, $kode_trans, null, null, null);
+				}
+				if($adjustment_type == 'plus'){
+					insertDataGroupReport($ArrUpdateStock, null, $id_gudang_ke, $kode_trans, null, null, null);
+				}
 				history("Adjustment material ".$adjustment_type." : ".$kode_trans);
 			}
 			echo json_encode($Arr_Data);

@@ -994,7 +994,8 @@ class Purchase_order_model extends CI_Model {
 							->join('tran_material_rfq_header b','a.hub_rfq=b.hub_rfq','left')
 							->get_where('tran_material_rfq_detail a',array(
 								'a.no_rfq' => $no_rfq,
-								'a.deleted' => 'N'
+								'a.deleted' => 'N',
+								// 'a.status' => 'SETUJU'
 							))
 							->result_array();
 			
@@ -1606,6 +1607,14 @@ class Purchase_order_model extends CI_Model {
 				'incoterms' 	=> strtolower($data['incoterms']),
 				'tgl_dibutuhkan' 	=> $REQ_DATE,
 				'tax' 			=> str_replace(',','',$data['tax']),
+				'total_po' 		=> str_replace(',','',$data['total_po']),
+				'discount' 		=> str_replace(',','',$data['discount']),
+				'net_price' 	=> str_replace(',','',$data['net_price']),
+				'net_plus_tax' 	=> str_replace(',','',$data['net_plus_tax']),
+				'delivery_cost' => str_replace(',','',$data['delivery_cost']),
+				'total_price' 	=> str_replace(',','',$data['grand_total']),
+				'id_supplier' 	=> $data['id_supplier'],
+				'nm_supplier' 	=> get_name('supplier','nm_supplier','id_supplier',$data['id_supplier']),
 				'top' 			=> strtolower($data['top']),
 				'remarks' 		=> strtolower($data['remarks']),
 				'buyer' 		=> strtolower($data['buyer']),
@@ -1617,9 +1626,15 @@ class Purchase_order_model extends CI_Model {
 
 			$ArrEdit = array();
 			foreach($detail AS $val => $valx){
+				$QTY = str_replace(',','',$valx['qty']);
+				$PRICE = str_replace(',','',$valx['price']);
+
 				$ArrEdit[$val]['id'] = $valx['id'];
 				$ArrEdit[$val]['nm_material'] = $valx['nm_material'];
-			//				$ArrEdit[$val]['qty_po'] = $valx['qty'];
+				$ArrEdit[$val]['qty_purchase'] = $QTY;
+				$ArrEdit[$val]['price_ref_sup'] = $PRICE;
+				$ArrEdit[$val]['net_price'] = $PRICE;
+				$ArrEdit[$val]['total_price'] = $PRICE * $QTY;
 			}
 			
 			$ArrEditPO = array();
@@ -1721,9 +1736,14 @@ class Purchase_order_model extends CI_Model {
 			$data_top		= $this->db->get_where('billing_top', array('no_po'=>$no_po))->result_array();
 			
 			$payment = $this->db->get_where('list_help', array('group_by'=>'top'))->result_array();
+			$listPPN = $this->db->get_where('list_help',array('group_by'=>'ppn'))->result_array();
+			$listSupplier = $this->db->order_by('nm_supplier','asc')->get_where('supplier', array('deleted'=>'0'))->result_array();
+			
 			
 			$data = array(
 				'data' 		=> $result,
+				'listSupplier' => $listSupplier,
+				'listPPN' => $listPPN,
 				'data_rfq' 	=> $result_RFQ,
 				'data_kurs' => $data_kurs,
 				'data_top' => $data_top,
@@ -1836,14 +1856,17 @@ class Purchase_order_model extends CI_Model {
 				$create	= "";
 				$edit	= "";
 				$edit_rfq	= "";
+				$edit_rfq2	= "";
 				$booking	= "";
 				$spk_ambil_mat	= "";
 				$cancel	= "";
 				if($row['sts_ajuan']=='OPN' AND $row['sts_process']=='N'){
-					$edit_rfq	= "&nbsp;<button type='button' class='btn btn-sm btn-primary edit_po' title='Edit RFQ' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-edit'></i></button>";
+					$edit_rfq	= "&nbsp;<button type='button' class='btn btn-sm btn-primary edit_po' title='Edit RFQ Print' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-edit'></i></button>";
+					$edit_rfq2	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po2' title='Edit Supplier' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-edit'></i></button>";
 					$spk_ambil_mat	= "&nbsp;<a href='".base_url('warehouse/print_rfq/'.$row['no_rfq'])."' target='_blank' class='btn btn-sm btn-info' title='Print SPK Purchase Order' data-role='qtip'><i class='fa fa-print'></i></a>";
 					if($Arr_Akses['update']=='1'){
-// masih ada error cek lagi agus						$edit			= "&nbsp;<button type='button' class='btn btn-sm btn-success editMat' title='Edit Material Purchase' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-edit'></i></button>";
+						// masih ada error cek lagi agus						
+						// $edit			= "&nbsp;<button type='button' class='btn btn-sm btn-success editMat' title='Edit Material Purchase' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-edit'></i></button>";
 					}
 					if($Arr_Akses['delete']=='1'){
 						// $cancel			= "&nbsp;<button type='button' class='btn btn-sm btn-danger cancelPO' title='Cancel Material Purchase' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-close'></i></button>";
@@ -1855,6 +1878,7 @@ class Purchase_order_model extends CI_Model {
 									".$edit."
 									".$booking."
 									".$spk_ambil_mat."
+									".$edit_rfq2."
 									".$edit_rfq."
 									".$cancel."
 									</div>";
@@ -2134,7 +2158,7 @@ class Purchase_order_model extends CI_Model {
 				a.*
 			FROM
 				tran_material_rfq_header a
-		    WHERE  (
+		    WHERE  a.deleted = 'N' AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
@@ -2562,7 +2586,7 @@ class Purchase_order_model extends CI_Model {
 				}
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
 					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
-					$edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
+					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					$delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 					//$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
 					//$close_po = "&nbsp;<button type='button' class='btn btn-sm btn-danger close_po' title='Close PO' data-no_po='".$row['no_po']."'><i class='fa fa-check'></i></button>";
@@ -2804,8 +2828,12 @@ class Purchase_order_model extends CI_Model {
 							ORDER BY
 								b.nm_supplier ASC ";
 			$restQuery 	= $this->db->query($query)->result_array();
+
+			$listPPN = $this->db->get_where('list_help',array('group_by'=>'ppn'))->result_array();
+
 			$data = array(
-				'supList' => $restQuery
+				'supList' => $restQuery,
+				'listPPN' => $listPPN,
 			);
 			$this->load->view('Purchase_order/modal_po', $data);
 		}

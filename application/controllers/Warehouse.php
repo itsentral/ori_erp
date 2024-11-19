@@ -16,6 +16,8 @@ class Warehouse extends CI_Controller {
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}
+
+		$this->gudang_produksi = getGudangProduksi();
     }
 
 	//==========================================================================================================================
@@ -308,6 +310,7 @@ class Warehouse extends CI_Controller {
 					$ArrDetailPR[$val]['app_date']		= $dateTime;
 					$ArrDetailPR[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 					$ArrDetailPR[$val]['created_date'] 	= $dateTime;
+					$ArrDetailPR[$val]['in_gudang']    	= 'project';
 
 					$ArrUpDetail_acc[$val]['id'] 			= $valx['id'];
 					$ArrUpDetail_acc[$val]['no_pr'] 		= $no_pr_group;
@@ -463,7 +466,248 @@ class Warehouse extends CI_Controller {
 	}
 	
 	public function modal_edit_rfq(){
-		$this->purchase_order_model->modal_edit_rfq();
+		$no_rfq = $this->uri->segment(3);
+		$result		= $this->db->select('
+									a.no_rfq,
+									a.id_material as id_barang,
+									a.qty,
+									a.nm_material as nm_barang,
+									"" AS spec,
+									b.category,
+									b.tanggal AS tgl_dibutuhkan,
+									b.no_pr,
+									b.created_date AS tgl_pr
+									')
+								->from('tran_material_rfq_detail a')
+								->join('tran_material_pr_detail b','a.no_rfq=b.no_rfq','left')
+								->where('a.id_material=b.id_material')
+								->where('a.no_rfq',$no_rfq)
+								->where('a.deleted','N')
+								->group_by('a.id_material')
+								->get()
+								->result_array();
+		// print_r($result); exit;
+		$RestSupplierList 		= $this->db->select('id_supplier, nm_supplier')->order_by('nm_supplier','asc')->get_where('supplier',array('sts_aktif'=>'aktif'))->result_array();
+		$RestCheckedSupplier 	= $this->db->select('id_supplier')->get_where('tran_material_rfq_header',array('no_rfq'=>$no_rfq,'deleted'=>'N'))->result_array();
+
+		$ArrSupChecked = '';
+		if(!empty($RestCheckedSupplier)){
+			$ArrData1 = array();
+			foreach($RestCheckedSupplier as $vaS => $vaA){
+				 $ArrData1[] = $vaA['id_supplier'];
+			}
+			$ArrData1 		= implode("," ,$ArrData1);
+			$ArrSupChecked 	= explode("," ,$ArrData1);
+		}
+		
+		$data = array(
+			'result' 			=> $result,
+			'supplierList' 		=> $RestSupplierList,
+			'supplierChecked' 	=> $ArrSupChecked,
+			'no_rfq' 			=> $no_rfq
+		);
+
+		$this->load->view('Purchase_order/modal_edit_rfq', $data);
+	}
+	
+	public function update_rfq_supplier(){
+		$data 			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$no_rfq			= $data['no_rfq'];
+		$category		= $data['category'];
+		$id_supplier	= $data['id_supplier'];
+		$dateTime		= date('Y-m-d H:i:s');
+		$UserName		= $data_session['ORI_User']['username'];
+		
+		$check			= $data['check'];
+		$ArrList 		= array();
+		foreach($check AS $vaxl){
+			$ArrList[$vaxl] = $vaxl;
+		}
+		$dtImplode		= "('".implode("','", $ArrList)."')";
+		
+		$qListG 	= "SELECT id, id_material, idmaterial, nm_material, SUM(qty_revisi) AS purchase, tanggal AS tgl_dibutuhkan, category FROM tran_material_pr_detail WHERE no_pr IN ".$dtImplode." AND no_rfq = '".$no_rfq."' GROUP BY id_material";
+		$restListG 	= $this->db->query($qListG)->result_array();
+
+		$ArrDetail = array();
+		$ArrHeader = array();
+		$no = 0;
+		foreach($id_supplier AS $sup => $supx){
+			$restSupplier	= $this->db->limit(1)->get_where('supplier',array('id_supplier'=>$supx))->result();
+			$SUM_MAT 		= 0;
+			
+			$no++;
+			$num = sprintf('%03s',$no);
+			foreach($restListG AS $val => $valx){
+				$SUM_MAT += $valx['purchase'];
+				
+				$ArrDetail[$sup.$val]['no_rfq'] 		= $no_rfq;
+				$ArrDetail[$sup.$val]['hub_rfq'] 		= $no_rfq.'-'.$num;
+				$ArrDetail[$sup.$val]['category'] 		= $valx['category'];
+				$ArrDetail[$sup.$val]['id_material'] 	= $valx['id_material'];
+				$ArrDetail[$sup.$val]['idmaterial'] 	= $valx['idmaterial'];
+				$ArrDetail[$sup.$val]['nm_material'] 	= $valx['nm_material'];
+				$ArrDetail[$sup.$val]['id_supplier'] 	= $supx;
+				$ArrDetail[$sup.$val]['nm_supplier'] 	= $restSupplier[0]->nm_supplier;
+				$ArrDetail[$sup.$val]['qty'] 		 	= $valx['purchase'];
+				$ArrDetail[$sup.$val]['tgl_dibutuhkan'] = $valx['tgl_dibutuhkan'];
+				$ArrDetail[$sup.$val]['created_by'] 	= $UserName;
+				$ArrDetail[$sup.$val]['created_date'] 	= $dateTime;
+			}
+			
+			$ArrHeader[$sup]['no_rfq'] 			= $no_rfq;
+			$ArrHeader[$sup]['hub_rfq'] 		= $no_rfq.'-'.$num;
+			$ArrHeader[$sup]['id_supplier'] 	= $supx;
+			$ArrHeader[$sup]['nm_supplier'] 	= $restSupplier[0]->nm_supplier;
+			$ArrHeader[$sup]['total_request'] 	= $SUM_MAT;
+			$ArrHeader[$sup]['created_by'] 		= $UserName;
+			$ArrHeader[$sup]['created_date'] 	= $dateTime;
+			$ArrHeader[$sup]['updated_by'] 		= $UserName;
+			$ArrHeader[$sup]['updated_date'] 	= $dateTime;
+
+		}
+
+		// print_r($ArrHeader);
+		// print_r($ArrDetail);
+		// exit;
+		$this->db->trans_start();
+			$this->db->delete('tran_material_rfq_header', array('no_rfq' => $no_rfq));
+			$this->db->delete('tran_material_rfq_detail', array('no_rfq' => $no_rfq));
+			$this->db->insert_batch('tran_material_rfq_header', $ArrHeader);
+			$this->db->insert_batch('tran_material_rfq_detail', $ArrDetail);
+		$this->db->trans_complete();
+
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Data	= array(
+				'pesan'		=>'Save process failed. Please try again later ...',
+				'status'	=> 0
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Data	= array(
+				'pesan'		=>'Save process success. Thanks ...',
+				'status'	=> 1
+			);
+			history('Update RFQ Supplier : '.$no_rfq);
+		}
+		echo json_encode($Arr_Data);
+	}
+	
+	public function cancel_sebagian_rfq(){
+		$data_session	= $this->session->userdata;
+		$no_pr			= $this->uri->segment(3);
+		$id_barang	= $this->uri->segment(4);
+		$no_rfq			= $this->uri->segment(5);
+
+		// echo $id."<br>";
+		// echo $no_po."<br>";
+		// echo $id_material."<br>";
+		// exit;
+
+		$ArrUpdateDetail = array(
+			'deleted' => 'Y',
+			'deleted_by' => $data_session['ORI_User']['username'],
+			'deleted_date' => date('Y-m-d H:i:s')
+		);
+
+		$ArrUpdateD = array(
+			'no_rfq' => NULL
+		);
+
+		// print_r($ArrUpdateD);
+		// exit;
+		$this->db->trans_start();
+			$this->db->where('no_rfq', $no_rfq);
+			$this->db->where('id_material', $id_barang);
+			$this->db->update('tran_material_rfq_detail', $ArrUpdateDetail);
+			
+			$this->db->where('no_rfq', $no_rfq);
+			$this->db->where('no_pr', $no_pr);
+			$this->db->where('id_material', $id_barang);
+			$this->db->update('tran_material_pr_detail', $ArrUpdateD);
+			
+		$this->db->trans_complete();
+
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Data	= array(
+				'pesan'		=>'Save process failed. Please try again later ...',
+				'status'	=> 0,
+				'no_rfq'		=> $no_rfq
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Data	= array(
+				'pesan'		=>'Save process success. Thanks ...',
+				'status'	=> 1,
+				'no_rfq'		=> $no_rfq
+			);
+			history('Cancel Sebagian RFQ Material : '.$no_rfq.'/'.$id_barang.'/'.$no_pr);
+		}
+		echo json_encode($Arr_Data);
+	}
+
+	public function modal_edit_rfq_print(){
+		if($this->input->post()){
+			$data_session	= $this->session->userdata;
+			$data	= $this->input->post();
+			
+			$ArrHeader = array(
+				'incoterms' 		=> strtolower($data['incoterms']),
+				'top' 				=> strtolower($data['top']),
+				'remarks' 			=> strtolower($data['remarks']),
+				'updated_print_by' 	=> $data_session['ORI_User']['username'],
+				'updated_print_date'=> date('Y-m-d H:i:s')
+			);
+			
+			// exit;
+			
+			$this->db->trans_start();
+				$this->db->where('no_rfq', $data['no_rfq']);
+				$this->db->update('tran_material_rfq_header', $ArrHeader);
+			$this->db->trans_complete();
+			
+			if($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				$Arr_Data	= array(
+					'pesan'		=>'Save data failed. Please try again later ...',
+					'status'	=> 0
+				);			
+			}
+			else{
+				$this->db->trans_commit();
+				$Arr_Data	= array(
+					'pesan'		=>'Save data success. Thanks ...',
+					'status'	=> 1
+				);				
+				history('Edit RFQ print custom : '.$data['no_rfq']);
+			}
+			echo json_encode($Arr_Data);
+		}
+		else{
+			$no_rfq 	= $this->uri->segment(3);
+
+			$sql 		= "	SELECT 
+								a.*
+							FROM 
+								tran_material_rfq_header a
+							WHERE 
+								a.no_rfq='".$no_rfq."'
+							";
+								
+			$result		= $this->db->query($sql)->result();
+			
+			$data = array(
+				'data' => $result
+			);
+			
+			$this->load->view('Purchase_order/modal_edit_rfq_print', $data);
+		}
 	}
 
 	public function delete_rfq(){
@@ -647,7 +891,8 @@ class Warehouse extends CI_Controller {
 			'Nama_Beda' => $Nama_Beda,
 			'printby' => $printby,
 			'kode_trans' => $kode_trans,
-			'check' => $check
+			'check' => $check,
+			'tanki'	=> $this->tanki_model,
 		);
 
 		history('Print Request Material '.$kode_trans);
@@ -804,16 +1049,20 @@ class Warehouse extends CI_Controller {
 		$username = $this->session->userdata['ORI_User']['username'];
 		$datetime = date('Y-m-d H:i:s');
 		
-		
 		$UserName = $this->session->userdata['ORI_User']['username'];
 		$DateTime = date('Y-m-d H:i:s');
+		
 
 		$id				= $data['id'];
 		$kode_trans		= $data['kode_trans'];
 		$kode_spk 		= $data['kode_spk'];
 		$hist_produksi	= $data['hist_produksi'];
-		$id_gudang 		= $data['id_gudang_from'];		
+		$id_gudang 		= $data['id_gudang_from'];
 		$id_gudang_wip 	= $data['id_gudang'];
+		
+		
+		
+		
 		$no_request 	= $data['no_request'];
 		$date_produksi 	= (!empty($data['date_produksi']))?$data['date_produksi']:NULL;
 		$detail_input	= $data['detail_input'];
@@ -821,8 +1070,9 @@ class Warehouse extends CI_Controller {
 		$edit_add 		= (!empty($data['edit_add']))?$data['edit_add']:array();
 		$GET_MATERIAL	= get_detail_material();
 		$GET_PERCENT	= get_persent_by_subgudang_filter($kode_trans);
-		
-		
+		$xyz_no_spk 	= $data['xyz_no_spk'];
+		$xyz_no_so 		= $data['xyz_no_so'];
+		$xyz_product 	= $data['xyz_product'];
 
 		$dateCreated = $datetime;
 		if($hist_produksi != '0'){
@@ -843,6 +1093,7 @@ class Warehouse extends CI_Controller {
 
 		//UPLOAD DOCUMENT
 		$file_name = '';
+		$ArrEndChange = [];
 		if(!empty($_FILES["upload_spk"]["name"])){
 			$target_dir     = "assets/file/produksi/";
 			$target_dir_u   = $_SERVER['DOCUMENT_ROOT']."/assets/file/produksi/";
@@ -856,6 +1107,10 @@ class Warehouse extends CI_Controller {
 			if(!empty($_FILES["upload_spk"]["tmp_name"])){
 				move_uploaded_file($_FILES["upload_spk"]["tmp_name"], $nama_upload);
 			}
+
+			$ArrEndChange = array(
+				'file_eng_change' 	=> $file_name
+			);
 		}
 
 		$ArrWhereIN_= [];
@@ -901,11 +1156,6 @@ class Warehouse extends CI_Controller {
 				$ArrRequestHist[$key]['terpakai'] = $TERPAKAI;
 				$ArrRequestHist[$key]['created_by'] = $username;
 				$ArrRequestHist[$key]['created_date'] = $datetime;
-				
-				
-				
-				
-				
 			}
 		}
 
@@ -943,133 +1193,148 @@ class Warehouse extends CI_Controller {
 		}
 
 		$ArrLooping = ['detail_liner','detail_joint','detail_strn1','detail_strn2','detail_str','detail_ext','detail_topcoat','resin_and_add'];
+		if(!empty($ArrWhereIN_)){
+			$get_detail_spk = $this->db->where_in('id',$ArrWhereIN_)->get_where('production_spk', array('kode_spk'=>$kode_spk))->result_array();
 
-		$get_detail_spk = $this->db->where_in('id',$ArrWhereIN_)->get_where('production_spk', array('kode_spk'=>$kode_spk))->result_array();
-
-		// print_r($get_detail_spk);
-		// exit;
-		$ArrGroup = [];
-		$ArrAktualResin = [];
-		$ArrAktualPlus = [];
-		$ArrAktualAdd = [];
-		$ArrUpdate = [];
-		
-		$ArrDeatil = [];
-		$ArrDeatilAdj = [];
-		$ArrUpdateRequest = [];
-		$nomor = 0;
-		$SUM_MAT = 0;
-		foreach ($get_detail_spk as $key => $value) {
-			foreach ($ArrLooping as $valueX) {
-				if(!empty($data[$valueX])){
-					if($valueX == 'detail_liner'){
-						$DETAIL_NAME = 'LINER THIKNESS / CB';
-					}
-					if($valueX == 'detail_joint'){
-						$DETAIL_NAME = 'RESIN AND ADD';
-					}
-					if($valueX == 'detail_strn1'){
-						$DETAIL_NAME = 'STRUKTUR NECK 1';
-					}
-					if($valueX == 'detail_strn2'){
-						$DETAIL_NAME = 'STRUKTUR NECK 2';
-					}
-					if($valueX == 'detail_str'){
-						$DETAIL_NAME = 'STRUKTUR THICKNESS';
-					}
-					if($valueX == 'detail_ext'){
-						$DETAIL_NAME = 'EXTERNAL LAYER THICKNESS';
-					}
-					if($valueX == 'detail_topcoat'){
-						$DETAIL_NAME = 'TOPCOAT';
-					}
-					if($valueX == 'resin_and_add'){
-						$DETAIL_NAME = 'RESIN AND ADD';
-					}
-					$detailX = $data[$valueX];
-					// print_r($detailX);
-
-					if($value['id_product'] != 'deadstok'){
-						$get_produksi 	= $this->db->limit(1)->select('id, id_category')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk']))->result();
-						//,'print_merge_date'=>$dateCreated
-						if(empty($get_produksi)){
-							$Arr_Kembali	= array(
-								'pesan'		=>'Error data proccess, please contact administrator !!! ErrorCode: id_ml:'.$value['id_milik'].'&spk:'.$value['kode_spk'].'&tm:'.$dateCreated,
-								'status'	=> 2
-							);
-							// cari di 	production_detail bedasarkan id milik dan kode spk, ganti waktu seperti di alert
-							echo json_encode($Arr_Kembali);
-							return false;
+			// print_r($get_detail_spk);
+			// exit;
+			$ArrGroup = [];
+			$ArrAktualResin = [];
+			$ArrAktualPlus = [];
+			$ArrAktualAdd = [];
+			$ArrUpdate = [];
+			
+			$ArrDeatil = [];
+			$ArrDeatilAdj = [];
+			$ArrUpdateRequest = [];
+			$nomor = 0;
+			$SUM_MAT = 0;
+			foreach ($get_detail_spk as $key => $value) {
+				foreach ($ArrLooping as $valueX) {
+					if(!empty($data[$valueX])){
+						if($valueX == 'detail_liner'){
+							$DETAIL_NAME = 'LINER THIKNESS / CB';
 						}
-					}
+						if($valueX == 'detail_joint'){
+							$DETAIL_NAME = 'RESIN AND ADD';
+						}
+						if($valueX == 'detail_strn1'){
+							$DETAIL_NAME = 'STRUKTUR NECK 1';
+						}
+						if($valueX == 'detail_strn2'){
+							$DETAIL_NAME = 'STRUKTUR NECK 2';
+						}
+						if($valueX == 'detail_str'){
+							$DETAIL_NAME = 'STRUKTUR THICKNESS';
+						}
+						if($valueX == 'detail_ext'){
+							$DETAIL_NAME = 'EXTERNAL LAYER THICKNESS';
+						}
+						if($valueX == 'detail_topcoat'){
+							$DETAIL_NAME = 'TOPCOAT';
+						}
+						if($valueX == 'resin_and_add'){
+							$DETAIL_NAME = 'RESIN AND ADD';
+						}
+						$detailX = $data[$valueX];
+						// print_r($detailX);
 
-					foreach ($detailX as $key2 => $value2) {
-						$get_liner 		= $this->db->select('id, id_material, qty_order AS berat, key_gudang, check_qty_oke')->get_where('warehouse_adjustment_detail', array('kode_trans'=>$kode_trans,'keterangan'=>$DETAIL_NAME))->result_array();
-						// print_r($get_liner);
-						// exit;
-						if(!empty($get_liner)){
-							foreach ($get_liner as $key3 => $value3) {
-								if($value2['id_key'] == $value3['key_gudang']){ 
-									$nomor 		= $value2['id_key'];
-									$ACTUAL_MAT = $value2['actual_type'];
-									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
-									$BERAT_UNIT = $value3['berat'] / $QTY_INP;
-									$total_est 	= $BERAT_UNIT * $QTY_INP;
-									$total_act  = 0;
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
-									}
-									$SUM_MAT 	+= $total_act;
-									$unit_act 	= $total_act / $QTY_INP;
-									$PERSEN 	= str_replace(',','',$value2['persen']);
-									if(!empty($PERSEN) AND $PERSEN > 0){
+						if($value['id_product'] != 'deadstok'){
+							$get_produksi 	= $this->db->limit(1)->select('id, id_category')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk']))->result();
+							//,'print_merge_date'=>$dateCreated
+							if(empty($get_produksi)){
+								$Arr_Kembali	= array(
+									'pesan'		=>'Error data proccess, please contact administrator !!! ErrorCode: id_ml:'.$value['id_milik'].'&spk:'.$value['kode_spk'].'&tm:'.$dateCreated,
+									'status'	=> 2
+								);
+								// cari di 	production_detail bedasarkan id milik dan kode spk, ganti waktu seperti di alert
+								echo json_encode($Arr_Kembali);
+								return false;
+							}
+						}
+
+						foreach ($detailX as $key2 => $value2) {
+							$get_liner 		= $this->db->select('id, id_material, qty_order AS berat, key_gudang, check_qty_oke')->get_where('warehouse_adjustment_detail', array('kode_trans'=>$kode_trans,'keterangan'=>$DETAIL_NAME))->result_array();
+							// print_r($get_liner);
+							// exit;
+							if(!empty($get_liner)){
+								foreach ($get_liner as $key3 => $value3) {
+									if($value2['id_key'] == $value3['key_gudang']){ 
+										$nomor 		= $value2['id_key'];
+										$ACTUAL_MAT = $value2['actual_type'];
+										$QTY_INP	= (!empty($WHERE_KEY_QTY[$value['id']]))?$WHERE_KEY_QTY[$value['id']]:0;
+										
+										$total_est  = 0;
+										$total_act  = 0;
+										$BERAT_UNIT  = 0;
+
+										if($value3['berat'] > 0 AND $QTY_INP > 0){
+										$BERAT_UNIT = $value3['berat'] / $QTY_INP;
+										}
+										if($BERAT_UNIT > 0 AND $QTY_INP > 0){
+										$total_est 	= $BERAT_UNIT * $QTY_INP;
+										}
+
+										$kebutuhan = (!empty($value2['kebutuhan']))?(float)str_replace(',','',$value2['kebutuhan']):0;
+										if($kebutuhan > 0){
+											$total_act = 0;
+											if($total_est > 0 AND $kebutuhan > 0){
+												$total_act 	= ($total_est / $kebutuhan) * (float) str_replace(',','',$value2['terpakai']);
+											}
+										}
+										$SUM_MAT 	+= $total_act;
+
+										$unit_act 	= 0;
+										if($total_act > 0 AND $QTY_INP > 0){
+											$unit_act 	= $total_act / $QTY_INP;
+										}
 										$PERSEN 	= str_replace(',','',$value2['persen']);
-									}
-									else{
-										$KEY        = $kode_trans.'-'.$value2['id_key'];
-										$PERSEN 	= (!empty($GET_PERCENT[$KEY]['persen']) AND $GET_PERCENT[$KEY]['persen'] > 0)?$GET_PERCENT[$KEY]['persen']:'';;
-									}
-									//UPDATE FLAG SPK 2
-									$ArrUpdate[$key.$key2.$key3.$nomor]['id'] 			= $value['id'];
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2'] 		= 'Y';
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_by'] 		= $username;
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_date']	= $datetime;
-									// $ArrUpdate[$key.$key2.$key3.$nomor]['gudang2']	= $id_gudang;
+										if(!empty($PERSEN) AND $PERSEN > 0){
+											$PERSEN 	= str_replace(',','',$value2['persen']);
+										}
+										else{
+											$KEY        = $kode_trans.'-'.$value2['id_key'];
+											$PERSEN 	= (!empty($GET_PERCENT[$KEY]['persen']) AND $GET_PERCENT[$KEY]['persen'] > 0)?$GET_PERCENT[$KEY]['persen']:'';;
+										}
+										//UPDATE FLAG SPK 2
+										$ArrUpdate[$key.$key2.$key3.$nomor]['id'] 			= $value['id'];
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2'] 		= 'Y';
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_by'] 		= $username;
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_date']	= $datetime;
+										// $ArrUpdate[$key.$key2.$key3.$nomor]['gudang2']	= $id_gudang;
 
-									//ARRAY STOCK
-									$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
-									$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
-									//UPDATE ADJUSTMENT DETAIL
-									$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
-									$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['qty_rusak'] 		= $PERSEN;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_oke'] 	= $total_act + $value3['check_qty_oke'];
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_rusak']	= $BERAT_UNIT;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_keterangan']	= $DETAIL_NAME;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['update_by'] 		= $username;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['update_date'] 		= $datetime;
-									//INSERT ADJUSTMENT CHECK
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_detail'] 	= $value3['id'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['kode_trans'] 	= $kode_trans;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['no_ipp'] 		= $no_request;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_material'] 	= $ACTUAL_MAT;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_material'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_order'] 	= $value3['berat'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_oke'] 		= $total_act;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_rusak'] 	= $PERSEN;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['expired_date'] 	= NULL;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['keterangan'] 	= $DETAIL_NAME;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_by'] 	= $username;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_date'] 	= $datetime;
+										//ARRAY STOCK
+										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
+										$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
+										//UPDATE ADJUSTMENT DETAIL
+										$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
+										$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['qty_rusak'] 		= $PERSEN;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_oke'] 	= $total_act + $value3['check_qty_oke'];
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_rusak']	= $BERAT_UNIT;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_keterangan']	= $DETAIL_NAME;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['update_by'] 		= $username;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['update_date'] 		= $datetime;
+										//INSERT ADJUSTMENT CHECK
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_detail'] 	= $value3['id'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['kode_trans'] 	= $kode_trans;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['no_ipp'] 		= $no_request;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_material'] 	= $ACTUAL_MAT;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_material'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_order'] 	= $value3['berat'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_oke'] 		= $total_act;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_rusak'] 	= $PERSEN;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['expired_date'] 	= NULL;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['keterangan'] 	= $DETAIL_NAME;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_by'] 	= $username;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_date'] 	= $datetime;
 
-									//UPDATE REQUEST
-									$ArrUpdateRequest[$key.$key2.$key3.$nomor]['id_key'] 	= $value3['key_gudang'];
-									$ArrUpdateRequest[$key.$key2.$key3.$nomor]['aktual'] 	= $total_act;
-									
-									
-				
+										//UPDATE REQUEST
+										$ArrUpdateRequest[$key.$key2.$key3.$nomor]['id_key'] 	= $value3['key_gudang'];
+										$ArrUpdateRequest[$key.$key2.$key3.$nomor]['aktual'] 	= $total_act;
+									}
 								}
 							}
 						}
@@ -1101,48 +1366,47 @@ class Warehouse extends CI_Controller {
 		$ArrUpdate 		= [];
 		$ArrUpdateHist 	= [];
 		// print_r($temp);
-		if($CHECK_BOOK === TRUE AND $no_ipp != 0){
-			// echo 'Masuk';
-			foreach ($temp as $material => $qty) {
-				$KEY 		= $material.'-'.$id_gudang_booking;
-				$booking 	= (!empty($GETS_STOCK[$KEY]['booking']))?$GETS_STOCK[$KEY]['booking']:0;
-				$stock 		= (!empty($GETS_STOCK[$KEY]['stock']))?$GETS_STOCK[$KEY]['stock']:0;
-				$rusak 		= (!empty($GETS_STOCK[$KEY]['rusak']))?$GETS_STOCK[$KEY]['rusak']:0;
-				$id_stock 	= (!empty($GETS_STOCK[$KEY]['id']))?$GETS_STOCK[$KEY]['id']:null;
-				$idmaterial 	= (!empty($GETS_STOCK[$KEY]['idmaterial']))?$GETS_STOCK[$KEY]['idmaterial']:null;
-				$nm_material 	= (!empty($GETS_STOCK[$KEY]['nm_material']))?$GETS_STOCK[$KEY]['nm_material']:null;
-				$id_category 	= (!empty($GETS_STOCK[$KEY]['id_category']))?$GETS_STOCK[$KEY]['id_category']:null;
-				$nm_category 	= (!empty($GETS_STOCK[$KEY]['nm_category']))?$GETS_STOCK[$KEY]['nm_category']:null;
-				// echo 'ID:'.$id_stock;
-				if(!empty($id_stock)){
-					$ArrUpdate[$material]['id'] = $id_stock;
-					$ArrUpdate[$material]['qty_booking'] = $booking - $qty;
+		if(!empty($temp)){
+			if($CHECK_BOOK === TRUE AND $no_ipp != 0){
+				// echo 'Masuk';
+				foreach ($temp as $material => $qty) {
+					$KEY 		= $material.'-'.$id_gudang_booking;
+					$booking 	= (!empty($GETS_STOCK[$KEY]['booking']))?$GETS_STOCK[$KEY]['booking']:0;
+					$stock 		= (!empty($GETS_STOCK[$KEY]['stock']))?$GETS_STOCK[$KEY]['stock']:0;
+					$rusak 		= (!empty($GETS_STOCK[$KEY]['rusak']))?$GETS_STOCK[$KEY]['rusak']:0;
+					$id_stock 	= (!empty($GETS_STOCK[$KEY]['id']))?$GETS_STOCK[$KEY]['id']:null;
+					$idmaterial 	= (!empty($GETS_STOCK[$KEY]['idmaterial']))?$GETS_STOCK[$KEY]['idmaterial']:null;
+					$nm_material 	= (!empty($GETS_STOCK[$KEY]['nm_material']))?$GETS_STOCK[$KEY]['nm_material']:null;
+					$id_category 	= (!empty($GETS_STOCK[$KEY]['id_category']))?$GETS_STOCK[$KEY]['id_category']:null;
+					$nm_category 	= (!empty($GETS_STOCK[$KEY]['nm_category']))?$GETS_STOCK[$KEY]['nm_category']:null;
+					// echo 'ID:'.$id_stock;
+					if(!empty($id_stock)){
+						$ArrUpdate[$material]['id'] = $id_stock;
+						$ArrUpdate[$material]['qty_booking'] = $booking - $qty;
 
-					$ArrUpdateHist[$material]['id_material'] 	= $material;
-					$ArrUpdateHist[$material]['idmaterial'] 	= $idmaterial;
-					$ArrUpdateHist[$material]['nm_material'] 	= $nm_material;
-					$ArrUpdateHist[$material]['id_category'] 	= $id_category;
-					$ArrUpdateHist[$material]['nm_category'] 	= $nm_category;
-					$ArrUpdateHist[$material]['id_gudang'] 		= $id_gudang_booking;
-					$ArrUpdateHist[$material]['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_booking);
-					$ArrUpdateHist[$material]['id_gudang_dari'] = NULL;
-					$ArrUpdateHist[$material]['kd_gudang_dari'] = 'BOOKING';
-					$ArrUpdateHist[$material]['id_gudang_ke'] 	= NULL;
-					$ArrUpdateHist[$material]['kd_gudang_ke'] 	= 'PENGURANG';
-					$ArrUpdateHist[$material]['qty_stock_awal'] 	= $stock;
-					$ArrUpdateHist[$material]['qty_stock_akhir'] 	= $stock;
-					$ArrUpdateHist[$material]['qty_booking_awal'] 	= $booking;
-					$ArrUpdateHist[$material]['qty_booking_akhir'] 	= $booking - $qty;
-					$ArrUpdateHist[$material]['qty_rusak_awal'] 	= $rusak;
-					$ArrUpdateHist[$material]['qty_rusak_akhir'] 	= $rusak;
-					$ArrUpdateHist[$material]['no_ipp'] 			= $no_ipp;
-					$ArrUpdateHist[$material]['jumlah_mat'] 		= $qty;
-					$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$kode_trans;
-					$ArrUpdateHist[$material]['update_by'] 			= $username;
-					$ArrUpdateHist[$material]['update_date'] 		= $datetime;			
-					
-					
-					
+						$ArrUpdateHist[$material]['id_material'] 	= $material;
+						$ArrUpdateHist[$material]['idmaterial'] 	= $idmaterial;
+						$ArrUpdateHist[$material]['nm_material'] 	= $nm_material;
+						$ArrUpdateHist[$material]['id_category'] 	= $id_category;
+						$ArrUpdateHist[$material]['nm_category'] 	= $nm_category;
+						$ArrUpdateHist[$material]['id_gudang'] 		= $id_gudang_booking;
+						$ArrUpdateHist[$material]['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_booking);
+						$ArrUpdateHist[$material]['id_gudang_dari'] = NULL;
+						$ArrUpdateHist[$material]['kd_gudang_dari'] = 'BOOKING';
+						$ArrUpdateHist[$material]['id_gudang_ke'] 	= NULL;
+						$ArrUpdateHist[$material]['kd_gudang_ke'] 	= 'PENGURANG';
+						$ArrUpdateHist[$material]['qty_stock_awal'] 	= $stock;
+						$ArrUpdateHist[$material]['qty_stock_akhir'] 	= $stock;
+						$ArrUpdateHist[$material]['qty_booking_awal'] 	= $booking;
+						$ArrUpdateHist[$material]['qty_booking_akhir'] 	= $booking - $qty;
+						$ArrUpdateHist[$material]['qty_rusak_awal'] 	= $rusak;
+						$ArrUpdateHist[$material]['qty_rusak_akhir'] 	= $rusak;
+						$ArrUpdateHist[$material]['no_ipp'] 			= $no_ipp;
+						$ArrUpdateHist[$material]['jumlah_mat'] 		= $qty;
+						$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$kode_trans;
+						$ArrUpdateHist[$material]['update_by'] 			= $username;
+						$ArrUpdateHist[$material]['update_date'] 		= $datetime;
+					}
 				}
 			}
 		}
@@ -1152,157 +1416,158 @@ class Warehouse extends CI_Controller {
 		// exit;
 
 		//ENd Mengurangi Booking
+		if(!empty($ArrUpdateStock)){
+			foreach($ArrUpdateStock as $value) {
+				if(!array_key_exists($value['id'], $tempx)) {
+					$tempx[$value['id']]['good'] = 0;
+				}
+				$tempx[$value['id']]['good'] += $value['qty'];
 
-		foreach($ArrUpdateStock as $value) {
-			if(!array_key_exists($value['id'], $tempx)) {
-				$tempx[$value['id']]['good'] = 0;
+				$grouping_temp[$value['id']]['id'] 			= $value['id'];
+				$grouping_temp[$value['id']]['qty_good'] 	= $tempx[$value['id']]['good'];
+				
+				
+				$id_material = $value['id'];
+
+					$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
+					$coa_gudang = $coa_1->coa_1;
+					$kategori_gudang = $coa_1->category;				 
+						
+						$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					$tanggal		= date('Y-m-d');
+					$Bln 			= substr($tanggal,5,2);
+					$Thn 			= substr($tanggal,0,4);
+					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+					
+					
+					
+					$GudangFrom = $kategori_gudang;
+					if($GudangFrom == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					$QTY_OKE  = $tempx[$value['id']]['good'];
+					$ACTUAL_MAT = $id_material;
+					
+					$ArrJurnalNew[$value['id']]['id_material'] 		= $ACTUAL_MAT;
+					$ArrJurnalNew[$value['id']]['idmaterial'] 		= $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];
+					$ArrJurnalNew[$value['id']]['nm_material'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
+					$ArrJurnalNew[$value['id']]['id_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
+					$ArrJurnalNew[$value['id']]['nm_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
+					$ArrJurnalNew[$value['id']]['id_gudang'] 			= $id_gudang;
+					$ArrJurnalNew[$value['id']]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
+					$ArrJurnalNew[$value['id']]['id_gudang_dari'] 	    = $id_gudang;
+					$ArrJurnalNew[$value['id']]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
+					$ArrJurnalNew[$value['id']]['id_gudang_ke'] 		= $id_gudang_wip;
+					$ArrJurnalNew[$value['id']]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
+					$ArrJurnalNew[$value['id']]['qty_stock_awal'] 		= $stokjurnalakhir;
+					$ArrJurnalNew[$value['id']]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+					$ArrJurnalNew[$value['id']]['kode_trans'] 			= $kode_trans;
+					$ArrJurnalNew[$value['id']]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew[$value['id']]['qty_out'] 			= $QTY_OKE;
+					$ArrJurnalNew[$value['id']]['ket'] 				= 'transfer subgudang - produksi';
+					$ArrJurnalNew[$value['id']]['harga'] 			= $PRICE;
+					$ArrJurnalNew[$value['id']]['harga_bm'] 		= 0;
+					$ArrJurnalNew[$value['id']]['nilai_awal_rp']	= $nilaijurnalakhir;
+					$ArrJurnalNew[$value['id']]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+					$ArrJurnalNew[$value['id']]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+					$ArrJurnalNew[$value['id']]['update_by'] 		= $UserName;
+					$ArrJurnalNew[$value['id']]['update_date'] 		= $DateTime;
+					$ArrJurnalNew[$value['id']]['no_jurnal'] 		= $Nojurnal;
+					$ArrJurnalNew[$value['id']]['coa_gudang'] 		= $coa_gudang;
+					
+					
+					$stokjurnalakhir2=0;
+					$nilaijurnalakhir2=0;
+					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+					
+					$coa_2    = $this->db->get_where('warehouse', array('id'=>$id_gudang_wip))->row();
+					$coa_gudang2 = $coa_2->coa_1;
+					$kategori_gudang2 = $coa_2->category;	
+					
+					
+					$GudangFrom2 = $kategori_gudang2;
+					if($GudangFrom2 == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom2 == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0; 
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom2 == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					$stok_akhir = ($PRICE*$QTY_OKE)+($PRICE2*$stokjurnalakhir2);
+					
+					if($stok_akhir==0){
+						$PRICENEW = 0;
+					} else{
+					$PRICENEW = $stok_akhir/($QTY_OKE+$stokjurnalakhir2);
+					}
+					
+					
+					
+					
+					$ArrJurnalNew2[$value['id']]['id_material'] 		= $ACTUAL_MAT;
+					$ArrJurnalNew2[$value['id']]['idmaterial'] 		    = $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];
+					$ArrJurnalNew2[$value['id']]['nm_material'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
+					$ArrJurnalNew2[$value['id']]['id_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
+					$ArrJurnalNew2[$value['id']]['nm_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
+					$ArrJurnalNew2[$value['id']]['id_gudang'] 			= $id_gudang_wip;
+					$ArrJurnalNew2[$value['id']]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
+					$ArrJurnalNew2[$value['id']]['id_gudang_dari'] 	    = $id_gudang;
+					$ArrJurnalNew2[$value['id']]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
+					$ArrJurnalNew2[$value['id']]['id_gudang_ke'] 		= $id_gudang_wip;
+					$ArrJurnalNew2[$value['id']]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
+					$ArrJurnalNew2[$value['id']]['qty_stock_awal']     	= $stokjurnalakhir2;
+					$ArrJurnalNew2[$value['id']]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
+					$ArrJurnalNew2[$value['id']]['kode_trans'] 		    = $kode_trans;
+					$ArrJurnalNew2[$value['id']]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew2[$value['id']]['qty_in'] 			    = $QTY_OKE;
+					$ArrJurnalNew2[$value['id']]['ket'] 				= 'transfer subgudang - produksi';
+					$ArrJurnalNew2[$value['id']]['harga'] 				= $PRICENEW;
+					$ArrJurnalNew2[$value['id']]['harga_bm'] 			= 0;
+					$ArrJurnalNew2[$value['id']]['nilai_awal_rp']		= $nilaijurnalakhir2;
+					$ArrJurnalNew2[$value['id']]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
+					$ArrJurnalNew2[$value['id']]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+					$ArrJurnalNew2[$value['id']]['update_by'] 			= $UserName;
+					$ArrJurnalNew2[$value['id']]['update_date'] 		= $DateTime;
+					$ArrJurnalNew2[$value['id']]['no_jurnal'] 			= '-';
+					$ArrJurnalNew2[$value['id']]['coa_gudang'] 		    = $coa_gudang2;
 			}
-			$tempx[$value['id']]['good'] += $value['qty'];
 
-			$grouping_temp[$value['id']]['id'] 			= $value['id'];
-			$grouping_temp[$value['id']]['qty_good'] 	= $tempx[$value['id']]['good'];
-			
-			
-			
-			$id_material = $value['id'];
-
-                $coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
-				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;				 
-					
-					$stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
-				
-				$tanggal		= date('Y-m-d');
-				$Bln 			= substr($tanggal,5,2);
-				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				
-				
-				$GudangFrom = $kategori_gudang;
-				if($GudangFrom == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-					
-				}
-				$QTY_OKE  = $tempx[$value['id']]['good'];
-				$ACTUAL_MAT = $id_material;
-				
-				$ArrJurnalNew[$value['id']]['id_material'] 		= $ACTUAL_MAT;
-				$ArrJurnalNew[$value['id']]['idmaterial'] 		= $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];
-				$ArrJurnalNew[$value['id']]['nm_material'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
-				$ArrJurnalNew[$value['id']]['id_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
-				$ArrJurnalNew[$value['id']]['nm_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
-				$ArrJurnalNew[$value['id']]['id_gudang'] 			= $id_gudang;
-				$ArrJurnalNew[$value['id']]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
-				$ArrJurnalNew[$value['id']]['id_gudang_dari'] 	    = $id_gudang;
-				$ArrJurnalNew[$value['id']]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
-				$ArrJurnalNew[$value['id']]['id_gudang_ke'] 		= $id_gudang_wip;
-				$ArrJurnalNew[$value['id']]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
-				$ArrJurnalNew[$value['id']]['qty_stock_awal'] 		= $stokjurnalakhir;
-				$ArrJurnalNew[$value['id']]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
-				$ArrJurnalNew[$value['id']]['kode_trans'] 			= $kode_trans;
-				$ArrJurnalNew[$value['id']]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew[$value['id']]['qty_out'] 			= $QTY_OKE;
-				$ArrJurnalNew[$value['id']]['ket'] 				= 'transfer subgudang - produksi';
-				$ArrJurnalNew[$value['id']]['harga'] 			= $PRICE;
-				$ArrJurnalNew[$value['id']]['harga_bm'] 		= 0;
-				$ArrJurnalNew[$value['id']]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$value['id']]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
-				$ArrJurnalNew[$value['id']]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
-				$ArrJurnalNew[$value['id']]['update_by'] 		= $UserName;
-				$ArrJurnalNew[$value['id']]['update_date'] 		= $DateTime;
-				$ArrJurnalNew[$value['id']]['no_jurnal'] 		= $Nojurnal;
-				$ArrJurnalNew[$value['id']]['coa_gudang'] 		= $coa_gudang;
-				
-				
-				$stokjurnalakhir2=0;
-				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-				
-				
-				$GudangFrom2 = $kategori_gudang;
-				if($GudangFrom2 == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom2 == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom2 == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-					
-				}
-				
-				$stok_akhir = ($PRICE*$QTY_OKE)+($PRICE2*$stokjurnalakhir2);
-				
-				if($stok_akhir==0){
-					$PRICENEW = 0;
-				} else{
-				   $PRICENEW = $stok_akhir/$QTY_OKE+$stokjurnalakhir2;
-		        }
-				
-				
-				
-				
-				$ArrJurnalNew2[$value['id']]['id_material'] 		= $ACTUAL_MAT;
-				$ArrJurnalNew2[$value['id']]['idmaterial'] 		= $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];
-				$ArrJurnalNew2[$value['id']]['nm_material'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
-				$ArrJurnalNew2[$value['id']]['id_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
-				$ArrJurnalNew2[$value['id']]['nm_category'] 		= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
-				$ArrJurnalNew2[$value['id']]['id_gudang'] 			= $id_gudang_wip;
-				$ArrJurnalNew2[$value['id']]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
-				$ArrJurnalNew2[$value['id']]['id_gudang_dari'] 	    = $id_gudang;
-				$ArrJurnalNew2[$value['id']]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang);
-				$ArrJurnalNew2[$value['id']]['id_gudang_ke'] 		= $id_gudang_wip;
-				$ArrJurnalNew2[$value['id']]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_wip);
-				$ArrJurnalNew2[$value['id']]['qty_stock_awal'] 	= $stokjurnalakhir2;
-				$ArrJurnalNew2[$value['id']]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
-				$ArrJurnalNew2[$value['id']]['kode_trans'] 		= $kode_trans;
-				$ArrJurnalNew2[$value['id']]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew2[$value['id']]['qty_in'] 			= $QTY_OKE;
-				$ArrJurnalNew2[$value['id']]['ket'] 				= 'transfer subgudang - produksi';
-				$ArrJurnalNew2[$value['id']]['harga'] 				= $PRICENEW;
-				$ArrJurnalNew2[$value['id']]['harga_bm'] 			= 0;
-				$ArrJurnalNew2[$value['id']]['nilai_awal_rp']		= $nilaijurnalakhir2;
-				$ArrJurnalNew2[$value['id']]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-				$ArrJurnalNew2[$value['id']]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
-				$ArrJurnalNew2[$value['id']]['update_by'] 			= $UserName;
-				$ArrJurnalNew2[$value['id']]['update_date'] 		= $DateTime;
-				$ArrJurnalNew2[$value['id']]['no_jurnal'] 			= '-';
-				$ArrJurnalNew2[$value['id']]['coa_gudang'] 		= $coa_gudang;
-				
-				
+			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
 		}
-
-		move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
-
 		//UPDATE NOMOR SURAT JALAN
 		$monthYear 		= date('/m/Y');
 		$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang);
@@ -1318,13 +1583,14 @@ class Warehouse extends CI_Controller {
 		$urut2			= sprintf('%03s',$urutan2);
 		$no_surat_jalan	= $urut2."/IA".$kode_gudang.$monthYear;
 
-		$ArrUpdateHeadAjudtment = array(
+		$ArrUpdateHeadAjudtment2 = array(
 			'jumlah_mat_check' => $getDetAjust[0]->jumlah_mat_check + $SUM_MAT,
 			'no_surat_jalan' => $no_surat_jalan,
-			'file_eng_change' => $file_name,
 			'checked_by' => $username,
 			'checked_date' => $datetime
 		);
+
+		$ArrUpdateHeadAjudtment = array_merge($ArrEndChange,$ArrUpdateHeadAjudtment2);
 
 		$UpdateRealFlag = array(
 			'upload_real2' => "Y",
@@ -1346,7 +1612,7 @@ class Warehouse extends CI_Controller {
 			$this->db->where('kode_trans', $kode_trans);
 			$this->db->update('warehouse_adjustment', $ArrUpdateHeadAjudtment);
 			
-			 $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+			$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				 
 			 if(!empty($ArrJurnalNew2)){
 				 $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
@@ -1400,20 +1666,19 @@ class Warehouse extends CI_Controller {
 				'status'	=> 1,
 				'kode_spk'	=> $id
 			);
-
+			if(!empty($ArrUpdateStock)){
+			insertDataGroupReport($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans,$xyz_no_so,$xyz_no_spk,$xyz_product);
+			}
 			history('Approve request producksi '.$kode_spk.'/'.$kode_trans.'/'.$id);
 		}
 		echo json_encode($Arr_Kembali);
 	}
 
 	public function save_update_produksi_2_new_close(){
-		$data 			= $this->input->post();		
+		$data 			= $this->input->post();
 		$data_session	= $this->session->userdata;
 		$username = $this->session->userdata['ORI_User']['username'];
 		$datetime = date('Y-m-d H:i:s');
-		
-		$UserName = $this->session->userdata['ORI_User']['username'];
-		$DateTime = date('Y-m-d H:i:s');
 
 		$id				= $data['id'];
 		$kode_trans		= $data['kode_trans'];
@@ -1427,6 +1692,9 @@ class Warehouse extends CI_Controller {
 		$requesta_add 	= (!empty($data['requesta_add']))?$data['requesta_add']:array();
 		$edit_add 		= (!empty($data['edit_add']))?$data['edit_add']:array();
 		$GET_MATERIAL	= get_detail_material();
+		$xyz_no_spk 	= $data['xyz_no_spk'];
+		$xyz_no_so 		= $data['xyz_no_so'];
+		$xyz_product 	= $data['xyz_product'];
 
 		$dateCreated = $datetime;
 		if($hist_produksi != '0'){
@@ -1447,6 +1715,7 @@ class Warehouse extends CI_Controller {
 
 		//UPLOAD DOCUMENT
 		$file_name = '';
+		$ArrEndChange = [];
 		if(!empty($_FILES["upload_spk"]["name"])){
 			$target_dir     = "assets/file/produksi/";
 			$target_dir_u   = $_SERVER['DOCUMENT_ROOT']."/assets/file/produksi/";
@@ -1460,6 +1729,10 @@ class Warehouse extends CI_Controller {
 			if(!empty($_FILES["upload_spk"]["tmp_name"])){
 				move_uploaded_file($_FILES["upload_spk"]["tmp_name"], $nama_upload);
 			}
+
+			$ArrEndChange = array(
+				'file_eng_change' 	=> $file_name
+			);
 		}
 
 		$ArrWhereIN_= [];
@@ -1543,120 +1816,138 @@ class Warehouse extends CI_Controller {
 
 		$ArrLooping = ['detail_liner','detail_joint','detail_strn1','detail_strn2','detail_str','detail_ext','detail_topcoat','resin_and_add'];
 
-		$get_detail_spk = $this->db->where_in('id',$ArrWhereIN_)->get_where('production_spk', array('kode_spk'=>$kode_spk))->result_array();
+		if(!empty($ArrWhereIN_)){
+			$get_detail_spk = $this->db->where_in('id',$ArrWhereIN_)->get_where('production_spk', array('kode_spk'=>$kode_spk))->result_array();
 
-		// print_r($get_detail_spk);
-		// exit;
-		$ArrGroup = [];
-		$ArrAktualResin = [];
-		$ArrAktualPlus = [];
-		$ArrAktualAdd = [];
-		$ArrUpdate = [];
-		
-		$ArrDeatil = [];
-		$ArrDeatilAdj = [];
-		$ArrUpdateRequest = [];
-		$nomor = 0;
-		$SUM_MAT = 0;
-		foreach ($get_detail_spk as $key => $value) {
-			foreach ($ArrLooping as $valueX) {
-				if(!empty($data[$valueX])){
-					if($valueX == 'detail_liner'){
-						$DETAIL_NAME = 'LINER THIKNESS / CB';
-					}
-					if($valueX == 'detail_joint'){
-						$DETAIL_NAME = 'RESIN AND ADD';
-					}
-					if($valueX == 'detail_strn1'){
-						$DETAIL_NAME = 'STRUKTUR NECK 1';
-					}
-					if($valueX == 'detail_strn2'){
-						$DETAIL_NAME = 'STRUKTUR NECK 2';
-					}
-					if($valueX == 'detail_str'){
-						$DETAIL_NAME = 'STRUKTUR THICKNESS';
-					}
-					if($valueX == 'detail_ext'){
-						$DETAIL_NAME = 'EXTERNAL LAYER THICKNESS';
-					}
-					if($valueX == 'detail_topcoat'){
-						$DETAIL_NAME = 'TOPCOAT';
-					}
-					if($valueX == 'resin_and_add'){
-						$DETAIL_NAME = 'RESIN AND ADD';
-					}
-					$detailX = $data[$valueX];
-					// print_r($detailX);
-					if($value['id_product'] != 'deadstok'){
-						$get_produksi 	= $this->db->limit(1)->select('id, id_category')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk']))->result();
-						//,'print_merge_date'=>$dateCreated
-						if(empty($get_produksi)){
-							$Arr_Kembali	= array(
-								'pesan'		=>'Error data proccess, please contact administrator !!! ErrorCode: id_ml:'.$value['id_milik'].'&spk:'.$value['kode_spk'].'&tm:'.$dateCreated,
-								'status'	=> 2
-							);
-							echo json_encode($Arr_Kembali);
-							return false;
+			// print_r($get_detail_spk);
+			// exit;
+			$ArrGroup = [];
+			$ArrAktualResin = [];
+			$ArrAktualPlus = [];
+			$ArrAktualAdd = [];
+			$ArrUpdate = [];
+			
+			$ArrDeatil = [];
+			$ArrDeatilAdj = [];
+			$ArrUpdateRequest = [];
+			$nomor = 0;
+			$SUM_MAT = 0;
+			foreach ($get_detail_spk as $key => $value) {
+				foreach ($ArrLooping as $valueX) {
+					if(!empty($data[$valueX])){
+						if($valueX == 'detail_liner'){
+							$DETAIL_NAME = 'LINER THIKNESS / CB';
 						}
-					}
-					
-					foreach ($detailX as $key2 => $value2) {
-						//RESIN
-						$get_liner 		= $this->db->select('id, id_material, qty_order AS berat, key_gudang, check_qty_oke')->get_where('warehouse_adjustment_detail', array('kode_trans'=>$kode_trans,'keterangan'=>$DETAIL_NAME))->result_array();
-						// print_r($get_liner);
-						// exit;
-						if(!empty($get_liner)){
-							foreach ($get_liner as $key3 => $value3) {
-								if($value2['id_key'] == $value3['key_gudang']){ 
-									$nomor 		= $value2['id_key'];
-									$ACTUAL_MAT = $value2['actual_type'];
-									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
-									$BERAT_UNIT = $value3['berat'] / $QTY_INP;
-									$total_est 	= $BERAT_UNIT * $QTY_INP;
-									$total_act  = 0;
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
-									}
-									$SUM_MAT 	+= $total_act;
-									$unit_act 	= $total_act / $QTY_INP;
-									$PERSEN = str_replace(',','',$value2['persen']);
-									//UPDATE FLAG SPK 2
-									$ArrUpdate[$key.$key2.$key3.$nomor]['id'] 			= $value['id'];
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2'] 		= 'Y';
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_by'] 		= $username;
-									$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_date']	= $datetime;
-									// $ArrUpdate[$key.$key2.$key3.$nomor]['gudang2']	= $id_gudang;
+						if($valueX == 'detail_joint'){
+							$DETAIL_NAME = 'RESIN AND ADD';
+						}
+						if($valueX == 'detail_strn1'){
+							$DETAIL_NAME = 'STRUKTUR NECK 1';
+						}
+						if($valueX == 'detail_strn2'){
+							$DETAIL_NAME = 'STRUKTUR NECK 2';
+						}
+						if($valueX == 'detail_str'){
+							$DETAIL_NAME = 'STRUKTUR THICKNESS';
+						}
+						if($valueX == 'detail_ext'){
+							$DETAIL_NAME = 'EXTERNAL LAYER THICKNESS';
+						}
+						if($valueX == 'detail_topcoat'){
+							$DETAIL_NAME = 'TOPCOAT';
+						}
+						if($valueX == 'resin_and_add'){
+							$DETAIL_NAME = 'RESIN AND ADD';
+						}
+						$detailX = $data[$valueX];
+						// print_r($detailX);
+						if($value['id_product'] != 'deadstok'){
+							$get_produksi 	= $this->db->limit(1)->select('id, id_category')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk']))->result();
+							//,'print_merge_date'=>$dateCreated
+							if(empty($get_produksi)){
+								$Arr_Kembali	= array(
+									'pesan'		=>'Error data proccess, please contact administrator !!! ErrorCode: id_ml:'.$value['id_milik'].'&spk:'.$value['kode_spk'].'&tm:'.$dateCreated,
+									'status'	=> 2
+								);
+								echo json_encode($Arr_Kembali);
+								return false;
+							}
+						}
+						
+						foreach ($detailX as $key2 => $value2) {
+							//RESIN
+							$get_liner 		= $this->db->select('id, id_material, qty_order AS berat, key_gudang, check_qty_oke')->get_where('warehouse_adjustment_detail', array('kode_trans'=>$kode_trans,'keterangan'=>$DETAIL_NAME))->result_array();
+							// print_r($get_liner);
+							// exit;
+							if(!empty($get_liner)){
+								foreach ($get_liner as $key3 => $value3) {
+									if($value2['id_key'] == $value3['key_gudang']){ 
+										$nomor 		= $value2['id_key'];
+										$ACTUAL_MAT = $value2['actual_type'];
+										$QTY_INP	= (!empty($WHERE_KEY_QTY[$value['id']]))?$WHERE_KEY_QTY[$value['id']]:0;
+										
+										$total_est  = 0;
+										$total_act  = 0;
+										$BERAT_UNIT  = 0;
 
-									//ARRAY STOCK
-									$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
-									$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
-									//UPDATE ADJUSTMENT DETAIL
-									$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
-									$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_oke'] 	= $total_act + $value3['check_qty_oke'];
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_rusak']	= $BERAT_UNIT;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['check_keterangan']	= $DETAIL_NAME;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['update_by'] 		= $username;
-									$ArrDeatil[$key.$key2.$key3.$nomor]['update_date'] 		= $datetime;
-									//INSERT ADJUSTMENT CHECK
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_detail'] 	= $value3['id'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['kode_trans'] 	= $kode_trans;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['no_ipp'] 		= $no_request;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_material'] 	= $ACTUAL_MAT;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_material'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_order'] 	= $value3['berat'];
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_oke'] 		= $total_act;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_rusak'] 	= 0;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['expired_date'] 	= NULL;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['keterangan'] 	= $DETAIL_NAME;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_by'] 	= $username;
-									$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_date'] 	= $datetime;
-									
-									//UPDATE REQUEST
-									$ArrUpdateRequest[$key.$key2.$key3.$nomor]['id_key'] 	= $value3['key_gudang'];
-									$ArrUpdateRequest[$key.$key2.$key3.$nomor]['aktual'] 	= $total_act;
+										if($value3['berat'] > 0 AND $QTY_INP > 0){
+										$BERAT_UNIT = $value3['berat'] / $QTY_INP;
+										}
+										if($BERAT_UNIT > 0 AND $QTY_INP > 0){
+										$total_est 	= $BERAT_UNIT * $QTY_INP;
+										}
+
+										$kebutuhan = (!empty($value2['kebutuhan']))?(float)str_replace(',','',$value2['kebutuhan']):0;
+										if($kebutuhan > 0){
+											$total_act = 0;
+											if($total_est > 0 AND $kebutuhan > 0){
+												$total_act 	= ($total_est / $kebutuhan) * (float)str_replace(',','',$value2['terpakai']);
+											}
+										}
+										$SUM_MAT 	+= $total_act;
+										$unit_act 	= 0;
+										if($total_act > 0 AND $QTY_INP > 0){
+											$unit_act 	= $total_act / $QTY_INP;
+										}
+										$PERSEN = str_replace(',','',$value2['persen']);
+										//UPDATE FLAG SPK 2
+										$ArrUpdate[$key.$key2.$key3.$nomor]['id'] 			= $value['id'];
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2'] 		= 'Y';
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_by'] 		= $username;
+										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_date']	= $datetime;
+										// $ArrUpdate[$key.$key2.$key3.$nomor]['gudang2']	= $id_gudang;
+
+										//ARRAY STOCK
+										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
+										$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
+										//UPDATE ADJUSTMENT DETAIL
+										$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
+										$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_oke'] 	= $total_act + $value3['check_qty_oke'];
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_qty_rusak']	= $BERAT_UNIT;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['check_keterangan']	= $DETAIL_NAME;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['update_by'] 		= $username;
+										$ArrDeatil[$key.$key2.$key3.$nomor]['update_date'] 		= $datetime;
+										//INSERT ADJUSTMENT CHECK
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_detail'] 	= $value3['id'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['kode_trans'] 	= $kode_trans;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['no_ipp'] 		= $no_request;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_material'] 	= $ACTUAL_MAT;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_material'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_material'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['id_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['id_category'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['nm_category'] 	= $GET_MATERIAL[$ACTUAL_MAT]['nm_category'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_order'] 	= $value3['berat'];
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_oke'] 		= $total_act;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['qty_rusak'] 	= 0;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['expired_date'] 	= NULL;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['keterangan'] 	= $DETAIL_NAME;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_by'] 	= $username;
+										$ArrDeatilAdj[$key.$key2.$key3.$nomor]['update_date'] 	= $datetime;
+										
+										//UPDATE REQUEST
+										$ArrUpdateRequest[$key.$key2.$key3.$nomor]['id_key'] 	= $value3['key_gudang'];
+										$ArrUpdateRequest[$key.$key2.$key3.$nomor]['aktual'] 	= $total_act;
+									}
 								}
 							}
 						}
@@ -1669,12 +1960,14 @@ class Warehouse extends CI_Controller {
 		$temp = [];
 		$tempx = [];
 		$grouping_temp = [];
-		foreach($ArrUpdateStock as $value) {
-			if($value['qty'] > 0){
-				if(!array_key_exists($value['id'], $temp)) {
-					$temp[$value['id']] = 0;
+		if(!empty($ArrUpdateStock)){
+			foreach($ArrUpdateStock as $value) {
+				if($value['qty'] > 0){
+					if(!array_key_exists($value['id'], $temp)) {
+						$temp[$value['id']] = 0;
+					}
+					$temp[$value['id']] += $value['qty'];
 				}
-				$temp[$value['id']] += $value['qty'];
 			}
 		}
 		
@@ -1688,45 +1981,47 @@ class Warehouse extends CI_Controller {
 		$ArrUpdate 		= [];
 		$ArrUpdateHist 	= [];
 		// print_r($temp);
-		if($CHECK_BOOK === TRUE AND $no_ipp != 0){
-			// echo 'Masuk';
-			foreach ($temp as $material => $qty) {
-				$KEY 		= $material.'-'.$id_gudang_booking;
-				$booking 	= (!empty($GETS_STOCK[$KEY]['booking']))?$GETS_STOCK[$KEY]['booking']:0;
-				$stock 		= (!empty($GETS_STOCK[$KEY]['stock']))?$GETS_STOCK[$KEY]['stock']:0;
-				$rusak 		= (!empty($GETS_STOCK[$KEY]['rusak']))?$GETS_STOCK[$KEY]['rusak']:0;
-				$id_stock 	= (!empty($GETS_STOCK[$KEY]['id']))?$GETS_STOCK[$KEY]['id']:null;
-				$idmaterial 	= (!empty($GETS_STOCK[$KEY]['idmaterial']))?$GETS_STOCK[$KEY]['idmaterial']:null;
-				$nm_material 	= (!empty($GETS_STOCK[$KEY]['nm_material']))?$GETS_STOCK[$KEY]['nm_material']:null;
-				$id_category 	= (!empty($GETS_STOCK[$KEY]['id_category']))?$GETS_STOCK[$KEY]['id_category']:null;
-				$nm_category 	= (!empty($GETS_STOCK[$KEY]['nm_category']))?$GETS_STOCK[$KEY]['nm_category']:null;
-				// echo 'ID:'.$id_stock;
-				if(!empty($id_stock)){
-					$ArrUpdate[$material]['id'] = $id_stock;
-					$ArrUpdate[$material]['qty_booking'] = $booking - $qty;
+		if(!empty($temp)){
+			if($CHECK_BOOK === TRUE AND $no_ipp != 0){
+				// echo 'Masuk';
+				foreach ($temp as $material => $qty) {
+					$KEY 		= $material.'-'.$id_gudang_booking;
+					$booking 	= (!empty($GETS_STOCK[$KEY]['booking']))?$GETS_STOCK[$KEY]['booking']:0;
+					$stock 		= (!empty($GETS_STOCK[$KEY]['stock']))?$GETS_STOCK[$KEY]['stock']:0;
+					$rusak 		= (!empty($GETS_STOCK[$KEY]['rusak']))?$GETS_STOCK[$KEY]['rusak']:0;
+					$id_stock 	= (!empty($GETS_STOCK[$KEY]['id']))?$GETS_STOCK[$KEY]['id']:null;
+					$idmaterial 	= (!empty($GETS_STOCK[$KEY]['idmaterial']))?$GETS_STOCK[$KEY]['idmaterial']:null;
+					$nm_material 	= (!empty($GETS_STOCK[$KEY]['nm_material']))?$GETS_STOCK[$KEY]['nm_material']:null;
+					$id_category 	= (!empty($GETS_STOCK[$KEY]['id_category']))?$GETS_STOCK[$KEY]['id_category']:null;
+					$nm_category 	= (!empty($GETS_STOCK[$KEY]['nm_category']))?$GETS_STOCK[$KEY]['nm_category']:null;
+					// echo 'ID:'.$id_stock;
+					if(!empty($id_stock)){
+						$ArrUpdate[$material]['id'] = $id_stock;
+						$ArrUpdate[$material]['qty_booking'] = $booking - $qty;
 
-					$ArrUpdateHist[$material]['id_material'] 	= $material;
-					$ArrUpdateHist[$material]['idmaterial'] 	= $idmaterial;
-					$ArrUpdateHist[$material]['nm_material'] 	= $nm_material;
-					$ArrUpdateHist[$material]['id_category'] 	= $id_category;
-					$ArrUpdateHist[$material]['nm_category'] 	= $nm_category;
-					$ArrUpdateHist[$material]['id_gudang'] 		= $id_gudang_booking;
-					$ArrUpdateHist[$material]['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_booking);
-					$ArrUpdateHist[$material]['id_gudang_dari'] = NULL;
-					$ArrUpdateHist[$material]['kd_gudang_dari'] = 'BOOKING';
-					$ArrUpdateHist[$material]['id_gudang_ke'] 	= NULL;
-					$ArrUpdateHist[$material]['kd_gudang_ke'] 	= 'PENGURANG';
-					$ArrUpdateHist[$material]['qty_stock_awal'] 	= $stock;
-					$ArrUpdateHist[$material]['qty_stock_akhir'] 	= $stock;
-					$ArrUpdateHist[$material]['qty_booking_awal'] 	= $booking;
-					$ArrUpdateHist[$material]['qty_booking_akhir'] 	= $booking - $qty;
-					$ArrUpdateHist[$material]['qty_rusak_awal'] 	= $rusak;
-					$ArrUpdateHist[$material]['qty_rusak_akhir'] 	= $rusak;
-					$ArrUpdateHist[$material]['no_ipp'] 			= $no_ipp;
-					$ArrUpdateHist[$material]['jumlah_mat'] 		= $qty;
-					$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$kode_trans.' close';
-					$ArrUpdateHist[$material]['update_by'] 			= $username;
-					$ArrUpdateHist[$material]['update_date'] 		= $datetime;
+						$ArrUpdateHist[$material]['id_material'] 	= $material;
+						$ArrUpdateHist[$material]['idmaterial'] 	= $idmaterial;
+						$ArrUpdateHist[$material]['nm_material'] 	= $nm_material;
+						$ArrUpdateHist[$material]['id_category'] 	= $id_category;
+						$ArrUpdateHist[$material]['nm_category'] 	= $nm_category;
+						$ArrUpdateHist[$material]['id_gudang'] 		= $id_gudang_booking;
+						$ArrUpdateHist[$material]['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_booking);
+						$ArrUpdateHist[$material]['id_gudang_dari'] = NULL;
+						$ArrUpdateHist[$material]['kd_gudang_dari'] = 'BOOKING';
+						$ArrUpdateHist[$material]['id_gudang_ke'] 	= NULL;
+						$ArrUpdateHist[$material]['kd_gudang_ke'] 	= 'PENGURANG';
+						$ArrUpdateHist[$material]['qty_stock_awal'] 	= $stock;
+						$ArrUpdateHist[$material]['qty_stock_akhir'] 	= $stock;
+						$ArrUpdateHist[$material]['qty_booking_awal'] 	= $booking;
+						$ArrUpdateHist[$material]['qty_booking_akhir'] 	= $booking - $qty;
+						$ArrUpdateHist[$material]['qty_rusak_awal'] 	= $rusak;
+						$ArrUpdateHist[$material]['qty_rusak_akhir'] 	= $rusak;
+						$ArrUpdateHist[$material]['no_ipp'] 			= $no_ipp;
+						$ArrUpdateHist[$material]['jumlah_mat'] 		= $qty;
+						$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$kode_trans.' close';
+						$ArrUpdateHist[$material]['update_by'] 			= $username;
+						$ArrUpdateHist[$material]['update_date'] 		= $datetime;
+					}
 				}
 			}
 		}
@@ -1736,19 +2031,19 @@ class Warehouse extends CI_Controller {
 		// exit;
 
 		//ENd Mengurangi Booking
+		if(!empty($ArrUpdateStock)){
+			foreach($ArrUpdateStock as $value) {
+				if(!array_key_exists($value['id'], $tempx)) {
+					$tempx[$value['id']]['good'] = 0;
+				}
+				$tempx[$value['id']]['good'] += $value['qty'];
 
-		foreach($ArrUpdateStock as $value) {
-			if(!array_key_exists($value['id'], $tempx)) {
-				$tempx[$value['id']]['good'] = 0;
+				$grouping_temp[$value['id']]['id'] 			= $value['id'];
+				$grouping_temp[$value['id']]['qty_good'] 	= $tempx[$value['id']]['good'];
 			}
-			$tempx[$value['id']]['good'] += $value['qty'];
 
-			$grouping_temp[$value['id']]['id'] 			= $value['id'];
-			$grouping_temp[$value['id']]['qty_good'] 	= $tempx[$value['id']]['good'];
+			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
 		}
-
-		move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
-
 		//UPDATE NOMOR SURAT JALAN
 		$monthYear 		= date('/m/Y');
 		$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang);
@@ -1764,14 +2059,15 @@ class Warehouse extends CI_Controller {
 		$urut2			= sprintf('%03s',$urutan2);
 		$no_surat_jalan	= $urut2."/IA".$kode_gudang.$monthYear;
 
-		$ArrUpdateHeadAjudtment = array(
+		$ArrUpdateHeadAjudtment2 = array(
 			'checked' => 'Y',
 			'jumlah_mat_check' => $getDetAjust[0]->jumlah_mat_check + $SUM_MAT,
 			'no_surat_jalan' => $no_surat_jalan,
-			'file_eng_change' => $file_name,
 			'checked_by' => $username,
 			'checked_date' => $datetime
 		);
+
+		$ArrUpdateHeadAjudtment = array_merge($ArrEndChange,$ArrUpdateHeadAjudtment2);
 
 		$UpdateRealFlag = array(
 			'upload_real2' => "Y",
@@ -1841,7 +2137,9 @@ class Warehouse extends CI_Controller {
 				'status'	=> 1,
 				'kode_spk'	=> $id
 			);
-
+			if(!empty($ArrUpdateStock)){
+			insertDataGroupReport($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans,$xyz_no_so,$xyz_no_spk,$xyz_product);
+			}
 			history('Close request produksi '.$kode_spk.'/'.$kode_trans.'/'.$id);
 		}
 		echo json_encode($Arr_Kembali);
@@ -2161,7 +2459,8 @@ class Warehouse extends CI_Controller {
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
 		$gudang			= $this->uri->segment(3);
-		$date_filter	= $this->uri->segment(4);
+		$category	= $this->uri->segment(4);
+		$date_filter	= $this->uri->segment(5);
 
 		$this->load->library("PHPExcel");
 		// $this->load->library("PHPExcel/Writer/Excel2007");
@@ -2183,6 +2482,8 @@ class Warehouse extends CI_Controller {
 		$where_gudang ='';
 		$where_date ='';
 		$field_add = '';
+		$group_by = '';
+		$fieldStock = 'a.qty_stock, a.qty_booking,a.qty_rusak, a.id_gudang,b.nm_gudang,';
 		if(!empty($gudang)){
 			$where_gudang = " AND a.id_gudang = '".$gudang."' ";
 		}
@@ -2193,26 +2494,29 @@ class Warehouse extends CI_Controller {
 			$table = "warehouse_stock_per_day";
 			$field_add = "a.costbook, a.total_value,";
 		}
+
+		if($gudang == '0'){
+			$where_gudang = " AND a.id_gudang IN (".$this->gudang_produksi.") ";
+			$group_by = ' GROUP BY c.id_material ';
+			$fieldStock = 'SUM(a.qty_stock) AS qty_stock, SUM(a.qty_booking) AS qty_booking, SUM(a.qty_rusak) AS qty_rusak, "0" AS id_gudang, "Gudang Produksi" AS nm_gudang,';
+		}
+
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
 				c.idmaterial,
 				c.id_material,
 				c.nm_material,
-				c.nm_category,
-				a.qty_stock,
-				a.qty_booking,
-				a.qty_rusak,
-				a.id_gudang,
+				".$fieldStock."
 				".$field_add."
-				b.nm_gudang
+				c.nm_category
 			FROM
 				".$table." a 
 				LEFT JOIN warehouse b ON a.kd_gudang=b.kd_gudang
 				LEFT JOIN raw_materials c ON a.id_material = c.id_material,
 				(SELECT @row:=0) r
 		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date."
-		";
+		".$group_by;
 		$restDetail1	= $this->db->query($sql)->result_array();
 		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$gudang))->result();
 		$nm_gudang = strtoupper(get_name('warehouse','nm_gudang','id',$gudang));
@@ -2265,7 +2569,7 @@ class Warehouse extends CI_Controller {
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(10);
 		
-		if($get_category[0]->category != 'produksi'){
+		if($category != 'produksi'){
 			$sheet->setCellValue('H'.$NewRow, 'BOOKING');
 			$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 			$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
@@ -2276,7 +2580,7 @@ class Warehouse extends CI_Controller {
 			$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 			$sheet->getColumnDimension('I')->setWidth(20);
 
-			if($get_category[0]->category == 'pusat'){
+			if($category == 'pusat'){
 				$sheet->setCellValue('J'.$NewRow, 'DEMAGED');
 				$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
 				$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
@@ -2348,7 +2652,7 @@ class Warehouse extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $qty_stock);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
-				if($get_category[0]->category != 'produksi'){
+				if($category != 'produksi'){
 					$awal_col++;
 					$qty_booking	= $row_Cek['qty_booking'];
 					$Cols			= getColsChar($awal_col);
@@ -2361,7 +2665,7 @@ class Warehouse extends CI_Controller {
 					$sheet->setCellValue($Cols.$awal_row, $qty_avl);
 					$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
-					if($get_category[0]->category == 'pusat'){
+					if($category == 'pusat'){
 						$awal_col++;
 						$qty_rusak	= $row_Cek['qty_rusak'];
 						$Cols			= getColsChar($awal_col);
@@ -3082,6 +3386,7 @@ class Warehouse extends CI_Controller {
 			'no_po' 	=> $result_header[0]->no_ipp,
 			'no_ipp' 	=> $result_header[0]->no_ipp,
 			'qty_spk' 	=> $result_header[0]->qty_spk,
+			'file_eng_change' 	=> $result_header[0]->file_eng_change,
 			'tanggal' 	=> (!empty($result_header[0]->tanggal))?date('d-M-Y',strtotime($result_header[0]->tanggal)):'',
 			'id_milik' 	=> get_name('production_detail','id_milik','no_spk',$result_header[0]->no_spk),
 			'dated' 	=> date('ymdhis', strtotime($result_header[0]->created_date)),
@@ -3409,4 +3714,455 @@ class Warehouse extends CI_Controller {
 		echo json_encode($Arr_Data);
 		//create history close booking
 	}
+
+	public function modal_incoming_check_new(){
+		$kode_trans     = $this->uri->segment(3);
+		
+		$sql_header	= "SELECT a.*,b.id as id_ros, b.no_ros FROM warehouse_adjustment a left join report_of_shipment b on a.no_ros=b.id WHERE a.kode_trans='".$kode_trans."' ";
+		$result_header		= $this->db->query($sql_header)->result();
+		
+		$pembeda = substr($result_header[0]->no_ipp,0,1);
+
+		if($pembeda == 'P'){
+			$sql 	= "	SELECT
+							a.*,
+							b.qty_purchase,
+							b.qty_in,
+							b.satuan,
+							b.id AS id2,
+							z.nm_material AS nm_material2,
+							z.nilai_konversi,
+							z.id_satuan,
+							z.id_packing
+						FROM
+							warehouse_adjustment_detail a
+							LEFT JOIN tran_material_po_detail b ON a.no_ipp=b.no_po AND a.id_po_detail = b.id
+							LEFT JOIN raw_materials z ON a.id_material=z.id_material
+						WHERE
+							a.id_material = b.id_material
+							AND a.kode_trans='".$kode_trans."' ";
+		}
+		if($pembeda == 'N'){
+			$sql 	= "	SELECT
+							a.*,
+							b.qty_purchase,
+							b.qty_in,
+							b.id AS id2,
+							z.nm_material AS nm_material2,
+							z.nilai_konversi,
+							z.id_satuan,
+							z.id_packing
+						FROM
+							warehouse_adjustment_detail a
+							LEFT JOIN tran_material_non_po_detail b ON a.no_ipp=b.no_non_po AND a.id_po_detail = b.id
+							LEFT JOIN raw_materials z ON a.id_material=z.id_material
+						WHERE
+							a.id_material = b.id_material
+							AND a.kode_trans='".$kode_trans."' ";
+		}
+		// echo $sql;
+		$result			= $this->db->query($sql)->result_array();
+
+		$data = array(
+			'result' 	=> $result,
+			'no_po' 	=> $result_header[0]->no_ipp,
+			'dokumen_file' 	=> $result_header[0]->doc,
+			'kode_trans' 	=> $result_header[0]->kode_trans,
+			'id_header' 	=> $result_header[0]->id,
+			'gudang_tujuan' 	=> $result_header[0]->kd_gudang_ke,
+			'id_tujuan' 	=> $result_header[0]->id_gudang_ke,
+			'dated' 	=> date('ymdhis', strtotime($result_header[0]->created_date)),
+			'resv' 	=> date('d F Y', strtotime($result_header[0]->created_date)),
+			'id_ros'	=> $result_header[0]->id_ros,
+			'no_ros'	=> $result_header[0]->no_ros,
+			'total_freight'	=> $result_header[0]->total_freight,
+		);
+
+		$this->load->view('Warehouse/modal_incoming_check_new', $data);
+	}
+
+	public function modal_detail_qr(){
+		$kode_trans = $this->uri->segment(3);
+		$tanda     	= $this->uri->segment(4);
+
+		$result			= $this->db->get_where('warehouse_adjustment_detail',array('kode_trans'=>$kode_trans))->result_array();
+		$result_header	= $this->db->get_where('warehouse_adjustment',array('kode_trans'=>$kode_trans))->result();
+
+		$data = array(
+			'result' 	=> $result,
+			'tanda' 	=> $tanda,
+			'dokumen_file' 	=> $result_header[0]->doc,
+			'checked' 	=> $result_header[0]->checked,
+			'kode_trans'=> $result_header[0]->kode_trans,
+			'no_po' 	=> $result_header[0]->no_ipp,
+			'no_ipp' 	=> $result_header[0]->no_ipp,
+			'qty_spk' 	=> $result_header[0]->qty_spk,
+			'no_ros' 	=> $result_header[0]->no_ros,
+			'tanggal' 	=> (!empty($result_header[0]->tanggal))?date('d-M-Y',strtotime($result_header[0]->tanggal)):'',
+			'id_milik' 	=> get_name('production_detail','id_milik','no_spk',$result_header[0]->no_spk),
+			'dated' 	=> date('ymdhis', strtotime($result_header[0]->created_date)),
+			'resv' 		=> date('d F Y', strtotime($result_header[0]->created_date))
+
+		);
+
+		$this->load->view('Warehouse/modal_detail_qr', $data);
+	}
+
+	public function save_download_qr(){
+		$group_id = implode('-', $this->input->post('checkboxx'));
+		echo json_encode(['id' => $group_id]);
+	}
+
+	public function download_incoming_checked_qr($id)
+	{
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+
+		$data_url		= base_url();
+		$Split_Beda		= explode('/', $data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		//update status qc
+		$explode = explode("-", $id);
+		$this->db->select('a.*, b.nm_lengkap');
+		$this->db->from('warehouse_adjustment_check a');
+		$this->db->join('users b', 'b.username = a.update_by', 'left');
+		$this->db->where_in('a.id', explode('-', $id));
+		$getData = $this->db->get()->result_array();
+
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'printby' => $printby,
+			'detail' => $getData,
+		);
+
+		$this->load->view('Warehouse/download_incoming_checked_qr', $data);
+	}
+
+	public function modal_history_lot(){
+		$id_material 	= $this->uri->segment(3);
+		$id_gudang 		= $this->uri->segment(4);
+
+		$result		= $this->db
+							->select('a.*, b.id_satuan, b.id_packing')
+							->join('raw_materials b','a.id_material=b.id_material','left')
+							->get_where('warehouse_adjustment_check a', array('a.id_material'=>$id_material, 'a.qr'=>'1'))->result_array();
+		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
+
+		$data = array(
+			'result' => $result,
+			'material' => $material,
+			'id_gudang' => $id_gudang
+		);
+
+		$this->load->view('Warehouse/modal_history_lot', $data);
+	}
+
+	public function modal_create_spk_req(){
+		if($this->input->post()){
+			$post = $this->input->post();
+			$data_session	= $this->session->userdata;
+			$check 		= $post['id_lot'];
+			$kode_trans = $post['kode_trans'];
+
+			$ArrInsert = [];
+			$ArrUpdate = [];
+			foreach ($check as $key => $value) {
+				$qty_request = str_replace(',','',$post['request_'.$value]);
+				$konversi = $post['konversi_'.$value];
+
+				$ArrInsert[$key]['kode_trans'] = $kode_trans;
+				$ArrInsert[$key]['id_lot'] = $value;
+				$ArrInsert[$key]['qty_pack'] = $qty_request;
+				$ArrInsert[$key]['konversi'] = $konversi;
+				$ArrInsert[$key]['qty_unit'] = $qty_request * $konversi;
+				$ArrInsert[$key]['id_material'] = $post['id_material_'.$value];
+				$ArrInsert[$key]['id_satuan'] = $post['id_satuan_'.$value];
+				$ArrInsert[$key]['id_packing'] = $post['id_packing_'.$value];
+				$ArrInsert[$key]['created_by'] = $data_session['ORI_User']['username'];
+				$ArrInsert[$key]['created_date'] = date('Y-m-d H:i:s');
+
+				$getQtyBooking = $this->db->get_where('warehouse_adjustment_check',array('id'=>$value))->result_array();
+				$qtyBooking = (!empty($getQtyBooking[0]['qty_booking']))?$getQtyBooking[0]['qty_booking']:0;
+
+				$ArrUpdate[$key]['id'] 			= $value;
+				$ArrUpdate[$key]['qty_booking'] = $qtyBooking + ($qty_request * $konversi);
+			}
+
+			$this->db->trans_start();
+				if(!empty($ArrUpdate)){
+					$this->db->update_batch('warehouse_adjustment_check', $ArrUpdate, 'id');
+				}
+				if(!empty($ArrInsert)){
+					$this->db->insert_batch('warehouse_adjustment_spk', $ArrInsert);
+				}
+
+			$this->db->trans_complete();
+			if($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				$Arr_Data	= array(
+					'pesan'		=>'Save process failed. Please try again later ...',
+					'status'	=> 0
+				);
+			}
+			else{
+				$this->db->trans_commit();
+				$Arr_Data	= array(
+					'pesan'		=>'Save process success. Thanks ...',
+					'status'	=> 1
+				);
+				history('Create SPK Outgoing '.$kode_trans);
+			}
+			echo json_encode($Arr_Data);
+
+		}
+		else{
+			$kode_trans     = $this->uri->segment(3);
+
+			$result_header	= $this->db->get_where('warehouse_adjustment',array('kode_trans'=>$kode_trans))->result();
+			$listMaterial	= $this->db
+								->select('a.id_material, SUM(qty_order) AS qty, b.id_satuan, b.id_packing, b.nilai_konversi AS konversi, b.nm_material')
+								->group_by('a.id_material')
+								->join('raw_materials b','a.id_material=b.id_material','left')
+								->get_where('warehouse_adjustment_detail a',array('a.kode_trans'=>$kode_trans))
+								->result_array();
+			$ArrMat = [];
+			$ArrMatQty = [];
+			$ArrRequestMaterial = [];
+			foreach ($listMaterial as $key => $value) {
+				$ArrMat[] = $value['id_material'];
+				$ArrMatQty[$value['id_material']] = $value['qty'];
+				$ArrRequestMaterial[$key]['id_material'] = $value['id_material'];
+				$ArrRequestMaterial[$key]['qty'] = $value['qty'];
+				$ArrRequestMaterial[$key]['id_satuan'] = $value['id_satuan'];
+				$ArrRequestMaterial[$key]['id_packing'] = $value['id_packing'];
+				$ArrRequestMaterial[$key]['konversi'] = $value['konversi'];
+				$ArrRequestMaterial[$key]['nm_material'] = $value['nm_material'];
+			}
+
+			$listLotMaterial = $this->db
+									->select('
+										a.id,
+										a.id_material,
+										a.expired_date,
+										a.qty_oke,
+										a.qty_out,
+										a.qty_booking,
+										a.keterangan,
+										b.nm_material,
+										b.id_satuan,
+										b.id_packing,
+										b.nilai_konversi AS konversi,
+										a.update_by,
+										a.update_date
+									')
+									->where_in('a.id_material',$ArrMat)
+									->where('a.qty_oke > a.qty_out')
+									->join('raw_materials b','a.id_material=b.id_material','left')
+									->get_where('warehouse_adjustment_check a',array('a.qr'=>'1'))
+									->result_array();
+
+
+			$data = array(
+				'ArrRequestMaterial' 	=> $ArrRequestMaterial,
+				'listLotMaterial' 	=> $listLotMaterial,
+				'ArrMatQty' 		=> $ArrMatQty,
+				'checked' 		=> $result_header[0]->checked,
+				'gudang_before' => $result_header[0]->id_gudang_dari,
+				'gudang_after' 	=> $result_header[0]->id_gudang_ke,
+				'kode_trans'	=> $result_header[0]->kode_trans,
+				'no_ipp'		=> $result_header[0]->no_ipp,
+				'dated' 		=> date('ymdhis', strtotime($result_header[0]->created_date)),
+				'resv' 			=> date('d F Y', strtotime($result_header[0]->created_date)),
+				'createdBy' 	=> get_name('users','nm_lengkap','username',$result_header[0]->created_by),
+			);
+
+			$this->load->view('Warehouse/modal_create_spk_req', $data);
+		}
+	}
+
+	public function print_surat_jalan_spk(){
+		$kode_trans     = $this->uri->segment(3);
+		$check     		= $this->uri->segment(4);
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+
+		$data_url		= base_url();
+		$Split_Beda		= explode('/',$data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'printby' => $printby,
+			'kode_trans' => $kode_trans,
+			'check' => $check
+		);
+		history('Print SJ SPK '.$kode_trans);
+		$this->load->view('Print/print_sj_material_spk', $data);
+	}
+
+	public function print_surat_jalan_spk_confirm(){
+        $kode_trans     = $this->uri->segment(3);
+        $check             = $this->uri->segment(4);
+        $data_session    = $this->session->userdata;
+        $printby        = $data_session['ORI_User']['username'];
+
+        $data_url        = base_url();
+        $Split_Beda        = explode('/',$data_url);
+        $Jum_Beda        = count($Split_Beda);
+        $Nama_Beda        = $Split_Beda[$Jum_Beda - 2];
+
+        $data = array(
+            'Nama_Beda' => $Nama_Beda,
+            'printby' => $printby,
+            'kode_trans' => $kode_trans,
+            'check' => $check
+        );
+        history('Print Cofirm SJ SPK '.$kode_trans);
+        $this->load->view('Print/print_sj_material_spk_confirm', $data);
+    }
+
+	public function modal_request_edit_new(){
+		if($this->input->post()){
+			$data 			= $this->input->post();
+			$data_session	= $this->session->userdata;
+
+			$detail			= $data['detail'];
+			$kode_trans		= $data['kode_trans'];
+			$Ym 			= date('ym');
+			$UserName		= $data_session['ORI_User']['username'];
+			$DateTime		= date('Y-m-d H:i:s');
+			// print_r($data);
+			// exit;
+
+			$ArrDeatil		 	= array();
+			$SUM_MAT = 0;
+			foreach ($detail as $key => $value) {
+				$qty_awal 	= str_replace(',','',$value['edit_qty_before']);
+				$qty_revisi = str_replace(',','',$value['edit_qty']);
+				$konversi 	= str_replace(',','',$value['konversi']);
+
+				$SUM_MAT += $qty_revisi * $konversi;
+				$ArrDeatil[$key]['id'] 			= $value['id'];
+				$ArrDeatil[$key]['qty_order'] 	= $qty_revisi * $konversi;
+				$ArrDeatil[$key]['qty_oke'] 	= $qty_revisi * $konversi;
+				$ArrDeatil[$key]['keterangan'] 	= $value['keterangan'];
+			}
+
+			$ArrUpdate = array(
+				'jumlah_mat' => $SUM_MAT,
+				'created_by' => $UserName,
+				'created_date' => $DateTime
+			);
+
+			// exit;
+			$this->db->trans_start();
+				$this->db->where('kode_trans', $kode_trans);
+				$this->db->update('warehouse_adjustment', $ArrUpdate);
+
+				$this->db->update_batch('warehouse_adjustment_detail',$ArrDeatil,'id');
+			$this->db->trans_complete();
+
+
+			if($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				$Arr_Data	= array(
+					'pesan'		=>'Save process failed. Please try again later ...',
+					'status'	=> 0
+				);
+			}
+			else{
+				$this->db->trans_commit();
+				$Arr_Data	= array(
+					'pesan'		=>'Save process success. Thanks ...',
+					'status'	=> 1
+				);
+				history("Update request material (gudang produksi) : ".$kode_trans);
+			}
+			echo json_encode($Arr_Data);
+		}
+		else{
+			$kode_trans     = $this->uri->segment(3);
+
+			$sql_header 		= "SELECT * FROM warehouse_adjustment WHERE kode_trans='".$kode_trans."' ";
+			$result_header		= $this->db->query($sql_header)->result();
+
+			$sql 		= "	SELECT
+								a.*,
+								b.qty_stock AS stock,
+								c.id_satuan,
+								c.id_packing,
+								c.nilai_konversi AS konversi
+							FROM
+								warehouse_adjustment_detail a
+								LEFT JOIN warehouse_stock b ON a.id_material = b.id_material
+								LEFT JOIN raw_materials c ON a.id_material=c.id_material
+							WHERE
+								a.kode_trans='".$kode_trans."'
+								AND b.id_gudang = '".$result_header[0]->id_gudang_dari."'
+							";
+			$result		= $this->db->query($sql)->result_array();
+
+			$data = array(
+				'result' 		=> $result,
+				'checked' 		=> $result_header[0]->checked,
+				'gudang_before' => $result_header[0]->id_gudang_dari,
+				'gudang_after' 	=> $result_header[0]->id_gudang_ke,
+				'kode_trans'	=> $result_header[0]->kode_trans,
+				'no_ipp'		=> $result_header[0]->no_ipp,
+				'dated' 		=> date('ymdhis', strtotime($result_header[0]->created_date)),
+				'resv' 			=> date('d F Y', strtotime($result_header[0]->created_date))
+
+			);
+
+			$this->load->view('Warehouse/modal_request_edit_new', $data);
+		}
+	}
+
+	public function auto_update_pr_material(){
+		$data = $this->input->post();
+		$category_awal = $this->uri->segment(3);
+		$tgl_now = date('Y-m-d');
+		$tgl_next_month = date('Y-m-'.'20', strtotime('+1 month', strtotime($tgl_now)));
+		$get_rutin 	= $this->db->get_where('raw_materials',array('delete'=>'N'))->result_array();
+		$ArrUpdate = [];
+
+		foreach ($get_rutin as $key => $value) {
+			$get_stock 		= $this->db->select('qty_stock AS stock')->where_in('id_gudang',array(1,2))->get_where('warehouse_stock',array('id_material'=>$value['id_material']))->result();
+			$qtypr 		= get_qty_pr($value['id_material']);
+			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
+			$purchase 	= (($value['max_stock']/30) * $value['kg_per_bulan']) - $stock_oke - $qtypr;
+			$purchase2 	= ($purchase < 0)?0:ceil($purchase);
+
+			$ArrUpdate[$key]['id_material'] = $value['id_material'];
+			$ArrUpdate[$key]['request'] = $purchase2;
+			$ArrUpdate[$key]['tgl_dibutuhkan'] = $tgl_next_month;
+		}
+		
+		$this->db->trans_start();
+			if(!empty($ArrUpdate)){
+				$this->db->update_batch('raw_materials', $ArrUpdate,'id_material');
+			}
+  		$this->db->trans_complete();
+
+  		if($this->db->trans_status() === FALSE){
+  			$this->db->trans_rollback();
+  			$Arr_Data	= array(
+  				'pesan'		=>'Save process failed. Please try again later ...',
+  				'status'	=> 0
+  			);
+  		}
+  		else{
+  			$this->db->trans_commit();
+  			$Arr_Data	= array(
+  				'pesan'		=>'Save process success. Thanks ...',
+  				'status'	=> 1
+  			);
+  			history('Update auto material pr');
+  		}
+  		echo json_encode($Arr_Data);
+	}
+
 }
