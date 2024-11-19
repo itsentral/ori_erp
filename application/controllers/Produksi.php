@@ -4688,33 +4688,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -5202,33 +5202,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -6374,33 +6374,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -6893,33 +6893,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -7384,33 +7384,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 			//update stock
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			//end update stock
 			
 			if($hist_produksi != '0'){
@@ -10414,33 +10414,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -11096,33 +11096,33 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ArrUpdate,'id');
 			}
 
-			if(!empty($ArrStock)){
-				$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
-			}
-			if(!empty($ArrHist)){
-				$this->db->insert_batch('warehouse_history', $ArrHist);
-			}
+			// if(!empty($ArrStock)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock, 'id');
+			// }
+			// if(!empty($ArrHist)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist);
+			// }
 
-			if(!empty($ArrStockInsert)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
-			}
-			if(!empty($ArrHistInsert)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert);
-			}
+			// if(!empty($ArrStockInsert)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert);
+			// }
+			// if(!empty($ArrHistInsert)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert);
+			// }
 
-			if(!empty($ArrStock2)){
-				$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
-			}
-			if(!empty($ArrHist2)){
-				$this->db->insert_batch('warehouse_history', $ArrHist2);
-			}
+			// if(!empty($ArrStock2)){
+			// 	$this->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+			// }
+			// if(!empty($ArrHist2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHist2);
+			// }
 
-			if(!empty($ArrStockInsert2)){
-				$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
-			}
-			if(!empty($ArrHistInsert2)){
-				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
-			}
+			// if(!empty($ArrStockInsert2)){
+			// 	$this->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+			// }
+			// if(!empty($ArrHistInsert2)){
+			// 	$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
+			// }
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
@@ -12002,7 +12002,7 @@ class Produksi extends CI_Controller {
 			$CHECK = $this->db->get_where('booking_deadstok_temp', array('id_product' => $row['id_product'], 'created_by' => $username))->result();
 			$checked = (!empty($CHECK[0]->qty_booking)) ? $CHECK[0]->qty_booking : '';
 
-			$GETBOOK = $this->db->select('COUNT(id) AS qty_book')->get_where('production_detail',array('id_product_deadstok' => $row['id_product']))->result();
+			$GETBOOK = $this->db->select('COUNT(id) AS qty_book')->get_where('production_detail',array('id_product_deadstok' => $row['id_product'],'id_deadstok_dipakai'=>NULL))->result();
 			$QTY_BOOK = (!empty($GETBOOK[0]->qty_book))?$GETBOOK[0]->qty_book:0;
 
 			$nestedData 	= array();
@@ -12013,7 +12013,7 @@ class Produksi extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".$row['product_spec']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['resin']."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row['length'])."</div>";
-			$nestedData[]	= "<div align='center' class='qty_stock'>".number_format($row['qty_stock'] - $QTY_BOOK)."</div>";
+			$nestedData[]	= "<div align='center' class='qty_stock' title='".$QTY_BOOK."'>".number_format($row['qty_stock'] - $QTY_BOOK)."</div>";
 			$nestedData[]	= "<div align='center'>
 									<input type='text' name='spk_" . $row['id_product'] . "' style='width:80px;' class='form-control text-center qty_booking input-md numberOnly0' autocomplete='off'  data-no_ipp='".$requestData['no_ipp']."' data-id_milik='".$requestData['id_milik']."' data-max_booking='".$requestData['max_booking']."' data-id_product='".$row['id_product']."' value='".$checked."' ><script>$('.numberOnly0').autoNumeric('init', {mDec: '0', aPad: false});</script>
 								</div>";
@@ -12050,6 +12050,7 @@ class Produksi extends CI_Controller {
 				WHERE 
 					a.deleted_date IS NULL
 					AND a.kode_delivery IS NULL
+					AND a.id_booking IS NULL
 				AND(
 					a.type LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.product_name LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -12421,10 +12422,12 @@ class Produksi extends CI_Controller {
 		$temp = [];
 		$tempMaterial = [];
 		$ArrIDSPK = [];
+		$ArrUpdateStock = [];
 		$SUM_MATERIAL = 0;
-		$QTY_OKE  =0;
+		$QTY_OKE = 0;
 		foreach ($restDetail as $key => $value) {
 			$UNIQ = $value['id_pro_det'].'-'.$value['id_material'];
+
 			if(!array_key_exists($UNIQ, $temp)) {
 				$temp[$UNIQ]['berat'] = 0;
 			}
@@ -12449,13 +12452,16 @@ class Produksi extends CI_Controller {
 
 			$costbook 	= (!empty($GET_COSTBOOK[$value['id_material']]))?$GET_COSTBOOK[$value['id_material']]:0;
 			$berat 		= $temp[$UNIQ]['berat'];
-			$SUM_MATERIAL += round($costbook * $berat);
+			// $SUM_MATERIAL += round($costbook * $berat);
 			
 			$temp[$UNIQ]['costbook'] 		= $costbook;
 			$temp[$UNIQ]['kurs'] 			= $kurs;
 			$temp[$UNIQ]['total_price'] 	= round($costbook * $berat);
 			$temp[$UNIQ]['created_by'] 		= $username;
 			$temp[$UNIQ]['created_date'] 	= $datetime;
+
+			$ArrUpdateStock[$UNIQ]['id'] 	= $value['id_material'];
+			$ArrUpdateStock[$UNIQ]['qty'] 	= $berat;
 
 			$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans'],'id_production_detail'=>$value['id_pro_det']))->result_array();
 			$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
@@ -12488,8 +12494,8 @@ class Produksi extends CI_Controller {
 			$tempMaterial[$UNIQ2]['gudang_dari'] 	= $id_gudang;
 			$tempMaterial[$UNIQ2]['gudng_ke'] 		= $id_gudang_ke;
 			
-			
 			$getDetailSPK1 = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans'],'id_production_detail'=>$value['id_pro_det']))->result_array();
+			
 			$id_trans1 = (!empty($getDetailSPK1[0]['id']))?$getDetailSPK1[0]['id']:0;
 			
 			$id_material = $value['id_material'];
@@ -12512,7 +12518,7 @@ class Produksi extends CI_Controller {
 				
 				
 				
-				$QTY_OKE  += $value['berat'];
+				$QTY_OKE  = $berat; 
 				$ACTUAL_MAT = $value['id_material'];
 				$kode_trans = $id_trans1;
 				$PRICE     = $costbook;
@@ -12543,6 +12549,7 @@ class Produksi extends CI_Controller {
 				$ArrJurnalNew[$UNIQ2]['update_date'] 		= $DateTime;
 				$ArrJurnalNew[$UNIQ2]['no_jurnal'] 		= $Nojurnal;
 				$ArrJurnalNew[$UNIQ2]['coa_gudang'] 		= $coa_gudang;
+			
 				
 		}
 		//biaya WIP
@@ -12582,20 +12589,20 @@ class Produksi extends CI_Controller {
 					
 					$nilai = 0;
 					if($value2 == 'Direct labour'){
-						$nilai = round($direct_labour)*$kurs;
+						$nilai = round($direct_labour*$kurs);
 					}
 					if($value2 == 'Indirect labour'){
-						$nilai = round($indirect_labour)*$kurs;
+						$nilai = round($indirect_labour*$kurs);
 					}
 					if($value2 == 'Consumable'){
-						$nilai = round($consumable)*$kurs;
+						$nilai = round($consumable*$kurs);
 					}
 					if($value2 == 'FOH'){
-						$nilai = (round($machine) + round($mould_mandrill) + round($foh_depresiasi) + round($biaya_rutin_bulanan) + round($foh_consumable))*$kurs;
+						$nilai = round(($machine + $mould_mandrill + $foh_depresiasi + $biaya_rutin_bulanan + $foh_consumable)*$kurs);
 					}
 					if($value2 == 'Total'){
-						$nilai1 = (round($direct_labour) + round($indirect_labour) + round($consumable) + round($machine) + round($mould_mandrill) + round($foh_depresiasi) + round($biaya_rutin_bulanan) + round($foh_consumable))*$kurs;
-						$nilai  = round($SUM_MATERIAL)+$nilai1;
+						$nilai1 = round(($direct_labour+ $indirect_labour+$consumable + $machine + $mould_mandrill + $foh_depresiasi + $biaya_rutin_bulanan + $foh_consumable)*$kurs);
+						$nilai  = $nilai1;
 					}					
 					
 					$temp2[$UNIQ]['costbook'] 		= 0;
@@ -12616,7 +12623,9 @@ class Produksi extends CI_Controller {
 		// exit;
 		if(!empty($dataWIP)){
 			$this->db->insert_batch('data_erp_wip',$dataWIP);
-		    $this->jurnalWIP($id_trans);
+		}
+		if(!empty($ArrUpdateStock)){
+			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_ke,$kode_spk_time);
 		}
 
 		//GROUP DATA
@@ -12651,8 +12660,9 @@ class Produksi extends CI_Controller {
 				$nilai_indirect 	= (!empty($getSummaryIndirect[0]['nilai']))?$getSummaryIndirect[0]['nilai']:0;
 				$nilai_consumable 	= (!empty($getSummaryConsumable[0]['nilai']))?$getSummaryConsumable[0]['nilai']:0;
 				$nilai_foh 			= (!empty($getSummaryFOH[0]['nilai']))?$getSummaryFOH[0]['nilai']:0;
-
-				$ArrGroup[$value]['nilai_wip'] = $nilai_material + $nilai_direct + $nilai_indirect + $nilai_consumable + $nilai_foh;
+				$nilai_wip			= $nilai_material + $nilai_direct + $nilai_indirect + $nilai_consumable + $nilai_foh;
+				
+				$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
 				$ArrGroup[$value]['material'] = $nilai_material;
 				$ArrGroup[$value]['wip_direct'] =  $nilai_direct;
 				$ArrGroup[$value]['wip_indirect'] =  $nilai_indirect;
@@ -12662,11 +12672,18 @@ class Produksi extends CI_Controller {
 				$ArrGroup[$value]['created_date'] = $datetime;
 				$ArrGroup[$value]['id_trans'] = $id_trans;
 				
+				$this->db->where('id_trans',$id_trans);
+				$this->db->where('nm_material','WIP Total');
+				$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip)); 
 			}
 		}
 
+
+		
+
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_wip_group',$ArrGroup);
+			$this->jurnalWIP($id_trans);
 		}
 		if(!empty($tempMaterial)){
 			$this->db->insert_batch('erp_data_subgudang',$tempMaterial);

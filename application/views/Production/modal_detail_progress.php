@@ -30,12 +30,28 @@
 							$a++;
 
 							//check delivery
-							$sqlCheck3 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'kode_delivery !='=>NULL))->result();
-							$QTY_DELIVERY	=$sqlCheck3[0]->Numc;
+							$sqlCheck3 		= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'kode_delivery !='=>NULL))->result();
+							$sqlCheckDead 	= $this->db->select('COUNT(*) as Numc')->get_where('deadstok', array('id_milik'=>$valx['id_milik'],'no_ipp'=>str_replace('PRO-','',$valx['id_produksi']),'kode_delivery !='=>NULL))->result();
+							$QTY_DELIVERY	= $sqlCheck3[0]->Numc + $sqlCheckDead[0]->Numc;
 
 							//check selain shop joint & type field
 							if($valx['typeProduct'] != 'field'){
-								$sqlCheck2 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'daycode !='=>NULL))->result();
+								$sqlCheck2 	= $this->db
+													->select('COUNT(*) as Numc')
+													->group_start()
+													->group_start()
+													->where('daycode !=', NULL)
+													->where('daycode !=', '')
+													->group_end()
+													->or_where('id_deadstok_dipakai !=', NULL)
+													->group_end()
+													->get_where('production_detail', 
+														array(
+															'id_milik'=>$valx['id_milik'],
+															'id_produksi'=>$valx['id_produksi']
+															)
+														)
+													->result();
 								$QTY_PRODUCT 		= $valx['qty'];
 								$QTY 		= $valx['qty'];
 								$ACT 		= $sqlCheck2[0]->Numc;

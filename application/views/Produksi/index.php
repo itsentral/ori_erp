@@ -211,7 +211,16 @@ if($tanda == 'request'){
 			if($('.chk_personal:checked').length == 0){
 				swal({
 					title	: "Error Message!",
-					text	: 'Checklist product minimal 1',
+					text	: 'Product belum di checklist !',
+					type	: "warning"
+				});
+				return false;
+			}
+
+			if($('.chk_personal:checked').length > 1){
+				swal({
+					title	: "Error Message!",
+					text	: 'Checklist hanya boleh satu product !',
 					type	: "warning"
 				});
 				return false;

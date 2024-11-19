@@ -3774,105 +3774,14 @@ class Production extends CI_Controller {
 		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();
 
-		$style_header = array(
-			'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			),
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'CCFF99'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$style_header2 = array(
-			'fill' => array(
-				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'FFB266'),
-			),
-			'font' => array(
-				'bold' => true,
-			),
-			'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			)
-		);
-
-		$styleArray = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		$styleArray3 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		  $styleArray5 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-		 $styleArray4 = array(
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
-				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
-			)
-		  );
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
-		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
@@ -3910,40 +3819,40 @@ class Production extends CI_Controller {
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(12);
 		$sheet->setCellValue('A'.$Row, 'DETAIL PROGRESS PRODUKSI');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 
 		$NewRow	= $NewRow +2;
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, 'IPP');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 
 		$sheet->setCellValue('B'.$NewRow, $no_ipp);
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 
 		$NewRow	= $NewRow +1;
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, 'No SO');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 
 		$sheet->setCellValue('B'.$NewRow, $no_so);
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 
 		$NewRow	= $NewRow +1;
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, 'Project');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 
 		$sheet->setCellValue('B'.$NewRow, $getData->project);
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray5);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 
 		// $nm_category	= $row_Cek['no_komponen'];
@@ -3955,62 +3864,62 @@ class Production extends CI_Controller {
 		$NextRow= $NewRow;
 
 		$sheet->setCellValue('A'.$NewRow, '#');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
 		$sheet->setCellValue('B'.$NewRow, 'PRODUCT TYPE');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
 		$sheet->setCellValue('C'.$NewRow, 'NO SPK');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
 		$sheet->setCellValue('D'.$NewRow, 'SPEC');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
 		$sheet->setCellValue('E'.$NewRow, 'PRODUCT NAME');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
 		$sheet->setCellValue('F'.$NewRow, 'QTY ORDER');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 		
 		$sheet->setCellValue('G'.$NewRow, 'QTY ACTUAL');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
 		$sheet->setCellValue('H'.$NewRow, 'QTY BALANCE');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
 		$sheet->setCellValue('I'.$NewRow, 'QTY DELIVERY');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
 
 		$sheet->setCellValue('J'.$NewRow, 'QTY FG');
-		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
 
 		$sheet->setCellValue('K'.$NewRow, 'PROGRESS (%)');
-		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
 		$sheet->getColumnDimension('K')->setWidth(20);
 
 		$sheet->setCellValue('L'.$NewRow, 'DELIVERY DATE');
-		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($styleArray);
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
 		$sheet->getColumnDimension('L')->setWidth(20);
 
@@ -4027,11 +3936,24 @@ class Production extends CI_Controller {
 
 				//check delivery
 				$sqlCheck3 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'kode_delivery !='=>NULL))->result();
-				$QTY_DELIVERY	=$sqlCheck3[0]->Numc;
+				$sqlCheckDead 	= $this->db->select('COUNT(*) as Numc')->get_where('deadstok', array('id_milik'=>$valx['id_milik'],'no_ipp'=>str_replace('PRO-','',$valx['id_produksi']),'kode_delivery !='=>NULL))->result();
+				$QTY_DELIVERY	= $sqlCheck3[0]->Numc + $sqlCheckDead[0]->Numc;
 
 				//check selain shop joint & type field
 				if($valx['typeProduct'] != 'field'){
-					$sqlCheck2 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'daycode !='=>NULL))->result();
+					$sqlCheck2 	= $this->db
+													->select('COUNT(*) as Numc')
+													->group_start()
+													->where('daycode !=', NULL)
+													->or_where('id_deadstok_dipakai !=', NULL)
+													->group_end()
+													->get_where('production_detail', 
+														array(
+															'id_milik'=>$valx['id_milik'],
+															'id_produksi'=>$valx['id_produksi']
+															)
+														)
+													->result();
 					$QTY_PRODUCT 		= $valx['qty'];
 					$QTY 		= $valx['qty'];
 					$ACT 		= $sqlCheck2[0]->Numc;
@@ -4111,71 +4033,70 @@ class Production extends CI_Controller {
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$comp	= strtoupper($valx['comp']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $comp);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_spk	= $valx['no_spk'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_spk);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$spec	= spec_fd($valx['id_uniq'], 'so_detail_header');
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $spec);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$id_product	= $valx['id_product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_product);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $QTY);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $ACT_OUT);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $balance);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $QTY_DELIVERY);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $bal_dev);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $progress);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$delivery_date	= $valx['delivery_date2'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $delivery_date);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 			}
 		}
-
 
 		$sheet->setTitle('Detail Progress Produksi');
 		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5

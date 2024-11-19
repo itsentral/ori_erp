@@ -56,8 +56,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -194,8 +196,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -320,8 +324,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -445,8 +451,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -570,8 +578,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -695,8 +705,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>
@@ -820,8 +832,10 @@ if($hist_produksi != '0'){
                                     <option value="MTL-1903000">NONE MATERIAL</option>
                                     <?php
                                         foreach($list_material AS $valMat => $valxMat){
-                                            $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
-                                            echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // if($valxMat['id_material'] == $material_sel){
+                                                $sel = ($valxMat['id_material'] == $material_sel)?'selected':'';
+                                                echo "<option value='".$valxMat['id_material']."' ".$sel.">".$valxMat['nm_material']."</option>";
+                                            // }
                                         }
                                     ?>
                                 </select>

@@ -69,22 +69,29 @@
     </thead>
     <tbody>
         <?php
+            $xyz_no_spk = [];
+            $xyz_no_so = [];
+            $xyz_product = [];
             if(!empty($get_detail_spk2)){
                 foreach($get_detail_spk2 AS $key => $value){
                     $key++;
                     $EXPLODE = explode('-',$value['product_code']);
 
                     $NO_SO = $EXPLODE[0];
-                    $NO_SPK = $value['no_spk'];
+                    $NO_SPK = (!empty($value['no_spk']))?$value['no_spk']:$value['no_spk2'];
                     $SPEC = spec_bq2($value['id_milik']);
                     if($value['typeTanki'] == 'tanki'){
-                        $NO_SPK = $value['no_spk'];
+                        $NO_SPK = (!empty($value['no_spk']))?$value['no_spk']:$value['no_spk2'];
                         $NO_SO = $value['no_so'];
                         $SPEC = (!empty($tanki_model->get_spec($value['id_milik'])))?$tanki_model->get_spec($value['id_milik']):'';
                     }
                     if($value['typeTanki'] == 'deadstok'){
                         $SPEC = '';
                     }
+
+                    $xyz_no_spk[] = $NO_SPK;
+                    $xyz_no_so[] = $NO_SO;
+                    $xyz_product[] = $value['product'];
                     echo "<tr>";
                         echo "<td align='center'>".$key."</td>";
                         echo "<td align='center'>".$NO_SO."</td>";
@@ -108,7 +115,13 @@
                     echo "<td colspan='6'>Tidak ada data yang ditampilkan, mungkin hanya penjualan material atau aksesoris saja.</td>";
                 echo "</tr>";
             }
+            $xyz_no_spk     = implode(', ', $xyz_no_spk);
+            $xyz_no_so      = implode(', ', $xyz_no_so);
+            $xyz_product    = implode(', ', $xyz_product);
         ?>
     </tbody>
 </table>
+<input type="hidden" name='xyz_no_spk' id='xyz_no_spk' value='<?=$xyz_no_spk;?>'>
+<input type="hidden" name='xyz_no_so' id='xyz_no_so' value='<?=$xyz_no_so;?>'>
+<input type="hidden" name='xyz_product' id='xyz_product' value='<?=$xyz_product;?>'>
 <?php } ?>
