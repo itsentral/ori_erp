@@ -1,0 +1,10 @@
+diff a/views/Budget_so/index.php b/views/Budget_so/index.php	(rejected hunks)
+@@ -184,7 +184,7 @@
+ 				$('#spinnerx').show();
+ 				var formData  	= new FormData($('#form_proses_bro')[0]);
+ 				$.ajax({
+-					url			: base_url + active_controller+'/insert_select_budget_so2',
++					url			: base_url + active_controller+'/insert_select_budget_so_deal_project',
+ 					type		: "POST",
+ 					data		: formData,
+ 					cache		: false,

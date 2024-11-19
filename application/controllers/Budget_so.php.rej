@@ -1,0 +1,10 @@
+diff a/controllers/Budget_so.php b/controllers/Budget_so.php	(rejected hunks)
+@@ -129,7 +129,7 @@
+ 			SELECT
+ 				a.*
+ 			FROM
+-				budget_so a
++				budget_so_new a
+ 		    WHERE 1=1
+ 				AND (
+ 				a.id_bq LIKE '%".$this->db->escape_like_str($like_value)."%'

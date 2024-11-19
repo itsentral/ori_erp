@@ -1,0 +1,102 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2020-06-23 02:20:32 --> Severity: Notice --> Use of undefined constant php - assumed 'php' /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/views/login_animate.php 6
+ERROR - 2020-06-23 02:20:32 --> 404 Page Not Found: /index
+ERROR - 2020-06-23 02:21:22 --> Severity: Notice --> Undefined variable: cabang /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/views/users_form.php 68
+ERROR - 2020-06-23 02:21:22 --> Severity: Warning --> Invalid argument supplied for foreach() /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/views/users_form.php 68
+ERROR - 2020-06-23 02:21:28 --> Severity: 8192 --> password_hash(): Use of the 'salt' option to password_hash is deprecated /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/controllers/Setting.php 440
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:29:40 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:40:31 --> Severity: Notice --> Undefined index: group_akses /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/asset/models/Asset_model.php 93
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:51:11 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:52:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:19 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:53:23 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:03 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 09:55:08 --> Severity: Notice --> Undefined property: stdClass::$id_type /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/costcenter/views/index.php 67
+ERROR - 2020-06-23 08:41:14 --> Severity: Notice --> Use of undefined constant php - assumed 'php' /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/views/login_animate.php 6
+ERROR - 2020-06-23 08:41:17 --> 404 Page Not Found: /index
+ERROR - 2020-06-23 08:41:20 --> Severity: Notice --> Use of undefined constant php - assumed 'php' /home/u643669649/domains/sentral.xyz/public_html/origa/application/modules/users/views/login_animate.php 6
