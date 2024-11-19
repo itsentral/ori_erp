@@ -4,20 +4,24 @@ $this->load->view('include/side_menu');
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data" autocomplete='off'>
 <div class="box box-primary">
 	<div class="box-header">
-		<h3 class="box-title"><?php echo $title;?></h3>
+		<h3 class="box-title"><?php echo $title;?></h3><br><br>
+		<div class="box-tool pull-left">
+			<b>Nama Product Tanki :</b><br>
+			<input type="text" class='form-control' name='nm_tanki' id='nm_tanki' placeholder='Nama Tanki untuk product tanki' value='<?=$nm_tanki;?>' style='float:right; margin-bottom:10px; margin-right:5px; width:400px;'>
+		</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
         <a href="<?php echo site_url('ppic/spool') ?>" class="btn btn-sm btn-default" style='float:right; margin-bottom:10px; margin-left:5px;'>Back</a>
         <button type='button' class='btn btn-sm btn-danger' style='float:right; margin-bottom:10px;' id='delete_spool'><i class='fa fa-puzzle-piece'></i>&nbsp;Delete Spool</button>
-        <button type='button' class='btn btn-sm btn-primary' style='float:right; margin-bottom:10px; margin-right:5px;' id='update_drawing'><i class='fa fa-edit'></i>&nbsp;Update Drawing Number</button>
+        <button type='button' class='btn btn-sm btn-primary' style='float:right; margin-bottom:10px; margin-right:5px;' id='update_drawing'><i class='fa fa-edit'></i>&nbsp;Update</button>
         <input type="text" class='form-control' name='no_drawing' id='no_drawing' value='<?=$no_drawing;?>' placeholder='No Drawing' style='float:right; margin-bottom:10px; margin-right:5px; width:200px;'>
 		<label style='float:right; margin-right:5px;'>No Drawing : </label>
 		<input type="hidden" name='kd_spoolx' id='kd_spoolx' value='<?=$spool_induk;?>'>
 		<br>
         <?php
         foreach ($result as $key2 => $value2) { $key2++;
-		    $result2 = $this->db->get_where('spool_group', array('spool_induk'=>$spool_induk,'kode_spool'=>$value2['kode_spool']))->result_array();
+		    $result2 = $this->db->get_where('spool_group_all', array('spool_induk'=>$spool_induk,'kode_spool'=>$value2['kode_spool']))->result_array();
 
             ?>  
                 <h4><?=$key2?>. Kode Spool : <?=$value2['kode_spool'];?></h4>
@@ -50,10 +54,16 @@ $this->load->view('include/side_menu');
                                 $product_code = $IMPLODE[0].'.'.$value['product_ke'].$CUTTING_KE;
                             }
 
+							$product_name = $value['id_category'];
+                            if($value['status_tanki'] == 'tanki'){
+                                $product_name = $value['nm_tanki'];
+                                $SPEC = $tanki_model->get_spec($value['id_milik']);
+                            }
+
                             echo "<tr>";
                                 echo "<td align='center'>".$key."</td>";
                                 echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
-                                echo "<td align='left'>".strtoupper($value['id_category'])."</td>";
+                                echo "<td align='left'>".strtoupper($product_name)."</td>";
 								echo "<td align='left'>".$SPEC."</td>";
                                 echo "<td align='right'>".$LENGTH."</td>";
 								echo "<td align='center'>".$product_code."</td>";
@@ -150,6 +160,7 @@ $this->load->view('include/side_menu');
 			
 			let no_drawing = $('#no_drawing').val();
 			let kd_spoolx = $('#kd_spoolx').val();
+			let nm_tanki = $('#nm_tanki').val();
 			// return false;
 			swal({
 			title: "Are you sure?",
@@ -170,7 +181,8 @@ $this->load->view('include/side_menu');
 						type		: "POST",
 						data		: {
 							'no_drawing' : no_drawing,
-							'kd_spool' : kd_spoolx
+							'kd_spool' : kd_spoolx,
+							'nm_tanki' : nm_tanki
 						},
 						cache		: false,
 						dataType	: 'json',				

@@ -15,6 +15,9 @@ $this->load->view('include/side_menu');
                 }
                 ?>
             </select>
+
+		<input type="text" class='form-control' name='nm_tanki' placeholder='Nama Tanki untuk product tanki' style='float:right; margin-bottom:10px; margin-right:5px; width:400px;'>
+
 		</div>
 		<div class="box-tool pull-right">
 			<select name='spool_induk' id='spool_induk' class='form-control input-sm chosen-select' style='width:250px; float:right; margin-top:10px;'>

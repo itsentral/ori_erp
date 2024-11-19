@@ -150,7 +150,7 @@ class Ppic extends CI_Controller {
 				$nestedData[]	= "<div align='left'>".$view.$cutting.$lock.$edit.$print."</div>";
 			}
 			else{
-				if($row['thickness'] < 999){
+				if($row['thickness'] < 999 AND $row['id_deadstok'] == null){
 					$nestedData[]	= "<div align='left'><span class='badge bg-red'>Waiting Start QC</span></div>";
 				}
 				else{
@@ -209,7 +209,8 @@ class Ppic extends CI_Controller {
 				LEFT JOIN so_detail_header b ON a.id_milik=b.id
 				LEFT JOIN production_detail c ON a.id_milik=c.id_milik AND a.qty_ke=c.product_ke,
 				(SELECT @row:=0) r
-			WHERE  1=1 ".$where." ".$where2." AND c.release_to_costing_date IS NOT NULL AND c.sts_cutting = 'Y' AND (c.kode_delivery IS NULL  OR a.id_deadstok IS NOT NULL) AND(
+		    WHERE  1=1 ".$where." ".$where2." AND ((c.kode_delivery IS NULL AND c.sts_cutting = 'Y' AND c.release_to_costing_date IS NOT NULL) OR a.id_deadstok IS NOT NULL ) 
+			AND(
 				a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_bq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -732,7 +733,7 @@ class Ppic extends CI_Controller {
 			$view = "<a href='".base_url('ppic/view_spool/'.$row['spool_induk'])."' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 
 
-			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length')->group_by('sts, id_milik')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
+			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length, status_tanki, nm_tanki')->group_by('sts, id_milik')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
 			$ArrNo_Spool = [];
 			$ArrNo_IPP = [];
 			$ArrNo_Drawing = [];
@@ -754,6 +755,9 @@ class Ppic extends CI_Controller {
 				$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']);
 				if($sts == 'cut'){
 					$product 	= strtoupper($value['nm_product']).', '. spec_bq2($value['id_milik']).', cut '.number_format($value['length']);
+				}
+				if($value['status_tanki'] == 'tanki'){
+					$product 	= strtoupper($value['nm_tanki']);
 				}
 
 				$no = sprintf('%02s', $key);
@@ -1113,12 +1117,16 @@ class Ppic extends CI_Controller {
 		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 		$result = $this->db->group_by('kode_spool')->order_by('kode_spool','asc')->get_where('spool_group', array('spool_induk'=>$kode_spool))->result_array();
 		$no_drawing = get_name('spool_group','no_drawing','spool_induk', $kode_spool);
+		$getNmTaki 	= $this->db->group_by('nm_tanki')->get_where('production_detail',array('spool_induk'=>$kode_spool,'nm_tanki <>'=>null))->result_array();
+		$nm_tanki 	= (!empty($getNmTaki[0]['nm_tanki']))?$getNmTaki[0]['nm_tanki']:'';
         $data = array(
 			'title'			=> 'Edit Spool',
 			'action'		=> 'index',
+			'tanki_model'		=> $this->tanki_model,
 			'row_group'		=> $data_Group,
 			'result'		=> $result,
 			'spool_induk'		=> $kode_spool,
+			'nm_tanki'		=> $nm_tanki,
 			'no_drawing'		=> $no_drawing,
 			'akses_menu'	=> $Arr_Akses
 		);
@@ -1128,12 +1136,16 @@ class Ppic extends CI_Controller {
 	public function view_spool($kode_spool){
 		
 		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
-		$result = $this->db->group_by('kode_spool')->order_by('kode_spool','asc')->get_where('spool_group_all', array('spool_induk'=>$kode_spool))->result_array();
+		$result 	= $this->db->group_by('kode_spool')->order_by('kode_spool','asc')->get_where('spool_group_all', array('spool_induk'=>$kode_spool))->result_array();
+		$getNmTaki 	= $this->db->group_by('nm_tanki')->get_where('production_detail',array('spool_induk'=>$kode_spool,'nm_tanki <>'=>null))->result_array();
+		$nm_tanki 	= (!empty($getNmTaki[0]['nm_tanki']))?$getNmTaki[0]['nm_tanki']:'';
 		$data = array(
 			'title'			=> 'Detail Spool',
 			'action'		=> 'index',
 			'result'		=> $result,
+			'tanki_model'		=> $this->tanki_model,
 			'spool_induk'		=> $kode_spool,
+			'nm_tanki'		=> $nm_tanki,
 		);
 		$this->load->view('Ppic/view_spool',$data);
 	}
@@ -1226,10 +1238,11 @@ class Ppic extends CI_Controller {
 
 		$no_drawing     = $data['no_drawing'];
 		$kd_spool 		= $data['kd_spool'];
+		$nm_tanki 		= $data['nm_tanki'];
 		
 		$this->db->trans_start();
 			$this->db->where('spool_induk', $kd_spool);
-			$this->db->update('production_detail', array('no_drawing'=>$no_drawing));
+			$this->db->update('production_detail', array('no_drawing'=>$no_drawing,'nm_tanki'=>$nm_tanki));
 
             $this->db->where('spool_induk', $kd_spool);
 			$this->db->update('so_cutting_detail', array('no_drawing'=>$no_drawing));
@@ -1351,6 +1364,7 @@ class Ppic extends CI_Controller {
 			'result'		=> $result,
 			'result_material'		=> $result_material,
 			'spool_induk'	=> $spool_induk,
+			'tanki_model'	=> $this->tanki_model,
 		);
 		$this->load->view('Print/print_spool',$data);
 	}
@@ -1583,6 +1597,7 @@ class Ppic extends CI_Controller {
 		$spool_induk 	= $data['spool_induk'];
 		$kode_spool 	= $data['kode_spool'];
 		$no_drawing 	= $data['no_drawing'];
+		$nm_tanki 		= $data['nm_tanki'];
 		$no_ipp 		= str_replace('PRO-','',$data['no_ipp']);
 		$username 		= $this->session->userdata['ORI_User']['username'];
 		$datetime 		= date('Y-m-d H:i:s');
@@ -1629,6 +1644,7 @@ class Ppic extends CI_Controller {
 					$ArrUpdateProduksi[$nomorx]['id'] = $id_pro;
 					$ArrUpdateProduksi[$nomorx]['spool_induk'] = $spool_induk;
 					$ArrUpdateProduksi[$nomorx]['kode_spool'] = $kode_spool;
+					$ArrUpdateProduksi[$nomorx]['nm_tanki'] = $nm_tanki;
 					$ArrUpdateProduksi[$nomorx]['no_drawing'] = $no_drawing;
 					$ArrUpdateProduksi[$nomorx]['spool_by'] = $username;
 					$ArrUpdateProduksi[$nomorx]['spool_date'] = $datetime;

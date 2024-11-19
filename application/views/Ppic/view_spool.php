@@ -45,10 +45,16 @@ $this->load->view('include/side_menu');
                                 $product_code = $IMPLODE[0].'.'.$value['product_ke'].$CUTTING_KE;
                             }
 
+                            $product_name = $value['id_category'];
+                            if($value['status_tanki'] == 'tanki'){
+                                $product_name = $value['nm_tanki'];
+                                $SPEC = $tanki_model->get_spec($value['id_milik']);
+                            }
+
                             echo "<tr>";
                                 echo "<td align='center'>".$key."</td>";
                                 echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
-                                echo "<td align='left'>".strtoupper($value['id_category'])."</td>";
+                                echo "<td align='left'>".strtoupper($product_name)."</td>";
                                 echo "<td align='left'>".$SPEC."</td>";
                                 echo "<td align='right'>".$LENGTH."</td>";
                                 echo "<td align='center'>".$product_code."</td>";
