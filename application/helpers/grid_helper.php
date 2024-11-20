@@ -6141,7 +6141,7 @@
 							DATE(a.delivery_date) AS tanggal
 						FROM 
 							scheduling_master a
-						WHERE a.delivery_date IS NOT NULL AND a.delivery_date != '0000-00-00'
+						WHERE a.delivery_date IS NOT NULL
 						ORDER BY a.no_ipp, a.delivery_date
 						";
 		$restPrice 	= $CI->db->query($sqlPrice)->result_array();
