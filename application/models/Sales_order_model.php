@@ -1852,23 +1852,25 @@ class Sales_order_model extends CI_Model {
 			);
 			
 			$ArrDetailProduct = array();
-			foreach($detail_product AS $val => $valx){
-				$ArrDetailProduct[$val]['no_ipp'] 			= $data['no_ipp'];
-				$ArrDetailProduct[$val]['id_milik'] 		= $valx['id'];
-				$ArrDetailProduct[$val]['product'] 			= $valx['product'];
-				$ArrDetailProduct[$val]['customer_item'] 	= strtolower($valx['customer_item']);
-				$ArrDetailProduct[$val]['desc'] 			= strtolower($valx['desc']);
-				$ArrDetailProduct[$val]['dim1'] 			= $valx['dim1'];
-				$ArrDetailProduct[$val]['dim2'] 			= $valx['dim2'];
-				$ArrDetailProduct[$val]['liner'] 			= $valx['liner'];
-				$ArrDetailProduct[$val]['pressure'] 		= $valx['pressure'];
-				$ArrDetailProduct[$val]['spec'] 			= $valx['spec'];
-				$ArrDetailProduct[$val]['qty'] 				= $valx['qty'];
-				$ArrDetailProduct[$val]['unit'] 			= $valx['unit'];
-				$ArrDetailProduct[$val]['price_satuan'] 	= str_replace(',','',$valx['price_satuan']);
-				$ArrDetailProduct[$val]['total_price'] 		= str_replace(',','',$valx['total_price']);
-				$ArrDetailProduct[$val]['total_deal_usd'] 	= str_replace(',','',$valx['total_deal_usd']);
-				$ArrDetailProduct[$val]['total_deal_idr'] 	= str_replace(',','',$valx['total_deal_idr']);
+			if(!empty($data['detail_product'])){
+				foreach($detail_product AS $val => $valx){
+					$ArrDetailProduct[$val]['no_ipp'] 			= $data['no_ipp'];
+					$ArrDetailProduct[$val]['id_milik'] 		= $valx['id'];
+					$ArrDetailProduct[$val]['product'] 			= $valx['product'];
+					$ArrDetailProduct[$val]['customer_item'] 	= strtolower($valx['customer_item']);
+					$ArrDetailProduct[$val]['desc'] 			= strtolower($valx['desc']);
+					$ArrDetailProduct[$val]['dim1'] 			= $valx['dim1'];
+					$ArrDetailProduct[$val]['dim2'] 			= $valx['dim2'];
+					$ArrDetailProduct[$val]['liner'] 			= $valx['liner'];
+					$ArrDetailProduct[$val]['pressure'] 		= $valx['pressure'];
+					$ArrDetailProduct[$val]['spec'] 			= $valx['spec'];
+					$ArrDetailProduct[$val]['qty'] 				= $valx['qty'];
+					$ArrDetailProduct[$val]['unit'] 			= $valx['unit'];
+					$ArrDetailProduct[$val]['price_satuan'] 	= str_replace(',','',$valx['price_satuan']);
+					$ArrDetailProduct[$val]['total_price'] 		= str_replace(',','',$valx['total_price']);
+					$ArrDetailProduct[$val]['total_deal_usd'] 	= str_replace(',','',$valx['total_deal_usd']);
+					$ArrDetailProduct[$val]['total_deal_idr'] 	= str_replace(',','',$valx['total_deal_idr']);
+				}
 			}
 
 			$ArrDetailMaterial = array();
