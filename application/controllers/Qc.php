@@ -2733,7 +2733,7 @@ class Qc extends CI_Controller
                 LEFT JOIN planning_tanki y ON REPLACE(a.id_produksi, 'PRO-', '') = y.no_ipp,
 				(SELECT @row:=0) r
 		    WHERE 1=1 
-				AND a.qc_pass_date IS NOT NULL AND a.qc_pass_date != '0000-00-00'
+				AND a.qc_pass_date IS NOT NULL
                 " . $where . "
                 " . $where2 . "
                 " . $WHERE_NOIPP . "
