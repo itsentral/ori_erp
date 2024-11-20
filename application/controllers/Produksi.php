@@ -7951,13 +7951,24 @@ class Produksi extends CI_Controller {
 				$this->db->update_batch('production_spk',$ARrUpdateSPK,'id');
 			}
 
-			$this->db->where_in('id_spk',$ArrWhereIN_);
-			$this->db->where('created_date',$hist_produksi);
-			$this->db->delete('production_spk_parsial', array('kode_spk'=>$kode_spk,'spk'=>'2'));
+			if($hist_produksi != '0'){
+				$this->db->where_in('id_spk',$ArrWhereIN_);
+				$this->db->where('created_date',$hist_produksi);
+				$this->db->delete('production_spk_parsial', array('kode_spk'=>$kode_spk,'spk'=>'2'));
 
-			$this->db->where_in('id_spk',$ArrWhereIN_);
-			$this->db->where('status_date',$hist_produksi);
-			$this->db->delete('production_spk_input', array('kode_spk'=>$kode_spk,'spk'=>'2'));
+				$this->db->where_in('id_spk',$ArrWhereIN_);
+				$this->db->where('status_date',$hist_produksi);
+				$this->db->delete('production_spk_input', array('kode_spk'=>$kode_spk,'spk'=>'2'));
+			}
+			else{
+				$this->db->where_in('id_spk',$ArrWhereIN_);
+				$this->db->where('created_date',null);
+				$this->db->delete('production_spk_parsial', array('kode_spk'=>$kode_spk,'spk'=>'2'));
+
+				$this->db->where_in('id_spk',$ArrWhereIN_);
+				$this->db->where('status_date',null);
+				$this->db->delete('production_spk_input', array('kode_spk'=>$kode_spk,'spk'=>'2'));
+			}
 			
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('production_spk_input',$ArrGroup);
