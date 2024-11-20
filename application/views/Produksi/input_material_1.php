@@ -3,6 +3,7 @@
 $GET_STOCK_MAT = get_warehouseStockMaterial();
 echo $hist_produksi;
 if($hist_produksi == '0'){
+    $hist_produksi = null;
 if(!empty($get_liner_utama)){ ?>
     <table class="table table-striped table-bordered table-hover table-condensed" width="100%">
         <thead>
