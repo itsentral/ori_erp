@@ -2,7 +2,7 @@
 
 $sroot         = $_SERVER['DOCUMENT_ROOT'];
 include $sroot . "/application/libraries/MPDF57/mpdf.php";
-include $sroot . "/application/libraries/phpqrcode/qrlib.php";
+// include $sroot . "/application/libraries/phpqrcode/qrlib.php";
 $mpdf = new mPDF('utf-8', array(42, 23));
 $mpdf->defaultheaderline = 0;
 
