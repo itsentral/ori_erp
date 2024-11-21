@@ -64,7 +64,7 @@ class Penerimaan_model extends CI_Model {
 		$template  	     = $this->Acc_model->GetTemplate(); 
 		$data_coa_bank = $this->All_model->GetCoaCombo('5'," a.no_perkiraan like '1101%'");		
 		
-		$coa = $this->db->query("SELECT a.no_perkiraan,a.nama FROM gl_ori_dummy.coa_master a
+		$coa = $this->db->query("SELECT a.no_perkiraan,a.nama FROM gl.coa_master a
 											WHERE a.no_perkiraan like '1101%' AND level='5'")->result();
 		// print_r($pphpenjualan);
 		// exit;
