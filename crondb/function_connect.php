@@ -2,9 +2,9 @@
 
 	class database_ORI extends mysqli {
 		private $DB_HOST 		= 'localhost';
-		private $DB_DATABASE 	= 'ori_dummy';
-        private $DB_USER 		= 'root';
-        private $DB_PASSWORD 	= 'sentral2022**';
+		private $DB_DATABASE 	= 'sentralsistem';
+        private $DB_USER 		= 'sentral';
+        private $DB_PASSWORD 	= 'Sentral@2024**';
 
 
 
@@ -15,21 +15,7 @@
 				echo 'Connection failed!<br>';
 			}
 		}
-		
-		// public function connect($host = NULL, $user = NULL, $password = NULL, $database = NULL, $port = NULL, $socket = NULL)
-		// {
-			// if($host === NULL)
-			// {
-				// parent::__construct($this->host, $this->user, $this->pass, $this->db);
-				// return $this->check_error();
-			// }else
-			// {
-				// parent::__construct($host, $user, $password , $database, $port, $socket);
-				// return $this->check_error();
-			// }
-		// }
-		
-		
+
 		public function connect() {
 			if(!mysqli_select_db($this->_conn, $this->DB_DATABASE)) {
 				die("Cannot connect database..<br>");

@@ -64,14 +64,26 @@ $diterima_oleh			= (!empty($get_spk))?$get_spk[0]->diterima_oleh:'';
             <tbody>
                 <?php
                 foreach ($result as $key => $value) { $key++;
-                    echo "<tr>";
-                        echo "<td align='center'>".$key."</td>";
-                        echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
-                        echo "<td align='left'>".strtoupper($value['product'])."</td>";
-                        echo "<td align='left'>".spec_bq2($value['id_milik'])."</td>";
-                        echo "<td align='center'>".$value['qtyCount']."</td>";
-                        echo "<td align='center'>".$value['no_spk']."</td>";
-                    echo "</tr>";
+                    if($value['sts'] == 'aksesoris'){
+                        echo "<tr>";
+                            echo "<td align='center'>".$key."</td>";
+                            echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
+                            echo "<td align='left'>".strtoupper($value['no_drawing'])."</td>";
+                            echo "<td align='left'></td>";
+                            echo "<td align='center'>".number_format($value['berat'],2)."</td>";
+                            echo "<td align='center'>".$value['no_spk']."</td>";
+                        echo "</tr>";
+                    }
+                    else{
+                        echo "<tr>";
+                            echo "<td align='center'>".$key."</td>";
+                            echo "<td align='center'>".str_replace('PRO-','',$value['id_produksi'])."</td>";
+                            echo "<td align='left'>".strtoupper($value['product'])."</td>";
+                            echo "<td align='left'>".spec_bq2($value['id_milik'])."</td>";
+                            echo "<td align='center'>".number_format($value['qtyCount'])."</td>";
+                            echo "<td align='center'>".$value['no_spk']."</td>";
+                        echo "</tr>";
+                    }
                 }
                 ?>
             </tbody>
