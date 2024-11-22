@@ -13,7 +13,8 @@ class Warehouse_stock_tras extends CI_Controller {
 	}
 	
 	function index(){
-
+        $controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$this->Arr_Akses	= getAcccesmenu($controller);
 		print_r($this->Arr_Akses);
 		exit;
 		if($this->Arr_Akses['read'] !='1'){
