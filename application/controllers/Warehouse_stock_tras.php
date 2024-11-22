@@ -13,6 +13,9 @@ class Warehouse_stock_tras extends CI_Controller {
 	}
 	
 	function index(){
+
+		print_r($this->Arr_Akses['read']);
+		exit;
 		if($this->Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
 			redirect(site_url('dashboard'));
