@@ -634,7 +634,7 @@ class Cron extends CI_Controller {
 
             $nestedData 	= array();
             $nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".$row['id']."</div>";
+			// $nestedData[]	= "<div align='left'>".$row['id']."</div>";
             $nestedData[]	= "<div align='left'>".$NO_IPP."</div>";
             $nestedData[]	= "<div align='left'>".$no_so."</div>";
             $nestedData[]	= "<div align='left'>".$row['id_category']."</div>";
