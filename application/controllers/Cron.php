@@ -898,11 +898,11 @@ class Cron extends CI_Controller {
 				$awal_col	= 0;
 				
 				
-				$awal_col++;
-				$id	= $row_Cek['id'];
-				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $id);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				// $awal_col++;
+				// $id	= $row_Cek['id'];
+				// $Cols			= getColsChar($awal_col);
+				// $sheet->setCellValue($Cols.$awal_row, $id);
+				// $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
 				$id_produksi	= $row_Cek['id_produksi'];
