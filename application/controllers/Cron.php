@@ -746,10 +746,10 @@ class Cron extends CI_Controller {
 		$NextRow= $NewRow;
 		$NextRow1= $NewRow +1;
 		
-		$sheet->setCellValue('A'.$NewRow, 'ID');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
-		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
-		$sheet->getColumnDimension('A')->setAutoSize(true);
+		// $sheet->setCellValue('A'.$NewRow, 'ID');
+		// $sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
+		// $sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
+		// $sheet->getColumnDimension('A')->setAutoSize(true);
 		
 		$sheet->setCellValue('A'.$NewRow, 'IPP'); 
 		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);

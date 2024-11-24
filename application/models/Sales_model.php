@@ -721,7 +721,7 @@ class Sales_model extends CI_Model {
 				$get_name = get_name('users','nm_lengkap','username',$dataModif);
 			$nestedData[]	= "<div align='center'>".ucwords(strtolower($get_name))."</div>";
 				$dataModifx = (!empty($row['ref_ke']))?$row['modified_date']:$row['created_date'];
-			$nestedData[]	= "<div align='center'>".date('d-m-Y', strtotime($dataModifx))."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($dataModifx))."</div>";
 				$Check = $this->db->query("SELECT id_product FROM bq_detail_header WHERE id_bq='BQ-".$row['no_ipp']."' AND (id_product= '' OR id_product  is null) ")->num_rows();
 				
 				$class = Color_status($row['status']);
@@ -798,7 +798,7 @@ class Sales_model extends CI_Model {
 			
 		);
 
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.created_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
