@@ -95,11 +95,11 @@ class Cron_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($START_PRODUKSI))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($SELESAI_PRODUKSI))."</div>";
 			$nestedData[]	= "<div align='left'>".$row_Cek['id_category']."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter'])."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter2'])."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($length)."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($thickness,2)."</div>";
-			$nestedData[]	= "<div align='center'>".number_format($row_Cek['liner'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".$row_Cek['diameter']."</div>";
+			$nestedData[]	= "<div align='center'>".$row_Cek['diameter2']."</div>";
+			$nestedData[]	= "<div align='center'>".$length."</div>";
+			$nestedData[]	= "<div align='center'>".$thickness."</div>";
+			$nestedData[]	= "<div align='center'>".$row_Cek['liner']."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($QTY_ORDER)."</div>";
 			$QTY = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
 			$nestedData[]	= "<div align='center'>".number_format($QTY)."</div>";
