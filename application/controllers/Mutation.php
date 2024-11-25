@@ -594,73 +594,71 @@ class Mutation extends CI_Controller {
                     $ArrHist[$key]['update_date'] 		= $dateTime;
 					
 						
-				$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
-				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;
-				
-				$id_material = 	$rest_pusat[0]->id_material;
-				$stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$kd_gudang_dari, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
-				
-				$tanggal		= date('Y-m-d');
-				$Bln 			= substr($tanggal,5,2);
-				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				$QTY_OKE      = $value;
-				
-				$GudangFrom = $kategori_gudang;
-				if($GudangFrom == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
+					$coa_gudang = $coa_1->coa_1;
+					$kategori_gudang = $coa_1->category;
 					
-				}
-				
-				
-				$ArrJurnalNew[$key]['id_material'] 		= $rest_pusat[0]->id_material;
-				$ArrJurnalNew[$key]['idmaterial'] 		= $rest_pusat[0]->idmaterial;
-				$ArrJurnalNew[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
-				$ArrJurnalNew[$key]['id_category'] 		= $rest_pusat[0]->id_category;
-				$ArrJurnalNew[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
-				$ArrJurnalNew[$key]['id_gudang'] 			= $id_gudang_dari;
-				$ArrJurnalNew[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew[$key]['id_gudang_dari'] 	    = $id_gudang_dari;
-				$ArrJurnalNew[$key]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_ke;
-				$ArrJurnalNew[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
-				$ArrJurnalNew[$key]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
-				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
-				$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
-				$ArrJurnalNew[$key]['ket'] 				= 'Retur';
-				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
-				$ArrJurnalNew[$key]['harga_bm'] 		= 0;
-				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
-				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
-				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
-				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
-				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
-				
-				
+					$id_material = 	$rest_pusat[0]->id_material;
+					$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$kd_gudang_dari, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					$tanggal		= date('Y-m-d');
+					$Bln 			= substr($tanggal,5,2);
+					$Thn 			= substr($tanggal,0,4);
+					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+					
+					$QTY_OKE      = $value;
+					
+					$GudangFrom = $kategori_gudang;
+					if($GudangFrom == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					
+					$ArrJurnalNew[$key]['id_material'] 		= $rest_pusat[0]->id_material;
+					$ArrJurnalNew[$key]['idmaterial'] 		= $rest_pusat[0]->idmaterial;
+					$ArrJurnalNew[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
+					$ArrJurnalNew[$key]['id_category'] 		= $rest_pusat[0]->id_category;
+					$ArrJurnalNew[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
+					$ArrJurnalNew[$key]['id_gudang'] 			= $id_gudang_dari;
+					$ArrJurnalNew[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew[$key]['id_gudang_dari'] 	    = $id_gudang_dari;
+					$ArrJurnalNew[$key]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_ke;
+					$ArrJurnalNew[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
+					$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
+					$ArrJurnalNew[$key]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+					$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
+					$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
+					$ArrJurnalNew[$key]['ket'] 				= 'Retur';
+					$ArrJurnalNew[$key]['harga'] 			= $PRICE;
+					$ArrJurnalNew[$key]['harga_bm'] 		= 0;
+					$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
+					$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+					$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+					$ArrJurnalNew[$key]['update_by'] 		= $UserName;
+					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
+					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
+					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 				
                 }
                 else{
@@ -704,210 +702,210 @@ class Mutation extends CI_Controller {
 					
 					
 					$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
-				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;
-				
-				$id_material = 	$restMat[0]->id_material;
-				$stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$kd_gudang_dari, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
-				
-				$tanggal		= date('Y-m-d');
-				$Bln 			= substr($tanggal,5,2);
-				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				$QTY_OKE      = $qty_oke;
-				
-				$GudangFrom = $kategori_gudang;
-				if($GudangFrom == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$coa_gudang = $coa_1->coa_1;
+					$kategori_gudang = $coa_1->category;
+					
+					$id_material = 	$restMat[0]->id_material;
+					$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$kd_gudang_dari, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					$tanggal		= date('Y-m-d');
+					$Bln 			= substr($tanggal,5,2);
+					$Thn 			= substr($tanggal,0,4);
+					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+					
+					$QTY_OKE      = $value;
+					
+					$GudangFrom = $kategori_gudang;
+					if($GudangFrom == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					
+					$ArrJurnalNew[$key]['id_material'] 		= $restMat[0]->id_material;
+					$ArrJurnalNew[$key]['idmaterial'] 		= $restMat[0]->idmaterial;
+					$ArrJurnalNew[$key]['nm_material'] 		= $restMat[0]->nm_material;
+					$ArrJurnalNew[$key]['id_category'] 		= $restMat[0]->id_category;
+					$ArrJurnalNew[$key]['nm_category'] 		= $restMat[0]->nm_category;
+					$ArrJurnalNew[$key]['id_gudang'] 			= $id_gudang_dari;
+					$ArrJurnalNew[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew[$key]['id_gudang_dari'] 	    = $id_gudang_dari;
+					$ArrJurnalNew[$key]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_ke;
+					$ArrJurnalNew[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
+					$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
+					$ArrJurnalNew[$key]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+					$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
+					$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
+					$ArrJurnalNew[$key]['ket'] 				= 'Retur';
+					$ArrJurnalNew[$key]['harga'] 			= $PRICE;
+					$ArrJurnalNew[$key]['harga_bm'] 		= 0;
+					$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
+					$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+					$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+					$ArrJurnalNew[$key]['update_by'] 		= $UserName;
+					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
+					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
+					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 					
 				}
-				
-				
-				$ArrJurnalNew[$key]['id_material'] 		= $restMat[0]->id_material;
-				$ArrJurnalNew[$key]['idmaterial'] 		= $restMat[0]->idmaterial;
-				$ArrJurnalNew[$key]['nm_material'] 		= $restMat[0]->nm_material;
-				$ArrJurnalNew[$key]['id_category'] 		= $restMat[0]->id_category;
-				$ArrJurnalNew[$key]['nm_category'] 		= $restMat[0]->nm_category;
-				$ArrJurnalNew[$key]['id_gudang'] 			= $id_gudang_dari;
-				$ArrJurnalNew[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew[$key]['id_gudang_dari'] 	    = $id_gudang_dari;
-				$ArrJurnalNew[$key]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_ke;
-				$ArrJurnalNew[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
-				$ArrJurnalNew[$key]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
-				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
-				$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
-				$ArrJurnalNew[$key]['ket'] 				= 'Retur';
-				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
-				$ArrJurnalNew[$key]['harga_bm'] 		= 0;
-				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
-				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
-				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
-				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
-				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
-				
-                }
 
-                //PENAMBAHAN GUDANG
-                $rest_pusat = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key))->result();
+				//PENAMBAHAN GUDANG
+				$rest_pusat = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key))->result();
 
-                if(!empty($rest_pusat)){
-                    $ArrStock2[$key]['id'] 			= $rest_pusat[0]->id;
-                    $ArrStock2[$key]['qty_stock'] 	= $rest_pusat[0]->qty_stock + $value;
-                    $ArrStock2[$key]['update_by'] 	=  $UserName;
-                    $ArrStock2[$key]['update_date'] 	= $dateTime;
+				if(!empty($rest_pusat)){
+					$ArrStock2[$key]['id'] 			= $rest_pusat[0]->id;
+					$ArrStock2[$key]['qty_stock'] 	= $rest_pusat[0]->qty_stock + $value;
+					$ArrStock2[$key]['update_by'] 	=  $UserName;
+					$ArrStock2[$key]['update_date'] 	= $dateTime;
 
-                    $ArrHist2[$key]['id_material'] 	= $key;
-                    $ArrHist2[$key]['idmaterial'] 	= $rest_pusat[0]->idmaterial;
-                    $ArrHist2[$key]['nm_material'] 	= $rest_pusat[0]->nm_material;
-                    $ArrHist2[$key]['id_category'] 	= $rest_pusat[0]->id_category;
-                    $ArrHist2[$key]['nm_category'] 	= $rest_pusat[0]->nm_category;
-                    $ArrHist2[$key]['id_gudang'] 		= $id_gudang_ke;
-                    $ArrHist2[$key]['kd_gudang'] 		= $kd_gudang_ke;
-                    $ArrHist2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
-                    $ArrHist2[$key]['kd_gudang_dari'] 	= $kd_gudang_dari;
-                    $ArrHist2[$key]['id_gudang_ke'] 	= $id_gudang_ke;
-                    $ArrHist2[$key]['kd_gudang_ke'] 	= $kd_gudang_ke;
-                    $ArrHist2[$key]['qty_stock_awal'] 	= $rest_pusat[0]->qty_stock;
-                    $ArrHist2[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock + $value;
-                    $ArrHist2[$key]['qty_booking_awal'] = $rest_pusat[0]->qty_booking;
-                    $ArrHist2[$key]['qty_booking_akhir']= $rest_pusat[0]->qty_booking;
-                    $ArrHist2[$key]['qty_rusak_awal'] 	= $rest_pusat[0]->qty_rusak;
-                    $ArrHist2[$key]['qty_rusak_akhir'] 	= $rest_pusat[0]->qty_rusak;
-                    $ArrHist2[$key]['no_ipp'] 			= $kode_trans;
-                    $ArrHist2[$key]['jumlah_mat'] 		= $value;
-                    $ArrHist2[$key]['ket'] 				= 'penambahan gudang';
-                    $ArrHist2[$key]['update_by'] 		= $UserName;
-                    $ArrHist2[$key]['update_date'] 		= $dateTime;
+					$ArrHist2[$key]['id_material'] 	= $key;
+					$ArrHist2[$key]['idmaterial'] 	= $rest_pusat[0]->idmaterial;
+					$ArrHist2[$key]['nm_material'] 	= $rest_pusat[0]->nm_material;
+					$ArrHist2[$key]['id_category'] 	= $rest_pusat[0]->id_category;
+					$ArrHist2[$key]['nm_category'] 	= $rest_pusat[0]->nm_category;
+					$ArrHist2[$key]['id_gudang'] 		= $id_gudang_ke;
+					$ArrHist2[$key]['kd_gudang'] 		= $kd_gudang_ke;
+					$ArrHist2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
+					$ArrHist2[$key]['kd_gudang_dari'] 	= $kd_gudang_dari;
+					$ArrHist2[$key]['id_gudang_ke'] 	= $id_gudang_ke;
+					$ArrHist2[$key]['kd_gudang_ke'] 	= $kd_gudang_ke;
+					$ArrHist2[$key]['qty_stock_awal'] 	= $rest_pusat[0]->qty_stock;
+					$ArrHist2[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock + $value;
+					$ArrHist2[$key]['qty_booking_awal'] = $rest_pusat[0]->qty_booking;
+					$ArrHist2[$key]['qty_booking_akhir']= $rest_pusat[0]->qty_booking;
+					$ArrHist2[$key]['qty_rusak_awal'] 	= $rest_pusat[0]->qty_rusak;
+					$ArrHist2[$key]['qty_rusak_akhir'] 	= $rest_pusat[0]->qty_rusak;
+					$ArrHist2[$key]['no_ipp'] 			= $kode_trans;
+					$ArrHist2[$key]['jumlah_mat'] 		= $value;
+					$ArrHist2[$key]['ket'] 				= 'penambahan gudang';
+					$ArrHist2[$key]['update_by'] 		= $UserName;
+					$ArrHist2[$key]['update_date'] 		= $dateTime;
 					
 					
 					$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_ke))->row();
-				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;
-				
-				$id_material = 	$rest_pusat[0]->id_material;
-				$stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
-				
-				$tanggal		= date('Y-m-d');
-				$Bln 			= substr($tanggal,5,2);
-				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				$QTY_OKE      = $value;
-				
-				
-				$coa_2   = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
-				$coa_gudang2 = $coa_2->coa_1;
-				$kategori_gudang2 = $coa_2->category;
-				
-				
-				
-				$Gudang2 = $kategori_gudang2;
-				if($Gudang2 == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($Gudang2 == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($Gudang2 == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$coa_gudang = $coa_1->coa_1;
+					$kategori_gudang = $coa_1->category;
 					
-				}
-				
-				
-				$GudangFrom = $kategori_gudang;
-				if($GudangFrom == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$id_material = 	$rest_pusat[0]->id_material;
+					$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
-				}
-				
-				$stokjurnalakhir2=0;
-				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-				
-								
-				
-				
-				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
-				
-				
-				$ArrJurnalNew2[$key]['id_material'] 		= $rest_pusat[0]->id_material;
-				$ArrJurnalNew2[$key]['idmaterial'] 		= $rest_pusat[0]->idmaterial;
-				$ArrJurnalNew2[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
-				$ArrJurnalNew2[$key]['id_category'] 		= $rest_pusat[0]->id_category;
-				$ArrJurnalNew2[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
-				$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_dari;
-				$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
-				$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
-				$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew2[$key]['qty_stock_awal'] 	= $stokjurnalakhir2;
-				$ArrJurnalNew2[$key]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
-				$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
-				$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
-				$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
-				$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
-				$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
-				$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;
-				$ArrJurnalNew2[$key]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-				$ArrJurnalNew2[$key]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
-				$ArrJurnalNew2[$key]['update_by'] 			= $UserName;
-				$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
-				$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
-				$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
+					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					$tanggal		= date('Y-m-d');
+					$Bln 			= substr($tanggal,5,2);
+					$Thn 			= substr($tanggal,0,4);
+					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+					
+					$QTY_OKE      = $value;
+					
+					
+					$coa_2   = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
+					$coa_gudang2 = $coa_2->coa_1;
+					$kategori_gudang2 = $coa_2->category;
+					
+					
+					
+					$Gudang2 = $kategori_gudang2;
+					if($Gudang2 == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($Gudang2 == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($Gudang2 == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					
+					$GudangFrom = $kategori_gudang;
+					if($GudangFrom == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					$stokjurnalakhir2=0;
+					$nilaijurnalakhir2=0;
+					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+					
+									
+					
+					
+					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+					
+					
+					$ArrJurnalNew2[$key]['id_material'] 		= $rest_pusat[0]->id_material;
+					$ArrJurnalNew2[$key]['idmaterial'] 		= $rest_pusat[0]->idmaterial;
+					$ArrJurnalNew2[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
+					$ArrJurnalNew2[$key]['id_category'] 		= $rest_pusat[0]->id_category;
+					$ArrJurnalNew2[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
+					$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_dari;
+					$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
+					$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
+					$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
+					$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
+					$ArrJurnalNew2[$key]['qty_stock_awal'] 	= $stokjurnalakhir2;
+					$ArrJurnalNew2[$key]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
+					$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
+					$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
+					$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
+					$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
+					$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
+					$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;
+					$ArrJurnalNew2[$key]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
+					$ArrJurnalNew2[$key]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+					$ArrJurnalNew2[$key]['update_by'] 			= $UserName;
+					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
+					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
+					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
 				
 				
                 }
@@ -950,110 +948,106 @@ class Mutation extends CI_Controller {
                     $ArrHistInsert2[$key]['update_date'] 		= $dateTime;
 					
 					$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_ke))->row();
-				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;
-				
-				$id_material = 	$rest_pusat[0]->id_material;
-				$stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
-				
-				$tanggal		= date('Y-m-d');
-				$Bln 			= substr($tanggal,5,2);
-				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				$QTY_OKE      = $qty_oke;
-				
-				
-				$coa_2   = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
-				$coa_gudang2 = $coa_2->coa_1;
-				$kategori_gudang2 = $coa_2->category;
-				
-				
-				
-				$Gudang2 = $kategori_gudang2;
-				if($Gudang2 == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($Gudang2 == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($Gudang2 == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-					$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$coa_gudang = $coa_1->coa_1;
+					$kategori_gudang = $coa_1->category;
 					
-				}
-				
-				
-				$GudangFrom = $kategori_gudang;
-				if($GudangFrom == 'pusat'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'subgudang'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				}elseif($GudangFrom == 'produksi'){
-					$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-					$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+					$id_material = 	$restMat[0]->id_material;
+					$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
-				}
-				
-				$stokjurnalakhir2=0;
-				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-				
-								
-				
-				
-				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
-				
-				
-				$ArrJurnalNew2[$key]['id_material'] 		= $rest_pusat[0]->id_material;
-				$ArrJurnalNew2[$key]['idmaterial'] 		= $rest_pusat[0]->idmaterial;
-				$ArrJurnalNew2[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
-				$ArrJurnalNew2[$key]['id_category'] 		= $rest_pusat[0]->id_category;
-				$ArrJurnalNew2[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
-				$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_ke;
-				$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke); 
-				$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
-				$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-				$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
-				$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
-				$ArrJurnalNew2[$key]['qty_stock_awal'] 	= $stokjurnalakhir2;
-				$ArrJurnalNew2[$key]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
-				$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
-				$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
-				$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
-				$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
-				$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
-				$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;
-				$ArrJurnalNew2[$key]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-				$ArrJurnalNew2[$key]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
-				$ArrJurnalNew2[$key]['update_by'] 			= $UserName;
-				$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
-				$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
-				$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
-				
+					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					$tanggal		= date('Y-m-d');
+					$Bln 			= substr($tanggal,5,2);
+					$Thn 			= substr($tanggal,0,4);
+					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+					
+					$QTY_OKE      = $value;
+					
+					
+					$coa_2   = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
+					$coa_gudang2 = $coa_2->coa_1;
+					$kategori_gudang2 = $coa_2->category;
+					
+					
+					
+					$Gudang2 = $kategori_gudang2;
+					if($Gudang2 == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($Gudang2 == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($Gudang2 == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					
+					$GudangFrom = $kategori_gudang;
+					if($GudangFrom == 'pusat'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'subgudang'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+					}elseif($GudangFrom == 'produksi'){
+						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
+						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+						$bmunit = 0;
+						$bm = 0;
+						
+					}
+					
+					$stokjurnalakhir2=0;
+					$nilaijurnalakhir2=0;
+					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
+					
+					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+					
+					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+					
+					
+					$ArrJurnalNew2[$key]['id_material'] 		= $restMat[0]->id_material;
+					$ArrJurnalNew2[$key]['idmaterial'] 			= $restMat[0]->idmaterial;
+					$ArrJurnalNew2[$key]['nm_material'] 		= $restMat[0]->nm_material;
+					$ArrJurnalNew2[$key]['id_category'] 		= $restMat[0]->id_category;
+					$ArrJurnalNew2[$key]['nm_category'] 		= $restMat[0]->nm_category;
+					$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_ke;
+					$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke); 
+					$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
+					$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+					$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
+					$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
+					$ArrJurnalNew2[$key]['qty_stock_awal'] 	= $stokjurnalakhir2;
+					$ArrJurnalNew2[$key]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
+					$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
+					$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
+					$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
+					$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
+					$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
+					$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
+					$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;
+					$ArrJurnalNew2[$key]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
+					$ArrJurnalNew2[$key]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+					$ArrJurnalNew2[$key]['update_by'] 			= $UserName;
+					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
+					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
+					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
 				
                 }
             }
