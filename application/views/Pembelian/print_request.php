@@ -10,7 +10,7 @@ require_once(APPPATH.'libraries/MPDF57/mpdf.php');
 	
 	$data_iden	= $this->db->get('identitas')->result();
     $owner      = $datapo->id_supplier;
-	$data_bank	= $this->db->get_where('supplierX', array('id_supplier =' => '$owner'))->result();
+	$data_bank	= $this->db->get_where('supplierX', array('id_supplier =' => $owner))->result();
 
 	print_r($data_bank);
 	exit;
