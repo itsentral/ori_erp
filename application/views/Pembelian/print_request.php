@@ -9,6 +9,8 @@ require_once(APPPATH.'libraries/MPDF57/mpdf.php');
 	ini_set('memory_limit','1024M');
 	
 	$data_iden	= $this->db->get('identitas')->result();
+    $owner      = $datapo->id_supplier;
+	$data_bank	= $this->db->get_where('supplier', array('owner =' => '$owner'))->result();
 	echo "<table class='gridtable2' border='0' width='100%' cellpadding='2'>";
 		echo "<tr>";
 			echo "<td class='header_style_company' colspan='3' width='60%'>".$data_iden[0]->nama_resmi."</td>";
@@ -35,6 +37,11 @@ require_once(APPPATH.'libraries/MPDF57/mpdf.php');
             echo "<td class='header_style_alamat' width='15%'>Vendor</td>";
 			echo "<td class='header_style_alamat' width='1%'>:</td>";
             echo "<td class='header_style_alamat' colspan='4'>".strtoupper(get_name('supplier','nm_supplier','id_supplier',$datapo->id_supplier))."</td>";
+        echo "</tr>";
+		echo "<tr>";
+            echo "<td class='header_style_alamat' width='15%'>Bank Account</td>";
+			echo "<td class='header_style_alamat' width='1%'>:</td>";
+            echo "<td class='header_style_alamat' colspan='4'>".$data_bank[0]->data_bank."</td>";
         echo "</tr>";
 
 	echo "</table>";
