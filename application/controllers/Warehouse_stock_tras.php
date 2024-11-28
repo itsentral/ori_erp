@@ -440,7 +440,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
 		
 		
-		if(!empty($Date_Find)){			
+		if(empty($Date_Find)){			
 			$Date_Find	= date('Y-m-d');
 		}
 		
