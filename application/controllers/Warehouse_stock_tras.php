@@ -716,10 +716,12 @@ class Warehouse_stock_tras extends CI_Controller {
 		$WHERE2			= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-') AND head_stock.qty_stock <> 0";
 		
 		$Coa_Find		= urldecode($this->input->get('coa'));
-		$Date_Find		= $this->input->post('tgl');
+		$Date_Find		= urldecode($this->input->post('tgl'));
 		$Categori_Find	= urldecode($this->input->post('category'));
 
+		print_r($Coa_Find);
 		print_r($Date_Find);
+		print_r($Categori_Find);
 		exit;
 		
 		
