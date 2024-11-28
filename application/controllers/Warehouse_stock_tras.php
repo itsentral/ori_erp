@@ -433,8 +433,8 @@ class Warehouse_stock_tras extends CI_Controller {
 		$WHERE			= "1=1";	
 		
 		$Coa_Find		= urldecode($this->input->get('coa'));
-		$Date_Find		= urldecode($this->input->post('tgl'));
-		$Categori_Find	= urldecode($this->input->post('category'));
+		$Date_Find		= urldecode($this->input->get('tgl'));
+		$Categori_Find	= urldecode($this->input->get('category'));
 		
 		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
@@ -716,14 +716,10 @@ class Warehouse_stock_tras extends CI_Controller {
 		$WHERE2			= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-') AND head_stock.qty_stock <> 0";
 		
 		$Coa_Find		= urldecode($this->input->get('coa'));
-		$Date_Find		= urldecode($this->input->post('tgl'));
-		$Categori_Find	= urldecode($this->input->post('category'));
+		$Date_Find		= urldecode($this->input->get('tgl'));
+		$Categori_Find	= urldecode($this->input->get('category'));
 
-		print_r($Coa_Find);
-		print_r($Date_Find);
-		print_r($Categori_Find);
-		exit;
-		
+				
 		
 		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
