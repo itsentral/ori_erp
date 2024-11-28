@@ -718,6 +718,10 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Coa_Find		= urldecode($this->input->get('coa'));
 		$Date_Find		= urldecode($this->input->post('tgl'));
 		$Categori_Find	= urldecode($this->input->post('category'));
+
+		print_r($Date_Find);
+		exit;
+		
 		
 		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
