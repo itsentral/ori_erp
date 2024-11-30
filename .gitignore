@@ -21,6 +21,7 @@ application/logs/*
 /gl/
 /tanki/
 /application/config/database.php
+/application/config/constants.php
 /gl/application/config/database.php
 /hris/application/config/database.php
 /tanki/application/config/database.php
