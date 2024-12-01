@@ -4,6 +4,7 @@ $status = $tanda;
 ?>
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data">
 	<input type="hidden" id='status' name='status' value='<?= $status; ?>'>
+	<input type="hidden" id='tanda' name='tanda' value='<?= $tanda; ?>'>
 	<div class="box box-primary">
 		<div class="box-header">
 			<h3 class="box-title"><?php echo $title; ?></h3>
@@ -40,6 +41,30 @@ $status = $tanda;
 				</thead>
 				<tbody></tbody>
 			</table>
+			<?php
+			if ($tanda == 'cutting') {
+			?>
+			<br>
+			<h5>Product Deadstock Cutting</h5>
+			<table class="table table-sm table-bordered table-striped" id="my-grid3" width='100%'>
+				<thead>
+					<tr class='bg-blue'>
+						<th class="text-center">#</th>
+						<th class="text-center">No SPK</th>
+						<th class="text-center">Product</th>
+						<th class="text-center no-sort">No SO</th>
+						<th class="text-center no-sort">Customer</th>
+						<th class="text-center no-sort">Project</th>
+						<th class="text-center no-sort" width="50">#</th>
+						<th class="text-center no-sort" width="30">QR</th>
+
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			<?php
+			}
+			?>
 		</div>
 		<!-- /.box-body -->
 	</div>
@@ -72,7 +97,11 @@ $status = $tanda;
 		})
 
 		let status = $('#status').val();
+		let tanda = $('#tanda').val();
 		DataTables2(status);
+		if(tanda='cutting'){
+			DataTables3();
+		}
 
 		$(document).on('click', '.look_history', function(e) {
 			e.preventDefault();
@@ -266,6 +295,49 @@ $status = $tanda;
 				data: function(d) {
 					d.status = status
 				},
+				cache: false,
+				error: function() {
+					$(".my-grid2-error").html("");
+					$("#my-grid2").append(
+						'<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>'
+					);
+					$("#my-grid2_processing").css("display", "none");
+				}
+			}
+		});
+	}
+
+	function DataTables3() {
+		var dataTable = $('#my-grid3').DataTable({
+			"serverSide": true,
+			"stateSave": true,
+			"bAutoWidth": true,
+			"destroy": true,
+			"processing": true,
+			"responsive": true,
+			"fixedHeader": {
+				"header": true,
+				"footer": true
+			},
+			"aaSorting": [
+				[1, "asc"]
+			],
+			"columnDefs": [{
+				"targets": 'no-sort',
+				"orderable": false,
+			}],
+			"sPaginationType": "simple_numbers",
+			"iDisplayLength": 10,
+			"aLengthMenu": [
+				[10, 20, 50, 100, 150],
+				[10, 20, 50, 100, 150]
+			],
+			"ajax": {
+				url: base_url + active_controller + '/server_side_cutting_deadstock',
+				type: "post",
+				// data: function(d) {
+				// 	d.status = status
+				// },
 				cache: false,
 				error: function() {
 					$(".my-grid2-error").html("");

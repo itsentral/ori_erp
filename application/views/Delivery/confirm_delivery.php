@@ -194,12 +194,12 @@ $diterima_oleh			= (!empty($get_spk))?$get_spk[0]->diterima_oleh:'';
             </tbody>
         </table>
 
-        <h4>FIELD JOINT</h4>
+        <h4>FIELD JOINT TYPE</h4>
         <table class="table table-sm table-bordered table-striped" id="my-grid" width='100%'>
             <thead>
                 <tr class='bg-blue'>
                     <th class="text-center">#</th>
-                    <th class="text-center">Nama Material</th>
+                    <th class="text-center">Nama Product</th>
                     <th class="text-center">Qty (kit)</th>
                 </tr>
             </thead>
@@ -208,7 +208,7 @@ $diterima_oleh			= (!empty($get_spk))?$get_spk[0]->diterima_oleh:'';
                 foreach ($result4 as $key => $value) { $key++;
                     echo "<tr>";
                         echo "<td align='center'>".$key."</td>";
-                        echo "<td align='left'> FIELD JOINT".spec_bq2($value['id_milik'])."</td>";
+                        echo "<td align='left'>".strtoupper($value['product']).", ".spec_bq2($value['id_milik'])."</td>";
                         echo "<td align='center'>".number_format($value['berat'])."</td>";
                     echo "</tr>";
                 }

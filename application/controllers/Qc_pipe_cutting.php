@@ -235,6 +235,7 @@ class Qc_pipe_cutting extends CI_Controller {
 			$data			= $this->input->post();
 			$data_session	= $this->session->userdata;
 			$dateTime		= date('Y-m-d H:i:s');
+			$UserName		= $data_session['ORI_User']['username'];
 
             $id = $data['id'];
             $qc_status = $data['qc_status'];
@@ -255,6 +256,105 @@ class Qc_pipe_cutting extends CI_Controller {
                 'qc_by' => $data_session['ORI_User']['username'],
                 'qc_date' => $dateTime
             ];
+
+			//SaveReport
+			$getCuttingDetail	= $this->db->get_where('so_cutting_detail',array('id_header'=>$id))->result_array();
+			$ArrFG_IN = [];
+			$ArrWIP_OUT = [];
+
+			$ArrFG_IN_DEADSTOCK = [];
+			$ArrWIP_OUT_DEADSTOCK = [];
+			foreach ($getCuttingDetail as $key => $value) {
+				$GetDetCut	= $this->db->get_where('data_erp_wip_group',array('id_trans'=>$value['id'],'jenis'=>'in cutting'))->result_array();
+				if(!empty($GetDetCut)){
+					$ArrFG_IN[$key]['tanggal'] 		= date('Y-m-d');
+					$ArrFG_IN[$key]['keterangan'] 	= 'WIP to Finish Good (Cutting)';
+					$ArrFG_IN[$key]['no_so'] 		= $GetDetCut[0]['no_so'];
+					$ArrFG_IN[$key]['product'] 		= $GetDetCut[0]['product'];
+					$ArrFG_IN[$key]['no_spk'] 		= $GetDetCut[0]['no_spk'];
+					$ArrFG_IN[$key]['kode_trans'] 	= $GetDetCut[0]['kode_trans'];
+					$ArrFG_IN[$key]['id_pro_det'] 	= $GetDetCut[0]['id_pro_det'];
+					$ArrFG_IN[$key]['qty'] 			= 1;
+					$ArrFG_IN[$key]['nilai_unit'] 	= $GetDetCut[0]['nilai_wip'];
+					$ArrFG_IN[$key]['nilai_wip'] 	= $GetDetCut[0]['nilai_wip'];
+					$ArrFG_IN[$key]['material'] 		= $GetDetCut[0]['material'];
+					$ArrFG_IN[$key]['wip_direct'] 		= $GetDetCut[0]['wip_direct'];
+					$ArrFG_IN[$key]['wip_indirect'] 	= $GetDetCut[0]['wip_indirect'];
+					$ArrFG_IN[$key]['wip_consumable'] 	= $GetDetCut[0]['wip_consumable'];
+					$ArrFG_IN[$key]['wip_foh'] 			= $GetDetCut[0]['wip_foh'];
+					$ArrFG_IN[$key]['created_by'] = $UserName;
+					$ArrFG_IN[$key]['created_date'] = $dateTime;
+					$ArrFG_IN[$key]['jenis'] = 'in cutting';
+					$ArrFG_IN[$key]['id_trans'] = $GetDetCut[0]['id_trans'];
+					$ArrFG_IN[$key]['id_pro'] = $GetDetCut[0]['id_trans'];
+
+					$ArrWIP_OUT[$key]['tanggal'] 		= date('Y-m-d');
+					$ArrWIP_OUT[$key]['keterangan'] 	= 'WIP to Finish Good (Cutting)';
+					$ArrWIP_OUT[$key]['no_so'] 			= $GetDetCut[0]['no_so'];
+					$ArrWIP_OUT[$key]['product'] 		= $GetDetCut[0]['product'];
+					$ArrWIP_OUT[$key]['no_spk'] 		= $GetDetCut[0]['no_spk'];
+					$ArrWIP_OUT[$key]['kode_trans'] 	= $GetDetCut[0]['kode_trans'];
+					$ArrWIP_OUT[$key]['id_pro_det'] 	= $GetDetCut[0]['id_pro_det'];
+					$ArrWIP_OUT[$key]['qty'] 			= 1;
+					$ArrWIP_OUT[$key]['nilai_wip'] 		= $GetDetCut[0]['nilai_wip'];
+					$ArrWIP_OUT[$key]['material'] 		= $GetDetCut[0]['material'];
+					$ArrWIP_OUT[$key]['wip_direct'] 	= $GetDetCut[0]['wip_direct'];
+					$ArrWIP_OUT[$key]['wip_indirect'] 	= $GetDetCut[0]['wip_indirect'];
+					$ArrWIP_OUT[$key]['wip_consumable'] 	= $GetDetCut[0]['wip_consumable'];
+					$ArrWIP_OUT[$key]['wip_foh'] 			= $GetDetCut[0]['wip_foh'];
+					$ArrWIP_OUT[$key]['created_by'] = $UserName;
+					$ArrWIP_OUT[$key]['created_date'] = $dateTime;
+					$ArrWIP_OUT[$key]['jenis'] = 'out cutting';
+					$ArrWIP_OUT[$key]['id_trans'] = $GetDetCut[0]['id_trans'];
+				}
+				//Deadstock
+				$GetDetCut_Deadstock	= $this->db->get_where('data_erp_wip_group',array('id_trans'=>$value['id'],'jenis'=>'in cutting deadstok'))->result_array();
+				if(!empty($GetDetCut_Deadstock)){
+					$ArrFG_IN_DEADSTOCK[$key]['tanggal'] 		= date('Y-m-d');
+					$ArrFG_IN_DEADSTOCK[$key]['keterangan'] 	= 'WIP to Finish Good (Cutting Deadstock)';
+					$ArrFG_IN_DEADSTOCK[$key]['no_so'] 		= $GetDetCut_Deadstock[0]['no_so'];
+					$ArrFG_IN_DEADSTOCK[$key]['product'] 		= $GetDetCut_Deadstock[0]['product'];
+					$ArrFG_IN_DEADSTOCK[$key]['no_spk'] 		= $GetDetCut_Deadstock[0]['no_spk'];
+					$ArrFG_IN_DEADSTOCK[$key]['kode_trans'] 	= $GetDetCut_Deadstock[0]['kode_trans'];
+					$ArrFG_IN_DEADSTOCK[$key]['id_pro_det'] 	= $GetDetCut_Deadstock[0]['id_pro_det'];
+					$ArrFG_IN_DEADSTOCK[$key]['qty'] 			= 1;
+					$ArrFG_IN_DEADSTOCK[$key]['nilai_unit'] 	= $GetDetCut_Deadstock[0]['nilai_wip'];
+					$ArrFG_IN_DEADSTOCK[$key]['nilai_wip'] 	= $GetDetCut_Deadstock[0]['nilai_wip'];
+					$ArrFG_IN_DEADSTOCK[$key]['material'] 		= $GetDetCut_Deadstock[0]['material'];
+					$ArrFG_IN_DEADSTOCK[$key]['wip_direct'] 		= $GetDetCut_Deadstock[0]['wip_direct'];
+					$ArrFG_IN_DEADSTOCK[$key]['wip_indirect'] 	= $GetDetCut_Deadstock[0]['wip_indirect'];
+					$ArrFG_IN_DEADSTOCK[$key]['wip_consumable'] 	= $GetDetCut_Deadstock[0]['wip_consumable'];
+					$ArrFG_IN_DEADSTOCK[$key]['wip_foh'] 			= $GetDetCut_Deadstock[0]['wip_foh'];
+					$ArrFG_IN_DEADSTOCK[$key]['created_by'] = $UserName;
+					$ArrFG_IN_DEADSTOCK[$key]['created_date'] = $dateTime;
+					$ArrFG_IN_DEADSTOCK[$key]['jenis'] = 'in cutting deadstok';
+					$ArrFG_IN_DEADSTOCK[$key]['id_trans'] = $GetDetCut_Deadstock[0]['id_trans'];
+					$ArrFG_IN_DEADSTOCK[$key]['id_pro'] = $GetDetCut_Deadstock[0]['id_trans'];
+
+					$ArrWIP_OUT_DEADSTOCK[$key]['tanggal'] 		= date('Y-m-d');
+					$ArrWIP_OUT_DEADSTOCK[$key]['keterangan'] 	= 'WIP to Finish Good (Cutting Deadstock)';
+					$ArrWIP_OUT_DEADSTOCK[$key]['no_so'] 			= $GetDetCut_Deadstock[0]['no_so'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['product'] 		= $GetDetCut_Deadstock[0]['product'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['no_spk'] 		= $GetDetCut_Deadstock[0]['no_spk'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['kode_trans'] 	= $GetDetCut_Deadstock[0]['kode_trans'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['id_pro_det'] 	= $GetDetCut_Deadstock[0]['id_pro_det'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['qty'] 			= 1;
+					$ArrWIP_OUT_DEADSTOCK[$key]['nilai_wip'] 		= $GetDetCut_Deadstock[0]['nilai_wip'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['material'] 		= $GetDetCut_Deadstock[0]['material'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['wip_direct'] 	= $GetDetCut_Deadstock[0]['wip_direct'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['wip_indirect'] 	= $GetDetCut_Deadstock[0]['wip_indirect'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['wip_consumable'] 	= $GetDetCut_Deadstock[0]['wip_consumable'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['wip_foh'] 			= $GetDetCut_Deadstock[0]['wip_foh'];
+					$ArrWIP_OUT_DEADSTOCK[$key]['created_by'] = $UserName;
+					$ArrWIP_OUT_DEADSTOCK[$key]['created_date'] = $dateTime;
+					$ArrWIP_OUT_DEADSTOCK[$key]['jenis'] = 'out cutting deadstok';
+					$ArrWIP_OUT_DEADSTOCK[$key]['id_trans'] = $GetDetCut_Deadstock[0]['id_trans'];
+				}
+			}
+
+			// print_r($ArrFG_IN);
+			// print_r($ArrWIP_OUT);
+			// exit;
 			
 			$this->db->trans_start();
                 $this->db->where('id',$id);
@@ -262,6 +362,22 @@ class Qc_pipe_cutting extends CI_Controller {
 
 				$this->db->where('id_header',$id);
                 $this->db->update('so_cutting_detail', $ArrUpdateDetail);
+
+				if(!empty($ArrFG_IN)){
+					$this->db->insert_batch('data_erp_fg',$ArrFG_IN);
+				}
+		
+				if(!empty($ArrWIP_OUT)){
+					$this->db->insert_batch('data_erp_wip_group',$ArrWIP_OUT);
+				}
+
+				if(!empty($ArrFG_IN_DEADSTOCK)){
+					$this->db->insert_batch('data_erp_fg',$ArrFG_IN_DEADSTOCK);
+				}
+		
+				if(!empty($ArrWIP_OUT_DEADSTOCK)){
+					$this->db->insert_batch('data_erp_wip_group',$ArrWIP_OUT_DEADSTOCK);
+				}
 			$this->db->trans_complete();
 
 			if ($this->db->trans_status() === FALSE){

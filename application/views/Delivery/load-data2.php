@@ -114,6 +114,7 @@
 						<th class="text-center">Spec</th>
 						<th class="text-center">ID Product</th>
 						<th class="text-center">No SPK</th>
+						<th class="text-center no-sort">Status</th>
 						<th class="text-center no-sort">#</th>
 					</tr>
 				</thead>
@@ -142,6 +143,11 @@
 						if ($value['sts'] == 'cut') {
 							$SPEC .= " x " . number_format($value['length']);
 						}
+						if ($value['sts_product'] == 'cut deadstock') {
+							$SPEC = number_format($value['length']);
+							$product_code = $value['product_code'];
+						}
+
 						echo "<tr>";
 						echo "<td align='center'>" . $key . "</td>";
 						echo "<td align='center'>" . str_replace('PRO-', '', $value['id_produksi']) . "</td>";

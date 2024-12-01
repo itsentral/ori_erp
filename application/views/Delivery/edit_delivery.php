@@ -227,6 +227,10 @@ $this->load->view('include/side_menu');
 								if ($value['sts'] == 'cut') {
 									$SPEC .= " x " . number_format($value['length']);
 								}
+								if ($value['sts_product'] == 'cut deadstock') {
+									$SPEC = number_format($value['length']);
+									$product_code = $value['product_code'];
+								}
 								echo "<tr>";
 								echo "<td align='center'>" . $key . "</td>";
 								echo "<td align='center'>" . str_replace('PRO-', '', $value['id_produksi']) . "</td>";

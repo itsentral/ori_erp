@@ -4327,11 +4327,18 @@ class Produksi extends CI_Controller {
 
 									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
 									$total_est 	= $value3['berat'] * $QTY_INP;
-									$total_act  = str_replace(',','',$value2['terpakai']);
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
+									$TERPAKAI 	= (!empty($value2['terpakai']))?str_replace(',','',$value2['terpakai']):0;
+									$KEBUTUHAN 	= (!empty($value2['kebutuhan']))?str_replace(',','',$value2['kebutuhan']):0;
+
+									$total_act  = $TERPAKAI;
+									if($KEBUTUHAN > 0 AND $total_est > 0){
+										$total_act 	= ($total_est / $KEBUTUHAN) * $TERPAKAI;
 									}
-									$unit_act 	= $total_act / $QTY_INP;
+
+									$unit_act = 0;
+									if($total_act > 0 AND $QTY_INP > 0){
+										$unit_act 	= $total_act / $QTY_INP;
+									}
 
 									//PRICE BOOK
 									$PRICE_BOOK = get_price_book($value2['actual_type']);
@@ -8494,9 +8501,11 @@ class Produksi extends CI_Controller {
 									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
 									$total_est 	= $value3['berat'] * $QTY_INP;
 									$total_act  = 0;
-									$qty_kebutuhan = str_replace(',','',$value2['kebutuhan']);
-									if($qty_kebutuhan > 0){
-										$total_act 	= ($total_est / $qty_kebutuhan) * str_replace(',','',$value2['terpakai']);
+									$qty_kebutuhan = (!empty($value2['kebutuhan']))?str_replace(',','',$value2['kebutuhan']):0;
+									$qty_terpakai = (!empty($value2['terpakai']))?str_replace(',','',$value2['terpakai']):0;
+
+									if($qty_kebutuhan > 0 AND $total_est > 0){
+										$total_act 	= ($total_est / $qty_kebutuhan) * $qty_terpakai;
 									}
 
 									
@@ -10060,11 +10069,18 @@ class Produksi extends CI_Controller {
 
 									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
 									$total_est 	= $value3['berat'] * $QTY_INP;
-									$total_act  = str_replace(',','',$value2['terpakai']);
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
+									$TERPAKAI 	= (!empty($value2['terpakai']))?str_replace(',','',$value2['terpakai']):0;
+									$KEBUTUHAN 	= (!empty($value2['kebutuhan']))?str_replace(',','',$value2['kebutuhan']):0;
+
+									$total_act  = $TERPAKAI;
+									if($KEBUTUHAN > 0 AND $total_est > 0){
+										$total_act 	= ($total_est / $KEBUTUHAN) * $TERPAKAI;
 									}
-									$unit_act 	= $total_act / $QTY_INP;
+
+									$unit_act = 0;
+									if($total_act > 0 AND $QTY_INP > 0){
+										$unit_act 	= $total_act / $QTY_INP;
+									}
 
 									//PRICE BOOK
 									$PRICE_BOOK = get_price_book($value2['actual_type']);
@@ -11398,6 +11414,9 @@ class Produksi extends CI_Controller {
 			}
 		}
 
+		// print_r($ArrUpdateStock);
+		// exit;
+
 		//grouping sum
 		$temp = [];
 		foreach($ArrUpdateStock as $value) {
@@ -11601,10 +11620,167 @@ class Produksi extends CI_Controller {
 			'close_produksi_date' => $datetime
 		];
 
+		//New Report FG
+		$getDetDeadStock = $this->db->get_where('deadstok_modif',array('kode_spk'=>$kode_spk))->result_array();
+		$ArrOUT_FG = [];
+		$ArrIN_WIP = [];
+		$ArrIN_WIP_MATERIAL = [];
+
+		$catatanPro = $kode_spk.'/'.$hist_produksi;
+		$TMP_DET = $this->db->select('actual_type as id, material_terpakai as qty')->get_where('tmp_production_real_detail',array('catatan_programmer'=>$catatanPro))->result_array();
+		$TMP_PLUS = $this->db->select('actual_type as id, material_terpakai as qty')->get_where('tmp_production_real_detail_plus',array('catatan_programmer'=>$catatanPro))->result_array();
+		$TMP_ADD = $this->db->select('actual_type as id, material_terpakai as qty')->get_where('tmp_production_real_detail_add',array('catatan_programmer'=>$catatanPro))->result_array();
+		$TMP_GROUP = array_merge($TMP_DET,$TMP_PLUS,$TMP_ADD);
+
+		$tempMixing = [];
+		foreach($TMP_GROUP as $value) {
+			if(!array_key_exists($value['id'], $tempMixing)) {
+				$tempMixing[$value['id']] = 0;
+			}
+			$tempMixing[$value['id']] += $value['qty'];
+		}
+
+		$tanggalNow = date('Y-m-d');
+		$GETDetMaterial = get_detail_material();
+		$GETPriceBookProduksi = getPriceBookByDateproduksi($tanggalNow);
+
+		if(!empty($getDetDeadStock)){
+			foreach ($getDetDeadStock as $key => $value) {
+				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$value['id_deadstok'],'jenis'=>'in deadstok'))->result_array();
+				if(!empty($getDataFG)){
+					$ArrOUT_FG[$key]['tanggal'] = date('Y-m-d');
+					$ArrOUT_FG[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+					$ArrOUT_FG[$key]['no_so'] = $getDataFG[0]['no_so'];
+					$ArrOUT_FG[$key]['product'] = $getDataFG[0]['product'];
+					$ArrOUT_FG[$key]['no_spk'] = $getDataFG[0]['no_spk'];
+					$ArrOUT_FG[$key]['kode_trans'] = $kode_spk;
+					$ArrOUT_FG[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+					$ArrOUT_FG[$key]['qty'] = 1;
+					$ArrOUT_FG[$key]['nilai_wip'] = $getDataFG[0]['nilai_wip'];
+					$ArrOUT_FG[$key]['nilai_unit'] = $getDataFG[0]['nilai_unit'];
+					$ArrOUT_FG[$key]['material'] = 0;
+					$ArrOUT_FG[$key]['wip_direct'] =  0;
+					$ArrOUT_FG[$key]['wip_indirect'] =  0;
+					$ArrOUT_FG[$key]['wip_consumable'] =  0;
+					$ArrOUT_FG[$key]['wip_foh'] =  0;
+					$ArrOUT_FG[$key]['created_by'] = $username;
+					$ArrOUT_FG[$key]['created_date'] = $datetime;
+					$ArrOUT_FG[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
+					$ArrOUT_FG[$key]['id_pro'] =  $value['id_deadstok'];
+					$ArrOUT_FG[$key]['jenis'] =  'out deadstok';
+
+					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
+					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
+					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
+					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
+					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
+					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+					$ArrIN_WIP[$key]['qty'] = 1;
+					$ArrIN_WIP[$key]['nilai_wip'] = $getDataFG[0]['nilai_wip'];
+					$ArrIN_WIP[$key]['material'] = 0;
+					$ArrIN_WIP[$key]['wip_direct'] =  0;
+					$ArrIN_WIP[$key]['wip_indirect'] =  0;
+					$ArrIN_WIP[$key]['wip_consumable'] =  0;
+					$ArrIN_WIP[$key]['wip_foh'] =  0;
+					$ArrIN_WIP[$key]['created_by'] = $username;
+					$ArrIN_WIP[$key]['created_date'] = $datetime;
+					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
+					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
+
+					if(!empty($temp)){
+						foreach ($temp as $key2 => $value2) {
+							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
+							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							$key_uniq = $key.'-'.$key2.'-Mix2';
+							$qtyValue = $value2 / COUNT($getDetDeadStock);
+
+							$ArrIN_WIP_MATERIAL[$key_uniq]['tanggal'] = date('Y-m-d');
+							$ArrIN_WIP_MATERIAL[$key_uniq]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+							$ArrIN_WIP_MATERIAL[$key_uniq]['no_so'] = $getDataFG[0]['no_so'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['product'] = $getDataFG[0]['product'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['no_spk'] = $getDataFG[0]['no_spk'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['kode_trans'] = $kode_spk;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['created_by'] = $username;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['created_date'] = $datetime;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_trans'] =  $getDataFG[0]['id_trans'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
+			
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['qty_mat'] =  $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+						}
+					}
+					if(!empty($tempMixing)){
+						foreach ($tempMixing as $key2 => $value2) {
+							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
+							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							$key_uniq = $key.'-'.$key2.'-Mix';
+							$qtyValue = $value2 / COUNT($getDetDeadStock);
+
+							$ArrIN_WIP_MATERIAL[$key_uniq]['tanggal'] = date('Y-m-d');
+							$ArrIN_WIP_MATERIAL[$key_uniq]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+							$ArrIN_WIP_MATERIAL[$key_uniq]['no_so'] = $getDataFG[0]['no_so'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['product'] = $getDataFG[0]['product'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['no_spk'] = $getDataFG[0]['no_spk'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['kode_trans'] = $kode_spk;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['created_by'] = $username;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['created_date'] = $datetime;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_trans'] =  $getDataFG[0]['id_trans'];
+							$ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
+			
+							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['qty_mat'] =  $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+						}
+					}
+				}
+			}
+		}
+
+		
+		
+		
+		// print_r($temp);
+		// print_r($ArrOUT_FG);
+		// print_r($ArrIN_WIP);
+		// print_r($ArrIN_WIP_MATERIAL);
+		// exit;
+
 		$this->db->trans_start();
 
 			$this->db->where('kode_spk',$kode_spk);
 			$this->db->update('deadstok_modif',$ArrInputProduksi);
+
+			if(!empty($ArrOUT_FG)){
+				$this->db->insert_batch('data_erp_fg',$ArrOUT_FG);
+			}
+			if(!empty($ArrIN_WIP)){
+				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP);
+			}
+			if(!empty($ArrIN_WIP_MATERIAL)){
+				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+			}
 			//update flag produksi input
 			if(!empty($ArrJurnal)){
 				insert_jurnal_wip($ArrJurnal,$id_gudang,14,'laporan produksi','pengurangan gudang produksi','wip',$kode_spk_created);

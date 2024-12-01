@@ -2924,6 +2924,63 @@
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 
+		//GetNilai GinishGood
+		$getCuttingHeader	= $CI->db->get_where('so_cutting_header',array('id'=>$kode_pro))->result();
+		$id_pro 			= $getCuttingHeader[0]->id_pro_det;
+		$id_deadstock 		= $getCuttingHeader[0]->id_deadstok;
+		
+		$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in cutting'))->result_array();
+		$ArrFG_OUT = [];
+		if(!empty($getReportFG)){
+			$ArrFG_OUT[0]['tanggal'] = date('Y-m-d');
+			$ArrFG_OUT[0]['keterangan'] = 'Finish Good to WIP (Cutting)';
+			$ArrFG_OUT[0]['no_so'] 	= (!empty($getReportFG[0]['no_so']))?$getReportFG[0]['no_so']:NULL;
+			$ArrFG_OUT[0]['product'] = (!empty($getReportFG[0]['product']))?$getReportFG[0]['product']:NULL;
+			$ArrFG_OUT[0]['no_spk'] = (!empty($getReportFG[0]['no_spk']))?$getReportFG[0]['no_spk']:NULL;
+			$ArrFG_OUT[0]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$getReportFG[0]['kode_trans']:NULL;
+			$ArrFG_OUT[0]['id_pro_det'] = (!empty($getReportFG[0]['id_pro_det']))?$getReportFG[0]['id_pro_det']:NULL;
+			$ArrFG_OUT[0]['qty'] = (!empty($getReportFG[0]['qty']))?$getReportFG[0]['qty']:NULL;
+			$ArrFG_OUT[0]['nilai_unit'] = (!empty($getReportFG[0]['nilai_unit']))?$getReportFG[0]['nilai_unit']:0;
+			$ArrFG_OUT[0]['nilai_wip'] = (!empty($getReportFG[0]['nilai_wip']))?$getReportFG[0]['nilai_wip']:0;
+			$ArrFG_OUT[0]['material'] = (!empty($getReportFG[0]['material']))?$getReportFG[0]['material']:0;
+			$ArrFG_OUT[0]['wip_direct'] = (!empty($getReportFG[0]['wip_direct']))?$getReportFG[0]['wip_direct']:0;
+			$ArrFG_OUT[0]['wip_indirect'] = (!empty($getReportFG[0]['wip_indirect']))?$getReportFG[0]['wip_indirect']:0;
+			$ArrFG_OUT[0]['wip_consumable'] = (!empty($getReportFG[0]['wip_consumable']))?$getReportFG[0]['wip_consumable']:0;
+			$ArrFG_OUT[0]['wip_foh'] = (!empty($getReportFG[0]['wip_foh']))?$getReportFG[0]['wip_foh']:0;
+			$ArrFG_OUT[0]['created_by'] = $UserName;
+			$ArrFG_OUT[0]['created_date'] = $DateTime;
+			$ArrFG_OUT[0]['id_trans'] = (!empty($getReportFG[0]['id_trans']))?$getReportFG[0]['id_trans']:NULL;
+			$ArrFG_OUT[0]['id_pro'] = (!empty($getReportFG[0]['id_pro']))?$getReportFG[0]['id_pro']:0;
+			$ArrFG_OUT[0]['qty_ke'] = (!empty($getReportFG[0]['qty_ke']))?$getReportFG[0]['qty_ke']:0;
+			$ArrFG_OUT[0]['jenis'] = 'out cutting';
+		}
+
+		//Deadstock
+		$getReportFG_DEADSTOCK 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$id_deadstock,'jenis'=>'in deadstok'))->result_array();
+		$ArrFG_OUT_DEADSTOCK = [];
+		if(!empty($getReportFG_DEADSTOCK)){
+			$ArrFG_OUT_DEADSTOCK[0]['tanggal'] = date('Y-m-d');
+			$ArrFG_OUT_DEADSTOCK[0]['keterangan'] = 'Finish Good to WIP (Cutting Deadstock)';
+			$ArrFG_OUT_DEADSTOCK[0]['no_so'] 	= $getReportFG_DEADSTOCK[0]['no_so'];
+			$ArrFG_OUT_DEADSTOCK[0]['product'] = $getReportFG_DEADSTOCK[0]['product'];
+			$ArrFG_OUT_DEADSTOCK[0]['no_spk'] = $getReportFG_DEADSTOCK[0]['no_spk'];
+			$ArrFG_OUT_DEADSTOCK[0]['kode_trans'] = $getReportFG_DEADSTOCK[0]['kode_trans'];
+			$ArrFG_OUT_DEADSTOCK[0]['id_pro_det'] = $getReportFG_DEADSTOCK[0]['id_pro_det'];
+			$ArrFG_OUT_DEADSTOCK[0]['qty'] = $getReportFG_DEADSTOCK[0]['qty'];
+			$ArrFG_OUT_DEADSTOCK[0]['nilai_unit'] = $getReportFG_DEADSTOCK[0]['nilai_unit'];
+			$ArrFG_OUT_DEADSTOCK[0]['nilai_wip'] = $getReportFG_DEADSTOCK[0]['nilai_wip'];
+			$ArrFG_OUT_DEADSTOCK[0]['material'] = 0;
+			$ArrFG_OUT_DEADSTOCK[0]['wip_direct'] = 0;
+			$ArrFG_OUT_DEADSTOCK[0]['wip_indirect'] = 0;
+			$ArrFG_OUT_DEADSTOCK[0]['wip_consumable'] = 0;
+			$ArrFG_OUT_DEADSTOCK[0]['wip_foh'] = 0;
+			$ArrFG_OUT_DEADSTOCK[0]['created_by'] = $UserName;
+			$ArrFG_OUT_DEADSTOCK[0]['created_date'] = $DateTime;
+			$ArrFG_OUT_DEADSTOCK[0]['id_trans'] = $getReportFG_DEADSTOCK[0]['id_trans'];
+			$ArrFG_OUT_DEADSTOCK[0]['id_pro'] = $getReportFG_DEADSTOCK[0]['id_pro'];
+			$ArrFG_OUT_DEADSTOCK[0]['jenis'] = 'out deadstok';
+		}
+
 		$SUM_PRICE = 0;
 		$ArrDetail = [];
 		$ArrJurnal = [];
@@ -2931,6 +2988,8 @@
 		$ArrDetailNew = [];
 		$ArrDetailProduct = [];
 		$nomor = 0;
+		$ArrWIP_IN = [];
+		$ArrWIP_IN_DEADSTOCK = [];
 
 		$temp = [];
 		$category = 'cutting loose';
@@ -2945,6 +3004,7 @@
 			$no_spk 			= get_name('so_detail_header','no_spk','id', $id_milik);
 			$product 			= $get_detProduksi[0]->id_category;
 			$length_cutting 	= $get_detProduksi[0]->length_split;
+			$length_full 		= $get_detProduksi[0]->length;
 			$no_ipp 			= str_replace('BQ-','',$id_bq);
 
 			$keterangan 		= $product.'/'.$id_milik.'/'.$nomor_so.'.'.$product_ke.'/'.$no_spk.'/'.$kode_pro;
@@ -2969,6 +3029,59 @@
 			$ArrDetailNew[$nomor]['created_by'] 	= $UserName;
 			$ArrDetailNew[$nomor]['created_date'] 	= $DateTime;
 			$ArrDetailNew[$nomor]['total_nilai'] 	= $value['finish_good'];
+
+			if(!empty($getReportFG)){
+				$nilai_wip = ($ArrFG_OUT[0]['nilai_wip'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['nilai_wip']:0;
+				$nilai_material = ($ArrFG_OUT[0]['material'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['material']:0;
+				$nilai_wip_direct = ($ArrFG_OUT[0]['wip_direct'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['wip_direct']:0;
+				$nilai_wip_indirect = ($ArrFG_OUT[0]['wip_indirect'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['wip_indirect']:0;
+				$nilai_wip_consumable = ($ArrFG_OUT[0]['wip_consumable'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['wip_consumable']:0;
+				$nilai_wip_foh = ($ArrFG_OUT[0]['wip_foh'] > 0)?$length_cutting/$length_full*$ArrFG_OUT[0]['wip_foh']:0;
+				
+				$ArrWIP_IN[$nomor]['tanggal'] = date('Y-m-d');
+				$ArrWIP_IN[$nomor]['keterangan'] = 'Finish Good to WIP (Cutting)';
+				$ArrWIP_IN[$nomor]['no_so'] 	= (!empty($getReportFG[0]['no_so']))?$getReportFG[0]['no_so']:NULL;
+				$ArrWIP_IN[$nomor]['product'] = (!empty($getReportFG[0]['product']))?$getReportFG[0]['product']:NULL;
+				$ArrWIP_IN[$nomor]['no_spk'] = (!empty($getReportFG[0]['no_spk']))?$getReportFG[0]['no_spk']:NULL;
+				$ArrWIP_IN[$nomor]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$getReportFG[0]['kode_trans']:NULL;
+				$ArrWIP_IN[$nomor]['id_pro_det'] = $id_pro;
+				$ArrWIP_IN[$nomor]['qty'] = 1;
+				$ArrWIP_IN[$nomor]['nilai_wip'] = $nilai_wip;
+				$ArrWIP_IN[$nomor]['material'] = $nilai_material;
+				$ArrWIP_IN[$nomor]['wip_direct'] = $nilai_wip_direct;
+				$ArrWIP_IN[$nomor]['wip_indirect'] = $nilai_wip_indirect;
+				$ArrWIP_IN[$nomor]['wip_consumable'] = $nilai_wip_consumable;
+				$ArrWIP_IN[$nomor]['wip_foh'] = $nilai_wip_foh;
+				$ArrWIP_IN[$nomor]['created_by'] = $UserName;
+				$ArrWIP_IN[$nomor]['created_date'] = $DateTime;
+				$ArrWIP_IN[$nomor]['jenis'] = 'in cutting';
+				$ArrWIP_IN[$nomor]['id_trans'] = $kode_spk;
+			}
+
+			//DEADSTOCK Cutting
+			$getDetailDead 	= $CI->db->get_where('data_erp_fg',array('id_pro_det'=>$id_deadstock,'jenis'=>'in deadstok'))->result_array();
+			if(!empty($getDetailDead)){
+				$nilai_wip = ($getDetailDead[0]['nilai_wip'] > 0)?$length_cutting/$length_full*$getDetailDead[0]['nilai_wip']:0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['tanggal'] = date('Y-m-d');
+				$ArrWIP_IN_DEADSTOCK[$nomor]['keterangan'] = 'Finish Good to WIP (Cutting Deadstock)';
+				$ArrWIP_IN_DEADSTOCK[$nomor]['no_so'] 	= (!empty($getDetailDead[0]['no_so']))?$getDetailDead[0]['no_so']:NULL;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['product'] = (!empty($getDetailDead[0]['product']))?$getDetailDead[0]['product']:NULL;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['no_spk'] = (!empty($getDetailDead[0]['no_spk']))?$getDetailDead[0]['no_spk']:NULL;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['kode_trans'] = (!empty($getDetailDead[0]['kode_trans']))?$getDetailDead[0]['kode_trans']:NULL;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['id_pro_det'] = (!empty($getDetailDead[0]['id_pro_det']))?$getDetailDead[0]['id_pro_det']:NULL;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['qty'] = 1;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['nilai_wip'] = $nilai_wip;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['material'] = 0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['wip_direct'] = 0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['wip_indirect'] = 0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['wip_consumable'] = 0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['wip_foh'] = 0;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['created_by'] = $UserName;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['created_date'] = $DateTime;
+				$ArrWIP_IN_DEADSTOCK[$nomor]['jenis'] = 'in cutting deadstok';
+				$ArrWIP_IN_DEADSTOCK[$nomor]['id_trans'] = $kode_spk;
+			}
+
 
 			$key_uniq = $kode_pro;
 			if(!array_key_exists($key_uniq, $temp)) {
@@ -3003,13 +3116,29 @@
 			$ArrJurnal[$kredit.$nomor]['updated_by'] = $UserName;
 			$ArrJurnal[$kredit.$nomor]['updated_date'] = $DateTime;
 		}
-		// print_r($ArrJurnal);
-		// print_r($ArrDetailNew);
+		// print_r($ArrFG_OUT_DEADSTOCK);
+		// print_r($ArrWIP_IN_DEADSTOCK);
 		// exit;
 
 		$CI->db->insert_batch('jurnal_temp',$ArrJurnal);
 		if(!empty($ArrDetailNew)){
 			$CI->db->insert_batch('jurnal_product',$ArrDetailNew);
+		}
+
+		if(!empty($ArrFG_OUT)){
+			$CI->db->insert_batch('data_erp_fg',$ArrFG_OUT);
+		}
+
+		if(!empty($ArrWIP_IN)){
+			$CI->db->insert_batch('data_erp_wip_group',$ArrWIP_IN);
+		}
+
+		if(!empty($ArrFG_OUT_DEADSTOCK)){
+			$CI->db->insert_batch('data_erp_fg',$ArrFG_OUT_DEADSTOCK);
+		}
+
+		if(!empty($ArrWIP_IN_DEADSTOCK)){
+			$CI->db->insert_batch('data_erp_wip_group',$ArrWIP_IN_DEADSTOCK);
 		}
 	}
 

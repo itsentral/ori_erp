@@ -18,6 +18,7 @@ application/logs/*
 /vendor/
 /assets/expense/
 /assets/file/
+/assets/qrcode/
 /gl/
 /tanki/
 /application/config/database.php

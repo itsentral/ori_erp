@@ -671,6 +671,7 @@ class Finish_good extends CI_Controller
 			$ArrUpdate[$value]['sts_cutting'] 	= 'Y';
 
 			$ArrCutting[$value]['id_milik'] 	= $valx['id_milik'];
+			$ArrCutting[$value]['id_pro_det'] 	= $valx['id'];
 			$ArrCutting[$value]['id_bq'] 		= str_replace('PRO-', 'BQ-', $valx['id_produksi']);
 			$ArrCutting[$value]['id_category'] 	= $valx['id_category'];
 			$ArrCutting[$value]['qty'] 			= $valx['qty'];
@@ -856,5 +857,105 @@ class Finish_good extends CI_Controller
 			'detail'	=> $detail_mat
 		);
 		$this->load->view('Finish_good/detail_berat', $data);
+	}
+
+	public function server_side_cutting_deadstock()
+	{
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_cutting_deadstock(
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+		$urut2  = 0;
+
+		foreach ($query->result_array() as $row) {
+			$total_data     = $totalData;
+			$start_dari     = $requestData['start'];
+			$asc_desc       = $requestData['order'][0]['dir'];
+			if ($asc_desc == 'asc') {
+				$nomor = $urut1 + $start_dari;
+			}
+			if ($asc_desc == 'desc') {
+				$nomor = ($total_data - $start_dari) - $urut2;
+			}
+
+			$no_ipp 	= str_replace('BQ-', '', $row['id_bq']);
+			$customer 	= get_name('production', 'nm_customer', 'no_ipp', $no_ipp);
+			$project 	= get_name('production', 'project', 'no_ipp', $no_ipp);
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>" . $nomor . "</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_spk']."</div>";
+			$nestedData[]	= "<div align='left'>" . strtoupper($row['id_category']) . ", ".$row['length_split']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
+			$nestedData[]	= "<div align='left'>" . $customer . "</div>";
+			$nestedData[]	= "<div align='left'>" . $project . "</div>";
+
+			$nestedData[]	= "<div align='center'>
+							<button type='button' target='_blank' class='btn btn-sm btn-default qr-cutting' data-id_cutting='cut-" . $row['id'] . "' style='margin-bottom:2px;padding:2px 6px'><i class='fa fa-qrcode fa-2x'></i></button></div>
+							";
+	
+			$ck = ($row['flag_qr'] == 'Y') ? '<i class="fa fa-check text-success"></i>' : '-';
+			$nestedData[] = "<div class='text-center'>" . $ck . "</div>";
+			$data[] = $nestedData;
+			$urut1++;
+			$urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval($requestData['draw']),
+			"recordsTotal"    	=> intval($totalData),
+			"recordsFiltered" 	=> intval($totalFiltered),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_cutting_deadstock($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL)
+	{
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.*,
+				b.no_so,
+				b.no_spk
+			FROM
+				so_cutting_detail a
+				LEFT JOIN data_erp_fg b ON a.id=b.id_trans AND b.jenis='in cutting deadstok',
+				(SELECT @row:=0) r
+		    WHERE 1=1 
+                AND a.qc_date IS NOT NULL AND (a.kode_delivery IS NULL AND a.spool_induk IS NULL)
+				AND (
+					a.id_category LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR a.id_category LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+				)
+			GROUP BY a.id
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'id_category',
+			2 => 'id_category',
+			3 => 'id_category'
+		);
+
+		$sql .= " ORDER BY a.id DESC, " . $columns_order_by[$column_order] . " " . $column_dir . " ";
+		$sql .= " LIMIT " . $limit_start . " ," . $limit_length . " ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
 	}
 }

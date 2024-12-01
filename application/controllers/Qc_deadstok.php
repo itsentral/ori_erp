@@ -407,10 +407,81 @@ class Qc_deadstok extends CI_Controller
 			'qc_date' => $dateTime
 		];
 
+		$checkIdDeadstok	= $this->db->get_where('deadstok_modif',array('kode'=>$kode))->result_array();
+		$kode_spk 			= (!empty($checkIdDeadstok[0]['kode_spk']))?$checkIdDeadstok[0]['kode_spk']:null;
+
+		$getQCDeadstockModif = $this->db->get_where('data_erp_wip_group',array('kode_trans'=>$kode_spk))->result_array();
+		$ArrIN_WIP_MATERIAL = [];
+		$ArrIN_FG_MATERIAL = [];
+		foreach ($getQCDeadstockModif as $key => $value) {
+			$ArrIN_WIP_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+			$ArrIN_WIP_MATERIAL[$key]['keterangan'] = 'WIP to Finish Good (Deadstock Modif)';
+			$ArrIN_WIP_MATERIAL[$key]['no_so'] = $value['no_so'];
+			$ArrIN_WIP_MATERIAL[$key]['product'] = $value['product'];
+			$ArrIN_WIP_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+			$ArrIN_WIP_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrIN_WIP_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrIN_WIP_MATERIAL[$key]['qty'] = 1;
+			$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_WIP_MATERIAL[$key]['material'] = $value['material'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_direct'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_indirect'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_consumable'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_foh'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['created_by'] = $username;
+			$ArrIN_WIP_MATERIAL[$key]['created_date'] = $dateTime;
+			$ArrIN_WIP_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+			$ArrIN_WIP_MATERIAL[$key]['jenis'] =  'out deadstok modif';
+
+			$ArrIN_WIP_MATERIAL[$key]['id_material'] =  $value['id_material'];
+			$ArrIN_WIP_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+			$ArrIN_WIP_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+			$ArrIN_WIP_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+			$ArrIN_WIP_MATERIAL[$key]['gudang'] =  $value['gudang'];
+
+			$ArrIN_FG_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+			$ArrIN_FG_MATERIAL[$key]['keterangan'] = 'WIP to Finish Good (Deadstock Modif)';
+			$ArrIN_FG_MATERIAL[$key]['no_so'] = $value['no_so'];
+			$ArrIN_FG_MATERIAL[$key]['product'] = $value['product'];
+			$ArrIN_FG_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+			$ArrIN_FG_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrIN_FG_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrIN_FG_MATERIAL[$key]['qty'] = 1;
+			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] = $value['nilai_wip'];
+			$ArrIN_FG_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_FG_MATERIAL[$key]['material'] = $value['material'];
+			$ArrIN_FG_MATERIAL[$key]['wip_direct'] =  0;
+			$ArrIN_FG_MATERIAL[$key]['wip_indirect'] =  0;
+			$ArrIN_FG_MATERIAL[$key]['wip_consumable'] =  0;
+			$ArrIN_FG_MATERIAL[$key]['wip_foh'] =  0;
+			$ArrIN_FG_MATERIAL[$key]['created_by'] = $username;
+			$ArrIN_FG_MATERIAL[$key]['created_date'] = $dateTime;
+			$ArrIN_FG_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+			$ArrIN_FG_MATERIAL[$key]['jenis'] =  'in deadstok modif';
+
+			$ArrIN_FG_MATERIAL[$key]['id_material'] =  $value['id_material'];
+			$ArrIN_FG_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+			$ArrIN_FG_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+			$ArrIN_FG_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+			$ArrIN_FG_MATERIAL[$key]['gudang'] =  $value['gudang'];
+		}
+
+		// print_r($ArrIN_WIP_MATERIAL);
+		// print_r($ArrIN_FG_MATERIAL);
+		// exit;
+
 		$this->db->trans_start();
             $this->db->where('qc_date', NULL);
             $this->db->where('kode', $kode);
             $this->db->update('deadstok_modif', $ArrFlagRelease);
+
+			if(!empty($ArrIN_WIP_MATERIAL)){
+				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+			}
+
+			if(!empty($ArrIN_FG_MATERIAL)){
+				$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
+			}
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -469,6 +540,7 @@ class Qc_deadstok extends CI_Controller
 
 		$checkIdDeadstok	= $this->db->get_where('deadstok_modif',array('kode'=>$kode))->result_array();
 		$id_deadstok 		= (!empty($checkIdDeadstok[0]['id_deadstok']))?$checkIdDeadstok[0]['id_deadstok']:0;
+		$kode_spk 			= (!empty($checkIdDeadstok[0]['kode_spk']))?$checkIdDeadstok[0]['kode_spk']:null;
 
 		$getDeadstok		= $this->db->get_where('deadstok',array('id'=>$id_deadstok))->result_array();
 		$id_product 		= (!empty($getDeadstok[0]['id_product']))?$getDeadstok[0]['id_product']:0;
@@ -478,6 +550,35 @@ class Qc_deadstok extends CI_Controller
 		$ArrID = [];
 		foreach ($getIdDeadstok as $key => $value) {
 			$ArrID[] = $value['id'];
+		}
+
+		$getQCDeadstockModif = $this->db->get_where('data_erp_wip_group',array('kode_trans'=>$kode_spk))->result_array();
+		$ArrIN_WIP_MATERIAL = [];
+		foreach ($getQCDeadstockModif as $key => $value) {
+			$ArrIN_WIP_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+			$ArrIN_WIP_MATERIAL[$key]['keterangan'] = 'WIP to Reject (Deadstock Modif)';
+			$ArrIN_WIP_MATERIAL[$key]['no_so'] = $value['no_so'];
+			$ArrIN_WIP_MATERIAL[$key]['product'] = $value['product'];
+			$ArrIN_WIP_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+			$ArrIN_WIP_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrIN_WIP_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrIN_WIP_MATERIAL[$key]['qty'] = 1;
+			$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_WIP_MATERIAL[$key]['material'] = $value['material'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_direct'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_indirect'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_consumable'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['wip_foh'] =  0;
+			$ArrIN_WIP_MATERIAL[$key]['created_by'] = $username;
+			$ArrIN_WIP_MATERIAL[$key]['created_date'] = $dateTime;
+			$ArrIN_WIP_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+			$ArrIN_WIP_MATERIAL[$key]['jenis'] =  'out deadstok modif';
+
+			$ArrIN_WIP_MATERIAL[$key]['id_material'] =  $value['id_material'];
+			$ArrIN_WIP_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+			$ArrIN_WIP_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+			$ArrIN_WIP_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+			$ArrIN_WIP_MATERIAL[$key]['gudang'] =  $value['gudang'];
 		}
 
 		// print_r($getDeadstok);
@@ -492,6 +593,10 @@ class Qc_deadstok extends CI_Controller
 			$this->db->where('id_milik', $id_milik);
 			$this->db->where('process_next', '4');
 			$this->db->update('deadstok', $ArrUpdateDeadstok);
+
+			if(!empty($ArrIN_WIP_MATERIAL)){
+				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+			}
 
 			if(!empty($ArrID)){
 				$this->db->where_in('id_deadstok_dipakai', $ArrID);
