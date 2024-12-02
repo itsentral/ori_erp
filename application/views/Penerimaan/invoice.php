@@ -34,7 +34,7 @@
 											  // INNER JOIN customer b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND (a.sisa_invoice_idr >='1' AND a.sisa_invoice >'0') ")->result();
 						  // } else {
 						  $invoice = $this->db->query("SELECT a.*, b.nm_customer as nm_customer FROM tr_invoice_header a
-											  INNER JOIN customer b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND ((a.base_cur='IDR' AND a.sisa_invoice_idr >='1')  OR (a.base_cur='USD' AND a.sisa_invoice >'0')) ")->result();
+											  INNER JOIN customer b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND ((a.base_cur='IDR' AND a.sisa_invoice_idr >='1')  OR (a.base_cur='USD' AND a.sisa_invoice_retensi2 >'0') OR (a.base_cur='IDR' AND a.sisa_invoice_retensi2_idr >='0')) ")->result();
 						  //}
 				  
 				  //}
