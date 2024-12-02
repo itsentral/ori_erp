@@ -8,7 +8,7 @@ class Asset extends CI_Controller{
 		$this->load->model('asset_model');
 		$this->load->model('master_model');
 
-		if(!$this->session->userdata('isORIlogin')){
+		if(!$this->session->userdata('isORIlogin')){ 
 			redirect('login');
 		}
     }
@@ -51,7 +51,8 @@ class Asset extends CI_Controller{
 			'list_cab' 		=> $this->asset_model->getList('asset_branch'),
 			'list_pajak'	=> $this->asset_model->getList('asset_category_pajak'),
 			'list_dept' 	=> $this->asset_model->getList('department'),
-			'list_catg' 	=> $this->asset_model->getList('asset_category')
+			'list_catg' 	=> $this->asset_model->getList('asset_category'),
+			'list_coa' 		=> $this->asset_model->getList('asset_coa')
 		);
         history("View index asset");
 		$this->load->view('Asset/modal_view', $data);
@@ -76,6 +77,7 @@ class Asset extends CI_Controller{
 			$KdCategoryPjk	= sprintf('%02s',$category_pajak);
 			$Ym				= date('ym');
 			$tgl_oleh		= date('Y-m-d');
+			$tgl_perolehan	= date('Y-m-d');
 			
 			$branch		= $data['branch'];
 
@@ -85,16 +87,23 @@ class Asset extends CI_Controller{
 				$Month			= date('m', strtotime($data['tanggal']));
 				$Ym				= $Year.$Month;
 			}
+			
+			if(!empty($data['tanggal_oleh'])){
+				$tgl_perolehan		= date('Y-m-d', strtotime($data['tanggal_oleh']));
+				$Year_perolehan		= date('y', strtotime($data['tanggal_oleh']));
+				$Month_perolehan	= date('m', strtotime($data['tanggal_oleh']));
+				$Ym_perolehan		= $Year_perolehan.$Month_perolehan;
+			}
 
-			$qQuery			= "SELECT max(kd_asset) as maxP FROM asset WHERE category='".$category."' AND kd_asset LIKE '".$branch."-".$Ym.$KdCategory.$KdCategoryPjk."-%' ";
+			$qQuery			= "SELECT max(kd_asset) as maxP FROM asset WHERE kd_asset LIKE '".$branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-%' ";//category='".$category."' AND 
 			$restQuery		= $this->db->query($qQuery)->result_array();
 
 			$angkaUrut2		= $restQuery[0]['maxP'];
-			$urutan2		= (int)substr($angkaUrut2, 10, 3);
+			$urutan2		= (int)substr($angkaUrut2, 13, 3);
 			$urutan2++;
 			$urut2			= sprintf('%03s',$urutan2);
 
-			$kode_assets	= $branch."-".$Ym.$KdCategory.$KdCategoryPjk."-".$urut2;
+			$kode_assets	= $branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-".$urut2;
 
 			//kode group
 			$q_group		= "SELECT max(code_group) as maxP FROM asset WHERE code_group LIKE 'AS%' ";
@@ -174,7 +183,7 @@ class Asset extends CI_Controller{
 				$detailData[$lopp]['kd_asset'] 		= $kode_assets.$Nomor;
 				$detailData[$lopp]['code_group'] 	= $kode_group;
 				$detailData[$lopp]['nm_asset'] 		= $data['nm_asset'];
-				$detailData[$lopp]['tgl_perolehan'] = $tgl_oleh;
+				$detailData[$lopp]['tgl_perolehan'] = $tgl_perolehan;
 				$detailData[$lopp]['id_coa'] 		= $id_coa;
 				$detailData[$lopp]['category'] 		= $data['category'];
 				$detailData[$lopp]['category_pajak']= $data['category_pajak'];
@@ -194,6 +203,7 @@ class Asset extends CI_Controller{
 				$detailData[$lopp]['cost_center'] 	= get_name('costcenter', 'nm_costcenter', 'id_costcenter', $data['cost_center']);
 				$detailData[$lopp]['created_by'] 	= $this->session->userdata['ORI_User']['username'];
 				$detailData[$lopp]['created_date'] 	= date('Y-m-d h:i:s');
+				$detailData[$lopp]['tgl_depresiasi'] = $tgl_oleh;
 
 				$jmlx   	= $data['depresiasi'] * 12;
 				$date_now 	= date('Y-m-d');
@@ -290,6 +300,71 @@ class Asset extends CI_Controller{
 			$this->load->view('Asset/add', $data);
 		}
 	}
+	
+	
+	public function edit(){
+		
+			$id = $this->uri->segment(3);
+			$header = $this->asset_model->getWhere('asset', 'id', $id);
+			$data = array(
+				'title'			=> 'Edit Asset',
+				'action'		=> 'edit',
+				'data' 			=> $header,
+				'list_cab' 		=> $this->asset_model->getList('asset_branch'),
+				'list_coa' 		=> $this->asset_model->getList('asset_coa'),
+				'list_pajak'	=> $this->asset_model->getList('asset_category_pajak'),
+				'list_dept' => $this->asset_model->getList('department'),
+				'list_catg' => $this->asset_model->getList('asset_category')
+				);
+			$this->load->view('Asset/edit', $data);
+	}
+	
+	
+	//move asset
+	public function edited(){
+		
+		$Arr_Kembali	= array();
+		$data			= $this->input->post();
+		
+		$branch				= $data['branch'];
+		$kd_asset			= $data['kd_asset'];
+		$lokasi_asset_new	= $data['lokasi_asset_new'];
+		$cost_center_new	= $data['cost_center_new'];
+		
+		$ArrUpHeader = array(
+		    'id_coa'		=> $data['id_coa'],
+			'category'		=> $data['category'],
+			'modified_by' 	=> $this->session->userdata['ORI_User']['username'],
+			'modified_date' => date('Y-m-d h:i:s')
+		);
+		
+	
+		
+		$this->db->trans_start();
+			$this->db->where('kd_asset', $kd_asset);
+			$this->db->update('asset', $ArrUpHeader);			
+			
+		$this->db->trans_complete();
+		
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Data	= array(
+				'pesan'		=>'Asset gagal disimpan ...',
+				'status'	=> 0
+			);			
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Data	= array(
+				'pesan'		=>'Asset berhasil disimpan. Thanks ...',
+				'status'	=> 1
+			);
+			history('Move asset to asset');
+		}
+		
+		echo json_encode($Arr_Data);
+	}
+	
 	
 	//move asset
 	public function move_asset(){
@@ -599,6 +674,22 @@ class Asset extends CI_Controller{
 	public function approve_pr(){ 
         $this->asset_model->approve_pr();
     }
+
+	public function print_pr_asset(){
+		$no_pr 	= $this->uri->segment(3);
+		$sql	= "	SELECT
+						a.*
+					FROM
+						tran_pr_detail a LEFT JOIN tran_pr_header b ON a.no_pr = b.no_pr
+					WHERE  1=1 AND a.category='asset' AND a.no_pr = '".$no_pr."'";
+		$result = $this->db->query($sql)->result_array();
+
+		$data = array(
+		  'no_pr'		=> $no_pr,
+		  'result'		=> $result
+		);
+		$this->load->view('Print/print_pr_asset',$data);
+	}
 
 	//generate asset manual
 	public function generate_asset_manual(){
@@ -956,7 +1047,7 @@ class Asset extends CI_Controller{
 		$WHERE_PERIODE = "AND (b.flag='N' OR b.flag='X')";
 		$WHERE_PERIODE2 = "AND (b.flag='Y')";
 		if($bulan != '0' AND $tahun != '0'){
-			$WHERE_PERIODE = "AND CONCAT(b.tahun,'-',b.bulan,'-01') > '".$tahun."-".$bulan."-01' OR a.penyusutan = 'N'";
+//			$WHERE_PERIODE = "AND CONCAT(b.tahun,'-',b.bulan,'-01') > '".$tahun."-".$bulan."-01' OR a.penyusutan = 'N'";
 			$WHERE_PERIODE2 = "AND CONCAT(b.tahun,'-',b.bulan,'-01') <= '".$tahun."-".$bulan."-01'";
 		}
 
@@ -1053,7 +1144,7 @@ class Asset extends CI_Controller{
 				$SISA_NILAI 	= ($row_Cek['penyusutan'] == 'N')?$row_Cek['nilai_asset']:$row_Cek['sisa_nilai'];
 				// $DEPRESIASI 	= ($SISA_NILAI > 0 AND $SISA_NILAI != $row_Cek['nilai_asset'])?$row_Cek['value'] : 0;
 				if(intval($bulan) >= 4  AND intval($tahun) >= 2022 AND $row_Cek['kd_asset'] == 'ORI-22000000-000122'){
-					$SISA_NILAI = $SISA_NILAI + 29887;
+//					$SISA_NILAI = $SISA_NILAI + 29887;
 				}
 
 				$TGL_PEROLEHAN 	= date('Y-m-01',strtotime($row_Cek['tgl_perolehan']));
@@ -1786,6 +1877,150 @@ class Asset extends CI_Controller{
 		$this->asset_model->data_side_depreciation();
 	}
 
+	//======================================================================================================================
+    //===================================================ASSET COA============================================================
+    //======================================================================================================================
+
+	public function asset_coa(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Indeks Of Asset COA',
+			'action'		=> 'category',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+		history('View Data Asset COA');
+		$this->load->view('Asset/asset_coa',$data);
+	}
+
+	public function data_side_asset_coa(){
+		$this->asset_model->get_json_asset_coa();
+	}
+
+	public function add_asset_coa(){
+		if($this->input->post()){
+			$Arr_Kembali	= array();
+			$data			= $this->input->post();
+			$data_session	= $this->session->userdata;
+			$dateTime		= date('Y-m-d H:i:s');
+
+			//header
+			$id 		    = $data['id'];
+			$keterangan		= strtoupper($data['keterangan']);
+			$coa			= $data['coa'];
+			$coa_kredit		= $data['coa_kredit'];
+			$status			= $data['status'];
+
+			if(empty($id)){
+                $ArrHeader = array(
+                    'keterangan'=> $keterangan,
+                    'coa' 		=> $coa,
+                    'coa_kredit'=> $coa_kredit,
+					'status'	=> $status,
+                );
+                $TandaI = "Insert";
+			}
+
+			if(!empty($id)){
+                $ArrHeader = array(
+                    'keterangan'   => $keterangan,
+                    'coa' 		=> $coa,
+                    'coa_kredit'=> $coa_kredit,
+					'status'	=> $status,
+                );
+                $TandaI = "Update";
+            }
+            
+            $this->db->trans_start();
+                if(empty($id)){
+                    $this->db->insert('asset_coa', $ArrHeader);
+                }
+                if(!empty($id)){
+                    $this->db->where('id', $id);
+                    $this->db->update('asset_coa', $ArrHeader);
+                }
+            $this->db->trans_complete();
+
+
+			if($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				$Arr_Kembali	= array(
+					'pesan'		=> $TandaI.' data failed. Please try again later ...',
+					'status'	=> 2
+				);
+			}
+			else{
+				$this->db->trans_commit();
+				$Arr_Kembali	= array(
+					'pesan'		=> $TandaI.' data success. Thanks ...',
+					'status'	=> 1
+				);
+				history($TandaI.' Asset COA '.$id.' / '.$keterangan);
+			}
+
+			echo json_encode($Arr_Kembali);
+		}
+		else{
+			$this->load->model('All_model');
+			$controller			= ucfirst(strtolower($this->uri->segment(1)));
+			$Arr_Akses			= getAcccesmenu($controller);
+			if($Arr_Akses['create'] !='1'){
+				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+				redirect(site_url('users'));
+            }
+            
+            $id = $this->uri->segment(3);
+            $query = "SELECT * FROM asset_coa WHERE id ='".$id."' LIMIT 1 ";
+            $result = $this->db->query($query)->result();
+			$data_coa = $this->All_model->GetCoaCombo();
+			$data = array(
+				'title'		=> 'Add Asset COA',
+                'action'	=> 'add',
+                'data'      => $result,
+                'coalist'      => $data_coa
+			);
+			$this->load->view('Asset/add_asset_coa',$data);
+		}
+	}
+
+	public function hapus_asset_coa(){
+		$id = $this->uri->segment(3);
+		$data_session	= $this->session->userdata;
+
+		$ArrPlant		= array(
+			'status' 		=> 'N',
+			);
+
+
+		$this->db->trans_start();
+            $this->db->where('id', $id);
+            $this->db->update('asset_coa', $ArrPlant);
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Data	= array(
+				'pesan'		=>'Delete data failed. Please try again later ...',
+				'status'	=> 0
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Data	= array(
+				'pesan'		=>'Delete data success. Thanks ...',
+				'status'	=> 1
+			);
+			history('Delete Asset COA : '.$id);
+		}
+		echo json_encode($Arr_Data);
+	}
 
 }
 ?>
