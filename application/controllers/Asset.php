@@ -8,7 +8,7 @@ class Asset extends CI_Controller{
 		$this->load->model('asset_model');
 		$this->load->model('master_model');
 
-		if(!$this->session->userdata('isORIlogin')){ 
+		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}
     }
@@ -77,7 +77,6 @@ class Asset extends CI_Controller{
 			$KdCategoryPjk	= sprintf('%02s',$category_pajak);
 			$Ym				= date('ym');
 			$tgl_oleh		= date('Y-m-d');
-			$tgl_perolehan	= date('Y-m-d');
 			
 			$branch		= $data['branch'];
 
@@ -87,15 +86,8 @@ class Asset extends CI_Controller{
 				$Month			= date('m', strtotime($data['tanggal']));
 				$Ym				= $Year.$Month;
 			}
-			
-			if(!empty($data['tanggal_oleh'])){
-				$tgl_perolehan		= date('Y-m-d', strtotime($data['tanggal_oleh']));
-				$Year_perolehan		= date('y', strtotime($data['tanggal_oleh']));
-				$Month_perolehan	= date('m', strtotime($data['tanggal_oleh']));
-				$Ym_perolehan		= $Year_perolehan.$Month_perolehan;
-			}
 
-			$qQuery			= "SELECT max(kd_asset) as maxP FROM asset WHERE kd_asset LIKE '".$branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-%' ";//category='".$category."' AND 
+			$qQuery			= "SELECT max(kd_asset) as maxP FROM asset WHERE kd_asset LIKE '".$branch."-".$Ym.$KdCategory.$KdCategoryPjk."-%' ";//category='".$category."' AND 
 			$restQuery		= $this->db->query($qQuery)->result_array();
 
 			$angkaUrut2		= $restQuery[0]['maxP'];
@@ -103,7 +95,7 @@ class Asset extends CI_Controller{
 			$urutan2++;
 			$urut2			= sprintf('%03s',$urutan2);
 
-			$kode_assets	= $branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-".$urut2;
+			$kode_assets	= $branch."-".$Ym.$KdCategory.$KdCategoryPjk."-".$urut2;
 
 			//kode group
 			$q_group		= "SELECT max(code_group) as maxP FROM asset WHERE code_group LIKE 'AS%' ";
@@ -183,7 +175,7 @@ class Asset extends CI_Controller{
 				$detailData[$lopp]['kd_asset'] 		= $kode_assets.$Nomor;
 				$detailData[$lopp]['code_group'] 	= $kode_group;
 				$detailData[$lopp]['nm_asset'] 		= $data['nm_asset'];
-				$detailData[$lopp]['tgl_perolehan'] = $tgl_perolehan;
+				$detailData[$lopp]['tgl_perolehan'] = $tgl_oleh;
 				$detailData[$lopp]['id_coa'] 		= $id_coa;
 				$detailData[$lopp]['category'] 		= $data['category'];
 				$detailData[$lopp]['category_pajak']= $data['category_pajak'];
@@ -203,7 +195,6 @@ class Asset extends CI_Controller{
 				$detailData[$lopp]['cost_center'] 	= get_name('costcenter', 'nm_costcenter', 'id_costcenter', $data['cost_center']);
 				$detailData[$lopp]['created_by'] 	= $this->session->userdata['ORI_User']['username'];
 				$detailData[$lopp]['created_date'] 	= date('Y-m-d h:i:s');
-				$detailData[$lopp]['tgl_depresiasi'] = $tgl_oleh;
 
 				$jmlx   	= $data['depresiasi'] * 12;
 				$date_now 	= date('Y-m-d');
@@ -300,71 +291,6 @@ class Asset extends CI_Controller{
 			$this->load->view('Asset/add', $data);
 		}
 	}
-	
-	
-	public function edit(){
-		
-			$id = $this->uri->segment(3);
-			$header = $this->asset_model->getWhere('asset', 'id', $id);
-			$data = array(
-				'title'			=> 'Edit Asset',
-				'action'		=> 'edit',
-				'data' 			=> $header,
-				'list_cab' 		=> $this->asset_model->getList('asset_branch'),
-				'list_coa' 		=> $this->asset_model->getList('asset_coa'),
-				'list_pajak'	=> $this->asset_model->getList('asset_category_pajak'),
-				'list_dept' => $this->asset_model->getList('department'),
-				'list_catg' => $this->asset_model->getList('asset_category')
-				);
-			$this->load->view('Asset/edit', $data);
-	}
-	
-	
-	//move asset
-	public function edited(){
-		
-		$Arr_Kembali	= array();
-		$data			= $this->input->post();
-		
-		$branch				= $data['branch'];
-		$kd_asset			= $data['kd_asset'];
-		$lokasi_asset_new	= $data['lokasi_asset_new'];
-		$cost_center_new	= $data['cost_center_new'];
-		
-		$ArrUpHeader = array(
-		    'id_coa'		=> $data['id_coa'],
-			'category'		=> $data['category'],
-			'modified_by' 	=> $this->session->userdata['ORI_User']['username'],
-			'modified_date' => date('Y-m-d h:i:s')
-		);
-		
-	
-		
-		$this->db->trans_start();
-			$this->db->where('kd_asset', $kd_asset);
-			$this->db->update('asset', $ArrUpHeader);			
-			
-		$this->db->trans_complete();
-		
-		if($this->db->trans_status() === FALSE){
-			$this->db->trans_rollback();
-			$Arr_Data	= array(
-				'pesan'		=>'Asset gagal disimpan ...',
-				'status'	=> 0
-			);			
-		}
-		else{
-			$this->db->trans_commit();
-			$Arr_Data	= array(
-				'pesan'		=>'Asset berhasil disimpan. Thanks ...',
-				'status'	=> 1
-			);
-			history('Move asset to asset');
-		}
-		
-		echo json_encode($Arr_Data);
-	}
-	
 	
 	//move asset
 	public function move_asset(){
