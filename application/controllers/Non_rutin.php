@@ -314,7 +314,7 @@ class Non_rutin extends CI_Controller {
 			$approve 	= $this->uri->segment(4);
 			$header 	= $this->db->query("SELECT * FROM rutin_non_planning_header WHERE no_pengajuan='".$id."' ")->result();
 			$detail 	= $this->db->query("SELECT * FROM rutin_non_planning_detail WHERE no_pengajuan='".$id."' ")->result_array();
-			$datacoa 	= $this->db->query("SELECT a.coa,b.nama FROM coa_category a join ".DBACC.".coa_master b on a.coa=b.no_perkiraan WHERE a.tipe='NONRUTIN' order by a.coa")->result_array();
+			$datacoa 	= $this->db->query("SELECT a.coa,b.nama FROM coa_category a join gl.coa_master b on a.coa=b.no_perkiraan WHERE a.tipe='NONRUTIN' order by a.coa")->result_array();
 			$satuan		= $this->db->get_where('raw_pieces',array('delete'=>'N'))->result_array();
 			$tanda 		= (!empty($header))?'Edit':'Add';
 			if(!empty($approve)){
