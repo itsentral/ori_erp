@@ -14,13 +14,9 @@ $value          = (!empty($data))?$data[0]['value']:'';
 $foto 			= (!empty($data[0]['id']))?$data[0]['foto']:'';
 $qty            = (!empty($data))?$data[0]['qty']:'';
 $id_costcenter  = (!empty($data))?$data[0]['id_costcenter']:'';
-$tgl_depresiasi  = (!empty($data))?$data[0]['tgl_depresiasi']:'';
 $tgl_perolehan  = (!empty($data))?$data[0]['tgl_perolehan']:'';
 $nama_user  	= (!empty($data))?$data[0]['nama_user']:'';
 $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
-
-print_r($id);
-exit;
 
 // echo $_SERVER['DOCUMENT_ROOT'];
 ?>
@@ -147,10 +143,10 @@ exit;
                         ?>
                 </div>
                 
-				<label class='label-control col-sm-2 va'><b>Date Start Depreciation</b></label>
+				<label class='label-control col-sm-2 va'><b>Date of Acquisition</b></label>
                 <div class='col-sm-4'>
                     <?php
-                        echo form_input(array('id'=>'tanggal','name'=>'tanggal','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Date Start Depreciation', 'readonly'=>'readonly'),$tgl_depresiasi);
+                        echo form_input(array('id'=>'tanggal','name'=>'tanggal','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Date of Acquisition', 'readonly'=>'readonly'),$tgl_perolehan);
                     ?>
                 </div>
             </div>
@@ -194,12 +190,6 @@ exit;
 						<option value='N'>No</option>
 					</select>
 				</div>
-				<label class='label-control col-sm-2 va'><b>Date of Acquisition</b></label>
-                <div class='col-sm-4'>
-                    <?php
-                        echo form_input(array('id'=>'tanggal_oleh','name'=>'tanggal_oleh','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Date of Acquisition', 'readonly'=>'readonly'),$tgl_perolehan);
-                    ?>
-                </div>
 			</div>
 			<div class='form-group row'>		 	 
 				<label class='label-control col-sm-2'><b>Nama User</b></label>
@@ -249,11 +239,6 @@ exit;
 			cursor:pointer;
 			background-color: white;
 		}
-		
-		#tanggal_oleh{
-			cursor:pointer;
-			background-color: white;
-		}
 	<?php } ?>
 </style>
 <script>
@@ -264,10 +249,6 @@ exit;
         $('#qty').maskMoney();
 
         $('#tanggal').datepicker({
-            format : 'yyyy-mm-dd'
-        });
-		
-		 $('#tanggal_oleh').datepicker({
             format : 'yyyy-mm-dd'
         });
 
