@@ -19,6 +19,9 @@ $tgl_perolehan  = (!empty($data))?$data[0]['tgl_perolehan']:'';
 $nama_user  	= (!empty($data))?$data[0]['nama_user']:'';
 $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 
+print_r($id);
+exit;
+
 // echo $_SERVER['DOCUMENT_ROOT'];
 ?>
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data">
