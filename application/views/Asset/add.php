@@ -202,7 +202,7 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 				<label class='label-control col-sm-2'><b>Nama User</b></label>
                 <div class='col-sm-4'>
 					<?php
-					echo form_input(array('id'=>'nama_user','name'=>'nama_user','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Nama User',$disabled=>$disabled),$nama_user);											
+					echo form_input(array('id'=>'nama_user','name'=>'nama_user','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Nama User',$disabled=>$disabled),$id);											
 				?>	
                 </div>
 			</div>
