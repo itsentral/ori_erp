@@ -1632,7 +1632,7 @@ class Outgoing extends CI_Controller {
 			if($tipe_out != 'non-so'){
 				foreach($addInMat AS $val => $valx){
 					if(!empty($valx['id'])){
-						$qtyIN 		= str_replace(',','',$valx['qty_in']);
+						$qtyIN 		= (!empty($valx['qty_in']))?str_replace(',','',$valx['qty_in']):0;
 						$SumMat 	+= $qtyIN;
 
 						if($tanda == 'TRS'){
@@ -1740,7 +1740,6 @@ class Outgoing extends CI_Controller {
                 }
             }
             
-
             //GROUPING UPDATE MATERIAL PER GUDANG
 			$ArrGrouping = [];
 			foreach ($ArrMaterial as $key => $value) {
@@ -1750,69 +1749,6 @@ class Outgoing extends CI_Controller {
 
 			$gudang_dari = $gudang;
 			$gudang_ke = getGudangFG();
-			// agus insert jurnal
-			// $tgl_voucher=date('Y-m-d');
-			// $this->load->model('jurnal_model');
-			// $Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
-			// $this->db->query("UPDATE ".DBACC.".pastibisa_tb_cabang SET nomorJC=nomorJC + 1  WHERE nocab='101'");
-			// $Bln	  = substr($tgl_voucher,5,2);
-			// $Thn	  = substr($tgl_voucher,0,4);
-			// $SUM_PRICE=0;
-			// $no_voucher = $kode_trans;
-			// $datadetail=[];
-			// end 
-			// if(!empty($ArrGrouping)){
-			// 	foreach ($ArrGrouping as $key => $value) {
-			// 		move_warehouse($value,$key,$gudang_ke,$kode_trans);
-			// 		if(!empty($value)){
-			// 			insert_jurnal($value,$key,15,$kode_trans,'material to FG','pengurangan subgudang','penambahan gudang finish good');
-			// 		}
-			// 		// insert jurnal agus
-			// 		// foreach($value AS $key2 => $value2){
-			// 		// 	$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$value2['id']))->result();
-			// 		// 	$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-			// 		// 	$kodejurnal='JV056';
-
-			// 		// 	$datajurnal  	 = $this->db->query("select a.* from ".DBACC.".master_oto_jurnal_detail a where kode_master_jurnal='".$kodejurnal."' order by a.posisi,a.parameter_no")->result();
-			// 		// 	foreach($datajurnal AS $record){
-			// 		// 		$tabel  = $record->menu;
-			// 		// 		$posisi = $record->posisi;
-			// 		// 		$nokir  = $record->no_perkiraan;
-			// 		// 		$nilaibayar = $PRICE * $value2['qty'];
-			// 		// 		$Keterangan_INV='Material to FG';
-			// 		// 		$no_request=$kode_trans;
-			// 		// 		if ($posisi=='D'){
-			// 		// 			$SUM_PRICE=($SUM_PRICE+$nilaibayar);
-			// 		// 			$datadetail[] = array(
-			// 		// 				'tipe'        => 'JV',
-			// 		// 				'nomor'       => $Nomor_JV,
-			// 		// 				'tanggal'     => $tgl_voucher,
-			// 		// 				'no_perkiraan'	=> $nokir,
-			// 		// 				'keterangan'	=> $Keterangan_INV,
-			// 		// 				'no_reff'		=> $no_request,
-			// 		// 				'debet'			=> $nilaibayar,
-			// 		// 				'kredit'		=> 0
-			// 		// 			);
-			// 		// 		} elseif ($posisi=='K'){
-			// 		// 			$datadetail[] = array(
-			// 		// 				'tipe'        => 'JV',
-			// 		// 				'nomor'       => $Nomor_JV,
-			// 		// 				'tanggal'     => $tgl_voucher,
-			// 		// 				'no_perkiraan'	=> $nokir,
-			// 		// 				'keterangan'	=> $Keterangan_INV,
-			// 		// 				'no_reff'		=> $no_request,
-			// 		// 				'debet'			=> 0,
-			// 		// 				'kredit'		=> $nilaibayar
-			// 		// 			);
-			// 		// 		}
-			// 		// 	}
-			// 		// }
-			// 	}
-			// }
-
-			// print_r($ArrGrouping);
-			// exit;
-
 
 			$ArrInsertH = array(
 				'kode_trans' 		=> $kode_trans,
@@ -1850,44 +1786,9 @@ class Outgoing extends CI_Controller {
 			}
 
 			//=======END NEW=============
-
-			// print_r($ArrUpdate);
-			// print_r($ArrQcHeader);
-			// print_r($ArrMaterialQc);
-			// exit;
-			
-			// if(!empty($ArrGrouping)){
-			// 	foreach ($ArrGrouping as $key => $valueParent) {
-			// 		$grouping_temp = [];
-			// 		$temp = [];
-			// 		foreach($valueParent as $value) { $key++;
-			// 			if(!array_key_exists($value['id'], $temp)) {
-			// 				$temp[$value['id']]['good'] = 0;
-			// 			}
-			// 			$temp[$value['id']]['good'] += $value['qty'];
-		
-			// 			$grouping_temp[$value['id']]['id'] 			= $value['id'];
-			// 			$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']]['good'];
-			// 		}
-					
-			// 		move_warehouse($grouping_temp,$key,$gudang_ke,$kode_trans);
-			// 		if(!empty($value)){
-			// 			insert_jurnal($grouping_temp,$key,15,$kode_trans,'material to FG','pengurangan subgudang','penambahan gudang finish good');
-			// 		}
-			// 	}
-			// }
-
 			// exit;
 			$this->db->trans_start();
-				// jurnal di off masuk ke jurnal helper
-				// agus insert jurnal
 				$UserName=$data_session['ORI_User']['username'];
-				// $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $SUM_PRICE, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kode_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-				// if(!empty($datadetail)){
-				// 	$this->db->insert(DBACC.'.javh',$dataJVhead);
-				// 	$this->db->insert_batch(DBACC.'.jurnal',$datadetail);
-				// }
-				// end	
 				$this->db->insert('warehouse_adjustment', $ArrInsertH);
 				$this->db->insert_batch('warehouse_adjustment_detail', $ArrDeatilAdj);
 				if($tipe_out != 'non-so'){
@@ -1926,7 +1827,8 @@ class Outgoing extends CI_Controller {
 							if(!array_key_exists($value['id'], $temp)) {
 								$temp[$value['id']]['good'] = 0;
 							}
-							$temp[$value['id']]['good'] += $value['qty'];
+							$QtyIn = (!empty($value['qty']))?$value['qty']:0;
+							$temp[$value['id']]['good'] += $QtyIn;
 			
 							$grouping_temp[$value['id']]['id'] 			= $value['id'];
 							$grouping_temp[$value['id']]['qty_good'] 	= $temp[$value['id']]['good'];

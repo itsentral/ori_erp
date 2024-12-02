@@ -648,6 +648,7 @@ class Deadstok extends CI_Controller {
 		$ArrInsertCutting = [];
 		$ArrInsertModif = [];
 		$ArrInsertToFG = [];
+		$ArrInsertToWIP = [];
 		if(!empty($detail)){
 			foreach ($detail as $key => $value) {
 				$getDetail = $this->db->get_where('deadstok',array('id_product'=>$value['id_product'],'id_booking'=>NULL,'deleted_date'=>NULL))->result_array();
@@ -722,8 +723,10 @@ class Deadstok extends CI_Controller {
 					//JIKA CUTTING
 					$getDetailDead 	= $this->db->get_where('deadstok',array('id'=>$deadstokDipakai))->result_array();
 					if($value['proses_next'] == '3'){
+						$ProductName = $getDetailDead[0]['product_name'].' '.$getDetailDead[0]['type_std'].' '.$getDetailDead[0]['resin'].', '.$getDetailDead[0]['product_spec'];
+
 						$ArrInsertCutting[$key]['id_milik'] 	= $id_milik;
-						$ArrInsertCutting[$key]['id_category'] 	= $getDetailDead[0]['product_name'].' '.$getDetailDead[0]['type_std'].' '.$getDetailDead[0]['resin'].', '.$getDetailDead[0]['product_spec'];
+						$ArrInsertCutting[$key]['id_category'] 	= $ProductName;
 						$ArrInsertCutting[$key]['id_deadstok'] 	= $deadstokDipakai;
 						$ArrInsertCutting[$key]['id_bq'] 		= 'BQ-'.$no_ipp;
 						$ArrInsertCutting[$key]['qty'] 			= 1;
@@ -733,6 +736,27 @@ class Deadstok extends CI_Controller {
 						$ArrInsertCutting[$key]['length'] 		= $getDetailDead[0]['length'];
 						$ArrInsertCutting[$key]['created_by'] 	= $username;
 						$ArrInsertCutting[$key]['created_date'] = $dateTime;
+
+						$ArrInsertToWIP[$key]['tanggal'] = date('Y-m-d');
+						$ArrInsertToWIP[$key]['keterangan'] = 'Deadstock to Finish Good';
+						$ArrInsertToWIP[$key]['no_so'] = $so_number;
+						$ArrInsertToWIP[$key]['product'] = $ProductName;
+						$ArrInsertToWIP[$key]['no_spk'] = $no_spk;
+						$ArrInsertToWIP[$key]['kode_trans'] = 'deadstok';
+						$ArrInsertToWIP[$key]['id_pro_det'] = $deadstokDipakai;
+						$ArrInsertToWIP[$key]['qty'] = 1;
+						$ArrInsertToWIP[$key]['nilai_wip'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['nilai_unit'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['material'] = 0;
+						$ArrInsertToWIP[$key]['wip_direct'] =  0;
+						$ArrInsertToWIP[$key]['wip_indirect'] =  0;
+						$ArrInsertToWIP[$key]['wip_consumable'] =  0;
+						$ArrInsertToWIP[$key]['wip_foh'] =  0;
+						$ArrInsertToWIP[$key]['created_by'] = $username;
+						$ArrInsertToWIP[$key]['created_date'] = $dateTime;
+						$ArrInsertToWIP[$key]['id_trans'] =  $value['id']; //menggantikan product di production_detail
+						$ArrInsertToWIP[$key]['id_pro'] =  $id_milik; //id milik
+						$ArrInsertToWIP[$key]['jenis'] =  'in deadstok'; //id milik
 					}
 
 					if($value['proses_next'] == '4'){
@@ -741,6 +765,54 @@ class Deadstok extends CI_Controller {
 						$ArrInsertModif[$key]['proses'] 		= $value['proses'];
 						$ArrInsertModif[$key]['created_by'] 	= $username;
 						$ArrInsertModif[$key]['created_date'] 	= $dateTime;
+
+						$ProductName = $getDetailDead[0]['product_name'].' '.$getDetailDead[0]['type_std'].' '.$getDetailDead[0]['resin'].', '.$getDetailDead[0]['product_spec'];
+
+						$ArrInsertToWIP[$key]['tanggal'] = date('Y-m-d');
+						$ArrInsertToWIP[$key]['keterangan'] = 'Deadstock to Finish Good';
+						$ArrInsertToWIP[$key]['no_so'] = $so_number;
+						$ArrInsertToWIP[$key]['product'] = $ProductName;
+						$ArrInsertToWIP[$key]['no_spk'] = $no_spk;
+						$ArrInsertToWIP[$key]['kode_trans'] = 'deadstok';
+						$ArrInsertToWIP[$key]['id_pro_det'] = $deadstokDipakai;
+						$ArrInsertToWIP[$key]['qty'] = 1;
+						$ArrInsertToWIP[$key]['nilai_wip'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['nilai_unit'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['material'] = 0;
+						$ArrInsertToWIP[$key]['wip_direct'] =  0;
+						$ArrInsertToWIP[$key]['wip_indirect'] =  0;
+						$ArrInsertToWIP[$key]['wip_consumable'] =  0;
+						$ArrInsertToWIP[$key]['wip_foh'] =  0;
+						$ArrInsertToWIP[$key]['created_by'] = $username;
+						$ArrInsertToWIP[$key]['created_date'] = $dateTime;
+						$ArrInsertToWIP[$key]['id_trans'] =  $value['id']; //menggantikan product di production_detail
+						$ArrInsertToWIP[$key]['id_pro'] =  $id_milik; //id milik
+						$ArrInsertToWIP[$key]['jenis'] =  'in deadstok'; //id milik
+					}
+
+					if($value['proses_next'] == '2'){
+						$ProductName = $getDetailDead[0]['product_name'].' '.$getDetailDead[0]['type_std'].' '.$getDetailDead[0]['resin'].', '.$getDetailDead[0]['product_spec'];
+
+						$ArrInsertToWIP[$key]['tanggal'] = date('Y-m-d');
+						$ArrInsertToWIP[$key]['keterangan'] = 'Deadstock to Finish Good';
+						$ArrInsertToWIP[$key]['no_so'] = $so_number;
+						$ArrInsertToWIP[$key]['product'] = $ProductName;
+						$ArrInsertToWIP[$key]['no_spk'] = $no_spk;
+						$ArrInsertToWIP[$key]['kode_trans'] = 'deadstok';
+						$ArrInsertToWIP[$key]['id_pro_det'] = $deadstokDipakai;
+						$ArrInsertToWIP[$key]['qty'] = 1;
+						$ArrInsertToWIP[$key]['nilai_wip'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['nilai_unit'] = $getDetailDead[0]['price_book'];
+						$ArrInsertToWIP[$key]['material'] = 0;
+						$ArrInsertToWIP[$key]['wip_direct'] =  0;
+						$ArrInsertToWIP[$key]['wip_indirect'] =  0;
+						$ArrInsertToWIP[$key]['wip_consumable'] =  0;
+						$ArrInsertToWIP[$key]['wip_foh'] =  0;
+						$ArrInsertToWIP[$key]['created_by'] = $username;
+						$ArrInsertToWIP[$key]['created_date'] = $dateTime;
+						$ArrInsertToWIP[$key]['id_trans'] =  $value['id']; //menggantikan product di production_detail
+						$ArrInsertToWIP[$key]['id_pro'] =  $id_milik; //id milik
+						$ArrInsertToWIP[$key]['jenis'] =  'in deadstok'; //id milik
 					}
 				}
 
@@ -760,6 +832,9 @@ class Deadstok extends CI_Controller {
 			}
 			if(!empty($ArrInsertToFG)){
 				$this->db->insert_batch('data_erp_fg',$ArrInsertToFG);
+			}
+			if(!empty($ArrInsertToWIP)){
+				$this->db->insert_batch('data_erp_fg',$ArrInsertToWIP);
 			}
 		$this->db->trans_complete();
 

@@ -132,7 +132,7 @@ $next_process			= (!empty($get_spk)) ? $get_spk[0]->next_process : '';
 							}
 
 							$check = "";
-							if ($value['fg_date'] != NULL && $value['lock_qc'] = 'Y') {
+							if ($value['fg_date'] != NULL && $value['lock_qc'] = 'Y' && $value['sts_cutting'] == 'N') {
 								$check = "<input type='checkbox' name='check[$key]' data-nomor='$key' class='chk_item' value='" . $value['id'] . "' >";
 							}
 							$flagQR = ($value['flag_qr'] != null && $value['flag_qr'] == 'Y') ? '<i class="text-success fa fa-check"></i>' : '-';

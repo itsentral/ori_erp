@@ -39,6 +39,9 @@ $this->load->view('include/side_menu');
                             <th class="text-center">NO TRANS</th>
                             <th class="text-center">QTY</th>
                             <th class="text-center">NILAI IN TRANSIT</th>
+							<th class="text-center">Material Name</th>
+							<th class="text-center">Qty/Berat</th>
+                            <th class="text-center">Costbook</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

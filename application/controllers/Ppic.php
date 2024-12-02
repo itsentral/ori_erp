@@ -733,7 +733,7 @@ class Ppic extends CI_Controller {
 			$view = "<a href='".base_url('ppic/view_spool/'.$row['spool_induk'])."' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 
 
-			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length, status_tanki, nm_tanki')->group_by('sts, id_milik')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
+			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, cutting_ke, no_drawing, id_category AS nm_product, no_spk, COUNT(id) AS qty, sts, length, status_tanki, nm_tanki')->group_by('sts, id_milik, length')->order_by('id','asc')->get_where('spool_group_all',array('spool_induk'=>$row['spool_induk']))->result_array();
 			$ArrNo_Spool = [];
 			$ArrNo_IPP = [];
 			$ArrNo_Drawing = [];

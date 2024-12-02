@@ -93,124 +93,11 @@ class Delivery extends CI_Controller
 			$view = "<a href='" . base_url('delivery/view_delivery/' . $row['kode_delivery']) . "' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 			$print2 = "<a href='" . base_url('delivery/print_preview/' . $row['kode_delivery']) . "' target='_blank' class='btn btn-sm btn-info' title='Preview'><i class='fa fa-search'></i></a>";
 					
-			$get_split_ipp1 = $this->db
-									->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
-									->group_by('a.id_milik, a.sts, a.spool_induk')
-									->order_by('a.spool_induk', 'asc')
-									->order_by('a.kode_spool', 'asc')
-									->where('(a.berat > 0 OR a.berat IS NULL)')
-									->join('production_detail b','a.id_pro=b.id','left')
-									->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'a.sts_product' => NULL,'a.kode_spk !='=>'deadstok'))->result_array();
-			$get_split_ipp2 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'so material'))->result_array();
-			$get_split_ipp3 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'field joint'))->result_array();
-			$get_split_ipp4 = $this->db->select('COUNT(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL OR a.sts = 'loose_dead')")->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'deadstok'))->result_array();
-			$get_split_ipp4a = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_milik')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'kode_spk' => 'deadstok'))->result_array();
-			$get_split_ipp5 = $this->db->select('SUM(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL)")->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'aksesoris'))->result_array();
-			$get_split_ipp = array_merge($get_split_ipp1, $get_split_ipp2, $get_split_ipp3, $get_split_ipp4, $get_split_ipp4a, $get_split_ipp5);
-			$ArrNo_IPP = [];
-			$ArrNo_SPK = [];
-			$ArrNo_LS = [];
-			$ArrNo_Drawing = [];
-			foreach ($get_split_ipp as $key => $value) {
-				$key++;
-				$no_spk 		= $value['no_spk'];
-				$NO_IPP 		= str_replace(['PRO-', 'BQ-'], '', $value['id_produksi']);
-				$NO_SO 			= (!empty($GET_SALES_ORDER[$NO_IPP]['so_number'])) ? $GET_SALES_ORDER[$NO_IPP]['so_number'] : '';
-				$ArrNo_IPP[]	= $NO_SO;
-				if (!empty($value['no_drawing'])) {
-					if ($value['sts_product'] != 'aksesoris') {
-					$ArrNo_Drawing[] = $value['no_drawing'];
-					}
-				}
+			$GetSPEC 		= $this->detailDelivery($row['kode_delivery']);
 
-				$CUTTING_KE = (!empty($value['cutting_ke'])) ? '.' . $value['cutting_ke'] : '';
-				$IMPLODE = explode('.', $value['product_code']);
-				$ID_PRX_ADD = $IMPLODE[0] . '.' . $value['product_ke'] . $CUTTING_KE . '/' . $no_spk;
-				if ($value['sts_product'] == 'so material') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					}
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('so_number', 'so_number', 'id_bq', str_replace('PRO-', 'BQ-', $value['id_produksi']))) . '/' . $no_spk;
-					}
-				}
-
-				$series 	= (!empty($GET_DET_FD[$value['id_milik']]['series'])) ? $GET_DET_FD[$value['id_milik']]['series'] : '';
-				$product 	= strtoupper($value['product']) . ", " . $series . ", DIA " . spec_bq2($value['id_milik']);
-				$SATUAN 	= ' pcs';
-				$QTY 		= $value['qty_product'];
-
-				if ($value['sts_product'] == 'deadstok') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['product_code'].' x '.$value['length'];
-				}
-
-				if ($value['sts'] == 'loose_dead') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['kode_spk'].' x '.$value['length'];
-				}
-
-				if ($value['type_product'] == 'tanki') {
-					$spec = $tanki_model->get_spec($value['id_milik']);
-					$product 	= strtoupper($value['product_tanki']) . ", " . $spec;
-				}
-
-				$ID_MILIK 	= (!empty($GET_ID_MILIK[$value['id_milik']])) ? $GET_ID_MILIK[$value['id_milik']] : '';
-				if ($value['sts_product'] == 'so material') {
-					$product 	= strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					$SATUAN 	= ' kg';
-					$QTY 		= number_format($value['berat'], 2);
-					$ID_MILIK 	= '';
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					$SATUAN     = ' kit';
-					$QTY         = number_format($value['berat']);
-				}
-
-				if ($value['sts_product'] == 'deadstok') {
-					$QTY         = number_format($value['qty_product']);
-					$product 	= strtoupper($value['product']) . ", " .$value['kode_spk']." x ".$value['length'];
-				}
-				if ($value['sts_product'] == 'aksesoris') {
-					$QTY         	= number_format($value['qty_product'],2);
-					$ID_PRX_ADD 	= $value['product_code'];
-					$product 		= strtoupper($value['no_drawing']);
-				}
-
-				$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>" . $ID_PRX_ADD . "</b>], " . $product;
-
-				$QNOSO = $this->db->get_where('so_number', ['id_bq' => str_replace("PRO", "BQ", $value['id_produksi'])])->row();
-				$NOSO = (!empty($QNOSO->so_number))?$QNOSO->so_number:'-';
-
-				//Category
-				$loose_spool = (!empty($value['spool_induk'])) ? $value['spool_induk'] . '-' . $value['kode_spool'] : 'LOOSE';
-				if ($value['sts_product'] == 'so material') {
-					$loose_spool = $NOSO;
-				}
-				if ($value['sts_product'] == 'field joint') {
-					$loose_spool = "FIELD JOINT";
-				}
-				if ($value['sts'] == 'cut' and empty($value['spool_induk'])) {
-					$loose_spool = "LOOSE PIPE CUTTING";
-				}
-				if ($value['sts_product'] == 'deadstok' OR $value['kode_spk'] == 'deadstok') {
-					$loose_spool = "DEADSTOCK";
-				}
-				if ($value['sts_product'] == 'aksesoris') {
-					$loose_spool = "AKSESORIS	";
-				}
-				$ArrNo_LS[] = $key . '. ' . $loose_spool;
-
-				$ArrNo_SPK[] = $key . ".<span class='text-bold text-blue'>" . $loose_spool . "</span> " . $ID_PRX;
-			}
-			// print_r($ArrGroup); exit;
-			$explode_ipp 	= implode('<br>', array_unique($ArrNo_IPP));
-			$explode_nd 	= implode('<br>', array_unique($ArrNo_Drawing));
-			$explode_spk 	= implode('<br>', $ArrNo_SPK);
+			$explode_ipp 	= $GetSPEC['explode_ipp'];
+			$explode_nd 	= $GetSPEC['explode_nd'];
+			$explode_spk 	= $GetSPEC['explode_spk'];
 			// $explode_ls 	= implode('<br>',$ArrNo_LS);
 
 			$nestedData 	= array();
@@ -637,7 +524,9 @@ class Delivery extends CI_Controller
 	/* loadDataSS */
 	public function loadDataSS($kode_delivery)
 	{
-		$result 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL))->result_array();
+		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL))->result_array();
+		$result_2 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts' => 'cut'))->result_array();
+		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
 		$result4 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material', 'product_code' => 'field joint'))->result_array();
 		$result2 	= $this->db->order_by('id', 'asc')->group_by('spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
@@ -1610,7 +1499,9 @@ class Delivery extends CI_Controller
 		// $dataSO = (array_replace($dataSOPro, $dataSOCut, $dataSOMat));
 		// $dataSO = array_unique(array_merge($dataSOPro, $dataSOCut, $dataSOMat));
 
-		$result 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL, 'sts !=' => 'loose_dead'))->result_array();
+		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL, 'sts !=' => 'loose_dead'))->result_array();
+		$result_2 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts' => 'cut'))->result_array();
+		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
 		$result4 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'field joint'))->result_array();
 		$result2 	= $this->db->order_by('id', 'asc')->group_by('spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
@@ -2355,6 +2246,11 @@ class Delivery extends CI_Controller
 			if ($value['sts'] == 'cut') {
 				$Cutting_ke = "." . $value['cutting_ke'];
 				$product_code = $IMPLODE[0] . '.' . $value['product_ke'] . $Cutting_ke;
+
+				$ArrInsert[$key]['sts_product'] = $value['sts'];
+			}
+			if ($value['id_milik'] == null) {
+				$product_code = $value['dead_no_so'];
 			}
 
 			$ArrInsert[$key]['kode_delivery'] = $kode_delivery;
@@ -2366,14 +2262,15 @@ class Delivery extends CI_Controller
 			$ArrInsert[$key]['spool_induk'] = $value['spool_induk'];
 			$ArrInsert[$key]['kode_spool'] = $value['kode_spool'];
 			$ArrInsert[$key]['product_code'] = $product_code;
-			$ArrInsert[$key]['no_spk'] = $value['no_spk'];
+			$ArrInsert[$key]['no_spk'] = (!empty($value['no_spk']))?$value['no_spk']:$value['dead_no_spk'];
 			$ArrInsert[$key]['product_ke'] = $value['product_ke'];
 			$ArrInsert[$key]['kode_spk'] = $value['kode_spk'];
 			$ArrInsert[$key]['length'] = $value['length'];
 			$ArrInsert[$key]['cutting_ke'] = $value['cutting_ke'];
 			$ArrInsert[$key]['no_drawing'] = $value['no_drawing'];
 			$ArrInsert[$key]['upload_date'] = $value['upload_date'];
-			$ArrInsert[$key]['sts'] = $value['sts'];
+			$ArrInsert[$key]['sts'] = (empty($value['id_milik']))?'cut':$value['sts'];
+			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			//agus
 			$ArrInsert[$key]['nilai_cogs'] = $value['finish_good'];
 			$ArrInsert[$key]['updated_by'] = $username;
@@ -2469,111 +2366,11 @@ class Delivery extends CI_Controller
 			$view = "<a href='" . base_url('delivery/view_delivery/' . $row['kode_delivery']) . "' target='_blank' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 
 
-			$get_split_ipp1 = $this->db
-									->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
-									->group_by('a.id_milik, a.sts')
-									->order_by('a.spool_induk', 'asc')
-									->order_by('a.kode_spool', 'asc')
-									->where('(a.berat > 0 OR a.berat IS NULL)')
-									->join('production_detail b','a.id_pro=b.id','left')
-									->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'a.sts_product' => NULL))->result_array();
-			$get_split_ipp2 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'so material'))->result_array();
-			$get_split_ipp3 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'field joint'))->result_array();
-			$get_split_ipp4 = $this->db->select('COUNT(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL OR a.sts = 'loose_dead')")->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'deadstok'))->result_array();
-			$get_split_ipp = array_merge($get_split_ipp1, $get_split_ipp2, $get_split_ipp3, $get_split_ipp4);
-			$ArrNo_IPP = [];
-			$ArrNo_SPK = [];
-			$ArrNo_LS = [];
-			$ArrNo_Drawing = [];
-			foreach ($get_split_ipp as $key => $value) {
-				$key++;
-				$no_spk 		= $value['no_spk'];
-				$NO_IPP 		= str_replace(['PRO-', 'BQ-'], '', $value['id_produksi']);
-				$NO_SO 			= (!empty($GET_SALES_ORDER[$NO_IPP]['so_number'])) ? $GET_SALES_ORDER[$NO_IPP]['so_number'] : '';
-				$ArrNo_IPP[]	= $NO_SO;
-				if (!empty($value['no_drawing'])) {
-					$ArrNo_Drawing[] = $value['no_drawing'];
-				}
+			$GetSPEC 		= $this->detailDelivery($row['kode_delivery']);
 
-				$CUTTING_KE = (!empty($value['cutting_ke'])) ? '.' . $value['cutting_ke'] : '';
-				$IMPLODE = explode('.', $value['product_code']);
-				$ID_PRX_ADD = $IMPLODE[0] . '.' . $value['product_ke'] . $CUTTING_KE . '/' . $no_spk;
-				if ($value['sts_product'] == 'so material') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					}
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('so_number', 'so_number', 'id_bq', str_replace('PRO-', 'BQ-', $value['id_produksi']))) . '/' . $no_spk;
-					}
-				}
-
-				$series 	= (!empty($GET_DET_FD[$value['id_milik']]['series'])) ? $GET_DET_FD[$value['id_milik']]['series'] : '';
-				$product 	= strtoupper($value['product']) . ", " . $series . ", DIA " . spec_bq2($value['id_milik']);
-				$SATUAN 	= ' pcs';
-				$QTY 		= $value['qty_product'];
-
-				if ($value['sts_product'] == 'deadstok') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['product_code'].' x '.$value['length'];
-				}
-
-				if ($value['sts'] == 'loose_dead') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['kode_spk'].' x '.$value['length'];
-				}
-
-				if ($value['type_product'] == 'tanki') {
-					$spec = $tanki_model->get_spec($value['id_milik']);
-					$product 	= strtoupper($value['product_tanki']) . ", " . $spec;
-				}
-
-				$ID_MILIK 	= (!empty($GET_ID_MILIK[$value['id_milik']])) ? $GET_ID_MILIK[$value['id_milik']] : '';
-				if ($value['sts_product'] == 'so material') {
-					$product 	= strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					$SATUAN 	= ' kg';
-					$QTY 		= number_format($value['berat'], 2);
-					$ID_MILIK 	= '';
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					$SATUAN     = ' kit';
-					$QTY         = number_format($value['berat']);
-				}
-
-				if ($value['sts_product'] == 'deadstok') {
-					$QTY         = number_format($value['qty_product']);
-				}
-
-				$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>" . $ID_PRX_ADD . "</b>], " . $product;
-
-				$QNOSO = $this->db->get_where('so_number', ['id_bq' => str_replace("PRO", "BQ", $value['id_produksi'])])->row();
-				$NOSO = (!empty($QNOSO->so_number))?$QNOSO->so_number:'-';
-
-				//Category
-				$loose_spool = (!empty($value['spool_induk'])) ? $value['spool_induk'] . '-' . $value['kode_spool'] : 'LOOSE';
-				if ($value['sts_product'] == 'so material') {
-					$loose_spool = $NOSO;
-				}
-				if ($value['sts_product'] == 'field joint') {
-					$loose_spool = "FIELD JOINT";
-				}
-				if ($value['sts'] == 'cut' and empty($value['spool_induk'])) {
-					$loose_spool = "LOOSE PIPE CUTTING";
-				}
-				if ($value['sts_product'] == 'deadstok') {
-					$loose_spool = "DEADSTOCK";
-				}
-				$ArrNo_LS[] = $key . '. ' . $loose_spool;
-
-				$ArrNo_SPK[] = $key . ".<span class='text-bold text-blue'>" . $loose_spool . "</span> " . $ID_PRX;
-			}
-			// print_r($ArrGroup); exit;
-			$explode_ipp 	= implode('<br>', array_unique($ArrNo_IPP));
-			$explode_nd 	= implode('<br>', array_unique($ArrNo_Drawing));
-			$explode_spk 	= implode('<br>', $ArrNo_SPK);
+			$explode_ipp 	= $GetSPEC['explode_ipp'];
+			$explode_nd 	= $GetSPEC['explode_nd'];
+			$explode_spk 	= $GetSPEC['explode_spk'];
 			// $explode_ls 	= implode('<br>',$ArrNo_LS);
 
 
@@ -2631,7 +2428,7 @@ class Delivery extends CI_Controller
 		// 	$where = " AND a.id_produksi='".$no_ipp."' ";
 		// }
 
-		$where2 = " AND b.id_produksi NOT IN " . filter_not_in() . " ";
+		$where2 = " AND (b.id_produksi NOT IN " . filter_not_in() . " OR b.id_produksi IS NULL) ";
 
 		$sql = "
 				SELECT
@@ -2767,6 +2564,7 @@ class Delivery extends CI_Controller
 				'pesan'		=> 'Process Success. Thanks ...',
 				'status'	=> 1
 			);
+			$this->close_jurnal_in_transit_reject_to_fg($kode_delivery);
 			history('Reject release delivery ' . $kode_delivery);
 		}
 
@@ -2784,6 +2582,7 @@ class Delivery extends CI_Controller
 							->select('a.*, COUNT(id) AS qtyCount')
 							->group_by('a.id_milik')
 							->order_by('a.id', 'asc')
+							->where_not_in('sts_product',['so material','field joint'])
 							->get_where('delivery_product_detail a', 
 								array(
 									'a.kode_delivery' => $kode_delivery, 
@@ -3054,113 +2853,11 @@ class Delivery extends CI_Controller
 			$view = "<a href='" . base_url('delivery/view_delivery/' . $row['kode_delivery']) . "' target='_blank' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
 
 
-			$get_split_ipp1 = $this->db
-									->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
-									->group_by('a.id_milik, a.sts')
-									->order_by('a.spool_induk', 'asc')
-									->order_by('a.kode_spool', 'asc')
-									->where('(a.berat > 0 OR a.berat IS NULL)')
-									->join('production_detail b','a.id_pro=b.id','left')
-									->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'a.sts_product' => NULL))->result_array();
-			$get_split_ipp2 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'so material'))->result_array();
-			$get_split_ipp3 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'field joint'))->result_array();
-			$get_split_ipp4 = $this->db->select('COUNT(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL OR a.sts = 'loose_dead')")->get_where('delivery_product_detail a', array('a.kode_delivery' => $row['kode_delivery'], 'sts_product' => 'deadstok'))->result_array();
-			$get_split_ipp = array_merge($get_split_ipp1, $get_split_ipp2, $get_split_ipp3, $get_split_ipp4);
-			$ArrNo_IPP = [];
-			$ArrNo_SPK = [];
-			$ArrNo_LS = [];
-			$ArrNo_Drawing = [];
-			foreach ($get_split_ipp as $key => $value) {
-				$key++;
-				$no_spk 		= $value['no_spk'];
-				$NO_IPP 		= str_replace(['PRO-', 'BQ-'], '', $value['id_produksi']);
-				$NO_SO 			= (!empty($GET_SALES_ORDER[$NO_IPP]['so_number'])) ? $GET_SALES_ORDER[$NO_IPP]['so_number'] : '';
-				$ArrNo_IPP[]	= $NO_SO;
-				if (!empty($value['no_drawing'])) {
-					$ArrNo_Drawing[] = $value['no_drawing'];
-				}
+			$GetSPEC 		= $this->detailDelivery($row['kode_delivery']);
 
-				$CUTTING_KE = (!empty($value['cutting_ke'])) ? '.' . $value['cutting_ke'] : '';
-				$IMPLODE = explode('.', $value['product_code']);
-				$ID_PRX_ADD = $IMPLODE[0] . '.' . $value['product_ke'] . $CUTTING_KE . '/' . $no_spk;
-				if ($value['sts_product'] == 'so material') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					}
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					if ($value['berat'] > 0) {
-						$ID_PRX_ADD = strtoupper(get_name('so_number', 'so_number', 'id_bq', str_replace('PRO-', 'BQ-', $value['id_produksi']))) . '/' . $no_spk;
-					}
-				}
-
-				$series 	= (!empty($GET_DET_FD[$value['id_milik']]['series'])) ? $GET_DET_FD[$value['id_milik']]['series'] : '';
-				$product 	= strtoupper($value['product']) . ", " . $series . ", DIA " . spec_bq2($value['id_milik']);
-				$SATUAN 	= ' pcs';
-				$QTY 		= $value['qty_product'];
-
-				if ($value['sts_product'] == 'deadstok') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['product_code'].' x '.$value['length'];
-				}
-
-				if ($value['sts'] == 'loose_dead') {
-					$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
-					$product 	= strtoupper($value['product']) . ", DIA " . $value['kode_spk'].' x '.$value['length'];
-				}
-
-				if ($value['type_product'] == 'tanki') {
-					$spec = $tanki_model->get_spec($value['id_milik']);
-					$product 	= strtoupper($value['product_tanki']) . ", " . $spec;
-				}
-
-				$ID_MILIK 	= (!empty($GET_ID_MILIK[$value['id_milik']])) ? $GET_ID_MILIK[$value['id_milik']] : '';
-				if ($value['sts_product'] == 'so material') {
-					$product 	= strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
-					$SATUAN 	= ' kg';
-					$QTY 		= number_format($value['berat'], 2);
-					$ID_MILIK 	= '';
-				}
-
-				if ($value['sts_product'] == 'field joint') {
-					$SATUAN     = ' kit';
-					$QTY         = number_format($value['berat']);
-				}
-
-				if ($value['sts_product'] == 'deadstok') {
-					$QTY         = number_format($value['qty_product']);
-				}
-
-				$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>" . $ID_PRX_ADD . "</b>], " . $product;
-
-				$QNOSO = $this->db->get_where('so_number', ['id_bq' => str_replace("PRO", "BQ", $value['id_produksi'])])->row();
-				$NOSO = (!empty($QNOSO->so_number))?$QNOSO->so_number:'-';
-
-				//Category
-				$loose_spool = (!empty($value['spool_induk'])) ? $value['spool_induk'] . '-' . $value['kode_spool'] : 'LOOSE';
-				if ($value['sts_product'] == 'so material') {
-					$loose_spool = $NOSO;
-				}
-				if ($value['sts_product'] == 'field joint') {
-					$loose_spool = "FIELD JOINT";
-				}
-				if ($value['sts'] == 'cut' and empty($value['spool_induk'])) {
-					$loose_spool = "LOOSE PIPE CUTTING";
-				}
-				if ($value['sts_product'] == 'deadstok') {
-					$loose_spool = "DEADSTOCK";
-				}
-				$ArrNo_LS[] = $key . '. ' . $loose_spool;
-
-				$ArrNo_SPK[] = $key . ".<span class='text-bold text-blue'>" . $loose_spool . "</span> " . $ID_PRX;
-			}
-			// print_r($ArrGroup); exit;
-			$explode_ipp 	= implode('<br>', array_unique($ArrNo_IPP));
-			$explode_nd 	= implode('<br>', array_unique($ArrNo_Drawing));
-			$explode_spk 	= implode('<br>', $ArrNo_SPK);
-			// $explode_ls 	= implode('<br>',$ArrNo_LS);
-
+			$explode_ipp 	= $GetSPEC['explode_ipp'];
+			$explode_nd 	= $GetSPEC['explode_nd'];
+			$explode_spk 	= $GetSPEC['explode_spk'];
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>" . $nomor . "</div>";
@@ -4150,6 +3847,8 @@ class Delivery extends CI_Controller
 						$ArrUpdate[$key]['lot_number'] 		= $kode_delivery;
 						$ArrUpdate[$key]['proccess_by'] 	= $username;
 						$ArrUpdate[$key]['proccess_date'] 	= $datetime;
+
+						//
 					}
 				}
 			}
@@ -5838,7 +5537,7 @@ class Delivery extends CI_Controller
 		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose'))->result_array();
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
-				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_pro']))->result_array();
+				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro'=>$valx['id_pro']))->result_array();
 
 				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroup[$value]['keterangan'] = 'Finish Good to In Transit';
@@ -5881,12 +5580,163 @@ class Delivery extends CI_Controller
 			}
 		}
 
+		$ArrGroupMaterial = [];
+		$ArrGroupOutMaterial = [];
+		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
+		$ArrayDeliveryMaterial = $this->db->where_in('sts_product',$ListIN)->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery))->result_array();
+		if(!empty($ArrayDeliveryMaterial)){
+			foreach ($ArrayDeliveryMaterial as $value => $valx) {
+				if($valx['sts_product'] == 'so material'){
+					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
+					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
+					$id_material 	= (!empty($getDetOutgoing[0]['id_material']))?$getDetOutgoing[0]['id_material']:0;
+
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+				}
+
+				if($valx['sts_product'] == 'field joint'){
+					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
+					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
+					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
+
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
+				}
+
+				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] != 'loose_dead_modif'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_uniq']))->result_array();
+				}
+
+				if($valx['sts_product'] == 'cut'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'id_pro_det'=>$valx['id_pro']))->result_array();
+				}
+
+				if($valx['sts_product'] == 'cut deadstock'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'jenis'=>'in cutting deadstok'))->result_array();
+				}
+
+				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif'){
+					$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
+					$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
+					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
+					foreach ($getSummary as $key => $value2x) {
+						$UNIQ2 = $value.'-'.$key;
+						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+
+						$ArrGroupOutMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupOutMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupOutMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_wip'] = $value2x['nilai_wip'];
+						$ArrGroupOutMaterial[$UNIQ2]['material'] = $value2x['material'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_direct'] = $value2x['wip_direct'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_indirect'] = $value2x['wip_indirect'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_consumable'] = $value2x['wip_consumable'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_foh'] = $value2x['wip_foh'];
+						$ArrGroupOutMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupOutMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupOutMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutMaterial[$UNIQ2]['jenis'] = 'out';
+						$ArrGroupOutMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupOutMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupOutMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+					}
+				}
+				else{
+					$ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
+					$ArrGroupMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					$ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					$ArrGroupMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					$ArrGroupMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					$ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					$ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					$ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					$ArrGroupMaterial[$value]['created_by'] = $username;
+					$ArrGroupMaterial[$value]['created_date'] = $datetime;
+					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					$ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					$ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					$ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
+					$ArrGroupMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					$ArrGroupMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					$ArrGroupMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					$ArrGroupMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					$ArrGroupMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					$ArrGroupOutMaterial[$value]['tanggal'] = date('Y-m-d');
+					$ArrGroupOutMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					$ArrGroupOutMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					$ArrGroupOutMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					$ArrGroupOutMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					$ArrGroupOutMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					$ArrGroupOutMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					$ArrGroupOutMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					$ArrGroupOutMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					$ArrGroupOutMaterial[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					$ArrGroupOutMaterial[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+					$ArrGroupOutMaterial[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+					$ArrGroupOutMaterial[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+					$ArrGroupOutMaterial[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+					$ArrGroupOutMaterial[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+					$ArrGroupOutMaterial[$value]['created_by'] = $username;
+					$ArrGroupOutMaterial[$value]['created_date'] = $datetime;
+					$ArrGroupOutMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					$ArrGroupOutMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					$ArrGroupOutMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					$ArrGroupOutMaterial[$value]['kode_delivery'] = $kode_delivery;
+					$ArrGroupOutMaterial[$value]['jenis'] = 'out';
+					$ArrGroupOutMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					$ArrGroupOutMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					$ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+				}
+			}
+		}
+
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
 		}
 
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+		}
+		
+		if(!empty($ArrGroupMaterial)){
+			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
+		}
+
+		if(!empty($ArrGroupOutMaterial)){
+			$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
 		}
 	}
 
@@ -5897,9 +5747,11 @@ class Delivery extends CI_Controller
 		$datetime = date('Y-m-d H:i:s');
 		
 		//GROUP DATA
+		$GetDate = $ArrIdPro = $this->db->select('MAX(created_date) AS created_date')->get_where('data_erp_in_transit',array('kode_delivery'=>$kode_delivery))->result_array();
+		$created_date = (!empty($GetDate[0]['$GetDate']))?$GetDate[0]['$GetDate']:null;
 		$ArrGroup = [];
 		$ArrGroupOut = [];
-		$ArrIdPro = $this->db->get_where('data_erp_in_transit',array('kode_delivery'=>$kode_delivery))->result_array();
+		$ArrIdPro = $this->db->get_where('data_erp_in_transit',array('kode_delivery'=>$kode_delivery,'created_date',$created_date))->result_array();
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
@@ -5917,6 +5769,11 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['id_pro'] = $valx['id_pro'];
 				$ArrGroup[$value]['qty_ke'] = $valx['qty_ke'];
 				$ArrGroup[$value]['kode_delivery'] = $valx['kode_delivery'];
+				$ArrGroup[$value]['id_material'] = $valx['id_material'];
+				$ArrGroup[$value]['nm_material'] = $valx['nm_material'];
+				$ArrGroup[$value]['qty_mat'] = $valx['qty_mat'];
+				$ArrGroup[$value]['cost_book'] = $valx['cost_book'];
+				$ArrGroup[$value]['gudang'] = $valx['gudang'];
 
 				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroupOut[$value]['keterangan'] = 'In Transit to Customer';
@@ -5934,6 +5791,11 @@ class Delivery extends CI_Controller
 				$ArrGroupOut[$value]['qty_ke'] = $valx['qty_ke'];
 				$ArrGroupOut[$value]['kode_delivery'] = $valx['kode_delivery'];
 				$ArrGroupOut[$value]['jenis'] = 'out';
+				$ArrGroupOut[$value]['id_material'] = $valx['id_material'];
+				$ArrGroupOut[$value]['nm_material'] = $valx['nm_material'];
+				$ArrGroupOut[$value]['qty_mat'] = $valx['qty_mat'];
+				$ArrGroupOut[$value]['cost_book'] = $valx['cost_book'];
+				$ArrGroupOut[$value]['gudang'] = $valx['gudang'];
 			} 
 		}
 
@@ -5943,6 +5805,359 @@ class Delivery extends CI_Controller
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
 		}
+	}
+
+	public function close_jurnal_in_transit_reject_to_fg($kode_delivery){
+		$data 			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$username = $this->session->userdata['ORI_User']['username'];
+		$datetime = date('Y-m-d H:i:s');
+		
+		//GROUP DATA
+		$ArrGroup = [];
+		$ArrGroupOut = [];
+		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose'))->result_array();
+		if(!empty($ArrIdPro)){
+			foreach ($ArrIdPro as $value => $valx) {
+				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro'=>$valx['id_pro']))->result_array();
+
+				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
+				$ArrGroup[$value]['keterangan'] = 'In Transit to Finish Good Reject';
+				$ArrGroup[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+				$ArrGroup[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+				$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+				$ArrGroup[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+				$ArrGroup[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+				$ArrGroup[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+				$ArrGroup[$value]['created_by'] = $username;
+				$ArrGroup[$value]['created_date'] = $datetime;
+				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+				$ArrGroup[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+				$ArrGroup[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+				$ArrGroup[$value]['kode_delivery'] = $kode_delivery;
+				$ArrGroup[$value]['jenis'] = 'out';
+
+				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
+				$ArrGroupOut[$value]['keterangan'] = 'In Transit to Finish Good Reject';
+				$ArrGroupOut[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+				$ArrGroupOut[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+				$ArrGroupOut[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+				$ArrGroupOut[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+				$ArrGroupOut[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+				$ArrGroupOut[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+				$ArrGroupOut[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+				$ArrGroupOut[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+				$ArrGroupOut[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+				$ArrGroupOut[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+				$ArrGroupOut[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+				$ArrGroupOut[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+				$ArrGroupOut[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+				$ArrGroupOut[$value]['created_by'] = $username;
+				$ArrGroupOut[$value]['created_date'] = $datetime;
+				$ArrGroupOut[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+				$ArrGroupOut[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+				$ArrGroupOut[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+				$ArrGroupOut[$value]['kode_delivery'] = $kode_delivery;
+				
+			}
+		}
+
+		$ArrGroupMaterial = [];
+		$ArrGroupOutMaterial = [];
+		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
+		$ArrayDeliveryMaterial = $this->db->where_in('sts_product',$ListIN)->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery))->result_array();
+		if(!empty($ArrayDeliveryMaterial)){
+			foreach ($ArrayDeliveryMaterial as $value => $valx) {
+				if($valx['sts_product'] == 'so material'){
+					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
+					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
+					$id_material 	= (!empty($getDetOutgoing[0]['id_material']))?$getDetOutgoing[0]['id_material']:0;
+
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+				}
+
+				if($valx['sts_product'] == 'field joint'){
+					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
+					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
+					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
+
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
+				}
+
+				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] != 'loose_dead_modif'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_uniq']))->result_array();
+				}
+
+				if($valx['sts_product'] == 'cut'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'id_pro_det'=>$valx['id_pro']))->result_array();
+				}
+
+				if($valx['sts_product'] == 'cut deadstock'){
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'jenis'=>'in cutting deadstok'))->result_array();
+				}
+
+				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif'){
+					$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
+					$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
+					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
+					foreach ($getSummary as $key => $value2x) {
+						$UNIQ2 = $value.'-'.$key;
+						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupMaterial[$UNIQ2]['keterangan'] = 'In Transit to Finish Good Reject';
+						$ArrGroupMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+						$ArrGroupMaterial[$UNIQ2]['jenis'] = 'out';
+
+						$ArrGroupOutMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutMaterial[$UNIQ2]['keterangan'] = 'In Transit to Finish Good Reject';
+						$ArrGroupOutMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupOutMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupOutMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_wip'] = $value2x['nilai_wip'];
+						$ArrGroupOutMaterial[$UNIQ2]['material'] = $value2x['material'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_direct'] = $value2x['wip_direct'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_indirect'] = $value2x['wip_indirect'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_consumable'] = $value2x['wip_consumable'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_foh'] = $value2x['wip_foh'];
+						$ArrGroupOutMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupOutMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupOutMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupOutMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupOutMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+					}
+				}
+				else{
+					$ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
+					$ArrGroupMaterial[$value]['keterangan'] = 'In Transit to Finish Good Reject';
+					$ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					$ArrGroupMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					$ArrGroupMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					$ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					$ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					$ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					$ArrGroupMaterial[$value]['created_by'] = $username;
+					$ArrGroupMaterial[$value]['created_date'] = $datetime;
+					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					$ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					$ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					$ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
+					$ArrGroupMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					$ArrGroupMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					$ArrGroupMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					$ArrGroupMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					$ArrGroupMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+					$ArrGroupMaterial[$value]['jenis'] = 'out';
+
+					$ArrGroupOutMaterial[$value]['tanggal'] = date('Y-m-d');
+					$ArrGroupOutMaterial[$value]['keterangan'] = 'In Transit to Finish Good Reject';
+					$ArrGroupOutMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					$ArrGroupOutMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					$ArrGroupOutMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					$ArrGroupOutMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					$ArrGroupOutMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					$ArrGroupOutMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					$ArrGroupOutMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					$ArrGroupOutMaterial[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					$ArrGroupOutMaterial[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+					$ArrGroupOutMaterial[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+					$ArrGroupOutMaterial[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+					$ArrGroupOutMaterial[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+					$ArrGroupOutMaterial[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+					$ArrGroupOutMaterial[$value]['created_by'] = $username;
+					$ArrGroupOutMaterial[$value]['created_date'] = $datetime;
+					$ArrGroupOutMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					$ArrGroupOutMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					$ArrGroupOutMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					$ArrGroupOutMaterial[$value]['kode_delivery'] = $kode_delivery;
+					$ArrGroupOutMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					$ArrGroupOutMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					$ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+					}
+			}
+		}
+
+		if(!empty($ArrGroup)){
+			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
+		}
+
+		if(!empty($ArrGroupOut)){
+			$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+		}
+		
+		if(!empty($ArrGroupMaterial)){
+			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
+		}
+
+		if(!empty($ArrGroupOutMaterial)){
+			$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
+		}
+	}
+
+	public function detailDelivery($kode_delivery){
+		$GET_DET_FD 		= get_detailFinalDrawing();
+		$GET_SALES_ORDER 	= get_detail_ipp();
+		$tanki_model = $this->tanki_model;
+
+		$get_split_ipp1 = $this->db
+								->select('COUNT(a.id_milik) AS qty_product, a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
+								->group_by('a.id_milik, a.sts, a.spool_induk')
+								->order_by('a.spool_induk', 'asc')
+								->order_by('a.kode_spool', 'asc')
+								->where('(a.berat > 0 OR a.berat IS NULL)')
+								->join('production_detail b','a.id_pro=b.id','left')
+								->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'a.sts_product' => NULL,'a.kode_spk !='=>'deadstok'))->result_array();
+		$get_split_ipp2 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'so material'))->result_array();
+		$get_split_ipp3 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'field joint'))->result_array();
+		$get_split_ipp4 = $this->db->select('COUNT(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL OR a.sts = 'loose_dead')")->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'deadstok'))->result_array();
+		$get_split_ipp4a = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_milik')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'kode_spk' => 'deadstok'))->result_array();
+		$get_split_ipp4b = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'cut'))->result_array();
+		$get_split_ipp5 = $this->db->select('SUM(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL)")->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'aksesoris'))->result_array();
+		$get_split_ipp = array_merge($get_split_ipp1, $get_split_ipp2, $get_split_ipp3, $get_split_ipp4, $get_split_ipp4a, $get_split_ipp5, $get_split_ipp4b);
+		$ArrNo_IPP = [];
+		$ArrNo_SPK = [];
+		$ArrNo_LS = [];
+		$ArrNo_Drawing = [];
+		foreach ($get_split_ipp as $key => $value) {
+			$key++;
+			$no_spk 		= $value['no_spk'];
+			$NO_IPP 		= str_replace(['PRO-', 'BQ-'], '', $value['id_produksi']);
+			$NO_SO 			= (!empty($GET_SALES_ORDER[$NO_IPP]['so_number'])) ? $GET_SALES_ORDER[$NO_IPP]['so_number'] : '';
+			$ArrNo_IPP[]	= $NO_SO;
+			if (!empty($value['no_drawing'])) {
+				if ($value['sts_product'] != 'aksesoris') {
+				$ArrNo_Drawing[] = $value['no_drawing'];
+				}
+			}
+
+			$CUTTING_KE = (!empty($value['cutting_ke'])) ? '.' . $value['cutting_ke'] : '';
+			$IMPLODE = explode('.', $value['product_code']);
+			$ID_PRX_ADD = $IMPLODE[0] . '.' . $value['product_ke'] . $CUTTING_KE . '/' . $no_spk;
+			if ($value['sts_product'] == 'so material') {
+				if ($value['berat'] > 0) {
+					$ID_PRX_ADD = strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
+				}
+			}
+
+			if ($value['sts_product'] == 'field joint') {
+				if ($value['berat'] > 0) {
+					$ID_PRX_ADD = strtoupper(get_name('so_number', 'so_number', 'id_bq', str_replace('PRO-', 'BQ-', $value['id_produksi']))) . '/' . $no_spk;
+				}
+			}
+
+			$series 	= (!empty($GET_DET_FD[$value['id_milik']]['series'])) ? $GET_DET_FD[$value['id_milik']]['series'] : '';
+			$product 	= strtoupper($value['product']) . ", " . $series . ", DIA " . spec_bq2($value['id_milik']);
+			$SATUAN 	= ' pcs';
+			$QTY 		= $value['qty_product'];
+
+			if ($value['sts_product'] == 'deadstok') {
+				$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
+				$product 	= strtoupper($value['product']) . ", DIA " . $value['product_code'].' x '.$value['length'];
+			}
+
+			if ($value['sts'] == 'loose_dead') {
+				$ID_PRX_ADD = $value['product_code'].'/'.$value['no_spk'];
+				$product 	= strtoupper($value['product']) . ", DIA " . $value['kode_spk'].' x '.$value['length'];
+			}
+
+			if ($value['type_product'] == 'tanki') {
+				$spec = $tanki_model->get_spec($value['id_milik']);
+				$product 	= strtoupper($value['product_tanki']) . ", " . $spec;
+			}
+
+			if ($value['sts_product'] == 'so material') {
+				$product 	= strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $value['product']));
+				$SATUAN 	= ' kg';
+				$QTY 		= number_format($value['berat'], 2);
+			}
+
+			if ($value['sts_product'] == 'field joint') {
+				$SATUAN     = ' kit';
+				$QTY         = number_format($value['berat']);
+			}
+
+			if ($value['sts_product'] == 'deadstok') {
+				$QTY         = number_format($value['qty_product']);
+				$product 	= strtoupper($value['product']) . ", " .$value['kode_spk']." x ".$value['length'];
+			}
+			if ($value['sts_product'] == 'aksesoris') {
+				$QTY         	= number_format($value['qty_product'],2);
+				$ID_PRX_ADD 	= $value['product_code'];
+				$product 		= strtoupper($value['no_drawing']);
+			}
+
+			$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>" . $ID_PRX_ADD . "</b>], " . $product;
+
+			$QNOSO = $this->db->get_where('so_number', ['id_bq' => str_replace("PRO", "BQ", $value['id_produksi'])])->row();
+			$NOSO = (!empty($QNOSO->so_number))?$QNOSO->so_number:'-';
+
+			//Category
+			$loose_spool = (!empty($value['spool_induk'])) ? $value['spool_induk'] . '-' . $value['kode_spool'] : 'LOOSE';
+			if ($value['sts_product'] == 'so material') {
+				$loose_spool = $NOSO;
+			}
+			if ($value['sts_product'] == 'field joint') {
+				$loose_spool = "FIELD JOINT";
+			}
+			if ($value['sts'] == 'cut' and empty($value['spool_induk'])) {
+				$loose_spool = "PIPE CUTTING";
+				$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>" . $ID_PRX_ADD . "</b>], " . $product.', '.$value['length'];
+			}
+			if ($value['sts_product'] == 'cut deadstock' and empty($value['spool_induk'])) {
+				$loose_spool = "DEADSTOCK CUTTING";
+				$ID_PRX = "[<b>" . $QTY . $SATUAN . "</b>][<b>".$value['product_code']."/".$value['no_spk']."</b>], " . $value['product'].', '.$value['length'];
+			}
+			if ($value['sts_product'] == 'deadstok' OR $value['kode_spk'] == 'deadstok') {
+				$loose_spool = "DEADSTOCK";
+			}
+			if ($value['sts_product'] == 'aksesoris') {
+				$loose_spool = "AKSESORIS	";
+			}
+			$ArrNo_LS[] = $key . '. ' . $loose_spool;
+
+			$ArrNo_SPK[] = $key . ".<span class='text-bold text-blue'>" . $loose_spool . "</span> " . $ID_PRX;
+		}
+		// print_r($ArrGroup); exit;
+		$explode_ipp 	= implode('<br>', array_unique($ArrNo_IPP));
+		$explode_nd 	= implode('<br>', array_unique($ArrNo_Drawing));
+		$explode_spk 	= implode('<br>', $ArrNo_SPK);
+
+		$ArrReturn = [
+			'explode_ipp' => $explode_ipp,
+			'explode_nd' => $explode_nd,
+			'explode_spk' => $explode_spk
+		];
+
+		return $ArrReturn;
 	}
 	
 }

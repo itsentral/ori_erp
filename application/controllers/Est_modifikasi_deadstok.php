@@ -1028,6 +1028,9 @@ class Est_modifikasi_deadstok extends CI_Controller {
 	public function delete(){
 		$id 			= $this->uri->segment(3);
 		$data_session	= $this->session->userdata;
+
+		$username = $data_session['ORI_User']['username'];
+		$dateTime = date('Y-m-d H:i:s');
 		
 		$ArrPlant		= array(
 			'deleted_by' 	=> $data_session['ORI_User']['username'],
@@ -1037,6 +1040,7 @@ class Est_modifikasi_deadstok extends CI_Controller {
 		$getdata = $this->db->get_where('deadstok_modif',array('kode'=>$id))->result_array();
 		$ArrUpdate = [];
 		$ArrUpdate2 = [];
+		$ArrInsertToWIP = [];
 		foreach ($getdata as $key => $value) {
 			$ArrUpdate[$key]['id'] = $value['id_deadstok'];
 			$ArrUpdate[$key]['id_booking'] = NULL;
@@ -1058,7 +1062,37 @@ class Est_modifikasi_deadstok extends CI_Controller {
 			$ArrUpdate2[$key]['kode_spk'] = NULL;
 			$ArrUpdate2[$key]['fg_date'] = NULL;
 			$ArrUpdate2[$key]['closing_produksi_date'] = NULL;
+
+
+			$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$value['id_deadstok'],'jenis'=>'in deadstok'))->result_array();
+			if(!empty($getDataFG)){
+				$ArrInsertToWIP[$key]['tanggal'] = date('Y-m-d');
+				$ArrInsertToWIP[$key]['keterangan'] = 'Finish Good to Deadstock';
+				$ArrInsertToWIP[$key]['no_so'] = $getDataFG[0]['no_so'];
+				$ArrInsertToWIP[$key]['product'] = $getDataFG[0]['product'];
+				$ArrInsertToWIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
+				$ArrInsertToWIP[$key]['kode_trans'] = 'deadstok';
+				$ArrInsertToWIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+				$ArrInsertToWIP[$key]['qty'] = 1;
+				$ArrInsertToWIP[$key]['nilai_wip'] = $getDataFG[0]['nilai_wip'];
+				$ArrInsertToWIP[$key]['nilai_unit'] = $getDataFG[0]['nilai_unit'];
+				$ArrInsertToWIP[$key]['material'] = 0;
+				$ArrInsertToWIP[$key]['wip_direct'] =  0;
+				$ArrInsertToWIP[$key]['wip_indirect'] =  0;
+				$ArrInsertToWIP[$key]['wip_consumable'] =  0;
+				$ArrInsertToWIP[$key]['wip_foh'] =  0;
+				$ArrInsertToWIP[$key]['created_by'] = $username;
+				$ArrInsertToWIP[$key]['created_date'] = $dateTime;
+				$ArrInsertToWIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
+				$ArrInsertToWIP[$key]['id_pro'] =  $getDataFG[0]['id_pro'];
+				$ArrInsertToWIP[$key]['jenis'] =  'out deadstok';
+			}
 		}
+
+		// print_r($ArrUpdate);
+		// print_r($ArrUpdate2);
+		// print_r($ArrInsertToWIP);
+		// exit;
 		
 		$this->db->trans_start();
 			$this->db->where('kode', $id); 
@@ -1069,6 +1103,9 @@ class Est_modifikasi_deadstok extends CI_Controller {
 			}
 			if(!empty($ArrUpdate2)){
 				$this->db->update_batch('production_detail', $ArrUpdate2, 'id');
+			}
+			if(!empty($ArrInsertToWIP)){
+				$this->db->insert_batch('data_erp_fg',$ArrInsertToWIP);
 			}
 		$this->db->trans_complete();
 		
