@@ -206,7 +206,7 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 				?>	
                 </div>
 			</div>
-            <div class='box-footer'>
+            
 				<?php
 					echo form_button(array('type'=>'button','style'=>'float:right; margin-left:5px;width:100px;','class'=>'btn btn-md btn-danger','value'=>'back','content'=>'Back','onClick'=>'javascript:back()'));
                     
@@ -219,7 +219,7 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 				
                     // echo form_button(array('type'=>'button','style'=>'float:right;','class'=>'btn btn-md btn-primary','value'=>'save','content'=>'Save','id'=>'simpan-bro')).' ';
                 ?>
-            </div>
+            
         </div>
     </div>
 </form>
