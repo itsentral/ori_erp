@@ -26,7 +26,7 @@ $this->load->view('include/side_menu');
                             ?>
                             <label for="tgl_bayar" class="col-sm-4 control-label">Tgl :</label>
                             <div class="col-sm-6">
-                                <input type="date" name="tgl_request" id="tgl_request" class="form-control input-sm" value="<?php echo date('Y-m-d') ?>" readonly >
+                                <input type="date" name="tgl_request" id="tgl_request" class="form-control input-sm" value="<?php echo date('Y-m-d') ?>">
                             </div>
                           </div>
                         </div>
