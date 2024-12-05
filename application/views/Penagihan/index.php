@@ -47,6 +47,7 @@ $this->load->view('include/side_menu');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">#</th>
+						<th class="text-center">ID Tagih</th> 
 						<th class="text-center">No SO</th> 
 						<th class="text-center">No PO</th>
 						<th class="text-center">Customer</th>
@@ -141,7 +142,7 @@ $this->load->view('include/side_menu');
 				cache: false,
 				error: function(){
 					$(".my-grid-error").html("");
-					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="10">No data found in the server</th></tr></tbody>');
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="11">No data found in the server</th></tr></tbody>');
 					$("#my-grid_processing").css("display","none");
 				}
 			}
