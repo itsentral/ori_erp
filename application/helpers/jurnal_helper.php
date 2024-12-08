@@ -2227,17 +2227,26 @@
 			if($dataproductiondetail->finish_good==0){
 				//$datasodetailheader = $CI->db->query("SELECT * FROM so_detail_header WHERE id ='".$datajurnal->id_milik."' limit 1" )->row();
 				$datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari WHERE id_milik ='".$datajurnal->id_milik."' limit 1" )->row();
-			
+				
+				$direct_labour 		= (!empty($datasodetailheader->direct_labour))?$datasodetailheader->direct_labour:0;
+				$indirect_labour 	= (!empty($datasodetailheader->indirect_labour))?$datasodetailheader->indirect_labour:0;
+				$machine 			= (!empty($datasodetailheader->machine))?$datasodetailheader->machine:0;
+				$mould_mandrill 	= (!empty($datasodetailheader->mould_mandrill))?$datasodetailheader->mould_mandrill:0;
+				$foh_depresiasi 	= (!empty($datasodetailheader->foh_depresiasi))?$datasodetailheader->foh_depresiasi:0;
+				$biaya_rutin_bulanan = (!empty($datasodetailheader->biaya_rutin_bulanan))?$datasodetailheader->biaya_rutin_bulanan:0;
+				$foh_consumable 	= (!empty($datasodetailheader->foh_consumable))?$datasodetailheader->foh_consumable:0;
+				$consumable 		= (!empty($datasodetailheader->consumable))?$datasodetailheader->consumable:0;
+				$man_hours 			= (!empty($datasodetailheader->man_hours))?$datasodetailheader->man_hours:0;
 				
 				$kurs=1;
 				$sqlkurs="select * from ms_kurs where tanggal <='".$datajurnal->tanggal."' and mata_uang='USD' order by tanggal desc limit 1";
 				$dtkurs	= $CI->db->query($sqlkurs)->row();
 				if(!empty($dtkurs)) $kurs=$dtkurs->kurs;
 				$wip_material=$datajurnal->total_nilai;
-				$pe_direct_labour=(($datasodetailheader->direct_labour*$datasodetailheader->man_hours)*$kurs);
-				$pe_indirect_labour=(($datasodetailheader->indirect_labour*$datasodetailheader->man_hours)*$kurs);
-				$foh=(($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable)*$kurs);
-				$pe_consumable=($datasodetailheader->consumable*$kurs);
+				$pe_direct_labour=(($direct_labour*$man_hours)*$kurs);
+				$pe_indirect_labour=(($indirect_labour*$man_hours)*$kurs);
+				$foh=(($machine + $mould_mandrill + $foh_depresiasi + $biaya_rutin_bulanan + $foh_consumable)*$kurs);
+				$pe_consumable=($consumable*$kurs);
 				$finish_good=($wip_material+$pe_direct_labour+$foh+$pe_indirect_labour+$pe_consumable);
 
 				$CI->db->query("update production_detail set wip_kurs='".$kurs."', wip_material='".$wip_material."' , wip_dl='".$pe_direct_labour."' , wip_foh='".$foh."', wip_il='".$pe_indirect_labour."', wip_consumable='".$pe_consumable."', finish_good='".$finish_good."' WHERE id='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1" );

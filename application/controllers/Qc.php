@@ -1765,6 +1765,7 @@ class Qc extends CI_Controller
 				'status'	=> 1
 			);
 			history('Release QC SPOOL = ' . $spool_induk);
+			$this->SpoolToFG_Report($spool_induk);
 		}
 		echo json_encode($Arr_Kembali);
 	}
@@ -4544,4 +4545,93 @@ class Qc extends CI_Controller
 			unset($det_Jurnaltes);unset($datadetail);
 		  
 		}
+
+	public function SpoolToFG_Report($kode)
+	{
+		$data_session	= $this->session->userdata;
+		$dateTime 		= date('Y-m-d H:i:s');
+		$username 		= $data_session['ORI_User']['username'];
+
+		$getQCDeadstockModif = $this->db->get_where('data_erp_wip_group',array('kode_spool'=>$kode,'jenis'=>'in spool'))->result_array();
+		$ArrIN_WIP_MATERIAL = [];
+		$ArrIN_FG_MATERIAL = [];
+		foreach ($getQCDeadstockModif as $key => $value) {
+			$ArrIN_WIP_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+			$ArrIN_WIP_MATERIAL[$key]['keterangan'] = 'WIP to Finish Good (Spool)';
+			$ArrIN_WIP_MATERIAL[$key]['no_so'] = $value['no_so'];
+			$ArrIN_WIP_MATERIAL[$key]['product'] = $value['product'];
+			$ArrIN_WIP_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+			$ArrIN_WIP_MATERIAL[$key]['kode_trans'] = $kode;
+			$ArrIN_WIP_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrIN_WIP_MATERIAL[$key]['qty'] = $value['qty'];
+			$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_WIP_MATERIAL[$key]['material'] = $value['material'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_direct'] =  $value['wip_direct'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_indirect'] =  $value['wip_indirect'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_consumable'] =  $value['wip_consumable'];
+			$ArrIN_WIP_MATERIAL[$key]['wip_foh'] =  $value['wip_foh'];
+			$ArrIN_WIP_MATERIAL[$key]['created_by'] = $username;
+			$ArrIN_WIP_MATERIAL[$key]['created_date'] = $dateTime;
+			$ArrIN_WIP_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+			$ArrIN_WIP_MATERIAL[$key]['jenis'] =  'out spool';
+			$ArrIN_WIP_MATERIAL[$key]['id_material'] =  $value['id_material'];
+			$ArrIN_WIP_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+			$ArrIN_WIP_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+			$ArrIN_WIP_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+			$ArrIN_WIP_MATERIAL[$key]['gudang'] =  $value['gudang'];
+			$ArrIN_WIP_MATERIAL[$key]['kode_spool'] =  $kode;
+		}
+
+		$getQCDeadstockModif = $this->db->get_where('data_erp_fg',array('kode_spool'=>$kode,'jenis'=>'out spool'))->result_array();
+		foreach ($getQCDeadstockModif as $key => $value) {
+			$ArrIN_FG_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+			$ArrIN_FG_MATERIAL[$key]['keterangan'] = 'WIP to Finish Good (Spool)';
+			$ArrIN_FG_MATERIAL[$key]['no_so'] = $value['no_so'];
+			$ArrIN_FG_MATERIAL[$key]['product'] = $value['product'];
+			$ArrIN_FG_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+			$ArrIN_FG_MATERIAL[$key]['kode_trans'] = $kode;
+			$ArrIN_FG_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrIN_FG_MATERIAL[$key]['qty'] = $value['qty'];
+			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] = $value['nilai_wip'];
+			$ArrIN_FG_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_FG_MATERIAL[$key]['material'] = $value['material'];
+			$ArrIN_FG_MATERIAL[$key]['wip_direct'] =  $value['wip_direct'];
+			$ArrIN_FG_MATERIAL[$key]['wip_indirect'] =  $value['wip_indirect'];
+			$ArrIN_FG_MATERIAL[$key]['wip_consumable'] =  $value['wip_consumable'];
+			$ArrIN_FG_MATERIAL[$key]['wip_foh'] =  $value['wip_foh'];
+			$ArrIN_FG_MATERIAL[$key]['created_by'] = $username;
+			$ArrIN_FG_MATERIAL[$key]['created_date'] = $dateTime;
+			$ArrIN_FG_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+			$ArrIN_FG_MATERIAL[$key]['id_pro'] =  $value['id_pro'];
+			$ArrIN_FG_MATERIAL[$key]['qty_ke'] =  $value['qty_ke'];
+			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] =  $value['nilai_unit'];
+			$ArrIN_FG_MATERIAL[$key]['jenis'] =  'in';
+			$ArrIN_FG_MATERIAL[$key]['id_material'] =  $value['id_material'];
+			$ArrIN_FG_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+			$ArrIN_FG_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+			$ArrIN_FG_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+			$ArrIN_FG_MATERIAL[$key]['gudang'] =  $value['gudang'];
+			$ArrIN_FG_MATERIAL[$key]['kode_spool'] =  $kode;
+		}
+
+		// print_r($ArrIN_WIP_MATERIAL);
+		// print_r($ArrIN_FG_MATERIAL);
+		// exit;
+
+		$this->db->trans_start();
+			if(!empty($ArrIN_WIP_MATERIAL)){
+				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+			}
+
+			if(!empty($ArrIN_FG_MATERIAL)){
+				$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
+			}
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+		} else {
+			$this->db->trans_commit();
+		}
+	}
 }

@@ -1162,6 +1162,7 @@ class Ppic extends CI_Controller {
 		$ArrUpdate3 = [];
 		$ArrUpdate4 = [];
 		$kode_id = [];
+		$ArrReportFG = [];
 		foreach ($check as $value) {
 			$EXPLODE 	= explode('-',$value);
 			$id_pro 	= $EXPLODE[0];
@@ -1171,30 +1172,60 @@ class Ppic extends CI_Controller {
 				$ArrUpdate[$value]['id'] = $id_pro;
 				$ArrUpdate[$value]['spool_induk'] = NULL;
 				$ArrUpdate[$value]['kode_spool'] = NULL;
+
+				$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+				$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+				if(!empty($ID_FG)){
+					$ArrReportFG[] = $ID_FG;
+				}
 			}
 
 			if($status == 'cut'){
 				$ArrUpdate2[$value]['id'] = $id_pro;
 				$ArrUpdate2[$value]['spool_induk'] = NULL;
 				$ArrUpdate2[$value]['kode_spool'] = NULL;
+
+				$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro'=>$id_cut,'jenis'=>'in cutting'))->result_array();
+				$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+				if(!empty($ID_FG)){
+					$ArrReportFG[] = $ID_FG;
+				}
 			}
 
 			if($status == 'loose_deadstok'){
 				$ArrUpdate3[$value]['id'] = $id_pro;
 				$ArrUpdate3[$value]['spool_induk'] = NULL;
 				$ArrUpdate3[$value]['kode_spool'] = NULL;
+
+				$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$id_pro,'jenis'=>'in deadstok'))->result_array();
+				$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+				if(!empty($ID_FG)){
+					$ArrReportFG[] = $ID_FG;
+				}
 			}
 
 			if($status == 'loose_deadstok_modif'){
 				$ArrUpdate4[$value]['id'] = $id_pro;
 				$ArrUpdate4[$value]['spool_induk'] = NULL;
 				$ArrUpdate4[$value]['kode_spool'] = NULL;
+
+				$getDeadstockModif = $this->db->get_where('deadstok_modif',array('id'=>$id_pro))->result_array();
+				$idDeadstock = (!empty($getDeadstockModif[0]['id_deadstok']))?$getDeadstockModif[0]['id_deadstok']:null;
+				$idKodeSPK = (!empty($getDeadstockModif[0]['kode_spk']))?$getDeadstockModif[0]['kode_spk']:null;
+
+				$ArrayGetFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$idDeadstock,'kode_trans'=>$idKodeSPK,'jenis'=>'in deadstok modif'))->result_array();
+				
+				if(!empty($ArrayGetFG)){
+					foreach ($ArrayGetFG as $keyFGDM => $valueFGDM) {
+						$ArrReportFG[] = $valueFGDM['id'];
+					}
+				}
 			}
 
 			$kode_id = $value;
 		}
 		
-		// print_r($ArrUpdate);
+		// print_r($ArrReportFG);
 		// exit;
 		
 		$this->db->trans_start();
@@ -1209,6 +1240,10 @@ class Ppic extends CI_Controller {
 			}
 			if(!empty($ArrUpdate4)){
 				$this->db->update_batch('deadstok_modif',$ArrUpdate4,'id');
+			}
+
+			if(!empty($ArrReportFG)){
+				$this->RemovesaveSpoolERP($data['kd_spoolx'],$ArrReportFG);
 			}
 		$this->db->trans_complete();
 
@@ -1325,6 +1360,8 @@ class Ppic extends CI_Controller {
 				'status'	=> 1
 			);
 			history('Lock spool '.$spool);
+
+			$this->SpoolToWIP_Report($spool);
 		}
 
 		echo json_encode($Arr_Kembali);
@@ -1622,6 +1659,7 @@ class Ppic extends CI_Controller {
 		$ArrUpdateDeadstokModif = [];
 		$ArrUpdateCutting = [];
 		$nomorx = 0;
+		$ArrReportFG = [];
 		if(!empty($data['check'])){
 			foreach ($check as $value) { $nomorx++;
 				if($kode_spool == '0'){
@@ -1648,6 +1686,12 @@ class Ppic extends CI_Controller {
 					$ArrUpdateProduksi[$nomorx]['no_drawing'] = $no_drawing;
 					$ArrUpdateProduksi[$nomorx]['spool_by'] = $username;
 					$ArrUpdateProduksi[$nomorx]['spool_date'] = $datetime;
+
+					$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+					$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+					if(!empty($ID_FG)){
+						$ArrReportFG[] = $ID_FG;
+					}
 				}
 
 				if(!empty($id_cut)){
@@ -1657,6 +1701,12 @@ class Ppic extends CI_Controller {
 					$ArrUpdateCutting[$nomorx]['no_drawing'] = $no_drawing;
 					$ArrUpdateCutting[$nomorx]['spool_by'] = $username;
 					$ArrUpdateCutting[$nomorx]['spool_date'] = $datetime;
+
+					$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro'=>$id_cut,'id_pro_det'=>$id_pro,'jenis'=>'in cutting'))->result_array();
+					$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+					if(!empty($ID_FG)){
+						$ArrReportFG[] = $ID_FG;
+					}
 				}
 				
 			}
@@ -1732,6 +1782,12 @@ class Ppic extends CI_Controller {
 				$ArrUpdateDeadstok[$nomorx]['no_drawing'] = $no_drawing;
 				$ArrUpdateDeadstok[$nomorx]['spool_by'] = $username;
 				$ArrUpdateDeadstok[$nomorx]['spool_date'] = $datetime;
+
+				$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$value,'jenis'=>'in deadstok'))->result_array();
+				$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+				if(!empty($ID_FG)){
+					$ArrReportFG[] = $ID_FG;
+				}
 			}
 		}
 
@@ -1754,6 +1810,18 @@ class Ppic extends CI_Controller {
 				$ArrUpdateDeadstokModif[$nomorx]['no_drawing'] = $no_drawing;
 				$ArrUpdateDeadstokModif[$nomorx]['spool_by'] = $username;
 				$ArrUpdateDeadstokModif[$nomorx]['spool_date'] = $datetime;
+
+				$getDeadstockModif = $this->db->get_where('deadstok_modif',array('id'=>$value))->result_array();
+				$idDeadstock = (!empty($getDeadstockModif[0]['id_deadstok']))?$getDeadstockModif[0]['id_deadstok']:null;
+				$idKodeSPK = (!empty($getDeadstockModif[0]['kode_spk']))?$getDeadstockModif[0]['kode_spk']:null;
+
+				$ArrayGetFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$idDeadstock,'kode_trans'=>$idKodeSPK,'jenis'=>'in deadstok modif'))->result_array();
+				
+				if(!empty($ArrayGetFG)){
+					foreach ($ArrayGetFG as $keyFGDM => $valueFGDM) {
+						$ArrReportFG[] = $valueFGDM['id'];
+					}
+				}
 			}
 		}
 
@@ -1772,6 +1840,10 @@ class Ppic extends CI_Controller {
 			}
 			if(!empty($ArrUpdateDeadstokModif)){
 				$this->db->update_batch('deadstok_modif',$ArrUpdateDeadstokModif,'id');
+			}
+
+			if(!empty($ArrReportFG)){
+				$this->saveSpoolERP($spool_induk,$ArrReportFG);
 			}
 		$this->db->trans_complete();
 
@@ -2387,6 +2459,136 @@ class Ppic extends CI_Controller {
 
 		$data['query'] = $this->db->query($sql);
 		return $data;
+	}
+
+	public function saveSpoolERP($kode_spool,$ArrFG){
+		$CheckSpool = $this->db->get_where('spool_data_erp',array('kode_spool'=>$kode_spool))->result_array();
+		$ArrFG_Before = [];
+		if(!empty($CheckSpool)){
+			$id_fg = $CheckSpool[0]['id_fg'];
+			$ArrFG_Before = explode(',',$id_fg);
+		}
+
+		$ArrMerge = array_merge($ArrFG,$ArrFG_Before);
+		$ArrImplode = implode(',',$ArrMerge);
+		// echo $ArrImplode;
+		// exit;
+		if(!empty($CheckSpool)){
+			$this->db->where('kode_spool',$kode_spool);
+			$this->db->update('spool_data_erp',['id_fg'=>$ArrImplode]);
+		}
+		if(empty($CheckSpool)){
+			$this->db->insert('spool_data_erp',['kode_spool'=>$kode_spool,'id_fg'=>$ArrImplode]);
+		}
+	}
+
+	public function RemovesaveSpoolERP($kode_spool,$ArrRemove){
+		$CheckSpool = $this->db->get_where('spool_data_erp',array('kode_spool'=>$kode_spool))->result_array();
+		$ArrFG_Before = [];
+		if(!empty($CheckSpool)){
+			$id_fg = $CheckSpool[0]['id_fg'];
+			$ArrFG_Before = explode(',',$id_fg);
+		}
+
+		$ArrMerge = array_diff($ArrFG_Before,$ArrRemove);
+		$ArrImplode = implode(',',$ArrMerge);
+		// echo $ArrImplode;
+		// exit;
+		if(!empty($CheckSpool)){
+			$this->db->where('kode_spool',$kode_spool);
+			$this->db->update('spool_data_erp',['id_fg'=>$ArrImplode]);
+		}
+	}
+
+	public function SpoolToWIP_Report($kode)
+	{
+		$data_session	= $this->session->userdata;
+		$dateTime 		= date('Y-m-d H:i:s');
+		$username 		= $data_session['ORI_User']['username'];
+
+		$CheckID_FG	= $this->db->get_where('spool_data_erp',array('kode_spool'=>$kode))->result_array();
+		$id_fg 		= (!empty($CheckID_FG[0]['id_fg']))?explode(',',$CheckID_FG[0]['id_fg']):[];
+		
+		if(!empty($id_fg)){
+			$getQCDeadstockModif = $this->db->where_in('id',$id_fg)->get_where('data_erp_fg')->result_array();
+			$ArrIN_WIP_MATERIAL = [];
+			$ArrIN_FG_MATERIAL = [];
+			foreach ($getQCDeadstockModif as $key => $value) {
+				$ArrIN_WIP_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+				$ArrIN_WIP_MATERIAL[$key]['keterangan'] = 'Finish Good to WIP (Spool)';
+				$ArrIN_WIP_MATERIAL[$key]['no_so'] = $value['no_so'];
+				$ArrIN_WIP_MATERIAL[$key]['product'] = $value['product'];
+				$ArrIN_WIP_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+				$ArrIN_WIP_MATERIAL[$key]['kode_trans'] = $kode;
+				$ArrIN_WIP_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+				$ArrIN_WIP_MATERIAL[$key]['qty'] = $value['qty'];
+				$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+				$ArrIN_WIP_MATERIAL[$key]['material'] = $value['material'];
+				$ArrIN_WIP_MATERIAL[$key]['wip_direct'] =  $value['wip_direct'];
+				$ArrIN_WIP_MATERIAL[$key]['wip_indirect'] =  $value['wip_indirect'];
+				$ArrIN_WIP_MATERIAL[$key]['wip_consumable'] =  $value['wip_consumable'];
+				$ArrIN_WIP_MATERIAL[$key]['wip_foh'] =  $value['wip_foh'];
+				$ArrIN_WIP_MATERIAL[$key]['created_by'] = $username;
+				$ArrIN_WIP_MATERIAL[$key]['created_date'] = $dateTime;
+				$ArrIN_WIP_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+				$ArrIN_WIP_MATERIAL[$key]['jenis'] =  'in spool';
+				$ArrIN_WIP_MATERIAL[$key]['id_material'] =  $value['id_material'];
+				$ArrIN_WIP_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+				$ArrIN_WIP_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+				$ArrIN_WIP_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+				$ArrIN_WIP_MATERIAL[$key]['gudang'] =  $value['gudang'];
+				$ArrIN_WIP_MATERIAL[$key]['kode_spool'] =  $kode;
+
+				$ArrIN_FG_MATERIAL[$key]['tanggal'] = date('Y-m-d');
+				$ArrIN_FG_MATERIAL[$key]['keterangan'] = 'Finish Good to WIP (Spool)';
+				$ArrIN_FG_MATERIAL[$key]['no_so'] = $value['no_so'];
+				$ArrIN_FG_MATERIAL[$key]['product'] = $value['product'];
+				$ArrIN_FG_MATERIAL[$key]['no_spk'] = $value['no_spk'];
+				$ArrIN_FG_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
+				$ArrIN_FG_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
+				$ArrIN_FG_MATERIAL[$key]['qty'] = $value['qty'];
+				$ArrIN_FG_MATERIAL[$key]['nilai_unit'] = $value['nilai_wip'];
+				$ArrIN_FG_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+				$ArrIN_FG_MATERIAL[$key]['material'] = $value['material'];
+				$ArrIN_FG_MATERIAL[$key]['wip_direct'] =  $value['wip_direct'];
+				$ArrIN_FG_MATERIAL[$key]['wip_indirect'] =  $value['wip_indirect'];
+				$ArrIN_FG_MATERIAL[$key]['wip_consumable'] =  $value['wip_consumable'];
+				$ArrIN_FG_MATERIAL[$key]['wip_foh'] =  $value['wip_foh'];
+				$ArrIN_FG_MATERIAL[$key]['created_by'] = $username;
+				$ArrIN_FG_MATERIAL[$key]['created_date'] = $dateTime;
+				$ArrIN_FG_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
+				$ArrIN_FG_MATERIAL[$key]['id_pro'] =  $value['id_pro'];
+				$ArrIN_FG_MATERIAL[$key]['qty_ke'] =  $value['qty_ke'];
+				$ArrIN_FG_MATERIAL[$key]['nilai_unit'] =  $value['nilai_unit'];
+				$ArrIN_FG_MATERIAL[$key]['jenis'] =  'out spool';
+				$ArrIN_FG_MATERIAL[$key]['id_material'] =  $value['id_material'];
+				$ArrIN_FG_MATERIAL[$key]['nm_material'] = $value['nm_material'];
+				$ArrIN_FG_MATERIAL[$key]['qty_mat'] =  $value['qty_mat'];
+				$ArrIN_FG_MATERIAL[$key]['cost_book'] =  $value['cost_book'];
+				$ArrIN_FG_MATERIAL[$key]['gudang'] =  $value['gudang'];
+				$ArrIN_FG_MATERIAL[$key]['kode_spool'] =  $kode;
+			}
+
+			// print_r($ArrIN_WIP_MATERIAL);
+			// print_r($ArrIN_FG_MATERIAL);
+			// exit;
+
+			$this->db->trans_start();
+				if(!empty($ArrIN_WIP_MATERIAL)){
+					$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+				}
+
+				if(!empty($ArrIN_FG_MATERIAL)){
+					$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
+				}
+			$this->db->trans_complete();
+
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+			} else {
+				$this->db->trans_commit();
+			}
+		}
 	}
 
 
