@@ -5115,6 +5115,12 @@
 		$data 	= (!empty($query[0]->so_number))?$query[0]->so_number:'';
 		return $data;
 	}
+	function get_nomor_so_po($no_bq){
+		$CI 	=& get_instance();
+		$query	= $CI->db->query("SELECT so_number, no_ipp FROM so_bf_header WHERE no_ipp='".$no_bq."'")->result();
+		$data 	= (!empty($query[0]->so_number))?$query[0]->so_number:'';
+		return $data;
+	}
 	
 	//FASTERST
 	function SUM_Quo_Material_FAST($id_bq){
@@ -6141,7 +6147,7 @@
 							DATE(a.delivery_date) AS tanggal
 						FROM 
 							scheduling_master a
-						WHERE a.delivery_date IS NOT NULL
+						WHERE a.delivery_date IS NOT NULL AND a.delivery_date != '0000-00-00'
 						ORDER BY a.no_ipp, a.delivery_date
 						";
 		$restPrice 	= $CI->db->query($sqlPrice)->result_array();
