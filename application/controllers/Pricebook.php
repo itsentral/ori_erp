@@ -33,7 +33,7 @@ class Pricebook extends CI_Controller {
 		$restgetBy			= $this->db->query($getBy)->result();
 		
 		$list_gudang = $this->db->query("SELECT
-										b.category, b.nm_gudang
+										b.id, b.category, b.nm_gudang
 									FROM
 										warehouse b")->result_array();
 		
@@ -59,6 +59,12 @@ class Pricebook extends CI_Controller {
 		$uri_code	= $this->uri->segment(3);
 		$Arr_Akses			= getAcccesmenu($controller);
 		$requestData	= $_REQUEST;
+		
+		$gudang   = $requestData['gudang'];
+		$warehouse   = $this->db->query("SELECT * FROM warehouse WHERE id = '$gudang'")->row();
+		$gudang1     = $warehouse->category;
+		
+		
 		$fetch			= $this->queryDataJSON(
 			$requestData['status'],
 			$requestData['gudang'],
@@ -75,11 +81,22 @@ class Pricebook extends CI_Controller {
 		$data	= array();
 		$urut1  = 1;
         $urut2  = 0;
+		$gudang   = $requestData['gudang'];
 		foreach($query->result_array() as $row)
 		{
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
+			
+			// $material = $row['id_material'];
+			// $hargaCostbook   = $this->db->query("SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_gudang = '$gudang' AND id_material= '$material' ORDER BY tgl_trans DESC limit 1")->row();
+			
+			// print_r($hargaCostbook);
+			// exit;
+			
+			//$PRICEBOOK       = $hargaCostbook->harga;
+			
+			
             if($asc_desc == 'asc')
             {
                 $nomor = $urut1 + $start_dari;
@@ -92,9 +109,9 @@ class Pricebook extends CI_Controller {
 			
 			$nestedData[]	= "<div align='center'>".$row['id_material']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['price_book'],2)."</div>";
-			$nestedData[]	= "<div align='center'>".$row['updated_date']."</div>";
-			$data[] = $nestedData;
+			$nestedData[]	= "<div align='right'>".number_format($row['harga'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".$row['tgl_trans']."</div>";
+			$data[] = $nestedData; 
             $urut1++;
             $urut2++;
 		}
@@ -111,72 +128,90 @@ class Pricebook extends CI_Controller {
 
 	public function queryDataJSON($status,$gudang, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		
+	   $sql = "
+			SELECT DISTINCT
+				a.id_material,
+				a.harga,
+				a.tgl_trans,
+				b.nm_material
+				
+			FROM
+				tran_warehouse_jurnal_detail a
+				INNER JOIN raw_materials b ON b.id_material=a.id_material
+		    WHERE 
+				1=1 AND a.id_gudang='$gudang' AND
+				(
+				a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.harga LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.tgl_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
+				ORDER BY a.tgl_trans DESC 
+				";
 	   
-	   
-	   if($gudang=='pusat'){
-		$sql = "
-			SELECT DISTINCT
-				a.id_material,
-				a.price_book,
-				a.updated_date,
-				b.nm_material
+	   // if($gudang=='pusat'){
+		// $sql = "
+			// SELECT DISTINCT
+				// a.id_material,
+				// a.price_book,
+				// a.updated_date,
+				// b.nm_material
 				
-			FROM
-				price_book a
-				INNER JOIN raw_materials b ON b.id_material=a.id_material
-		    WHERE 
-				1=1 AND
-				(
-				a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
-				ORDER BY a.updated_date DESC 
-				";
-	   }elseif($gudang=='subgudang') {
+			// FROM
+				// price_book a
+				// INNER JOIN raw_materials b ON b.id_material=a.id_material
+		    // WHERE 
+				// 1=1 AND
+				// (
+				// a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
+				// ORDER BY a.updated_date DESC 
+				// ";
+	   // }elseif($gudang=='subgudang') {
 		   
-		   $sql = "
-			SELECT DISTINCT
-				a.id_material,
-				a.price_book,
-				a.updated_date,
-				b.nm_material
+		   // $sql = "
+			// SELECT DISTINCT
+				// a.id_material,
+				// a.price_book,
+				// a.updated_date,
+				// b.nm_material
 				
-			FROM
-				price_book_subgudang a
-				INNER JOIN raw_materials b ON b.id_material=a.id_material
-		    WHERE 
-				1=1 AND
-				(
-				a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
-				ORDER BY a.updated_date DESC 
-				";
+			// FROM
+				// price_book_subgudang a
+				// INNER JOIN raw_materials b ON b.id_material=a.id_material
+		    // WHERE 
+				// 1=1 AND
+				// (
+				// a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
+				// ORDER BY a.updated_date DESC 
+				// ";
 		   
-	   }elseif($gudang=='produksi') {
-		   $sql = "
-			SELECT DISTINCT
-				a.id_material,
-				a.price_book,
-				a.updated_date,
-				b.nm_material
+	   // }elseif($gudang=='produksi') {
+		   // $sql = "
+			// SELECT DISTINCT
+				// a.id_material,
+				// a.price_book,
+				// a.updated_date,
+				// b.nm_material
 				
-			FROM
-				price_book_produksi a
-				INNER JOIN raw_materials b ON b.id_material=a.id_material
-		    WHERE 
-				1=1 AND
-				(
-				a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
-				ORDER BY a.updated_date DESC 
-				";
+			// FROM
+				// price_book_produksi a
+				// INNER JOIN raw_materials b ON b.id_material=a.id_material
+		    // WHERE 
+				// 1=1 AND
+				// (
+				// a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.price_book LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR a.updated_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+				// OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%')				
+				// ORDER BY a.updated_date DESC 
+				// ";
 		   
-	   }
+	   // }
 		
 		//echo $sql; exit;
 
