@@ -6,17 +6,20 @@ class Warehouse_stock_tras extends CI_Controller {
         $this->load->model('master_model');
 		$this->folder		= 'Stock_tras/';
 		$this->accounting	= $this->load->database('gl', TRUE);
-		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
-		$this->Arr_Akses	= getAcccesmenu($controller);
+		// $controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		// $this->Arr_Akses	= getAcccesmenu($controller);
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
 		$this->arr_bulan	= array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
 		
+	
 	}
 	
 	function index(){
-        $controller			= ucfirst(strtolower($this->uri->segment(1)));
-		$this->Arr_Akses	= getAcccesmenu($controller);
 		
-		if($this->Arr_Akses['read'] !='1'){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
 			redirect(site_url('dashboard'));
 		}
@@ -28,7 +31,7 @@ class Warehouse_stock_tras extends CI_Controller {
 			'title'			=> 'DAFTAR STOCK',
 			'action'		=> 'index',
 			'rows_coa'		=> $rows_COA,
-			'akses_menu'	=> $this->Arr_Akses
+			'akses_menu'	=> $Arr_Akses
 		);
 		$this->load->view($this->folder.'v_warehouse_stock',$data);
 		
@@ -232,9 +235,9 @@ class Warehouse_stock_tras extends CI_Controller {
 			}
 			
 			$Harga_HPP			= $Nilai_HPP;
-			if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
-				$Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
-			}
+			// if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
+				// $Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
+			// }
 			
 			//echo"<br> Qty : ".$Qty_Akhir." Harga : ".$Harga_HPP." Total : ".$SaldoAkhir_HPP;
 			
@@ -247,7 +250,9 @@ class Warehouse_stock_tras extends CI_Controller {
 			$nestedData[]	= $Name_Gudang;
 			$nestedData[]	= number_format($Qty_Akhir,4);
 			$nestedData[]	= number_format($Harga_HPP,2);
-			$nestedData[]	= number_format($SaldoAkhir_HPP,2);
+			$nestedData[]	= number_format($SaldoAkhir_HPP,2);		
+			$nestedData[]	= "<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>";			
+			
 			
 			$data[] 		= $nestedData;
             $urut1++;
@@ -436,11 +441,15 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Date_Find		= urldecode($this->input->get('tgl'));
 		$Categori_Find	= urldecode($this->input->get('category'));
 		
+		// print_r($Date_Find);
+		// exit;
+		
+		
 		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
 		
 		
-		if(empty($Date_Find)){			
+		if(!empty($Date_Find)){			
 			$Date_Find	= date('Y-m-d');
 		}
 		
@@ -655,9 +664,9 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				$Harga_HPP			= $Nilai_HPP;
-				if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
-					$Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
-				}
+				// if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
+					// $Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
+				// }
 				
 				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($SaldoAkhir_HPP,2));
 				
@@ -718,9 +727,8 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Coa_Find		= urldecode($this->input->get('coa'));
 		$Date_Find		= urldecode($this->input->get('tgl'));
 		$Categori_Find	= urldecode($this->input->get('category'));
-
-				
 		
+			
 		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
 		
@@ -1034,7 +1042,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		
 		
-		$Grand_Total	= $Total_Qty = $Total_Stock = $Tot_Stock_Qty = $Total_Selisih = $Tot_Selisih_Qty = 0;			
+		$Grand_Total	= $Total_Qty;			
 		if($record){
 			$Next_Row		= $NextRow2;
 			$intL			= 0;
@@ -1066,9 +1074,9 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				$Harga_HPP			= $Nilai_HPP;
-				if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
-					$Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
-				}
+				// if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
+					// $Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
+				// }
 				
 				$Code_UnitFind		= $Code_Gudang.'^_^'.$Code_Material;
 				$Qty_Temp	= $Harga_Temp = $Total_Temp = 0;
@@ -1096,8 +1104,8 @@ class Warehouse_stock_tras extends CI_Controller {
 					unset($Temp_Compare[$Code_UnitFind]);
 				}
 				
-				$Selisih_Qty		= $Qty_Akhir - $Qty_Temp;
-				$Selisih_Total		= $SaldoAkhir_HPP - $Total_Temp;
+				$Selisih_Qty		= $Qty_Akhir - $Qty_Akhir; //$Qty_Akhir - $Qty_Temp;
+				$Selisih_Total		= $SaldoAkhir_HPP - $SaldoAkhir_HPP; //$SaldoAkhir_HPP - $Total_Temp;
 				
 				$Fix_Style			= $styleArray2;
 				if($Selisih_Qty > 0 || $Selisih_Qty < 0  || $Selisih_Total > 0 || $Selisih_Total < 0){
@@ -1105,7 +1113,7 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($SaldoAkhir_HPP,2),number_format($Qty_Temp,4),number_format($Harga_Temp,2),number_format($Total_Temp,2),number_format($Selisih_Qty,4),number_format($Selisih_Total,2));
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Akhir,$Harga_HPP,$SaldoAkhir_HPP,$Qty_Temp,$Harga_HPP,$SaldoAkhir_HPP,$Selisih_Qty,$Selisih_Total);
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
@@ -1114,19 +1122,13 @@ class Warehouse_stock_tras extends CI_Controller {
 					$sheet->getStyle($Cols.$Next_Row)->applyFromArray($Fix_Style);
 				}
 				
-				$Grand_Total		+=$SaldoAkhir_HPP;
-				$Total_Qty			+=$Qty_Akhir;
-				
-				$Total_Stock		+=$Total_Temp;
-				$Tot_Stock_Qty		+=$Qty_Temp;
-				
-				$Total_Selisih		+=$Selisih_Total;
-				$Tot_Selisih_Qty	+=$Selisih_Qty;
+				$Grand_Total	+=$SaldoAkhir_HPP;
+				$Total_Qty		+=$Qty_Akhir;
 				
 			}
 			
 			## ANTISIPASI JIKA DI TRAS TIDAK ADA TAPI DI STOCK ADA ##
-			if($Temp_Compare){
+		/*	if($Temp_Compare){
 				foreach($Temp_Compare as $keySisa=>$valSisa){
 					$Next_Row++;
 					$intL++;
@@ -1169,7 +1171,7 @@ class Warehouse_stock_tras extends CI_Controller {
 					}
 					
 					
-					$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($SaldoAkhir_HPP,2),number_format($Qty_Temp,4),number_format($Harga_Temp,2),number_format($Total_Temp,2),number_format($Selisih_Qty,4),number_format($Selisih_Total,2));
+					$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Akhir,$Harga_HPP,$SaldoAkhir_HPP,$Qty_Temp,$Harga_Temp,$Total_Temp,$Selisih_Qty,$Selisih_Total);
 					
 					foreach($Temp_Loop as $KeyLoop=>$valLoop){
 						$Mula_Col++;				
@@ -1181,43 +1183,22 @@ class Warehouse_stock_tras extends CI_Controller {
 					$Grand_Total	+=$SaldoAkhir_HPP;
 					$Total_Qty		+=$Qty_Akhir;
 					
-					$Total_Stock		+=$Total_Temp;
-					$Tot_Stock_Qty		+=$Qty_Temp;
-					
-					$Total_Selisih		+=$Selisih_Total;
-					$Tot_Selisih_Qty	+=$Selisih_Qty;
 					
 				}
-			}
+			}*/
 			
-			
+			/*
 			$Next_Row++;
 			$sheet->setCellValue('A'.$Next_Row, 'Grand Total');
-			$sheet->getStyle('A'.$Next_Row.':E'.$Next_Row)->applyFromArray($style_header);
-			$sheet->mergeCells('A'.$Next_Row.':E'.$Next_Row);
+			$sheet->getStyle('A'.$Next_Row.':G'.$Next_Row)->applyFromArray($style_header);
+			$sheet->mergeCells('A'.$Next_Row.':G'.$Next_Row);
 			
 			
-			$sheet->setCellValue('F'.$Next_Row, number_format($Total_Qty,4));
-			$sheet->getStyle('F'.$Next_Row)->applyFromArray($style_header);
-			
-			$sheet->setCellValue('G'.$Next_Row, number_format($Grand_Total,2));
-			$sheet->getStyle('G'.$Next_Row.':H'.$Next_Row)->applyFromArray($style_header);
-			$sheet->mergeCells('G'.$Next_Row.':H'.$Next_Row);
-			
-			$sheet->setCellValue('I'.$Next_Row, number_format($Tot_Stock_Qty,4));
-			$sheet->getStyle('I'.$Next_Row)->applyFromArray($style_header);
-			
-			$sheet->setCellValue('J'.$Next_Row, number_format($Total_Stock,2));
-			$sheet->getStyle('J'.$Next_Row.':K'.$Next_Row)->applyFromArray($style_header);
-			$sheet->mergeCells('J'.$Next_Row.':K'.$Next_Row);
-			
-			$sheet->setCellValue('L'.$Next_Row, number_format($Tot_Selisih_Qty,4));
-			$sheet->getStyle('L'.$Next_Row)->applyFromArray($style_header);
-			
-			$sheet->setCellValue('M'.$Next_Row, number_format($Total_Selisih,2));
-			$sheet->getStyle('M'.$Next_Row)->applyFromArray($style_header);
+			$sheet->setCellValue('H'.$Next_Row, number_format($Grand_Total,2));
+			$sheet->getStyle('H'.$Next_Row)->applyFromArray($style_header);
 			
 			
+			*/
 		}
 		
 		
@@ -1237,6 +1218,22 @@ class Warehouse_stock_tras extends CI_Controller {
 		//unduh file
 		$objWriter->save("php://output");
 		exit;
+	}
+	
+	public function modal_history(){
+		$id_material 	= $this->uri->segment(3);
+		$id_gudang 		= $this->uri->segment(4);
+
+		$result		= $this->db->get_where('tran_warehouse_jurnal_detail', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang))->result_array();
+		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
+
+		$data = array(
+			'result' => $result,
+			'material' => $material,
+			'id_gudang' => $id_gudang
+		);
+
+		$this->load->view('Stock_tras/modal_history', $data);
 	}
 
 }
