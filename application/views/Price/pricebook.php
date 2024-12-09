@@ -6,6 +6,18 @@ $this->load->view('include/side_menu');
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
+		<div class="box-tool pull-right">
+			<select name='gudang' id='gudang' class='form-control input-sm' style='width:150px; float:right;'>
+				<option value='0'>Select Gudang</option>
+				<?php
+				foreach($list_gudang AS $val => $valx){
+					echo "<option value='".$valx['id']."'>".strtoupper($valx['nm_gudang'])."</option>";
+				}
+				?>
+			</select>
+
+			
+		</div>
 		
 	</div>
 	
@@ -59,12 +71,20 @@ $this->load->view('include/side_menu');
 	$(document).ready(function(){
 		$('#spinnerx').hide();
 		var status = 1;
-		DataTables(status);
+		var gudang = $('#gudang').val();
+		DataTables(status,gudang);
+		
+		$(document).on('change','#gudang', function(e){
+			e.preventDefault();
+			var status = 1;
+			var gudang = $('#gudang').val();
+			DataTables(status,gudang);
+		});
 	});
 	
 	
 		
-	function DataTables(status = null){
+	function DataTables(status = null, gudang=null){
 		var dataTable = $('#my-grid').DataTable({
 			"scrollY": "1000",
 			"scrollCollapse" : true,
@@ -91,7 +111,8 @@ $this->load->view('include/side_menu');
 				url : base_url + active_controller+'/getDataJSON/pricebook',
 				type: "post",
 				data: function(d){
-					d.status = status
+					d.status = status,
+					d.gudang = gudang
 				},
 				cache: false,
 				error: function(){
