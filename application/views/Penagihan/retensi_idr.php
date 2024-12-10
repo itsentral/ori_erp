@@ -6,7 +6,7 @@
 					?>
 					<thead>
 						<tr class='bg-blue'>
-							<td class="text-left headX HeaderHr" colspan='3'><b>RETENSI</b></td>
+							<td class="text-left headX HeaderHr" colspan='3'><b>RETENSI IDR</b></td>
 						</tr>
 						<tr class='bg-blue'>
 							<th class="text-center" width = '2%'>#</th>
