@@ -2027,7 +2027,7 @@ if($base_cur=='USD'){
 					
 					$dtListIDipp = [];
 					foreach($result_data AS $val => $valx ){
-						$dtListIDipp[$val['id']] = $valx['id'];
+						$dtListIDipp[] = $valx['id'];
 					}
 					$dtImplode	= "('".implode("','", $dtListIDipp)."')"; 
 					$dtImplode2	= implode(",", $dtListIDipp);
