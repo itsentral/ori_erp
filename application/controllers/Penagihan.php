@@ -6194,221 +6194,221 @@ if($base_cur=='USD'){
 	
 	public function add_new_invoice_delivery(){
 		
-			$controller			= ucfirst(strtolower($this->uri->segment(1)));
-			$Arr_Akses			= getAcccesmenu($controller);
-			if($Arr_Akses['read'] !='1'){
-				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
-				redirect(site_url('dashboard'));
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
+
+		$id    		= $this->uri->segment(3);
+		$penagihan 	= $this->db->get_where('penagihan', array('id'=>$id))->result();
+		$nomor_id 	= explode(",",$penagihan[0]->no_so);
+		$approval	= $this->uri->segment(4);
+		// print_r($penagihan);exit;
+		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so')->result_array();
+		
+		// print_r($getBq);
+		// exit;
+		
+
+		$in_ipp = [];
+		$in_bq = [];
+
+		foreach($getBq AS $val => $valx){
+			$in_ipp[$val] 	= $valx['no_po'];
+			$in_bq[$val] 	= 'BQ-'.$valx['no_po'];
+			$in_so[$val] 	= get_nomor_so_po($valx['no_po']);
+			$base_cur		= $valx['base_cur'];
+		}
+		if(empty($in_ipp)) {echo 'Nomor SO kosong';die();}
+		$penagihan_detail 	= $this->db->get_where('penagihan_detail', array('id_penagihan'=>$id))->row();
+		$noipp=implode("','",$in_ipp);
+		$id_produksi=implode("','PRO-",$in_ipp);
+		$id_bq=implode("','BQ-",$in_ipp);
+		$kode_delivery=str_ireplace(",","','",$penagihan[0]->delivery_no);
+		$getHeader	= $this->db->where_in('no_ipp',$in_ipp)->get('production')->result();
+		if(!empty($penagihan_detail)){
+			$getDetail	= $this->db->query("select *,harga_total as total_deal_usd, dim_1 as dim1,dim_2 as dim2, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item
+			from penagihan_detail where kategori_detail='PRODUCT' and id_penagihan='".$id."'")->result_array();
+			$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
+			$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
+			$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
+			$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
+			$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
+			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
+			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+			$sisa_um   = $get_kurs[0]->sisa_um;
+			$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+
+			$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
+			//$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+			if($base_cur=='USD'){
+				$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
+			}else{
+				$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
+			}
+			$uang_muka_persen2 = 0;
+			$down_payment2 = 0;
+			if(count($get_tagih) > 1){
+				$get_tagih		= $this->db->order_by('id','DESC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
+				$uang_muka_persen2 = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
+				if($base_cur=='USD'){
+					$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
+				}else{
+					$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
+				}
+			}
+		}else{
+			$this->db->query("delete from penagihan_product_temp where id_penagihan='".$id."'");
+			$ada_data_bf='';
+//loose
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_uniq=b.id where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose' group by b.id_milik, b.id_product, b.id_produksi ";
+			$delivery_loose	= $this->db->query($sql)->result_array();
+			if(!empty($delivery_loose)){
+				foreach ($delivery_loose as $keys=>$vals){
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose','".$vals['cogs']."','".$vals['id_product']."') ");
+				}
+				$ada_data_bf='so_detail_header';
+			}
+			
+//loose_dead_modif	
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai  where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' group by b.id_milik, b.id_product, b.id_produksi ";
+			$delivery_loose	= $this->db->query($sql)->result_array();
+			if(!empty($delivery_loose)){
+				foreach ($delivery_loose as $keys=>$vals){
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead_modif','".$vals['cogs']."','".$vals['id_product']."') ");
+				}
+				
+			}
+			
+//loose_dead	
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
+			$delivery_loose	= $this->db->query($sql)->result_array();
+			if(!empty($delivery_loose)){
+				foreach ($delivery_loose as $keys=>$vals){
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
+				}
+				
+			}
+		
+			// $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' ";
+			// $delivery_loose	= $this->db->query($sql)->result_array();
+							
+			// if(!empty($delivery_loose)){
+				// foreach ($delivery_loose as $keys=>$vals){
+					// $this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".$vals['id_produksi']."','".$vals['qty']."','loose_dead_modif','".$vals['cogs']."','".$vals['id_product']."') ");
+				// }
+				
+			// }
+// field join
+			$sql="select sum(a.berat) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join (select id_milik,id_product,id_produksi from production_detail group by id_milik,id_product,id_produksi) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and a.sts_product='field joint' group by a.id_milik, b.id_product, b.id_produksi ";
+			$delivery_loose	= $this->db->query($sql)->result_array();			
+			if(!empty($delivery_loose)){
+				foreach ($delivery_loose as $keys=>$vals){
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','field join','".$vals['cogs']."','".$vals['id_product']."') ");
+				}
+			}
+// cutting
+			$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik, b.id_product, b.id_produksi ";
+			$delivery_loose	= $this->db->query($sql)->result_array();
+			if(!empty($delivery_loose)){
+				foreach ($delivery_loose as $keys=>$vals){
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','cut','".$vals['cogs']."','".$vals['id_product']."') ");
+				}
 			}
 
-			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
-
-			$id    		= $this->uri->segment(3);
-			$penagihan 	= $this->db->get_where('penagihan', array('id'=>$id))->result();
-			$nomor_id 	= explode(",",$penagihan[0]->no_so);
-			$approval	= $this->uri->segment(4);
-			// print_r($penagihan);exit;
-			$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so')->result_array();
+			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	 from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
+			x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
 			
-			// print_r($getBq);
+			
+			if($ada_data_bf!=''){
+				if(empty($getDetail)) { 
+					$getDetail	= $this->db->query("
+					select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join 
+					( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, , x.sts_do from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id where x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp and b.id=c.id_milik")->result_array();
+				}
+			}
+			
+			// print_r($getDetail);
 			// exit;
 			
-
-			$in_ipp = [];
-			$in_bq = [];
-
-			foreach($getBq AS $val => $valx){
-				$in_ipp[$val] 	= $valx['no_po'];
-				$in_bq[$val] 	= 'BQ-'.$valx['no_po'];
-				$in_so[$val] 	= get_nomor_so_po($valx['no_po']);
-				$base_cur		= $valx['base_cur'];
-			}
-			if(empty($in_ipp)) {echo 'Nomor SO kosong';die();}
-			$penagihan_detail 	= $this->db->get_where('penagihan_detail', array('id_penagihan'=>$id))->row();
-			$noipp=implode("','",$in_ipp);
-			$id_produksi=implode("','PRO-",$in_ipp);
-			$id_bq=implode("','BQ-",$in_ipp);
-			$kode_delivery=str_ireplace(",","','",$penagihan[0]->delivery_no);
-			$getHeader	= $this->db->where_in('no_ipp',$in_ipp)->get('production')->result();
-			if(!empty($penagihan_detail)){
-				$getDetail	= $this->db->query("select *,harga_total as total_deal_usd, dim_1 as dim1,dim_2 as dim2, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item
-				from penagihan_detail where kategori_detail='PRODUCT' and id_penagihan='".$id."'")->result_array();
-				$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
-				$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
-				$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
-				$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
-				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
-				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
-				//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
-				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = $get_kurs[0]->sisa_um;
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-
-				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
-				//$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-				if($base_cur=='USD'){
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-				}else{
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-				}
-				$uang_muka_persen2 = 0;
-				$down_payment2 = 0;
-				if(count($get_tagih) > 1){
-					$get_tagih		= $this->db->order_by('id','DESC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
-					$uang_muka_persen2 = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
-					if($base_cur=='USD'){
-						$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-					}else{
-						$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-					}
-				}
-			}else{
-				$this->db->query("delete from penagihan_product_temp where id_penagihan='".$id."'");
-				$ada_data_bf='';
-//loose
-				$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_uniq=b.id where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose' group by b.id_milik, b.id_product, b.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
-					$ada_data_bf='so_detail_header';
-				}
-				
-//loose_dead_modif	
-                $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai  where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' group by b.id_milik, b.id_product, b.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead_modif','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
-					
-				}
-				
-//loose_dead	
-                $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
-					
-				}
-			
-				// $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' ";
-				// $delivery_loose	= $this->db->query($sql)->result_array();
-								
-				// if(!empty($delivery_loose)){
-					// foreach ($delivery_loose as $keys=>$vals){
-						// $this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".$vals['id_produksi']."','".$vals['qty']."','loose_dead_modif','".$vals['cogs']."','".$vals['id_product']."') ");
-					// }
-					
-				// }
-// field join
-				$sql="select sum(a.berat) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join (select id_milik,id_product,id_produksi from production_detail group by id_milik,id_product,id_produksi) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and a.sts_product='field joint' group by a.id_milik, b.id_product, b.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();			
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','field join','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
-				}
-// cutting
-				$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik, b.id_product, b.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','cut','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
-				}
-
-				$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	 from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
-	            x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
-				
-				
-				if($ada_data_bf!=''){
-					if(empty($getDetail)) { 
-						$getDetail	= $this->db->query("
-						select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join 
-						( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, , x.sts_do from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id where x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp and b.id=c.id_milik")->result_array();
-					}
-				}
-				
-				// print_r($getDetail);
-				// exit;
-				
 //				$getDetail	= $this->db->order_by('id_milik','asc')->where_in('no_ipp',$in_ipp)->get('billing_so_product')->result_array();
-				$getEngCost	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','eng')->get('billing_so_add')->result_array();
-				$getPackCost= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','pack')->get('billing_so_add')->result_array();
-				$getTruck	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','ship')->get('billing_so_add')->result_array();
-				$getAcc  	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','lainnya')->get('billing_so_add')->result_array();
-				
-				//$non_frp	= $this->db->select('*,qty as qty_total, (qty-qty_inv) qty_inv,0 qty_delivery ')->from('billing_so_add')->where("(category='baut' OR category='plate' OR category='gasket' OR category='lainnya')")->where_in('no_ipp',$in_ipp)->get()->result_array();
-				//$non_frp    = $this->db->order_by('a.id', 'asc')->group_by('a.product')->select('SUM(a.berat) AS qty_product, a.*, "aksesoris" AS type_product')->where('(berat > 0 OR berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'aksesoris'))->result_array();
-				$non_frp      = $this->db->query("SELECT sum( a.berat ) AS qty_delivery, a.*,'aksesoris' AS type_product,b.no_ipp,b.satuan,b.total_deal_idr,b.id_material,b.qty as qty_total,(b.qty-b.qty_inv) as qty_inv,b.total_deal_usd FROM delivery_product_detail a JOIN billing_so_add b on a.product=b.id_material AND a.id_produksi = b.no_ipp WHERE ( a.berat > 0 OR a.berat IS NOT NULL )  AND a.kode_delivery IN ('$kode_delivery')  AND a.sts = 'aksesoris'  GROUP BY a.product  ORDER BY a.id ASC")->result_array();
-		        
-                $material	= $this->db->select('*,qty as qty_total, (qty-qty_inv) qty_inv,(qty-qty_inv) qty_delivery ')->where_in('no_ipp',$in_ipp)->get_where('billing_so_add',array('category'=>'mat'))->result_array();
-				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
+			$getEngCost	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','eng')->get('billing_so_add')->result_array();
+			$getPackCost= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','pack')->get('billing_so_add')->result_array();
+			$getTruck	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','ship')->get('billing_so_add')->result_array();
+			$getAcc  	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','lainnya')->get('billing_so_add')->result_array();
+			
+			//$non_frp	= $this->db->select('*,qty as qty_total, (qty-qty_inv) qty_inv,0 qty_delivery ')->from('billing_so_add')->where("(category='baut' OR category='plate' OR category='gasket' OR category='lainnya')")->where_in('no_ipp',$in_ipp)->get()->result_array();
+			//$non_frp    = $this->db->order_by('a.id', 'asc')->group_by('a.product')->select('SUM(a.berat) AS qty_product, a.*, "aksesoris" AS type_product')->where('(berat > 0 OR berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'aksesoris'))->result_array();
+			$non_frp      = $this->db->query("SELECT sum( a.berat ) AS qty_delivery, a.*,'aksesoris' AS type_product,b.no_ipp,b.satuan,b.total_deal_idr,b.id_material,b.qty as qty_total,(b.qty-b.qty_inv) as qty_inv,b.total_deal_usd FROM delivery_product_detail a JOIN billing_so_add b on a.product=b.id_material AND a.id_produksi = b.no_ipp WHERE ( a.berat > 0 OR a.berat IS NOT NULL )  AND a.kode_delivery IN ('$kode_delivery')  AND a.sts = 'aksesoris'  GROUP BY a.product  ORDER BY a.id ASC")->result_array();
+			
+			$material	= $this->db->select('*,qty as qty_total, (qty-qty_inv) qty_inv,(qty-qty_inv) qty_delivery ')->where_in('no_ipp',$in_ipp)->get_where('billing_so_add',array('category'=>'mat'))->result_array();
+			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 
 //				$get_kurs	= $this->db->select(' (kurs_usd_dipakai) AS kurs,  (uang_muka_persen) AS uang_muka_persen,  (uang_muka_persen2) AS uang_muka_persen2')->where_in('no_ipp',$in_ipp)->get('billing_so')->result();
-				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
+			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+			$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 //				$uang_muka_persen = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
-                $sisa_um   = $get_kurs[0]->sisa_um;
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+			$sisa_um   = $get_kurs[0]->sisa_um;
+			$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+			if($base_cur=='USD'){
+				$down_payment = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
+			}else{
+				$down_payment = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
+			}
+			$uang_muka_persen2 = 0;
+			$down_payment2 = 0;
+			if(count($get_tagih) > 1){
+				$get_tagih		= $this->db->order_by('id','DESC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
+				$uang_muka_persen2 = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
 				if($base_cur=='USD'){
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
+					$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
 				}else{
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
-				}
-				$uang_muka_persen2 = 0;
-				$down_payment2 = 0;
-				if(count($get_tagih) > 1){
-					$get_tagih		= $this->db->order_by('id','DESC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
-					$uang_muka_persen2 = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
-					if($base_cur=='USD'){
-						$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
-					}else{
-						$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
-					}
+					$down_payment2 = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
 				}
 			}
-			
-			// print_r($in_ipp);
-			// exit;
-
-			$data2 = array(
-				'title'			=> 'Indeks Of Create Invoice Progress',
-				'action'		=> 'index',
-				'row_group'		=> $data_Group,
-				'akses_menu'	=> $Arr_Akses,
-				'getHeader'		=> $getHeader,
-				'getDetail' 	=> $getDetail,
-				'getEngCost' 	=> $getEngCost,
-				'getPackCost' 	=> $getPackCost,
-				'getTruck' 		=> $getTruck,
-				'non_frp'		=> $non_frp,
-				'getAcc'		=> $getAcc,
-				'material'		=> $material,
-				'list_top'		=> $list_top,
-				'base_cur'		=> $base_cur,
-				'in_ipp'		=> implode(',',$in_ipp),
-				'in_bq'			=> implode(',',$in_bq),
-				'in_so'			=> implode(',',$in_so),
-				'arr_in_ipp'	=> $in_ipp,
-				'penagihan'		=> $penagihan,
-				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $uang_muka_persen,
-				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> $down_payment,
-				'sisa_um'	    => $sisa_um,
-				'down_payment2'	=> $down_payment2,
-				'id'			=> $id,
-				'approval'		=> $approval
-			);
-			$this->load->view('Penagihan/add_new_invoice_delivery',$data2);
+		}
 		
-	}
+		// print_r($in_ipp);
+		// exit;
+
+		$data2 = array(
+			'title'			=> 'Indeks Of Create Invoice Progress',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'getHeader'		=> $getHeader,
+			'getDetail' 	=> $getDetail,
+			'getEngCost' 	=> $getEngCost,
+			'getPackCost' 	=> $getPackCost,
+			'getTruck' 		=> $getTruck,
+			'non_frp'		=> $non_frp,
+			'getAcc'		=> $getAcc,
+			'material'		=> $material,
+			'list_top'		=> $list_top,
+			'base_cur'		=> $base_cur,
+			'in_ipp'		=> implode(',',$in_ipp),
+			'in_bq'			=> implode(',',$in_bq),
+			'in_so'			=> implode(',',$in_so),
+			'arr_in_ipp'	=> $in_ipp,
+			'penagihan'		=> $penagihan,
+			'kurs'			=> $get_kurs[0]->kurs,
+			'uang_muka_persen'	=> $uang_muka_persen,
+			'uang_muka_persen2'	=> 0,
+			'down_payment'	=> $down_payment,
+			'sisa_um'	    => $sisa_um,
+			'down_payment2'	=> $down_payment2,
+			'id'			=> $id,
+			'approval'		=> $approval
+		);
+		$this->load->view('Penagihan/add_new_invoice_delivery',$data2);
 	
+}
+
 	
 	public function add_new_invoice_instalasi(){
 		
