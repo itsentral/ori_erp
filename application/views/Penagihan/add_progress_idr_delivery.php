@@ -6,7 +6,6 @@
 		<tr class='bg-blue'>
 			<th class="text-center" width='2%'>#</th>
 			<th class="text-center">Product</th>
-			<th class="text-center">Item No</th>
 			<th class="text-center">PO Description</th>
 			<th class="text-center" width='6%'>Dim 1</th>
 			<th class="text-center" width='6%'>Dim 2</th>
@@ -57,14 +56,14 @@
 			?>
 			<tr id='tr_<?= $numb;?>' >
 				<td align='center'>
-					<input type="hidden" id="ck_<?= $numb;?>" name="tr1_<?= $numb;?>" value="<?= $numb;?>">
+					<input type="hidden"   id="ck_<?= $numb;?>" name="tr1_<?= $numb;?>" value="<?= $numb;?>" readonly>
 					<input type="hidden" id="data_ipp_<?=$numb?>" name="data1[<?=$numb?>][no_ipp]" value="<?=$valx['no_ipp']?>">
 					<input type="hidden" id="data_so_<?=$numb?>" name="data1[<?=$numb?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
 					<input type="hidden" id="data_idmilik_<?=$numb?>" name="data1[<?=$numb?>][id_milik]" value="<?=$valx['id_milik']?>">
 					<input type="hidden" id="data_cogs_<?=$numb?>" name="data1[<?=$numb?>][cogs]" value="<?=$valx['cogs']?>">
+					<input type="hidden" id="product_cust<?= $numb;?>" name="data1[<?=$numb ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['customer_item'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1">
 				</td>
 				<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb;?>" name="data1[<?=$numb ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb;?>" name="data1[<?=$numb ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['customer_item'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb;?>" name="data1[<?=$numb ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['desc'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb;?>" name="data1[<?=$numb ?>][diameter_1]" value="<?=$valx['dim1']; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb;?>" name="data1[<?=$numb ?>][diameter_2]" value="<?=$valx['dim2']; ?>" readonly  tabindex="-1"></td>
@@ -87,7 +86,7 @@
 		}
 		?>
 		<tr class='FootColor'>
-			<td colspan='14'><b>TOTAL COST  OF PRODUCT</b></td>
+			<td colspan='13'><b>TOTAL COST  OF PRODUCT</b></td>
 			<td align='center'>
 				<?php
 				$tot_product2=round($SUM,2);
@@ -126,21 +125,11 @@
 				}else{
 					$harga_sat2= round($valx['harga_satuan_idr'],2);
 				}
-				if(isset($valx['checked'])){
-					if($valx['checked']!="") { 
+				
 						$checked="checked";$readonly="";
 						$harga_tot2=round($harga_sat2*$valx['qty_delivery'],2);
 						$SUM_NONFRP += ($harga_tot2);
-					}
-				} 
-				else {
-				
-				
-				$harga_tot2=round($valx['harga_total_idr']);
-				$SUM_NONFRP += ($harga_tot2);
-				
-				}
-				
+										
 				
 				?>
 				<tr id='tr1_<?= $numb2;?>' >
@@ -289,8 +278,10 @@
 	$SUM1=0;
 	$SUM2=0;
 	$SUM3=0;
-	$SUM4=0;
-
+	$SUM4=0;	
+	//ACCESORIES
+	$SUM_ACC=0;
+	
 	//ENGENERING
 	$SUM1=0;
 	if(!empty($getEngCost)){
@@ -511,7 +502,7 @@
 			<td align='center' style='text-align:center;' colspan='2'></td>
 			<td align='right' style='text-align:center;' colspan='2'>
 				<?php
-					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
+					$grand_total = round($SUM + $SUM_ACC + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
 					$down_payment=round($uang_muka_persen*$grand_total/100,0);
 					$down_payment2=0;
 				?>
@@ -596,7 +587,7 @@
 				if(isset($penagihan[0]->total_invoice)){
 					$grand_total = round($penagihan[0]->total_invoice_idr, 2);
 				}else{
-					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP - ($down_payment + $down_payment2), 2);
+					$grand_total = round($SUM + $SUM_ACC + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP - ($down_payment + $down_payment2), 2);
 				}
 				?>
 				<input type="text" class="form-control total_invoice text-right input-sm divide" id="total_invoice" name="total_invoice" value="<?php echo set_value('total_invoice', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">
