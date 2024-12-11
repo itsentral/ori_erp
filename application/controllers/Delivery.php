@@ -2016,7 +2016,7 @@ class Delivery extends CI_Controller
 				$ArrKeyJurnal[] = $row['id_uniq'];
 			}
 		}
-		move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
+		// move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
 		//SAMPAI SINI
 		// exit;
 		$this->db->trans_start();
@@ -2052,6 +2052,7 @@ class Delivery extends CI_Controller
 				'pesan'		=> 'Process Success. Thanks ...',
 				'status'	=> 1
 			);
+			move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
 			$this->close_jurnal_in_transit($kode_delivery);
 			history('Lock release delivery ' . $kode_delivery);
 		}
