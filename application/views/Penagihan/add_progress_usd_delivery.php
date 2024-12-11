@@ -501,6 +501,8 @@
 	$tagih = isset($penagihan[0]->total_ppn)?$penagihan[0]->total_ppn:0;
 	
 	
+	
+	
 	?>
 	<tfoot>
 		<tr class='HeaderHr'>
@@ -512,7 +514,7 @@
 			<td align='right' style='text-align:center;' colspan='2'>
 				<?php
 					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
-					$down_payment=($uang_muka_persen*$grand_total/100);
+					$down_payment=($sisa_um);
 					$down_payment2=0;
 				?>
 				<input type="text" class="form-control grand_total text-right input-sm divide" id="grand_total" name="grand_total" value="<?php echo set_value('grand_total', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">				
