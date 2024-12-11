@@ -3587,7 +3587,7 @@ else
 					$kodejurnal1	= 'JV066';
 					// update kartu po customer uang muka
 					$this->db->query("update tr_kartu_po_customer set  
-					total_retensi2=(total_retensi2-".$gethd->total_dpp."), 
+					total_retensi2=(total_retensi2-".$gethd->total_dpp_usd."), 
 					total_retensi2_idr=(total_retensi2_idr-".$gethd->total_dpp_rp.")
 					WHERE nomor_po='$no_po'");
 					$this->db->query("update tr_kartu_po_customer set kurs_um=ROUND((total_um_idr/total_um),0) WHERE nomor_po='$no_po'");
