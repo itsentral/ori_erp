@@ -885,7 +885,7 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['nm_material'] 		= $rest_pusat[0]->nm_material;
 					$ArrJurnalNew2[$key]['id_category'] 		= $rest_pusat[0]->id_category;
 					$ArrJurnalNew2[$key]['nm_category'] 		= $rest_pusat[0]->nm_category;
-					$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_dari;
+					$ArrJurnalNew2[$key]['id_gudang'] 			= $id_gudang_ke;
 					$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
 					$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
 					$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
