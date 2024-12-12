@@ -91,7 +91,7 @@ class Delivery extends CI_Controller
 				// $edit_print = "<button type='button' class='btn btn-sm bg-purple edit_print' data-kode_delivery='".$row['kode_delivery']."' title='Edit Surat Jalan'><i class='fa fa-file'></i></button>";
 			}
 			$view = "<a href='" . base_url('delivery/view_delivery/' . $row['kode_delivery']) . "' class='btn btn-sm btn-warning' title='Detail'><i class='fa fa-eye'></i></a>";
-			$print2 = "<a href='" . base_url('delivery/print_preview/' . $row['kode_delivery']) . "' target='_blank' class='btn btn-sm btn-info' title='Preview'><i class='fa fa-search'></i></a>";
+			// $print2 = "<a href='" . base_url('delivery/print_preview/' . $row['kode_delivery']) . "' target='_blank' class='btn btn-sm btn-info' title='Preview'><i class='fa fa-search'></i></a>";
 					
 			$GetSPEC 		= $this->detailDelivery($row['kode_delivery']);
 
