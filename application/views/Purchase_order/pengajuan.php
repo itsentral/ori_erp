@@ -23,7 +23,7 @@ $this->load->view('include/side_menu');
 					<th class="text-center">Create By</th>
 					<th class="text-center">Created Date</th>
 					<th class="text-center">Status</th>
-					<th class="text-center" width='170px'>Option</th>
+					<th class="text-center">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>

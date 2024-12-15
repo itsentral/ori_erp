@@ -12,7 +12,8 @@
 				<th class="text-center mid" width='7%'>LEAD TIME</th>
 				<th class="text-right mid" width='7%'>QTY</th>
 				<th class="text-right mid" width='10%'>TOTAL HARGA</th>
-				<th class="text-center mid" width='15%'>CHECK</th>
+				<th class="text-center mid" width='10%'>STATUS CC</th>
+				<th class="text-center mid" width='10%'>STATUS DPT</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -37,7 +38,8 @@
 					echo "<td class='text-center mid'>".number_format($valx['lead_time'],2)."</td>";
 					echo "<td class='text-right mid'>".number_format($valx['qty'],2)."</td>";
 					echo "<td class='text-right mid'>".number_format($valx['harga_idr'] * $valx['qty'],2)."</td>";
-					echo "<td class='text-left mid'><b>".strtoupper($valx['status'])."</b></td>";
+					echo "<td class='text-center mid'><b>".strtoupper($valx['status'])."</b></td>";
+					echo "<td class='text-center mid'><b>".strtoupper($valx['status_apv'])."</b></td>";
 				echo "</tr>";
 			}
 			?>
