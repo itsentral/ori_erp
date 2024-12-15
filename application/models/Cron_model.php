@@ -125,7 +125,7 @@ class Cron_model extends CI_Model {
 			$nm_add			= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']:'';
 
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_veil)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($berat_veil,4)."</div>";
+			$nestedData[]	= "<div align='right' title='".$row_Cek['id_production_detail']."'>".number_format($berat_veil,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_csm)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($berat_cms,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_rooving)."</div>";
