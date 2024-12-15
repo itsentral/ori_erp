@@ -8,9 +8,10 @@ $this->load->view('include/side_menu');
 		<?php
 			if($akses_menu['download']=='1'){
 		?>
-		  <a href="<?php echo site_url('history_pembelian/excel_non_material') ?>" class="btn btn-sm btn-success" style='float:right;' target='_blank'>
+		  <!-- <a href="<?php echo site_url('history_pembelian/excel_non_material') ?>" class="btn btn-sm btn-success" style='float:right;' target='_blank'>
 			<i class="fa fa-file-excel-o"></i> &nbsp;&nbsp;Download
-		  </a>
+		  </a> -->
+		  <button type='button' class='btn btn-sm btn-success' id='btnDownload' style='float:right;'><i class="fa fa-file-excel-o"></i> &nbsp;&nbsp;Download</button>
 		  <?php
 			}
 		  ?>
@@ -18,6 +19,11 @@ $this->load->view('include/side_menu');
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
+		<div class='form-group row'>
+			<div class='col-sm-3'>
+				<input type="text" name="date_range" id="date_range" class="form-control input-md text-center datepicker" readonly="readonly" placeholder="Select Date">
+			</div>
+		</div>
 		<!-- <div class='tableFixHead' style="height:700px;"> -->
 			<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 				<thead class='thead'>
@@ -32,6 +38,7 @@ $this->load->view('include/side_menu');
 						<th class="text-center th">Total PO</th>
 						<th class="text-center th">Tgl Permintaan</th>
 						<th class="text-center th">Aktual Kedatangan</th>    
+						<th class="text-center th">Created</th>    
 					</tr>
 				</thead>
 				<tbody></tbody>
@@ -61,22 +68,35 @@ $this->load->view('include/side_menu');
 </div>
 <!-- modal --> 
 <?php $this->load->view('include/footer'); ?>
-<!-- <style>
-.tableFixHead {
-  overflow: auto;
-  height: 100px;
-}
-
-.tableFixHead .thead .th {
-  	position: sticky;
-  	top: 0;
-	background: #3c8dbc;
-}
-
-</style> -->
+<style>
+	.datepicker{
+		cursor: pointer;
+	}
+</style>
 <script>
 	$(document).ready(function(){
-		DataTables();
+		$('.datepicker').daterangepicker({
+			showDropdowns: true,
+			autoUpdateInput: false,
+			locale: {
+				cancelLabel: 'Clear'
+			}
+		});
+		
+		$('.datepicker').on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+			var range 	= $('#date_range').val();
+			DataTables(range);
+		});
+
+		$('.datepicker').on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
+			var range 	= $('#date_range').val();
+			DataTables(range);
+		});
+
+		var range 	= $('#date_range').val();
+		DataTables(range);
 
 		$(document).on('click', '.detail_material', function(){
 			var no_po 	= $(this).data('no_po');
@@ -99,9 +119,27 @@ $this->load->view('include/side_menu');
 				}
 			})
 		});
+
+		$(document).on('click', '#btnDownload', function(){
+			let range = $('#date_range').val();
+			var tgl_awal 	= '0';
+			var tgl_akhir 	= '0';
+			if(range == ''){
+				alert('Range date wajib diisi !!!')
+				return false
+			}
+			if(range != ''){
+				var sPLT 		= range.split(' - ');
+				var tgl_awal 	= sPLT[0];
+				var tgl_akhir 	= sPLT[1];
+			}
+			var Links		= base_url + active_controller+'/excel_non_material/'+tgl_awal+'/'+tgl_akhir;
+			window.open(Links,'_blank');
+		});
+
 	});
 		
-	function DataTables(){
+	function DataTables(range=null){
 		var dataTable = $('#my-grid').DataTable({
 			
 			"serverSide": true,
@@ -127,7 +165,7 @@ $this->load->view('include/side_menu');
 				url : base_url + active_controller+'/getDataJSON',
 				type: "post",
 				data: function(d){
-					// d.kode_partner = $('#kode_partner').val()
+					d.range = range
 				},
 				cache: false,
 				error: function(){
