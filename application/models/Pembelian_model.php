@@ -434,7 +434,11 @@ class Pembelian_model extends CI_Model {
 			}
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
-			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
+			if($category == 'rutin'){
+				$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
+			}else{
+				$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group2'])."</div>";
+			}
 			// $nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
 			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
@@ -492,7 +496,8 @@ class Pembelian_model extends CI_Model {
 				a.*,
 				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
 				GROUP_CONCAT(DISTINCT b.tgl_dibutuhkan ORDER BY b.id ASC SEPARATOR '<br>') AS dibutuhkan,
-				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group2
 			FROM
 				tran_rfq_detail b
 				LEFT JOIN tran_rfq_header a on a.no_rfq=b.no_rfq,
@@ -1337,8 +1342,11 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
-			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
-			// $nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
+			if($category == 'rutin'){
+				$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
+			}else{
+				$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group2'])."</div>";
+			}// $nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
 			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
 			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['updated_date']))."</div>";
@@ -1396,7 +1404,8 @@ class Pembelian_model extends CI_Model {
 				a.*,
 				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
 				GROUP_CONCAT(DISTINCT b.tgl_dibutuhkan ORDER BY b.id ASC SEPARATOR '<br>') AS dibutuhkan,
-				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group2
 			FROM
 				tran_rfq_detail b
 				LEFT JOIN tran_rfq_header a on a.no_rfq=b.no_rfq,
