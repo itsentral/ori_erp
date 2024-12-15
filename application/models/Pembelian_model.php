@@ -1887,6 +1887,9 @@ class Pembelian_model extends CI_Model {
 						$ajukan	= "&nbsp;<button type='button' class='btn btn-sm btn-info approved' title='Approve' data-no_rfq='".$row['no_rfq']."' data-status='".$row['sts_ajuan']."'><i class='fa fa-check'></i></button>";
 					}
 				}
+				if(($row['sts_ajuan']=='APV' OR $row['sts_ajuan']=='CLS') AND $row['sts_process']=='Y'){
+					$ajukan	= "&nbsp;<button type='button' class='btn btn-sm btn-success hasil_ajukan' title='Hasil Perbandingan' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-eye'></i></button>";
+				}
 			$nestedData[]	= "<div align='left'>
                                     <button type='button' class='btn btn-sm btn-primary detailMat' title='Detail' data-no_rfq='".$row['no_rfq']."' data-status='".$row['sts_ajuan']."'><i class='fa fa-eye'></i></button>
                                    ".$ajukan."

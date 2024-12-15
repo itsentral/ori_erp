@@ -97,6 +97,29 @@ $this->load->view('include/side_menu');
 			}
 		});
 	});
+
+	$(document).on('click', '.hasil_ajukan', function(e){
+		e.preventDefault();
+		loading_spinner();
+		$("#head_title2").html("<b>TOTAL MATERIAL PURCHASE ["+$(this).data('no_rfq')+"]</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url + active_controller+'/modal_hasil_pengajuan/'+$(this).data('no_rfq'),
+			success:function(data){
+				$("#ModalView2").modal();
+				$("#view2").html(data);
+
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
 	
 	$(document).on('click', '.approved', function(e){
 		e.preventDefault();
