@@ -11,6 +11,8 @@ foreach($result AS $val => $valx){
 	$datarow['material'.$valx->id_barang]['id_barang']=$valx->id_barang;
 	$datarow['material'.$valx->id_barang]['no_rfq']=$valx->no_rfq;
 	$datarow['material'.$valx->id_barang]['nm_barang']=$valx->nm_barang;
+	$datarow['material'.$valx->id_barang]['spec']=$valx->spec;
+	$datarow['material'.$valx->id_barang]['info']=$valx->info;
 	$datarow['material'.$valx->id_barang]['price_ref']=$valx->price_ref;
 	$datarow['material'.$valx->id_barang]['qty']=$valx->qty;
 	$datarow['material'.$valx->id_barang]['tgl_dibutuhkan']=$valx->tgl_dibutuhkan;
@@ -23,12 +25,12 @@ foreach($result AS $val => $valx){
 		<thead id='head_table'>
 			<tr class='bg-blue'>
 				<th class="text-center" width='7%' rowspan=2>No RFQ</th> 
-				<th class="text-center" width='15%' rowspan=2>Material Name</th>
-				<th class="text-center" width='6%' rowspan=2>Price Ref ($)</th>
+				<th class="text-center" rowspan=2>Material Name</th>
+				<th class="text-center" width='6%' rowspan=2>Price Ref</th>
 				<th class="text-center" width='7%' rowspan=2>Qty PR</th>
-				<th class="text-center" width='6%' colspan=<?=$jumlah_supp?>>Harga</th>
-				<th class="text-center" width='6%' colspan=<?=$jumlah_supp?>>MOQ</th>
-				<th class="text-center" width='6%' colspan=<?=$jumlah_supp?>>Lead Time</th>
+				<th class="text-center" width='15%' colspan=<?=$jumlah_supp?>>Harga</th>
+				<th class="text-center" width='15%' colspan=<?=$jumlah_supp?>>MOQ</th>
+				<th class="text-center" width='15%' colspan=<?=$jumlah_supp?>>Lead Time</th>
 				<th class="text-center" width='7%' rowspan=2>Tgl Dibutuhkan</th>
 			</th>
 			</tr>
@@ -41,12 +43,12 @@ foreach($result AS $val => $valx){
 		<tbody>
 			<?php
 			foreach($datarow as $keys => $value) {
-				echo '<tr><td>'.$value['no_rfq'].'</td>
-				<td>'.$value['nm_barang'].'</td>
-				<td>'.$value['price_ref'].'</td>
-				<td>'.$value['qty'].'</td>';
+				echo '<tr><td align="center">'.$value['no_rfq'].'</td>
+				<td>'.$value['nm_barang'].' '.$value['spec'].' '.$value['info'].'</td>
+				<td align="right">'.number_format($value['price_ref'],2).'</td>
+				<td align="right">'.number_format($value['qty'],2).'</td>';
 				foreach($dt_supplier AS $val => $valx){
-					echo '<td align=right nowrap>'.strtoupper($value[$valx->id_supplier]['currency']).' '.number_format($value[$valx->id_supplier]['price_ref_sup']).'</td>';
+					echo '<td align=right nowrap>'.strtoupper($value[$valx->id_supplier]['currency']).' '.number_format($value[$valx->id_supplier]['price_ref_sup'],2).'</td>';
 				}
 				foreach($dt_supplier AS $val => $valx){
 					echo '<td align=center>'.$value[$valx->id_supplier]['moq'].'</td>';
@@ -54,7 +56,7 @@ foreach($result AS $val => $valx){
 				foreach($dt_supplier AS $val => $valx){
 					echo '<td align=center>'.$value[$valx->id_supplier]['lead_time'].'</td>';
 				}
-				echo'<td>'.date('d-m-Y', strtotime($value['tgl_dibutuhkan'])).'</td>
+				echo'<td align="center">'.date('d-M-Y', strtotime($value['tgl_dibutuhkan'])).'</td>
 				</tr>';
 			}
 /*			

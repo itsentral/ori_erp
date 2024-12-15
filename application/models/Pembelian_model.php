@@ -391,25 +391,25 @@ class Pembelian_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 			
-			$list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
-			$arr_sup = array();
-			foreach($list_supplier AS $val => $valx){
-				$arr_sup[$val] = $valx['nm_supplier'];
-			}
-			$dt_sup	= implode("<br>", $arr_sup);
+			// $list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
+			// $arr_sup = array();
+			// foreach($list_supplier AS $val => $valx){
+			// 	$arr_sup[$val] = $valx['nm_supplier'];
+			// }
+			// $dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT nm_barang, qty, tgl_dibutuhkan FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
-			$arr_mat = array();
-			$arr_tgl = array();
-			$arr_qty = array();
-			foreach($list_material AS $val => $valx){
-				$arr_mat[$val] = $valx['nm_barang'];
-				$arr_qty[$val] = number_format($valx['qty']);
-				$arr_tgl[$val] = date('d-M-Y',strtotime($valx['tgl_dibutuhkan']));
-			}
-			$dt_mat	= implode("<br>", $arr_mat);
-			$dt_qty	= implode("<br>", $arr_qty);
-			$dt_tgl	= implode("<br>", array_unique($arr_tgl));
+			// $list_material		= $this->db->query("SELECT nm_barang, qty, tgl_dibutuhkan, spec, info FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
+			// $arr_mat = array();
+			// $arr_tgl = array();
+			// $arr_qty = array();
+			// foreach($list_material AS $val => $valx){
+			// 	$arr_mat[$val] = $valx['nm_barang'].' '.$valx['spec'].' '.$valx['info'];
+			// 	$arr_qty[$val] = number_format($valx['qty'],2);
+			// 	$arr_tgl[$val] = date('d-M-Y',strtotime($valx['tgl_dibutuhkan']));
+			// }
+			// $dt_mat	= implode("<br>", $arr_mat);
+			// $dt_qty	= implode("<br>", $arr_qty);
+			// $dt_tgl	= implode("<br>", array_unique($arr_tgl));
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
@@ -433,11 +433,11 @@ class Pembelian_model extends CI_Model {
 				$category = 'departemen';
 			}
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
-			$nestedData[]	= "<div align='left'>".$dt_sup."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($dt_mat)."</div>";
-			$nestedData[]	= "<div align='center'>".$dt_qty."</div>";
-			$nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
-			$nestedData[]	= "<div align='center'>".$row['updated_by']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
+			// $nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
+			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
 			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['updated_date']))."</div>";
 			
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
@@ -489,13 +489,19 @@ class Pembelian_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*
+				a.*,
+				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
+				GROUP_CONCAT(DISTINCT b.tgl_dibutuhkan ORDER BY b.id ASC SEPARATOR '<br>') AS dibutuhkan,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
 			FROM
-				tran_rfq_header a,
+				tran_rfq_detail b
+				LEFT JOIN tran_rfq_header a on a.no_rfq=b.no_rfq,
 				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where." AND a.deleted = 'N' AND  (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.created_by LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 			GROUP BY a.no_rfq
 		";
@@ -581,6 +587,8 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_pr_group']."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['tgl_pr']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_barang'])."</div>";
+			$nestedData[]	= "<div align='left'>".$row['spec']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['info']."</div>";
 			if($row['category'] == 'asset'){
 				$warna = '#a9179e';
 			}
@@ -643,6 +651,8 @@ class Pembelian_model extends CI_Model {
 				OR a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.info LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
@@ -652,7 +662,11 @@ class Pembelian_model extends CI_Model {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'no_pr'
+			1 => 'no_pr_group',
+			2 => 'tgl_pr',
+			3 => 'nm_barang',
+			4 => 'spec',
+			5 => 'info',
 		);
 
 		$sql .= " ORDER BY a.created_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
@@ -961,8 +975,8 @@ class Pembelian_model extends CI_Model {
 									a.no_rfq,
 									a.id_barang,
 									a.qty,
-									a.nm_barang,
-									UPPER(a.spec) AS spec,
+									CONCAT(a.nm_barang," ",a.spec," ",a.info) as nm_barang,
+									a.spec AS spec,
 									b.category,
 									b.tgl_dibutuhkan,
 									b.no_pr,
@@ -1271,31 +1285,31 @@ class Pembelian_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 			
-			$list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
-			$arr_sup = array();
-			foreach($list_supplier AS $val => $valx){
-				$arr_sup[$val] = $valx['nm_supplier'];
-			}
-			$dt_sup	= implode("<br>", $arr_sup);
+			// $list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
+			// $arr_sup = array();
+			// foreach($list_supplier AS $val => $valx){
+			// 	$arr_sup[$val] = $valx['nm_supplier'];
+			// }
+			// $dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT no_pr, nm_barang, qty, price_ref, price_ref_sup, tgl_dibutuhkan FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
+			$list_material		= $this->db->query("SELECT no_pr, nm_barang, qty, price_ref, price_ref_sup, tgl_dibutuhkan, spec, info FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
 			
-			$arr_mat = array();
-			$arr_qty = array();
-			$arr_price = array();
-			$arr_tgl = array();
+			// $arr_mat = array();
+			// $arr_qty = array();
+			// $arr_price = array();
+			// $arr_tgl = array();
 			$arr_pr = array();
 			foreach($list_material AS $val => $valx){
-				$arr_mat[$val] = $valx['nm_barang'];
+			// 	$arr_mat[$val] = $valx['nm_barang'].' '.$valx['spec'].' '.$valx['info'];
 				$arr_pr[$val] = $valx['no_pr'];
-				$arr_qty[$val] = number_format($valx['qty'],2);
-				$arr_price[$val] = number_format($valx['price_ref']);
-				$arr_tgl[$val] = date('d-M-Y',strtotime($valx['tgl_dibutuhkan']));
+			// 	$arr_qty[$val] = number_format($valx['qty'],2);
+			// 	$arr_price[$val] = number_format($valx['price_ref_sup'],2);
+			// 	$arr_tgl[$val] = date('d-M-Y',strtotime($valx['tgl_dibutuhkan']));
 			}
-			$dt_mat	= implode("<br>", $arr_mat);
-			$dt_qty	= implode("<br>", $arr_qty);
-			$dt_price	= implode("<br>", $arr_price);
-			$dt_tgl	= implode("<br>", array_unique($arr_tgl));
+			// $dt_mat	= implode("<br>", $arr_mat);
+			// $dt_qty	= implode("<br>", $arr_qty);
+			// $dt_price	= implode("<br>", $arr_price);
+			// $dt_tgl	= implode("<br>", array_unique($arr_tgl));
 			$dt_pr	= implode("<br>", array_unique($arr_pr));
 
 			$nestedData 	= array();
@@ -1322,12 +1336,11 @@ class Pembelian_model extends CI_Model {
 			}
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			
-			$nestedData[]	= "<div align='left'>".$dt_sup."</div>";
-			$nestedData[]	= "<div align='left'>".$dt_mat."</div>";
-			$nestedData[]	= "<div align='right'>".$dt_price."</div>";
-			$nestedData[]	= "<div align='right'>".$dt_qty."</div>";
-			$nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
-			$nestedData[]	= "<div align='center'>".$row['updated_by']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
+			// $nestedData[]	= "<div align='center'>".$dt_tgl."</div>";
+			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
 			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['updated_date']))."</div>";
 		
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
@@ -1379,14 +1392,21 @@ class Pembelian_model extends CI_Model {
 		
 		$sql = "
 			SELECT
-				a.*
+				(@row:=@row+1) AS nomor,
+				a.*,
+				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
+				GROUP_CONCAT(DISTINCT b.tgl_dibutuhkan ORDER BY b.id ASC SEPARATOR '<br>') AS dibutuhkan,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_barang,' ',b.spec,' ',b.info,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
 			FROM
-				tran_rfq_header a
-				LEFT JOIN tran_rfq_detail b ON a.no_rfq = b.no_rfq
+				tran_rfq_detail b
+				LEFT JOIN tran_rfq_header a on a.no_rfq=b.no_rfq,
+				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where." AND a.deleted = 'N' AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.created_by LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 			GROUP BY a.no_rfq
 		";
@@ -1582,22 +1602,22 @@ class Pembelian_model extends CI_Model {
 			}
 			$dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT nm_barang, qty, price_ref, price_ref_sup FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
+			$list_material		= $this->db->query("SELECT nm_barang, qty, price_ref, price_ref_sup, spec, info FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
 			$arr_mat = array();
 			foreach($list_material AS $val => $valx){
-				$arr_mat[$val] = strtoupper($valx['nm_barang']);
+				$arr_mat[$val] = strtolower($valx['nm_barang'].' '.$valx['spec'].' '.$valx['info']);
 			}
 			$dt_mat	= implode("<br>", $arr_mat);
 			
 			$arr_qty = array();
 			foreach($list_material AS $val => $valx){
-				$arr_qty[$val] = number_format($valx['qty']);
+				$arr_qty[$val] = number_format($valx['qty'],2);
 			}
 			$dt_qty	= implode("<br>", $arr_qty);
 			
 			$arr_price = array();
 			foreach($list_material AS $val => $valx){
-				$arr_price[$val] = number_format($valx['price_ref']);
+				$arr_price[$val] = number_format($valx['price_ref_sup'],2);
 			}
 			$dt_price	= implode("<br>", $arr_price);
 
@@ -1626,8 +1646,8 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".$dt_mat."</div>";
 			$nestedData[]	= "<div align='right'>".$dt_price."</div>";
 			$nestedData[]	= "<div align='right'>".$dt_qty."</div>";
-			$nestedData[]	= "<div align='center'>".$row['created_by']."</div>";
-			$nestedData[]	= "<div align='right'>".date('d F Y', strtotime($row['created_date']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['created_by'])."</div>";
+			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['created_date']))."</div>";
 			
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
 				$ajukan	= "";
@@ -1803,22 +1823,22 @@ class Pembelian_model extends CI_Model {
 			}
 			$dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT nm_barang, qty, price_ref, price_ref_sup FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
+			$list_material		= $this->db->query("SELECT nm_barang, qty, price_ref, price_ref_sup, spec, info FROM tran_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_barang")->result_array();
 			$arr_mat = array();
 			foreach($list_material AS $val => $valx){
-				$arr_mat[$val] = strtoupper($valx['nm_barang']);
+				$arr_mat[$val] = strtolower($valx['nm_barang'].' '.$valx['spec'].' '.$valx['info']);
 			}
 			$dt_mat	= implode("<br>", $arr_mat);
 			
 			$arr_qty = array();
 			foreach($list_material AS $val => $valx){
-				$arr_qty[$val] = number_format($valx['qty']);
+				$arr_qty[$val] = number_format($valx['qty'],2);
 			}
 			$dt_qty	= implode("<br>", $arr_qty);
 			
 			$arr_price = array();
 			foreach($list_material AS $val => $valx){
-				$arr_price[$val] = number_format($valx['price_ref']);
+				$arr_price[$val] = number_format($valx['price_ref_sup'],2);
 			}
 			$dt_price	= implode("<br>", $arr_price);
 
@@ -1847,8 +1867,8 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".$dt_mat."</div>";
 			$nestedData[]	= "<div align='right'>".$dt_price."</div>";
 			$nestedData[]	= "<div align='right'>".$dt_qty."</div>";
-			$nestedData[]	= "<div align='center'>".$row['created_by']."</div>";
-			$nestedData[]	= "<div align='right'>".date('d F Y', strtotime($row['created_date']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['created_by'])."</div>";
+			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['created_date']))."</div>";
 			
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
 				$ajukan	= "";
@@ -2086,7 +2106,7 @@ class Pembelian_model extends CI_Model {
 			$status_po=$row['status_po'];
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
@@ -3439,7 +3459,7 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_rfq']."
 									<input type='hidden' name='harga_idr_".$row['id']."' value='".$row['harga_idr']."' class='harga_idr_val'>
 									<input type='hidden' name='total_harga_".$row['id']."' value='".$row['total_harga']."' class='total_harga_val'></div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_barang'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang'].' '.$row['spec'].' '.$row['info'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty_po'],2)."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['tgl_dibutuhkan']))."</div>";

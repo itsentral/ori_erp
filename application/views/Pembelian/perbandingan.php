@@ -24,10 +24,10 @@ $this->load->view('include/side_menu');
 					<th class="text-center">No PR</th> 
 					<th class="text-center">Category</th> 
 					<th class="text-center">Suppier</th>
-					<th class="text-center">Material Name</th>
-					<th class="text-center">Price Est</th>
-					<th class="text-center">Qty</th>
-					<th class="text-center no-sort">Tgl Dibutuhkan</th>
+					<th class="text-center">Nama Barang</th>
+					<!-- <th class="text-center">Price Est</th>
+					<th class="text-center">Qty</th> -->
+					<th class="text-center">Dibutuhkan</th>
 					<th class="text-center">Last By</th> 
 					<th class="text-center">Last Date</th>
 					<th class="text-center">Status</th>

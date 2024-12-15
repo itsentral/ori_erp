@@ -7,8 +7,8 @@
 			<th class="text-center" width='7%'>No RFQ</th> 
 				<th class="text-center" width='13%'>Supplier Name</th>
 				<th class="text-center">Pengiriman</th>
-				<th class="text-center" width='15%'>Material Name</th>
-				<th class="text-center" width='6%'>Price Ref ($)</th>
+				<th class="text-center" width='15%'>Item Name</th>
+				<th class="text-center" width='6%'>Price Ref</th>
 				<th class="text-center" width='8%'>Price From Supplier</th>
 				<th class="text-center" width='8%'>Harga (IDR)</th>
 				<th class="text-center" width='7%'>Qty PR</th>

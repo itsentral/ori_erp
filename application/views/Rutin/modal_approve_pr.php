@@ -43,7 +43,7 @@
 						echo "<td align='center'>".number_format(($KEBUTUHAN * 1.5), 2)."</td>";
 						echo "<td align='center'>".number_format($valx['purchase'])." ".strtolower($SATUAN)."</td>";
 						echo "<td align='center'>".date('d-M-Y', strtotime($valx['tanggal']))."</td>";
-						echo "<td align='left'>".strtoupper($valx['spec_pr'])."</td>";
+						echo "<td align='left'>".$valx['spec_pr']."</td>";
 						// echo "<td align='left'>".strtoupper($valx['info_pr'])."</td>";
 						echo "<td align='center'><input type='text' name='detail[".$no."][qty_revisi]' id='tot_rev_".$no."' class='form-control input-sm text-center maskM rev_qty' value='".number_format($valx['purchase'])."' style='width:100%;' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 						echo "<td align='center'>

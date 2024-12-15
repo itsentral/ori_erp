@@ -226,6 +226,8 @@ class Non_rutin extends CI_Controller {
 						$ArrDetailPR[$val]['nilai_pr'] 		= $harga;
 						$ArrDetailPR[$val]['tgl_dibutuhkan']= $valx['tanggal'];
 						$ArrDetailPR[$val]['satuan']		= $valx['satuan'];
+						$ArrDetailPR[$val]['spec']		= $valx['spec'];
+						$ArrDetailPR[$val]['info']		= $valx['keterangan'];
 						$ArrDetailPR[$val]['app_status'] 	= 'Y';
 						$ArrDetailPR[$val]['app_reason']	= strtolower($valx['keterangan']);
 						$ArrDetailPR[$val]['app_by'] = $data_session['ORI_User']['username'];

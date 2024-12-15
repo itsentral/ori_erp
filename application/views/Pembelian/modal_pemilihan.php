@@ -6,11 +6,11 @@
 			<tr class='bg-blue'>
 				<th class="text-center mid">SUPPLIER NAME</th>
 				<th class="text-center mid">MATERIAL NAME</th>
-				<th class="text-center mid" width='10%'>PRICE REF</th>
-				<th class="text-right mid" width='10%'>NET PRICE</th>
-				<th class="text-center mid" width='10%'>MOQ</th>
-				<th class="text-center mid" width='10%'>LEAD TIME</th>
-				<th class="text-center mid" width='10%'>QTY</th>
+				<th class="text-center mid" width='8%'>PRICE REF</th>
+				<th class="text-right mid" width='8%'>NET PRICE</th>
+				<th class="text-center mid" width='7%'>MOQ</th>
+				<th class="text-center mid" width='7%'>LEAD TIME</th>
+				<th class="text-center mid" width='7%'>QTY</th>
 				<th class="text-center mid" width='10%'>TOTAL HARGA</th>
 				<th class="text-center mid" width='5%'>CHECK</th>
 			</tr>
@@ -19,7 +19,7 @@
 			<?php
 			$no=0;
             foreach($result AS $val => $valx){ $no++;
-				$nm_material = $valx['nm_barang'];
+				$nm_material = $valx['nm_barang'].' '.$valx['spec'].' '.$valx['info'];
                 echo "<tr>";
 					echo "<td class='mid' >".strtoupper($valx['nm_supplier'])."</td>";
 					echo "<td class='mid' >".strtoupper($nm_material)."</td>";
@@ -27,7 +27,7 @@
 					echo "<td class='text-right mid'>".number_format($valx['harga_idr'],2)." <span class='text-primary text-bold'>".strtoupper($valx['currency'])."</span></td>";
 					echo "<td class='text-center mid'>".number_format($valx['moq'],2)."</td>";
 					echo "<td class='text-center mid'>".number_format($valx['lead_time'],2)."</td>";
-					echo "<td class='text-center mid'>".number_format($valx['qty'],2)."</td>";
+					echo "<td class='text-right mid'>".number_format($valx['qty'],2)."</td>";
 					echo "<td class='text-right mid'>".number_format($valx['harga_idr'] * $valx['qty'],2)."</td>";
 					echo "<td class='text-center mid'><input type='checkbox' name='check[".$valx['id']."]' class='chk_personal' value='".$valx['id']."'></td>";
 				echo "</tr>";

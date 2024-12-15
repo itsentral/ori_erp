@@ -24,8 +24,8 @@ $this->load->view('include/side_menu');
 					<th class="text-center">Category</th>
 					<th class="text-center no-sort">Suppier</th>
 					<th class="text-center no-sort">Nama Barang</th>
-					<th class="text-center no-sort">Total Request</th>
-					<th class="text-center no-sort">Tgl Dibutuhkan</th>
+					<!-- <th class="text-center no-sort">Qty</th> -->
+					<th class="text-center no-sort">Dibutuhkan</th>
 					<th class="text-center no-sort">Last By</th>
 					<th class="text-center no-sort">Last Date</th>
 					<th class="text-center no-sort">Status</th>
