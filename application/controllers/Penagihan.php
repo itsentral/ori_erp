@@ -6387,7 +6387,6 @@ if($base_cur=='USD'){
 			'getPackCost' 	=> $getPackCost,
 			'getTruck' 		=> $getTruck,
 			'non_frp'		=> $non_frp,
-			'getAcc'		=> $getAcc,
 			'material'		=> $material,
 			'list_top'		=> $list_top,
 			'base_cur'		=> $base_cur,

@@ -940,7 +940,7 @@ if(isset($approval)){
 							+ getNum(result7_hidden1)
 							+ getNum(result8_hidden1);
 
-		let uangmuka   	= 	(getNum(grandtotal * uang_muka)/100);
+		let uangmuka   	= 	(down_payment_hidden);
 		let uangmuka2 = 0;
 		if(dataPpn=='0'){
 			let totalPpn=0;
