@@ -1108,6 +1108,9 @@ class Expense extends CI_Controller {
 								->where('a.id_bq <>','x')
 								->get()
 								->result_array();
+								
+		$matauang  	     = $this->All_model->matauang();
+	
 
 		$data = array(
 			'title'			=> 'Edit Kasbon',
@@ -1117,6 +1120,7 @@ class Expense extends CI_Controller {
 			'combodept'		=> $combodept,
 			'status'	    => $this->status,
 			'data'	    	=> $data,
+			'matauang'	    	=> $matauang,
 			'data_coa_kasbon'=> $data_coa_kasbon,
 			'combo_so'=> $so_number,
 			'stsview'	    => '',
@@ -1813,7 +1817,7 @@ class Expense extends CI_Controller {
 	// transport fin approve
 	public function transport_req_approve($id='',$status){
 		$data_session			= $this->session->userdata;
-		$UserName = $data_session['ORI_User']['id_user']; 
+		$UserName = $data_session['ORI_User']['id_user'];
 
 		$result=false;
         if($id!="") {
