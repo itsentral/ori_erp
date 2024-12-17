@@ -2406,7 +2406,7 @@ class Purchase_order_model extends CI_Model {
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
 				$ajukan	= "";
 				$hasil	= "";
-				if(($row['sts_ajuan']=='APV' OR $row['sts_ajuan']=='CLS') AND $row['sts_process']=='Y'){
+				if($row['sts_ajuan']=='CLS'){
 					$hasil	= "&nbsp;<button type='button' class='btn btn-sm btn-success hasil_ajukan' title='Hasil Perbandingan' data-no_rfq='".$row['no_rfq']."'><i class='fa fa-eye'></i></button>";
 				}
 				if($row['sts_ajuan']=='APV' AND $row['sts_process']=='Y'){
