@@ -184,6 +184,8 @@ class Request_aksesoris extends CI_Controller {
 						$GET_REQ        = $this->db->get_where($TableUpdate,array('id' => $valx['id']))->result();
 						$QTY_REQUEST    = $GET_REQ[0]->request + $QTY;
 						$ArrDeatilUpdate[$val]['request']    	= $QTY_REQUEST;
+						$ArrDeatilUpdate[$val]['id_material']   = $valx['id_material2'];
+						$ArrDeatilUpdate[$val]['id_material2']  = $valx['id_material'];
 					}
 					else{
 						$GET_REQ        = $this->db->get_where($TableUpdate,array('id' => $valx['id']))->result();

@@ -70,6 +70,7 @@
                 echo "<tr>";
                     echo "<td align='center'>".$No."
                             <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>
+                            <input type='hidden' name='add[".$No."][id_material]' value='".$valx['id_material']."'>
                             </td>";
                     // echo "<td>".get_name_acc($valx['id_material'])."</td>";
                     echo "<td>";
@@ -79,12 +80,12 @@
                     //         echo "<option value='".$value['id']."' ".$selected.">".$value['nama'].", ".$value['spsifikasi'].", ".$value['material']."</option>";
                     //     }
                     // echo "</select>";
-                    if($tandaTanki != 'IPPT'){
+                    // if($tandaTanki != 'IPPT'){
                         echo form_dropdown("add[".$No."][id_material2]",$ArrSelect, $valx['id_material'], array('class'=>'form-control input-md  chosen-select'));
-                    }
-                    else{
-                        echo  $ArrSelect[$valx['id_material']];
-                    }
+                    // }
+                    // else{
+                    //     echo  $ArrSelect[$valx['id_material']];
+                    // }
                     echo "</td>";
                     // echo "<td>".strtoupper(get_name('accessories','material','id',$valx['id_material']))."</td>";
                     echo "<td align='right'>".number_format($qty,2)."</td>";
