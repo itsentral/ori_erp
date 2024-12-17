@@ -240,6 +240,7 @@ class Request_aksesoris extends CI_Controller {
 												'a.category'=>'acc'
                                                 )
                                             )
+										->group_by('a.id')
                                         ->result_array();
 				$list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki <>'=>NULL))->result_array();
 			}
