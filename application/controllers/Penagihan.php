@@ -6286,7 +6286,7 @@ if($base_cur=='USD'){
 			}
 			
 //loose_dead	
-			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detailx a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
