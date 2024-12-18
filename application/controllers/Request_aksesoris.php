@@ -226,7 +226,7 @@ class Request_aksesoris extends CI_Controller {
 			$id_bq              = $this->uri->segment(3);
 			$tandaTanki 	= substr($id_bq,0,4);
 			$result_aksesoris   = $this->db->get_where('so_acc_and_mat',array('category <>'=>'mat','id_bq'=>$id_bq,'qty >'=>0))->result_array();
-			$list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki'=>NULL))->result_array();
+			$list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			if($tandaTanki == 'IPPT'){
 				$result_aksesoris   = $this->db
                                         ->select('a.*, b.customer as nm_customer, e.id_customer AS id_customer, a.berat as qty, c.id_material AS code_group, a.request as qty_req')
@@ -242,7 +242,7 @@ class Request_aksesoris extends CI_Controller {
                                                 )
                                             )
                                         ->result_array();
-				$list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL))->result_array();
+				// $list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			}
 			$data = array(
 				'tandaTanki' 		=> $tandaTanki,
