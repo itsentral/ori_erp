@@ -242,7 +242,7 @@ class Request_aksesoris extends CI_Controller {
                                                 )
                                             )
                                         ->result_array();
-				$list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki <>'=>NULL))->result_array();
+				$list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			}
 			$data = array(
 				'tandaTanki' 		=> $tandaTanki,
