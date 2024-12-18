@@ -982,7 +982,7 @@ if(isset($approval)){
 			totalPpn=0;
 		}
 		
-		console.log(grandtotal);
+		
 		
 		if(dataPpn=='1'){
 			if(base_cur=='IDR'){
@@ -1057,6 +1057,27 @@ if(isset($approval)){
 						- getNum(potongan_retensi_hidden2)
 						- getNum(down_payment_hidden1)
 						- getNum(down_payment_hidden12));
+
+		console.log(result1_hidden1);	
+		console.log(result2_hidden1);
+		console.log(result3_hidden1);
+		console.log(result4_hidden1);
+		console.log(result5_hidden1);
+		console.log(result6_hidden1);
+		console.log(ppn_hidden);
+		console.log(result7_hidden1);
+		console.log(result8_hidden1);
+		console.log(diskon_hidden);
+		console.log(potongan_retensi_hidden1);
+		console.log(potongan_retensi_hidden2);
+		console.log(down_payment_hidden1);
+		console.log(down_payment_hidden12);
+
+		
+
+
+		
+						
 
 		$(".total_invoice").val(num(grandtotal));
     }
