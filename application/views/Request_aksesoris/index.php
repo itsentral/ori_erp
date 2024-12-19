@@ -31,7 +31,7 @@ $this->load->view('include/side_menu');
   <!-- /.box -->
 
   <!-- modal -->
-	<div class="modal fade" id="ModalView"  style='overflow-y: auto;'>
+	<div class="modal fade" id="ModalView"  style='overflow-y: auto;' style='width:100%;'>
 		<div class="modal-dialog"  style='width:100%;'>
 			<div class="modal-content">
 				<div class="modal-header">
