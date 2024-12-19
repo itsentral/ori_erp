@@ -81,7 +81,7 @@
                     //     }
                     // echo "</select>";
                     // if($tandaTanki != 'IPPT'){
-                        echo form_dropdown("add[".$No."][id_material2]",$ArrSelect, $valx['id_material'], array('class'=>'form-control input-md  chosen-select', 'style'=>'width: 250px; display: none;'>));
+                        echo form_dropdown("add[".$No."][id_material2]",$ArrSelect, $valx['id_material'], array('class'=>'form-control input-md  chosen-select' ));
                     // }
                     // else{
                     //     echo  $ArrSelect[$valx['id_material']];
