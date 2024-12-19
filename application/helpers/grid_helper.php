@@ -6147,7 +6147,7 @@
 							DATE(a.delivery_date) AS tanggal
 						FROM 
 							scheduling_master a
-						WHERE a.delivery_date IS NOT NULL AND a.delivery_date != '0000-00-00'
+						WHERE a.delivery_date IS NOT NULL AND a.delivery_date NOT LIKE '%0000-00-00%' 
 						ORDER BY a.no_ipp, a.delivery_date
 						";
 		$restPrice 	= $CI->db->query($sqlPrice)->result_array();
@@ -6170,7 +6170,7 @@
 							scheduling_master a
 						WHERE 
 							a.delivery_date IS NOT NULL 
-							AND a.delivery_date != '0000-00-00' 
+							AND a.delivery_date NOT LIKE '%0000-00-00%' 
 							AND DATE(a.delivery_date) BETWEEN '".date('Y-m-d',strtotime($tgl_awal))."' AND '".date('Y-m-d',strtotime($tgl_akhir))."'
 						ORDER BY a.no_ipp, a.delivery_date
 						";

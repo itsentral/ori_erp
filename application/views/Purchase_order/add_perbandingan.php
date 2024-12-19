@@ -31,6 +31,7 @@ $this->load->view('include/side_menu');
 			$query 	= "	SELECT 
 							a.*, 
 							b.price_ref_purchase,
+							b.price_from_supplier,
 							c.tanggal
 						FROM 
 							tran_material_rfq_detail a 
@@ -82,7 +83,8 @@ $this->load->view('include/side_menu');
 						<thead>
 							<tr class='bg-blue'>
 								<th class="text-center mid">Material Name</th>
-								<th class="text-center mid" width='15%'>Price From Supplier</th>
+								<th class="text-center mid" width='7%'>Price Ref</th>
+								<th class="text-center mid" width='10%'>Price From Supplier</th>
 								<!--<th class="text-center mid hidden" width='10%'>Harga (IDR)</th>-->
 								<th class="text-center mid" width='7%'>Qty PR</th>
 								<th class="text-center mid" width='7%'>Unit</th>
@@ -108,6 +110,7 @@ $this->load->view('include/side_menu');
 							}
 							echo "<tr>";
 								echo "<td class='mid'>".$nm_material."</td>";
+								echo "<td class='mid' align='right'>".number_format($valx2['price_from_supplier'],2)."</td>";
 								echo "<td class='mid' align='right'><input type='text' name='Detail[".$no."][detail][".$no2."][price_ref_sup]' class='form-control text-center input-md autoNumeric2 price_sub_".$no." changeKurs' value='".$valx2['price_ref_sup']."' data-no='".$no."'></td>";
 								echo "<td class='mid hidden' align='right'><input type='text' name='Detail[".$no."][detail][".$no2."][harga_idr]' class='form-control text-right input-md autoNumeric2 harga_idr' readonly value='".$valx2['harga_idr']."'></td>";
 								echo "<td class='mid' align='center'><input type='text' name='Detail[".$no."][detail][".$no2."][qty]' class='form-control text-center input-md autoNumeric2 qty_pr' value='".$valx2['qty']."' data-no='".$no."'></td>";
@@ -133,7 +136,7 @@ $this->load->view('include/side_menu');
 							$SUM_HARGA += $valx2['total_harga'];
 						}
 						echo "<tr>";
-							echo "<td colspan='7' class='text-right text-bold mid'>TOTAL PRICE</td>";
+							echo "<td colspan='8' class='text-right text-bold mid'>TOTAL PRICE</td>";
 							echo "<td class='mid' align='right'><input type='text' class='form-control text-right input-md autoNumeric2 sum_harga_idr_".$no."' value='".$SUM_HARGA."' readonly></td>";
 						echo "</tr>";
 						?>
