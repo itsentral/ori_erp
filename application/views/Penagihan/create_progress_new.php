@@ -83,8 +83,8 @@ $this->load->view('include/side_menu');
 				$selects1="";
 				$selects2="";
 				if(isset($penagihan[0]->ppnselect)){
-					if($penagihan[0]->ppnselect=="1") $selects1="selected";
-					if($penagihan[0]->ppnselect=="2") $selects2="selected";
+					if($penagihan[0]->ppnselect=="1") $selects1="";
+					if($penagihan[0]->ppnselect=="2") $selects2="";
 				}
 				?>
 					<select id="ppnselect" name="ppnselect" class="form-control input-sm chosen_select" required>
