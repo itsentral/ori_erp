@@ -70,7 +70,7 @@ class Cron_model extends CI_Model {
 				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
 				$nm_customer		= $getDetailTanki['customer'];
 				$nm_project		= $getDetailTanki['nm_project'];
-				$so_number		= $getDetailTanki['no_so'];
+				$so_number		= $row_Cek['no_so'];
 				$length			= 0;
 				$thickness		= 0;
 				$no_spk		= $row_Cek['no_spk'];
@@ -211,6 +211,8 @@ class Cron_model extends CI_Model {
 		    WHERE 1=1 AND a.id_category <> '' ".$where_tgl." ".$where_bln." ".$where_thn." ".$where_range." AND (
 				a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
