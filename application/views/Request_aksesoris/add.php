@@ -21,7 +21,7 @@
 		<thead id='head_table'>
 			<tr class='bg-blue'>
 				<th class="text-center" style='vertical-align:middle;' width='3%'>#</th>
-				<th class="text-center" style='vertical-align:middle;'>Material Name</th>
+				<th class="text-center" style='vertical-align:middle;' width='52%'>Material Name</th>
 				<!-- <th class="text-center" style='vertical-align:middle;'>Material Name</th> -->
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Estimasi</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Tot Request</th>
@@ -108,6 +108,22 @@
 	.tgl{
 		cursor:pointer;
 	}
+    .chosen-container-active .chosen-single {
+            border: none;
+            box-shadow: none;
+    }
+    .chosen-container-single .chosen-single {
+        height: 34px;
+        border: 1px solid #d2d6de;
+        border-radius: 0px;
+            background: none;
+        box-shadow: none;
+        color: #444;
+        line-height: 32px;
+    }
+    .chosen-container-single .chosen-single div{
+        top: 5px;
+    }
 </style>
 <script>
 	$(document).ready(function(){

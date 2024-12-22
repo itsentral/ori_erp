@@ -23,7 +23,7 @@ class Product_model extends CI_Model {
 			$ArrInsert	= array();
 			foreach($Detail AS $val => $valx){
 				if($valx['costcenter'] <> '0'){
-					$costcenter_name	= $this->db->query("SELECT name FROM hris.departments WHERE id='".$valx['costcenter']."' LIMIT 1")->result();
+					$costcenter_name	= $this->db->query("SELECT nm_costcenter as name FROM costcenter WHERE id='".$valx['costcenter']."' LIMIT 1")->result();
 					if(!empty($valx['id'])){
 						$ArrDetail[$val]['id'] 				= $valx['id'];
 						$ArrDetail[$val]['id_product'] 		= $id_product;
@@ -87,7 +87,7 @@ class Product_model extends CI_Model {
 			}
 			
 			$id = $this->uri->segment(3);
-			$product	= $this->db->query("SELECT * FROM hris.departments WHERE division_id='DIV009' ORDER BY name")->result_array();
+			$product	= $this->db->query("SELECT * FROM costcenter WHERE id_dept='10' ORDER BY nm_costcenter")->result_array();
 			$data2 	= NULL;
 			if(!empty($id)){
 				$sql	= "SELECT * FROM product_parent_costcenter WHERE id_product='".$id."' AND deleted='N'";
@@ -110,7 +110,7 @@ class Product_model extends CI_Model {
 		$id 	= $this->uri->segment(3);
 		$no 	= 0;
 
-		$product	= $this->db->query("SELECT * FROM hris.departments WHERE division_id='DIV009' ORDER BY name")->result_array();
+		$product	= $this->db->query("SELECT * FROM costcenter WHERE id_dept='10' ORDER BY nm_costcenter")->result_array();
 
 		$d_Header = "";
 		$d_Header .= "<tr class='header_".$id."'>";
@@ -118,7 +118,7 @@ class Product_model extends CI_Model {
 				$d_Header .= "<select name='detail[".$id."][costcenter]' class='chosen_select form-control input-sm inline-blockd'>";
 				$d_Header .= "<option value='0'>Select Costcenter</option>";
 				foreach($product AS $val => $valx){
-				  $d_Header .= "<option value='".$valx['id']."'>".strtoupper($valx['name'])."</option>";
+				  $d_Header .= "<option value='".$valx['id']."'>".strtoupper($valx['nm_costcenter'])."</option>";
 				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
@@ -366,7 +366,7 @@ class Product_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".strtolower($last_create)."</div>";
 
 			$last_date = (!empty($row['updated_date']))?$row['updated_date']:$row['created_date'];
-			$nestedData[]	= "<div align='right'>".date('d-F-Y H:i:s', strtotime($last_date))."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i:s', strtotime($last_date))."</div>";
 
 			$edit	= "";
 
