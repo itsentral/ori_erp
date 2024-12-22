@@ -71,7 +71,7 @@ class Total_value_material extends CI_Controller {
 		$urut1  = 1;
         $urut2  = 0;
 		$dateFilter = (!empty($requestData['date_filter']))?$requestData['date_filter']:date('Y-m-d');
-		$GET_PRICEBOOK = getPriceBookByDate($dateFilter);
+		$GET_PRICEBOOK = getPriceBookByDate2($dateFilter);
 		foreach($query->result_array() as $row)
 		{
 			$total_data     = $totalData;
@@ -146,7 +146,7 @@ class Total_value_material extends CI_Controller {
 		$urut1  = 1;
         $urut2  = 0;
 		$dateFilter = (!empty($requestData['date_filter']))?$requestData['date_filter']:date('Y-m-d');
-		$GET_PRICEBOOK = getPriceBookByDatesubgudang($dateFilter);
+		$GET_PRICEBOOK = getPriceBookByDatesubgudang2($dateFilter);
 		foreach($query->result_array() as $row)
 		{
 			$total_data     = $totalData;
@@ -221,7 +221,7 @@ class Total_value_material extends CI_Controller {
 		$urut1  = 1;
         $urut2  = 0;
 		$dateFilter = (!empty($requestData['date_filter']))?$requestData['date_filter']:date('Y-m-d');
-		$GET_PRICEBOOK = getPriceBookByDateproduksi($dateFilter);
+		$GET_PRICEBOOK = getPriceBookByDateproduksi2($dateFilter);
 		foreach($query->result_array() as $row)
 		{
 			$total_data     = $totalData;
@@ -573,7 +573,7 @@ class Total_value_material extends CI_Controller {
 
 
 		// echo $qDetail1; exit;
-		$GET_PRICEBOOK = getPriceBookByDate($tanggal_update2);
+		$GET_PRICEBOOK = getPriceBookByDate2($tanggal_update2);
 
 		if($restDetail1){
 			$awal_row	= $NextRow;
@@ -778,7 +778,7 @@ class Total_value_material extends CI_Controller {
 
 
 		
-		$GET_PRICEBOOK1 = getPriceBookByDatesubgudang($tanggal_update2);
+		$GET_PRICEBOOK1 = getPriceBookByDatesubgudang2($tanggal_update2);
 		
 		//print_r ($restDetail1); exit;
 
@@ -990,7 +990,7 @@ class Total_value_material extends CI_Controller {
 
 
 		// echo $qDetail1; exit;
-		$GET_PRICEBOOK = getPriceBookByDateproduksi($tanggal_update2);
+		$GET_PRICEBOOK = getPriceBookByDateproduksi2($tanggal_update2);
 
 		if($restDetail1){
 			$awal_row	= $NextRow;

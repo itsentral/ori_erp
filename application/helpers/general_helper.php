@@ -1429,6 +1429,46 @@ function getPriceBookByDate($dateFilter){
     return $ArrPriceBook;
 }
 
+function getPriceBookByDate2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."' AND id_gudang ='2'
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $SQLPriceBook2 = "	SELECT
+     a.id, a.id_material, a.harga as price_book
+    FROM
+        tran_warehouse_jurnal_detail a 
+    WHERE
+        id_gudang ='2'"
+    
+    $result = $CI->db->query($SQLPriceBook2)->result_array();
+
+    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
 function getPriceBookByDatesubgudang($dateFilter){ 
     $CI =& get_instance();
 
@@ -1460,6 +1500,47 @@ function getPriceBookByDatesubgudang($dateFilter){
     return $ArrPriceBook;
 }
 
+
+unction getPriceBookByDatesubgudang2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."' AND (id_gudang ='3' OR id_gudang ='4')
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $SQLPriceBook2 = "	SELECT
+     a.id, a.id_material, a.harga as price_book
+    FROM
+        tran_warehouse_jurnal_detail a 
+    WHERE
+        (id_gudang ='3' OR id_gudang ='4')"
+    
+    $result = $CI->db->query($SQLPriceBook2)->result_array();
+
+    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
 function getPriceBookByDateproduksi($dateFilter){ 
     $CI =& get_instance();
 
@@ -1476,6 +1557,46 @@ function getPriceBookByDateproduksi($dateFilter){
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
     $result = $CI->db->get('price_book_produksi')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
+unction getPriceBookByDateproduksi2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."' AND (id_gudang !='2' OR id_gudang !='3' OR id_gudang !='4')
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $SQLPriceBook2 = "	SELECT
+    a.id, a.id_material, a.harga as price_book
+    FROM
+        tran_warehouse_jurnal_detail a 
+    WHERE
+        (id_gudang !='2' OR id_gudang !='3' OR id_gudang !='4')"
+    
+    $result = $CI->db->query($SQLPriceBook2)->result_array();
+
+    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
