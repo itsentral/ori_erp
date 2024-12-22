@@ -161,8 +161,8 @@ class Total_value_material extends CI_Controller {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
-		//			$PRICEBOOK = (!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0;
-			$PRICEBOOK = ($row['costbook']==0)?((!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0):$row['costbook'];
+		$PRICEBOOK = (!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0;
+			//$PRICEBOOK = ($row['costbook']==0)?((!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0):$row['costbook'];
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
