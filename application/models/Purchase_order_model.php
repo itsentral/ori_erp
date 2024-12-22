@@ -1814,44 +1814,44 @@ class Purchase_order_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 			
-			$list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_material_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
-			$arr_sup = array();
-			foreach($list_supplier AS $val => $valx){
-				$arr_sup[$val] = $valx['nm_supplier'];
-			}
-			$dt_sup	= implode("<br>", $arr_sup);
+			// $list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_material_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
+			// $arr_sup = array();
+			// foreach($list_supplier AS $val => $valx){
+			// 	$arr_sup[$val] = $valx['nm_supplier'];
+			// }
+			// $dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT id_material, idmaterial, nm_material, qty, category FROM tran_material_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_material ORDER BY id DESC")->result_array();
-			$arr_mat = array();
-			foreach($list_material AS $val => $valx){
-				if($valx['category'] == 'mat'){
-					$arr_mat[$val] = $valx['nm_material'];
-				}
-				if($valx['category'] == 'acc'){
-					$arr_mat[$val] = get_name_acc($valx['id_material']);
-					if(empty($valx['idmaterial'])){
-						$arr_mat[$val] = $valx['nm_material'];
-					}
-				}
+			// $list_material		= $this->db->query("SELECT id_material, idmaterial, nm_material, qty, category FROM tran_material_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_material ORDER BY id DESC")->result_array();
+			// $arr_mat = array();
+			// foreach($list_material AS $val => $valx){
+			// 	if($valx['category'] == 'mat'){
+			// 		$arr_mat[$val] = $valx['nm_material'];
+			// 	}
+			// 	if($valx['category'] == 'acc'){
+			// 		$arr_mat[$val] = get_name_acc($valx['id_material']);
+			// 		if(empty($valx['idmaterial'])){
+			// 			$arr_mat[$val] = $valx['nm_material'];
+			// 		}
+			// 	}
 				
-			}
-			$dt_mat	= implode("<br>", $arr_mat);
+			// }
+			// $dt_mat	= implode("<br>", $arr_mat);
 			
-			$arr_qty = array();
-			foreach($list_material AS $val => $valx){
-				$arr_qty[$val] = number_format($valx['qty']);
-			}
-			$dt_qty	= implode("<br>", $arr_qty);
+			// $arr_qty = array();
+			// foreach($list_material AS $val => $valx){
+			// 	$arr_qty[$val] = number_format($valx['qty']);
+			// }
+			// $dt_qty	= implode("<br>", $arr_qty);
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_rfq']."</div>";
-			$nestedData[]	= "<div align='left'>".$dt_sup."</div>";
-			$nestedData[]	= "<div align='left'>".$dt_mat."</div>";
-			$nestedData[]	= "<div align='right'>".$dt_qty."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
+			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
-			$nestedData[]	= "<div align='right'>".date('d F Y', strtotime($row['created_date']))."</div>";
-			
+			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
+		
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
 				$create	= "";
 				$edit	= "";
@@ -1902,13 +1902,17 @@ class Purchase_order_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*
+				a.*,
+				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_material,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
 			FROM
-				tran_material_rfq_header a,
+				tran_material_rfq_detail b
+				LEFT JOIN tran_material_rfq_header a on a.no_rfq=b.no_rfq,
 				(SELECT @row:=0) r
 		    WHERE a.deleted_date IS NULL AND  (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 			GROUP BY a.no_rfq
 		";
@@ -2067,49 +2071,49 @@ class Purchase_order_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 			
-			$list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_material_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
-			$arr_sup = array();
-			foreach($list_supplier AS $val => $valx){
-				$arr_sup[$val] = $valx['nm_supplier'];
-			}
-			$dt_sup	= implode("<br>", $arr_sup);
+			// $list_supplier		= $this->db->query("SELECT nm_supplier FROM tran_material_rfq_header WHERE no_rfq='".$row['no_rfq']."' AND deleted='N'")->result_array();
+			// $arr_sup = array();
+			// foreach($list_supplier AS $val => $valx){
+			// 	$arr_sup[$val] = $valx['nm_supplier'];
+			// }
+			// $dt_sup	= implode("<br>", $arr_sup);
 			
-			$list_material		= $this->db->query("SELECT nm_material, qty, price_ref, price_ref_sup, category, id_material FROM tran_material_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_material ORDER BY id DESC")->result_array();
-			$arr_mat = array();
-			foreach($list_material AS $val => $valx){
-				if($valx['category'] == 'mat'){
-					$arr_mat[$val] = $valx['nm_material'];
-				}
-				if($valx['category'] == 'acc'){
-					$arr_mat[$val] = get_name_acc($valx['id_material']);
-					if(empty($valx['idmaterial'])){
-						$arr_mat[$val] = $valx['nm_material'];
-					}
-				}
-			}
-			$dt_mat	= implode("<br>", $arr_mat);
+			// $list_material		= $this->db->query("SELECT nm_material, qty, price_ref, price_ref_sup, category, id_material FROM tran_material_rfq_detail WHERE no_rfq='".$row['no_rfq']."' AND deleted='N' GROUP BY id_material ORDER BY id DESC")->result_array();
+			// $arr_mat = array();
+			// foreach($list_material AS $val => $valx){
+			// 	if($valx['category'] == 'mat'){
+			// 		$arr_mat[$val] = $valx['nm_material'];
+			// 	}
+			// 	if($valx['category'] == 'acc'){
+			// 		$arr_mat[$val] = get_name_acc($valx['id_material']);
+			// 		if(empty($valx['idmaterial'])){
+			// 			$arr_mat[$val] = $valx['nm_material'];
+			// 		}
+			// 	}
+			// }
+			// $dt_mat	= implode("<br>", $arr_mat);
 			
-			$arr_qty = array();
-			foreach($list_material AS $val => $valx){
-				$arr_qty[$val] = number_format($valx['qty']);
-			}
-			$dt_qty	= implode("<br>", $arr_qty);
+			// $arr_qty = array();
+			// foreach($list_material AS $val => $valx){
+			// 	$arr_qty[$val] = number_format($valx['qty']);
+			// }
+			// $dt_qty	= implode("<br>", $arr_qty);
 			
-			$arr_price = array();
-			foreach($list_material AS $val => $valx){
-				$arr_price[$val] = number_format($valx['price_ref']);
-			}
-			$dt_price	= implode("<br>", $arr_price);
+			// $arr_price = array();
+			// foreach($list_material AS $val => $valx){
+			// 	$arr_price[$val] = number_format($valx['price_ref']);
+			// }
+			// $dt_price	= implode("<br>", $arr_price);
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_rfq']."</div>";
-			$nestedData[]	= "<div align='left'>".$dt_sup."</div>";
-			$nestedData[]	= "<div align='left'>".$dt_mat."</div>";
-			$nestedData[]	= "<div align='right'>".$dt_price."</div>";
-			$nestedData[]	= "<div align='right'>".$dt_qty."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
+			// $nestedData[]	= "<div align='right'>".$dt_price."</div>";
+			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
-			$nestedData[]	= "<div align='right'>".date('d F Y', strtotime($row['created_date']))."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
 		
 			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
 				$create	= "";
@@ -2155,12 +2159,18 @@ class Purchase_order_model extends CI_Model {
 
 		$sql = "
 			SELECT
-				a.*
+				(@row:=@row+1) AS nomor,
+				a.*,
+				GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
+				GROUP_CONCAT(DISTINCT CONCAT(b.nm_material,', <b>(',b.qty,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
 			FROM
-				tran_material_rfq_header a
+				tran_material_rfq_detail b
+				LEFT JOIN tran_material_rfq_header a on a.no_rfq=b.no_rfq,
+				(SELECT @row:=0) r
 		    WHERE  a.deleted = 'N' AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 			GROUP BY a.no_rfq
 		";
@@ -2174,7 +2184,7 @@ class Purchase_order_model extends CI_Model {
 			2 => 'nm_supplier'
 		);
 
-		$sql .= " ORDER BY a.updated_date DESC, a.id DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
