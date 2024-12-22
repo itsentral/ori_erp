@@ -1492,7 +1492,7 @@ function getPriceBookByDatesubgudang($dateFilter){
 }
 
 
-unction getPriceBookByDatesubgudang2($dateFilter){
+function getPriceBookByDatesubgudang2($dateFilter){
     $CI =& get_instance();
 
     $SQLPriceBook = "	SELECT
@@ -1554,7 +1554,7 @@ function getPriceBookByDateproduksi($dateFilter){
     return $ArrPriceBook;
 }
 
-unction getPriceBookByDateproduksi2($dateFilter){
+function getPriceBookByDateproduksi2($dateFilter){
     $CI =& get_instance();
 
     $SQLPriceBook = "	SELECT
