@@ -14,7 +14,7 @@ $koneksi_tanki 		= $db2->connect();
 //echo $db1;exit;
 $dateC = date('Y-m-d');
 $date = date('Y-m-d', strtotime('-1 days', strtotime($dateC)));
-$date = '2024-11-14';
+// $date = '2024-11-14';
 $sqlHeader      = "SELECT a.*, b.id_milik, b.no_spk, b.product_code, b.id_product AS nm_tanki FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date)='".$date."' and a.id_product='tanki' ";
 
 
@@ -106,7 +106,7 @@ if(!empty($restHeader)){
                         FROM
                                 bq_detail_detail a
                         WHERE a.id='".$valx['id_milik']."' LIMIT 1";
-        echo $sqlBy."<br>";
+        // echo $sqlBy."<br>";
         $Q_By		= $koneksi_tanki->query($sqlBy);
         $restBy		= $Q_By->fetch_array(MYSQLI_ASSOC);
         
