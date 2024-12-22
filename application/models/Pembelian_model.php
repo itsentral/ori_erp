@@ -3335,6 +3335,7 @@ class Pembelian_model extends CI_Model {
 
 				$SUM_MAT += $qty_po;
 
+				$ArrDetail[$val2]['id_rfq_det'] 	= $valx22['id'];
 				$ArrDetail[$val2]['no_po'] 			= $no_po;
 				$ArrDetail[$val2]['id_barang'] 		= $valx22['id_barang'];
 				$ArrDetail[$val2]['nm_barang'] 		= $valx22['nm_barang'];
@@ -3473,11 +3474,12 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_rfq']."
 									<input type='hidden' name='harga_idr_".$row['id']."' value='".$row['harga_idr']."' class='harga_idr_val'>
 									<input type='hidden' name='total_harga_".$row['id']."' value='".$row['total_harga']."' class='total_harga_val'></div>";
-			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang'].' '.$row['spec'].' '.$row['info'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['spec'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty_po'],2)."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['tgl_dibutuhkan']))."</div>";
-			$nestedData[]	= "<div align='center'>".$row['created_by']."</div>";
+			$nestedData[]	= "<div align='left'>".strtolower($row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
 			$nestedData[]	= "<div align='right' class='harga_idr'>".number_format($row['harga_idr'],2)."</div>";
 			$nestedData[]	= "<div align='left'><span class='text-primary text-bold'>".$row['currency']."</span></div>";

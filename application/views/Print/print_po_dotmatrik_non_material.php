@@ -11,9 +11,17 @@
 	$data_iden	= $this->db->get('identitas')->result();
 	$data_header	= $this->db->get_where('tran_po_header',array('no_po'=>$no_po))->result();
 	
-	$rest_detail	= $this->db->select('a.*, b.kode_satuan AS unit')->join('raw_pieces b','a.satuan=b.id_satuan','left')->get_where('tran_po_detail a',array('a.no_po'=>$no_po))->result_array();
+	$rest_detail	= $this->db
+							->select('a.*, b.kode_satuan AS unit, c.spec')
+							->join('raw_pieces b','a.satuan=b.id_satuan','left')
+							->join('tran_rfq_detail c','a.no_po=c.no_po AND a.id_barang=c.id_barang','left')
+							->get_where('tran_po_detail a',array('a.no_po'=>$no_po))->result_array();
 	if($data_header[0]->status != 'DELETED'){
-		$rest_detail	= $this->db->select('a.*, b.kode_satuan AS unit')->join('raw_pieces b','a.satuan=b.id_satuan','left')->get_where('tran_po_detail a',array('a.no_po'=>$no_po,'a.deleted'=>'N'))->result_array();
+		$rest_detail	= $this->db
+							->select('a.*, b.kode_satuan AS unit, c.spec')
+							->join('raw_pieces b','a.satuan=b.id_satuan','left')
+							->join('tran_rfq_detail c','a.no_po=c.no_po AND a.id_barang=c.id_barang','left')
+							->get_where('tran_po_detail a',array('a.no_po'=>$no_po,'a.deleted'=>'N'))->result_array();
 	}
 
 	$mata_uang = (!empty($data_header[0]->mata_uang))?$data_header[0]->mata_uang:'';
@@ -142,7 +150,8 @@
 			foreach($rest_detail AS $val => $valx2){	
 				$no++;
 				$SUM += $valx2['price_ref_sup'] * $valx2['qty_purchase'];
-				$nm_material = $valx2['nm_barang'];
+				$spec = (!empty($valx2['spec']))?' - '.$valx2['spec']:'';
+				$nm_material = $valx2['nm_barang'].$spec;
                 
 				echo "<tr>";
 					echo "<td align='center'>".$no."</td>";
