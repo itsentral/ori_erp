@@ -1429,6 +1429,37 @@ function getPriceBookByDate($dateFilter){
     return $ArrPriceBook;
 }
 
+function getPriceBookByDate2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail_pusat a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."'
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_pusat')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
 function getPriceBookByDatesubgudang($dateFilter){ 
     $CI =& get_instance();
 
@@ -1460,6 +1491,38 @@ function getPriceBookByDatesubgudang($dateFilter){
     return $ArrPriceBook;
 }
 
+
+function getPriceBookByDatesubgudang2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail_subgudang a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."'
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_subgudang')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
 function getPriceBookByDateproduksi($dateFilter){ 
     $CI =& get_instance();
 
@@ -1476,6 +1539,37 @@ function getPriceBookByDateproduksi($dateFilter){
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
     $result = $CI->db->get('price_book_produksi')->result_array();
+    $ArrResult = [];
+    foreach ($result as $key => $value) {
+        $ArrResult[$value['id']] = $value['price_book'];
+    }
+    
+    $GET_PRICE_BOOK = $ArrResult;
+    $ArrPriceBook = [];
+    foreach ($resultPriceBook as $key => $value) {
+        $priceBook = (!empty($GET_PRICE_BOOK[$value['id']]))?$GET_PRICE_BOOK[$value['id']]:0;
+        $ArrPriceBook[$value['id_material']] = $priceBook;
+    }
+
+    return $ArrPriceBook;
+}
+
+function getPriceBookByDateproduksi2($dateFilter){
+    $CI =& get_instance();
+
+    $SQLPriceBook = "	SELECT
+                            MAX( a.id ) AS id,
+                            a.id_material 
+                        FROM
+                            tran_warehouse_jurnal_detail_produksi a 
+                        WHERE
+                            a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."'
+                        GROUP BY
+                            a.id_material";
+    $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
+
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_produksi')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
