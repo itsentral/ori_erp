@@ -19,7 +19,7 @@ $this->load->view('include/side_menu');
 				<label class='label-control col-sm-2'><b>Type Product</b></label>
 				<div class='col-sm-2'>
 					<select name='type' id='type' class='form-control input-md'>
-						<!--<option value='0'>Select An Type</option>-->
+						<option value='fitting'>Fitting</option>
 						<?php
 							foreach($type AS $val => $valx){
 								$name_only = ($valx['type'] == 'field')?'Material Only':$valx['type'];

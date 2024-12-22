@@ -466,7 +466,7 @@ class Product extends CI_Controller {
 				redirect(site_url('users'));
 			}
 
-			$dataType	= "SELECT * FROM parent_type WHERE type='fitting' OR type='field' ORDER BY type DESC";
+			$dataType	= "SELECT * FROM parent_type WHERE type in ('field','joint')";
 			$restType	= $this->db->query($dataType)->result_array();
 			$data = array(
 				'title'			=> 'Add Product Type',
