@@ -1444,16 +1444,7 @@ function getPriceBookByDate2($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $SQLPriceBook2 = "	SELECT
-     a.id, a.id_material, a.harga as price_book
-    FROM
-        tran_warehouse_jurnal_detail a 
-    WHERE
-        id_gudang ='2'"
-    
-    $result = $CI->db->query($SQLPriceBook2)->result_array();
-
-    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_pusat')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
@@ -1516,16 +1507,7 @@ unction getPriceBookByDatesubgudang2($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $SQLPriceBook2 = "	SELECT
-     a.id, a.id_material, a.harga as price_book
-    FROM
-        tran_warehouse_jurnal_detail a 
-    WHERE
-        (id_gudang ='3' OR id_gudang ='4')"
-    
-    $result = $CI->db->query($SQLPriceBook2)->result_array();
-
-    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_subgudang')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
@@ -1587,16 +1569,7 @@ unction getPriceBookByDateproduksi2($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $SQLPriceBook2 = "	SELECT
-    a.id, a.id_material, a.harga as price_book
-    FROM
-        tran_warehouse_jurnal_detail a 
-    WHERE
-        (id_gudang !='2' OR id_gudang !='3' OR id_gudang !='4')"
-    
-    $result = $CI->db->query($SQLPriceBook2)->result_array();
-
-    //$result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('tran_warehouse_jurnal_detail_produksi')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
