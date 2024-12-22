@@ -106,7 +106,7 @@ if(!empty($restHeader)){
                         FROM
                                 bq_detail_detail a
                         WHERE a.id='".$valx['id_milik']."' LIMIT 1";
-        // echo $sqlBy."<br>";
+        echo $sqlBy."<br>";
         $Q_By		= $koneksi_tanki->query($sqlBy);
         $restBy		= $Q_By->fetch_array(MYSQLI_ASSOC);
         
