@@ -3267,14 +3267,14 @@ class Purchase_order_model extends CI_Model {
 			if($row['mata_uang']=='IDR'){
 			   $total  =	$row['total_price'];
 			   $dp     =	$row['nilai_dp'];
-			   $unbill =	$row['total_terima_barang_idr']
+			   $unbill =	$row['total_terima_barang_idr'];
 			   $hutang =	$row['sisa_hutang_idr'];
 			   $bayar  =	$row['bayar_idr'];
 			}
 			else{
 				$total  =	$row['total_price'];
 				$dp     =	$row['nilai_dp'];
-				$unbill =	$row['nilai_terima_barang_kurs']
+				$unbill =	$row['nilai_terima_barang_kurs'];
 				$hutang =	$row['sisa_hutang_kurs'];
 				$bayar  =	$row['bayar_kurs'];
 			 }
