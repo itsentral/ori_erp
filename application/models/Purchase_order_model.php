@@ -3263,16 +3263,31 @@ class Purchase_order_model extends CI_Model {
             {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
+            
+			if($row['mata_uang']=='IDR'){
+			   $total  =	$row['total_price'];
+			   $dp     =	$row['nilai_dp'];
+			   $unbill =	$row['total_terima_barang_idr']
+			   $hutang =	$row['sisa_hutang_idr'];
+			   $bayar  =	$row['bayar_idr'];
+			}
+			else{
+				$total  =	$row['total_price'];
+				$dp     =	$row['nilai_dp'];
+				$unbill =	$row['nilai_terima_barang_kurs']
+				$hutang =	$row['sisa_hutang_kurs'];
+				$bayar  =	$row['bayar_kurs'];
+			 }
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
 			$nestedData[]	= "<div align='right'>".$row['mata_uang']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($total,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($dp,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($unbill,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($hutang,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($bayar,2)."</div>";
 			
 			$data[] = $nestedData;
             $urut1++;
