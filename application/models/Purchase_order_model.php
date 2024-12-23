@@ -3267,6 +3267,7 @@ class Purchase_order_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='right'>".$row['mata_uang']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";

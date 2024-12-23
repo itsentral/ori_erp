@@ -17,6 +17,7 @@ $this->load->view('include/side_menu');
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">Suppier</th>
+                    <th class="text-center">Mata Uang</th>
 					<th class="text-center">Total PO</th>
 					<th class="text-center">DP</th>
 					<th class="text-center">UNBILL</th>
