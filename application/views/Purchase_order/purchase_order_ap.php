@@ -21,11 +21,11 @@ $this->load->view('include/side_menu');
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">Suppier</th>
-					<th class="text-center">Material Name</th>
-					<!-- <th class="text-center">Qty</th> -->
 					<th class="text-center">Total PO</th>
-					<th class="text-center">By</th>
-					<th class="text-center">Dated</th>
+					<th class="text-center">DP</th>
+					<th class="text-center">UNBILL</th>
+                    <th class="text-center">HUTANG</th>
+					<th class="text-center">BAYAR</th>
 				</tr>
 			</thead>
 			<tbody></tbody>

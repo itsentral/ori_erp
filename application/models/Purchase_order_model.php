@@ -3267,11 +3267,11 @@ class Purchase_order_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
-			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
-			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
-			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
 			
 			$data[] = $nestedData;
             $urut1++;
