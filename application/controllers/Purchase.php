@@ -1282,4 +1282,8 @@ class Purchase extends CI_Controller {
 	public function purchase_order_ap(){
 		$this->purchase_order_model->index_purchase_order_ap();
 	}
+
+	public function server_side_purchase_order_ap(){
+		$this->purchase_order_model->get_data_json_purchase_order_ap();
+	}
 }

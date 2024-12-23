@@ -3211,7 +3211,7 @@ class Purchase_order_model extends CI_Model {
 			}
 			echo json_encode($Arr_Data);
 	}
-
+// SYAMSUDIN 23-12-2024
 	public function index_purchase_order_ap(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)));
 		$Arr_Akses			= getAcccesmenu($controller);
@@ -3230,4 +3230,98 @@ class Purchase_order_model extends CI_Model {
 		history('View AP');
 		$this->load->view('Purchase_order/purchase_order_ap',$data);
 	}
+
+	public function get_data_json_purchase_order_ap(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)))."/purchase_order";
+		$Arr_Akses			= getAcccesmenu($controller);
+
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_json_purchase_order_ap(
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
+			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_price'],2)."</div>";
+			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
+			
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_json_purchase_order_ap($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+
+		$sql = "SELECT
+					(@row:=@row+1) AS nomor,
+					a.*,
+					GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
+					GROUP_CONCAT(CONCAT(b.nm_material,', <b>(',b.qty_purchase,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
+				FROM
+					tran_material_po_detail b
+					LEFT JOIN tran_material_po_header a ON a.no_po = b.no_po,
+					(SELECT @row:=0) r
+				WHERE 1=1 AND a.deleted = 'N' AND a.repeat_po IS NULL AND a.status_id = '1'
+				AND (
+					a.no_po LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				)
+				GROUP BY b.no_po
+			";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_po',
+			2 => 'nm_supplier'
+		);
+
+		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+	
 }
