@@ -6,11 +6,7 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-			<?php
-				if($akses_menu['create']=='1'){
-					echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Add PO','content'=>'Add PO','id'=>'addPO')).' ';
-				}
-			?>
+			
 		</div>
 	</div>
 	<!-- /.box-header -->
