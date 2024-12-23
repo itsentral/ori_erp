@@ -540,8 +540,9 @@ class Pembelian extends CI_Controller {
 		}
 							
 		$result		= $this->db
-							->select('a.*, b.nm_supplier, b.mata_uang AS currency')
+							->select('a.*, b.nm_supplier, b.mata_uang AS currency, c.spec')
 							->join('tran_po_header b','a.no_po=b.no_po','left')
+							->join('tran_rfq_detail c','a.no_po=c.no_po AND a.id_barang=c.id_barang','left')
 							->get_where('tran_po_detail a',$WHERE)
 							->result_array();
 		
@@ -693,10 +694,17 @@ class Pembelian extends CI_Controller {
 
 			$result	= $this->db->get_where('tran_po_header',array('no_po'=>$no_po))->result();
 			
-			$sql_detail = "SELECT a.*, b.nm_supplier FROM tran_po_detail a LEFT JOIN tran_po_header b ON a.no_po=b.no_po WHERE a.no_po='".$no_po."'";
+			$sql_detail = "SELECT 
+								a.*, 
+								b.nm_supplier,
+								c.spec
+							FROM tran_po_detail a 
+							LEFT JOIN tran_po_header b ON a.no_po=b.no_po 
+							LEFT JOIN tran_rfq_detail c ON a.no_po=c.no_po AND a.id_barang=c.id_barang
+							WHERE a.no_po='".$no_po."'";
 			
 			if($result[0]->status != 'DELETED'){
-				$sql_detail = "SELECT a.*, b.nm_supplier FROM tran_po_detail a LEFT JOIN tran_po_header b ON a.no_po=b.no_po WHERE a.no_po='".$no_po."' AND a.deleted='N'";
+				$sql_detail = $sql_detail." AND a.deleted='N'";
 			}
 			
 			

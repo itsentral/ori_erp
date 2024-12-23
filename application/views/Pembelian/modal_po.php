@@ -46,14 +46,15 @@
                         <th class="text-center no-sort" width='3%'>#</th>
                         <th class="text-center" width='8%'>No RFQ</th> 
                         <th class="text-center">Material Name</th>
-                        <th class="text-right" width='8%'>Qty PR</th>
-                        <th class="text-right" width='8%'>Qty PO</th>
+                        <th class="text-center" width='8%'>Spec</th>
+                        <th class="text-right" width='5%'>Qty PR</th>
+                        <th class="text-right" width='5%'>Qty PO</th>
 						<th class="text-center" width='8%'>Dibutuhkan</th>
 						<th class="text-center" width='7%'>Created</th>
 						<th class="text-center" width='7%'>Dated</th>
 						<th class="text-right" width='10%'>Net Price</th>
 						<th class="text-right" width='4%'>#</th>
-                        <th class="text-center" width='10%'>Qty PO</th>
+                        <th class="text-center" width='8%'>Qty PO</th>
                         <th class="text-center" width='10%'>Total Price</th>
                     </tr>
                 </thead>

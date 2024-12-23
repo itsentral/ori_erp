@@ -3423,14 +3423,16 @@ class Cron extends CI_Controller {
 				$so_number		= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
 				$length			= $SERACH_DETAIL_SPEC[$id_milik]['length'];
 				$thickness		= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
+				$no_spk			= (!empty($GET_PRODUKSI_DETAIL[0]->no_spk))?$GET_PRODUKSI_DETAIL[0]->no_spk:'-';
 			  }
 			  else{
 				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
 				$customer		= $getDetailTanki['customer'];
 				$project		= $getDetailTanki['nm_project'];
-				$so_number		= $getDetailTanki['no_so'];
+				$so_number		= $row_Cek['no_so'];
 				$length			= '';
 				$thickness		= '';
+				$no_spk			= $row_Cek['no_spk'];
 			  }
 
 			  $awal_col++;
@@ -3449,7 +3451,7 @@ class Cron extends CI_Controller {
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
-			  $no_spk		= (!empty($GET_PRODUKSI_DETAIL[0]->no_spk))?$GET_PRODUKSI_DETAIL[0]->no_spk:'-';
+			  
 			  $Cols			= getColsChar($awal_col);
 			  $sheet->setCellValue($Cols.$awal_row, $no_spk);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);

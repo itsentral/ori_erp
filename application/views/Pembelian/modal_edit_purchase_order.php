@@ -95,9 +95,10 @@
 				<thead id='head_table'>
 					<tr class='bg-blue'>
 						<th class="text-center">Nama Barang</th>
+						<th class="text-center" width='10%'>Spec</th>
 						<th class="text-center" width='10%'>Qty</th>
-						<th class="text-center" width='20%'>Price/Unit</th>
-						<th class="text-center" width='20%'>Total Price</th>
+						<th class="text-center" width='17%'>Price/Unit</th>
+						<th class="text-center" width='17%'>Total Price</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -109,10 +110,11 @@
 						$qty_p = (!empty($valx['qty_po']))?$valx['qty_po']:$valx['qty_purchase'];
 						$SUM += $qty_p * $valx['price_ref_sup'];
 						echo "<tr>";
-							echo "<td align='left'>
-									<input name='detail[".$no."][nm_barang]' id='nm_barang_".$no."' class='form-control input-sm ' value='".strtoupper($valx['nm_barang'])."' readonly>
+							echo "<td align='left'>".strtolower($valx['nm_barang'])."
+									<input type='hidden' name='detail[".$no."][nm_barang]' id='nm_barang_".$no."' class='form-control input-sm ' value='".strtoupper($valx['nm_barang'])."' readonly>
 									<input type='hidden' name='detail[".$no."][id]' id='id_".$no."' value='".$valx['id']."'>
 									</td>";
+							echo "<td align='left'>".strtolower($valx['spec'])."</td>";
 							echo "<td align='center'><input type='hidden' name='detail[".$no."][qty]' id='qty_".$no."' class='form-control text-center input-sm maskM ch_qty' value='".$qty_p."' readonly tabindex='-1'>".$qty_p."</td>";
 							echo "<td align='right'><input type='hidden' name='detail[".$no."][price]' id='price_".$no."' class='form-control text-right input-sm maskM ch_qty changePrice' value='".$valx['price_ref_sup']."'>".number_format($valx['price_ref_sup'],2)."</td>";
 							echo "<td align='right'><input type='text' name='detail[".$no."][totprice]' id='qtytot_".$no."' class='form-control sum_tot text-right input-sm maskM' value='".$qty_p * $valx['price_ref_sup']."' readonly></td>";
@@ -120,22 +122,22 @@
 					}
 					?>
 					<tr>
-                        <td colspan='2'></td>
-                        <td class='text-right mid' width='25%'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td colspan='3'></td>
+                        <td class='text-right mid'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='total_po'  name='total_po' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Total' readonly value='<?=$SUM;?>'></td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='discount' name='discount' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Discount (%)' value='<?=$data[0]->discount;?>'></td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>NET PRICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='net_price' name='net_price' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price'  value='<?=$data[0]->net_price;?>'></td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'>
                             <select name="tax" id="tax" class='form-control chosen-select'>
@@ -149,17 +151,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>NET PRICE + TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='net_plus_tax' name='net_plus_tax' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price + Tax' value='<?=$data[0]->net_plus_tax;?>'></td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='delivery_cost' name='delivery_cost' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Delivery Cost' value='<?=$data[0]->delivery_cost;?>'></td>
                     </tr>
                     <tr>
-                        <td colspan='2'></td>
+                        <td colspan='3'></td>
                         <td class='text-right mid'><b>GRAND TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='grand_total' name='grand_total' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Grand Total' value='<?=$data[0]->total_price;?>'></td>
                     </tr>

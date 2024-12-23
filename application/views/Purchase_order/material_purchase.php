@@ -18,11 +18,11 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center no-sort">No</th>
+					<th class="text-center no-sort">#</th>
 					<th class="text-center">No RFQ</th> 
-					<th class="text-center no-sort">Suppier</th>
+					<th class="text-center">Suppier</th>
 					<th class="text-center no-sort">Material Name</th>
-					<th class="text-center no-sort">Total Request</th>
+					<!-- <th class="text-center no-sort">Total Request</th> -->
 					<th class="text-center no-sort">Create By</th>
 					<th class="text-center no-sort">Created Date</th>
 					<th class="text-center no-sort">Status</th>
@@ -231,10 +231,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -243,10 +240,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -255,10 +249,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -369,10 +360,7 @@ $this->load->view('include/side_menu');
 							  title				: "Error Message !",
 							  text				: 'An Error Occured During Process. Please try again..',
 							  type				: "warning",
-							  timer				: 7000,
-							  showCancelButton	: false,
-							  showConfirmButton	: false,
-							  allowOutsideClick	: false
+							  timer				: 7000
 							});
 							$('#edit_po').prop('disabled',false);
 						}
@@ -417,10 +405,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -429,10 +414,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -441,10 +423,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -488,10 +467,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -500,10 +476,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -512,10 +485,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -562,10 +532,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							// window.location.href = base_url + active_controller+'/material_purchase';
 							$("#head_title2").html("<b>EDIT MATERIAL PURCHASE ["+data.no_po+"]</b>");
@@ -577,10 +544,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -589,10 +553,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -635,10 +596,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -647,10 +605,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -659,10 +614,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -749,19 +701,6 @@ $this->load->view('include/side_menu');
 			"autoWidth": false,
 			"destroy": true,
 			"responsive": true,
-			"oLanguage": {
-				"sSearch": "<b>Live Search : </b>",
-				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-				"sInfoFiltered": "(filtered from _MAX_ total entries)",
-				"sZeroRecords": "No matching records found",
-				"sEmptyTable": "No data available in table",
-				"sLoadingRecords": "Please wait - loading...",
-				"oPaginate": {
-					"sPrevious": "Prev",
-					"sNext": "Next"
-				}
-			},
 			"aaSorting": [[ 1, "asc" ]],
 			"columnDefs": [ {
 				"targets": 'no-sort',
@@ -794,19 +733,6 @@ $this->load->view('include/side_menu');
 			"autoWidth": false,
 			"destroy": true,
 			"responsive": true,
-			"oLanguage": {
-				"sSearch": "<b>Live Search : </b>",
-				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-				"sInfoFiltered": "(filtered from _MAX_ total entries)",
-				"sZeroRecords": "No matching records found",
-				"sEmptyTable": "No data available in table",
-				"sLoadingRecords": "Please wait - loading...",
-				"oPaginate": {
-					"sPrevious": "Prev",
-					"sNext": "Next"
-				}
-			},
 			"aaSorting": [[ 1, "asc" ]],
 			"columnDefs": [ {
 				"targets": 'no-sort',

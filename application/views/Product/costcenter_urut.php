@@ -35,7 +35,7 @@ $this->load->view('include/side_menu');
 								echo "<option value='0'>Select Costcenter</option>";
 								foreach($product AS $val => $valx){
 									$sel = ($valx2['costcenter'] == $valx['id'])?'selected':'';
-									echo "<option value='".$valx['id']."' ".$sel.">".strtoupper($valx['name'])."</option>";
+									echo "<option value='".$valx['id']."' ".$sel.">".strtoupper($valx['nm_costcenter'])."</option>";
 								}
 								echo "</select>";
 							echo "</td>";

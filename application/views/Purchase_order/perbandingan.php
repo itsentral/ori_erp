@@ -14,16 +14,16 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center">No</th>
+					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">Suppier</th>
-					<th class="text-center">Material Name</th>
-					<th class="text-center">Price Ref. ($)</th>
-					<th class="text-center">Total Req. (Kg)</th>
-					<th class="text-center">Create By</th>
-					<th class="text-center">Created Date</th>
-					<th class="text-center">Status</th>
-					<th class="text-center" width='170px'>Option</th>
+					<th class="text-center no-sort">Material Name</th>
+					<!-- <th class="text-center">Price Ref. ($)</th>
+					<th class="text-center">Total Req. (Kg)</th> -->
+					<th class="text-center no-sort">Create By</th>
+					<th class="text-center no-sort">Created Date</th>
+					<th class="text-center no-sort">Status</th>
+					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -76,10 +76,7 @@ $this->load->view('include/side_menu');
 				  title				: "Error Message !",
 				  text				: 'Connection Timed Out ...',
 				  type				: "warning",
-				  timer				: 5000,
-				  showCancelButton	: false,
-				  showConfirmButton	: false,
-				  allowOutsideClick	: false
+				  timer				: 5000
 				});
 			}
 		});
@@ -136,10 +133,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -148,10 +142,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -160,10 +151,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -206,10 +194,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/material_purchase';
 						}
@@ -218,10 +203,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -230,10 +212,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -277,10 +256,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/perbandingan';
 						}
@@ -289,10 +265,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -301,10 +274,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -351,10 +321,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							// window.location.href = base_url + active_controller+'/material_purchase';
 							$("#head_title2").html("<b>EDIT MATERIAL PURCHASE ["+data.no_po+"]</b>");
@@ -366,10 +333,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -378,10 +342,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
