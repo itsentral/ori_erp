@@ -3201,4 +3201,23 @@ class Purchase_order_model extends CI_Model {
 			}
 			echo json_encode($Arr_Data);
 	}
+
+	public function index_purchase_order_ap(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Pembelian Material >> List AP ',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+		history('View AP');
+		$this->load->view('Purchase_order/purchase_order_ap',$data);
+	}
 }

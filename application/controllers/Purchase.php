@@ -1278,4 +1278,8 @@ class Purchase extends CI_Controller {
 		);
 		echo json_encode($param);
 	}
+
+	public function purchase_order_ap(){
+		$this->purchase_order_model->index_purchase_order_ap();
+	}
 }
