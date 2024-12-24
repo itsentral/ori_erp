@@ -385,8 +385,6 @@ class Penagihan extends CI_Controller {
 		$material	= $this->db->where_in('no_ipp',$in_ipp)->get_where('billing_so_add',array('category'=>'mat'))->result_array();
 
 		$getTanki	= $this->db->order_by('id_milik','asc')->where_in('no_ipp',$in_ipp)->get(DBTANKI.'.billing_product')->result_array();
-        print_r($getTanki);
-		exit;
 
 		$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 		
