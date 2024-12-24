@@ -58,10 +58,10 @@
 
                 $TOTAL_REQ += $qty_req;
                 $TOTAL_OUT += $qty_out;
-
-                $code_group = (!empty($GET_ACCESSORIES[$valx['id_material']]['code_group']))?$GET_ACCESSORIES[$valx['id_material']]['code_group']:0;
-                $nm_material = get_name_acc($valx['id_material']);
-                $material = get_name('accessories','material','id',$valx['id_material']);
+                $id_material = (!empty($valx['id_material2']))?$valx['id_material2']:$valx['id_material'];
+                $code_group = (!empty($GET_ACCESSORIES[$id_material]['code_group']))?$GET_ACCESSORIES[$id_material]['code_group']:0;
+                $nm_material = get_name_acc($id_material);
+                $material = get_name('accessories','material','id',$id_material);
                 if($tanda == 'X'){
                     $code_group = $valx['code_group'];
                     $nm_material = get_name_by_code_group($valx['code_group']);
@@ -72,7 +72,7 @@
                 echo "<tr>";
                     echo "<td align='center'>".$No."
                             <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>
-                            <input type='hidden' name='add[".$No."][id_material]' value='".$valx['id_material']."'>
+                            <input type='hidden' name='add[".$No."][id_material]' value='".$id_material."'>
                             <input type='hidden' name='add[".$No."][no_ipp]' value='".$valx['no_ipp']."'>
                             <input type='hidden' name='add[".$No."][id_customer]' value='".$valx['id_customer']."'>
                             <input type='hidden' name='add[".$No."][code_group]' value='".$code_group."'>
