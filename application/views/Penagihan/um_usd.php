@@ -30,9 +30,9 @@ foreach($getTanki AS $val => $valx){
 
 $grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP + $SUM_TANKI, 2);
 $total_so=$grand_total;
-if(isset($penagihan[0]->total_invoice)){
-	$grand_total = round($penagihan[0]->total_invoice, 2);
-}
+//if(isset($penagihan[0]->total_invoice)){
+//	$grand_total = round($penagihan[0]->total_invoice, 2);
+//}
 ?>
 <input type="hidden" id="total_so" name="total_so" value="<?=$total_so;?>" >
 			<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
