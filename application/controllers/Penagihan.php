@@ -393,6 +393,7 @@ class Penagihan extends CI_Controller {
 		}else{
 			$get_kurs	= $this->db->select("(kurs_jual) AS kurs, persentase AS uang_muka_persen, '0' AS uang_muka_persen2")->where("id",$id)->get("penagihan")->result();
 		}
+        
 
 		$approval	= $this->uri->segment(4);
 		$data = array(
@@ -6178,8 +6179,8 @@ if($base_cur=='USD'){
 				'in_so'			=> implode(',',$in_so),
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
-				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $get_kurs[0]->uang_muka_persen,
+				'kurs'			=> (!empty($get_kurs))?$get_kurs[0]->kurs:0,
+				'uang_muka_persen'	=> (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0,
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> 0,
 				'down_payment2'	=> 0,

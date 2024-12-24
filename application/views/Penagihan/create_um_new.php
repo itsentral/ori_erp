@@ -398,7 +398,7 @@ if(isset($approval)){
 
 		let dataIni	  = getNum($('#um_persen').val());		
 		let dataPpn		= $('#ppnselect').val();
-		let total_so	= $("#total_plan").val();
+		let total_so	= $("#total_so").val();
 		let grandtotal= total_so * (dataIni/100);
 
 		$(".grand_total").val(number_format(grandtotal,2));
