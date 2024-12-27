@@ -1205,7 +1205,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$sheet->setTitle($Title);
 		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5          
-		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		ob_end_clean();
 		//sesuaikan headernya 
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
