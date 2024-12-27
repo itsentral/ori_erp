@@ -371,9 +371,10 @@ class Request_aksesoris_gudang extends CI_Controller {
                                         ->result_array();
 				if($tandaTanki == 'IPPT'){
 					$result_aksesoris   = $this->db
-											->select('c.id_material as code_group, c.id as id_material, b.berat AS qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
+											->select('c.id_material as code_group, c.id as id_material, d.id_material as code_group2, d.id as id_material2, b.berat AS qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
 											->join('planning_tanki_detail b','a.id_milik=b.id')
 											->join('accessories c','b.id_material=c.id_acc_tanki','left')
+											->join('accessories d','b.id_material=d.id','left')
 											->get_where('request_accessories a',array('a.kode'=>$kode))
 											->result_array();
 				}
@@ -419,15 +420,33 @@ class Request_aksesoris_gudang extends CI_Controller {
 		$Jum_Beda		= count($Split_Beda);
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 
-        $result_aksesoris   = $this->db
-                                        ->select('b.id_material2 AS id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, b.berat, b.category, a.no_ipp, a.created_date')
+        $getDetail = $this->db->get_where('request_accessories',array('kode'=>$kode))->result_array();
+			$no_ipp = $getDetail[0]['no_ipp'];
+			$tandaTanki = substr($no_ipp,0,4);
+
+			$tanda	= substr($kode,0,1);
+			if($tanda == 'P'){
+				$result_aksesoris   = $this->db
+                                        ->select('b.id_material2 AS id_material, b.qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
                                         ->join('so_acc_and_mat b','a.id_milik=b.id')
                                         ->get_where('request_accessories a',array('a.kode'=>$kode))
                                         ->result_array();
+				if($tandaTanki == 'IPPT'){
+					$result_aksesoris   = $this->db
+											->select('c.id_material as code_group, c.id as id_material, d.id_material as code_group2, d.id as id_material2, b.berat AS qty, a.qty_request, a.qty_out, a.id, b.satuan, a.no_ipp, a.id_customer')
+											->join('planning_tanki_detail b','a.id_milik=b.id')
+											->join('accessories c','b.id_material=c.id_acc_tanki','left')
+											->join('accessories d','b.id_material=d.id','left')
+											->get_where('request_accessories a',array('a.kode'=>$kode))
+											->result_array();
+				}
+			}
 		
 		$data = array(
 			'Nama_Beda' => $Nama_Beda,
 			'printby' => $printby,
+			'tandaTanki' 		=> $tandaTanki,
+			'GET_ACCESSORIES' 	=> get_detail_accessories(),
 			'result_aksesoris' => $result_aksesoris,
 			'kode' => $kode
 		);

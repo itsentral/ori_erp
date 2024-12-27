@@ -74,11 +74,21 @@ $NO_SO  = (!empty($GET_SO[$NO_IPP]['so_number']))?$GET_SO[$NO_IPP]['so_number']:
 
             $qty_req = $valx['qty_request'];
             $qty_out = $valx['qty_out'];
+
+			$id_material = (!empty($valx['id_material2']))?$valx['id_material2']:$valx['id_material'];
+			$code_group = (!empty($GET_ACCESSORIES[$id_material]['code_group']))?$GET_ACCESSORIES[$id_material]['code_group']:0;
+			$nm_material = get_name_acc($id_material);
+			$material = get_name('accessories','material','id',$id_material);
+			if($tanda == 'X'){
+				$code_group = $valx['code_group'];
+				$nm_material = get_name_by_code_group($valx['code_group']);
+				$material = get_name('con_nonmat_new','material_name','code_group',$code_group);
+			}
 			
 			echo "<tr>";
 				echo "<td align='center'>".$No."</td>";
-				echo "<td>".get_name_acc($valx['id_material'])."</td>";
-				echo "<td>".strtoupper(get_name('accessories','material','id',$valx['id_material']))."</td>";
+				echo "<td>".$nm_material."</td>";
+				echo "<td>".$material."</td>";
 				echo "<td align='center'>".number_format($qty,2)."</td>";
 		}
 		?>
