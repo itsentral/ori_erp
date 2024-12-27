@@ -1099,13 +1099,13 @@ class Warehouse_stock_tras extends CI_Controller {
 						
 					}
 					
-					$Total_Temp = $Harga_Temp * $Qty_Temp;
+					$Total_Temp = $Harga_HPP * $Qty_Temp;
 					
 					unset($Temp_Compare[$Code_UnitFind]);
 				}
 				
-				$Selisih_Qty		= $Qty_Akhir - $Qty_Akhir; //$Qty_Akhir - $Qty_Temp;
-				$Selisih_Total		= $SaldoAkhir_HPP - $SaldoAkhir_HPP; //$SaldoAkhir_HPP - $Total_Temp;
+				$Selisih_Qty		= $Qty_Akhir - $Qty_Temp; //$Qty_Akhir - $Qty_Temp;
+				$Selisih_Total		= $SaldoAkhir_HPP - $Total_Temp; //$SaldoAkhir_HPP - $Total_Temp;
 				
 				$Fix_Style			= $styleArray2;
 				if($Selisih_Qty > 0 || $Selisih_Qty < 0  || $Selisih_Total > 0 || $Selisih_Total < 0){
@@ -1214,7 +1214,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="Report_Stock_Material_Tras_vs_Stock'.date('YmdHis').'.xls"');
+		header('Content-Disposition: attachment;filename="Report_Stock_Material_Tras_vs_Stock'.date('YmdHis').'.xlsx"');
 		//unduh file
 		$objWriter->save("php://output");
 		exit;
