@@ -3146,7 +3146,7 @@ class Warehouse extends CI_Controller {
 		$spk 			= $data['no_spk'];
 		$category_mat 	= $data['category_mat'];
 		$no_ipp 		= $data['no_ipp'];
-		$get_detail 	= $this->db->get_where('production_detail',array('no_spk'=>$spk))->result();
+		$get_detail 	= $this->db->get_where('production_detail',array('no_spk'=>$spk,'id_produksi'=>'PRO-'.$no_ipp))->result();
 		if(empty($get_detail)){
 			$Arr_Kembali    = array(
 				'pesan'        =>'SPK belum masuk produksi !!!',
@@ -3170,7 +3170,7 @@ class Warehouse extends CI_Controller {
 								->order_by('b.nm_material','asc')
 								->where_in('b.id_category',$WHEREIN)
 								->join('raw_materials b','a.id_material=b.id_material','left')
-								->get_where('est_material_tanki a',array('a.id_det'=>$id_milik,'a.id_material !='=>'MTL-1903000'))->result_array();
+								->get_where('est_material_tanki a',array('a.id_det'=>$id_milik,'a.id_material !='=>'MTL-1903000','a.no_ipp'=>$no_ipp))->result_array();
 		
 		$HTML = '';
 		if(!empty($get_material)){
