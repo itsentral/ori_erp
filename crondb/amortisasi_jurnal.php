@@ -4,11 +4,11 @@ include_once 'function_connect.php';
 
 $db1 			= new database_ORI();
 $koneksi 		= $db1->connect();
-define('DBACC', 'gl_ori_dummy');
+define('DBACC', 'gl');
 
 //cek if end of month
 $tanggal_exe=date("Y-m-t");
-//if(date("Y-m-d")!=$tanggal_exe) die("Bukan akhir bulan");
+if(date("Y-m-d")!=$tanggal_exe) die("Bukan akhir bulan");
 
 $bulan=date("m");
 $tahun=date("Y");
@@ -61,7 +61,7 @@ if(!empty($ArrJurnal)){
 	$bulan_Proses	= date('Y',strtotime($payment_date));
 	$Urut			= 1;
 	$Pros_Cab		= $koneksi->query("SELECT subcab,nomorJC FROM ".DBACC.".pastibisa_tb_cabang WHERE nocab='".$Cabang."' limit 1");
-	$det_Cab		= $Pros_Cab->fetch_array(MYSQLI_ASSOC);
+	$det_Cab		= $Pros_Cab->fetch_array(MYSQLI_ASSOC); 
 	if($det_Cab){
 		$nocab		= $det_Cab['subcab'];
 		$Urut		= intval($det_Cab['nomorJC']) + 1;
@@ -77,22 +77,23 @@ if(!empty($ArrJurnal)){
 	$DtJurnal = array();
 	while($rowjurnal  = $Q_Detail->fetch_array(MYSQLI_ASSOC))
 	$DtJurnal[] = $rowjurnal;
-
+       $total = 0;
 	foreach($DtJurnal AS $keys => $vals){
+		
+		$total += $vals["kredit"];
 		$sqlinsert="insert into ".DBACC.".jurnal (nomor, tipe, tanggal, no_reff, no_perkiraan, keterangan, debet, kredit )
 		VALUE 
 		('".$Nomor_JV."','JV','".$payment_date."','".$vals["no_request"]."','".$vals["no_perkiraan"]."','".$vals["keterangan"]."','".$vals["debet"]."','".$vals["kredit"]."')";
 		$koneksi->query($sqlinsert);
 	}
 
-	$sqlinsert="insert into ".DBACC.".javh (nomor, tgl, jml, kdcab, jenis, keterangan, bulan, tahun, user_id, ho_valid )
+	$sqlinsert2="insert into ".DBACC.".javh (nomor, tgl, jml, kdcab, jenis, keterangan, bulan, tahun,memo, user_id, ho_valid )
 	VALUE 
-	('".$Nomor_JV."','".$payment_date."','".$total."','101','JV','Amortisasi ".$Bln." - ".$Thn."','".$Bln."','".$Thn."','system','')";
-	$koneksi->query($sqlinsert);
+	('".$Nomor_JV."','".$payment_date."','".$total."','101','JV','Amortisasi ".$Bln." - ".$Thn."','".$Bln."','".$Thn."','memo','system','')";
+	$koneksi->query($sqlinsert2);
 	
 	$koneksi->query("update jurnaltras set stspos='1'  WHERE jenis_jurnal='".$jenis_jurnal."' and nomor='".$nomor_jurnal."'");
 
-//		
 
 }
 
