@@ -135,9 +135,7 @@
 				}
 			}
 			$spesifikasi='';
-			$get_bqHead = $this->db->get_where('tanki.bq_detail_header', array('no_ipp'=>$valx['no_ipp'],'category'=>'frp'))->result();
-			print_r($get_bqHead);
-			exit;
+			$get_bqHead = $this->db->get_where('tanki.bq_detail_header', array('no_ipp'=>$valx['no_ipp'],'category'=>'frp'))->result_array();
 			if(!empty($get_bqHead))  {
 				$spesifikasi=number_format($get_bqHead[0]['length']).' X '
 				.number_format($get_bqHead[0]['wide']).' X '
