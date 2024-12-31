@@ -135,7 +135,7 @@
 				}
 			}
 			$spesifikasi='';
-			$get_bqHead = $this->db->get_where('bq_detail_header', array('no_ipp'=>$value['no_ipp'],'category'=>'frp'))->result();
+			$get_bqHead = $this->db->get_where('bq_detail_header', array('no_ipp'=>$valx['no_ipp'],'category'=>'frp'))->result();
 			if(!empty($get_bqHead))  {
 				$spesifikasi=number_format($get_bqHead[0]['length']).' X '.number_format($get_bqHead[0]['wide']).' X '.number_format($get_bqHead[0]['high']);
 			}
