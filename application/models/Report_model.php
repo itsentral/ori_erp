@@ -1141,23 +1141,21 @@ class Report_model extends CI_Model {
             }
             
 			
-				$total  =	$row['kredit'];
+				$hutang  =	$row['kredit'];
 				$dp     =	0;
 				$unbill =	0;
 				$bayar  =	$row['debet'];
-				$hutang =	$total - $bayar;
+				$saldo =	$total - $bayar;
 				
 			 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_reff']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['id_supplier']."</div>";
-			$nestedData[]	= "<div align='right'>".$row['nama_supplier']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($total,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($dp,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($unbill,2)."</div>";
+			$nestedData[]	= "<div align='left'>".$row['nama_supplier']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($hutang,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($bayar,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($saldo,2)."</div>";
 			
 			$data[] = $nestedData;
             $urut1++;

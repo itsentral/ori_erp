@@ -16,13 +16,12 @@ $this->load->view('include/side_menu');
 				<tr class='bg-blue'>
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
-					<th class="text-center">Suppier</th>
-                    <th class="text-center">Mata Uang</th>
-					<th class="text-center">Total PO</th>
-					<th class="text-center">DP</th>
-					<th class="text-center">UNBILL</th>
-                    <th class="text-center">HUTANG</th>
-					<th class="text-center">BAYAR</th>
+					<th class="text-center">Id Supplier</th>
+                    <th class="text-center">Nama Supplier</th>
+					<th class="text-center">Hutang</th>
+                    <th class="text-center">Bayar</th>
+					<th class="text-center">Saldo</th>
+					
 				</tr>
 			</thead>
 			<tbody></tbody>
