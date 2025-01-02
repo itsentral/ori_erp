@@ -1140,25 +1140,19 @@ class Report_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
             
-			if($row['mata_uang']=='IDR'){
-			   $total  =	$row['total_price'];
-			   $dp     =	$row['nilai_dp'];
-			   $unbill =	$row['total_terima_barang_idr'];
-			   $hutang =	$row['sisa_hutang_idr'];
-			   $bayar  =	$row['bayar_idr'];
-			}
-			else{
-				$total  =	$row['total_price'];
-				$dp     =	$row['nilai_dp'];
-				$unbill =	$row['nilai_terima_barang_kurs'];
-				$hutang =	$row['sisa_hutang_kurs'];
-				$bayar  =	$row['bayar_kurs'];
-			 }
+			
+				$total  =	$row['kredit'];
+				$dp     =	0;
+				$unbill =	0;
+				$bayar  =	$row['debet'];
+				$hutang =	$total - $bayar;
+				
+			 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
-			$nestedData[]	= "<div align='right'>".$row['mata_uang']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_reff']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['id_supplier']."</div>";
+			$nestedData[]	= "<div align='right'>".$row['nama_supplier']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($total,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($dp,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($unbill,2)."</div>";
@@ -1184,20 +1178,15 @@ class Report_model extends CI_Model {
 
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
-					a.*,
-					GROUP_CONCAT(DISTINCT a.nm_supplier ORDER BY b.id ASC SEPARATOR '<br>') AS nm_supplier,
-					GROUP_CONCAT(CONCAT(b.nm_material,', <b>(',b.qty_purchase,')</b>') ORDER BY b.id ASC SEPARATOR '<br>') AS nm_barang_group
-				FROM
-					tran_material_po_detail b
-					LEFT JOIN tran_material_po_header a ON a.no_po = b.no_po,
+					a.*	FROM
+					tr_kartu_hutang a
 					(SELECT @row:=0) r
-				WHERE 1=1 AND a.deleted = 'N' AND a.repeat_po IS NULL AND a.status_id = '1'
+				WHERE 1=1 
 				AND (
-					a.no_po LIKE '%".$this->db->escape_like_str($like_value)."%'
+					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
-				GROUP BY b.no_po
+				GROUP BY a.no_reff
 			";
 		// echo $sql; exit;
 
@@ -1205,11 +1194,11 @@ class Report_model extends CI_Model {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'no_po',
-			2 => 'nm_supplier'
+			1 => 'no_reff',
+			2 => 'nama_supplier'
 		);
 
-		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.tanggal DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
