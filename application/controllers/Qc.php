@@ -4385,7 +4385,7 @@ class Qc extends CI_Controller
 				$coa_foh 		='5101-05-01';
 				$coa_consumable ='5101-02-01';
 				
-				$coacogs 		='5104-01-01';
+				$coacogs 		='5103-01-01';
 				$coafg   		='1103-04-01';
                 				
 				
