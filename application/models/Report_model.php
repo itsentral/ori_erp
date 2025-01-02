@@ -1176,7 +1176,7 @@ class Report_model extends CI_Model {
 
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
-					a.*	FROM
+					a.sum(kredit) as kredit, a.sum(debet) as debet, a.id_supplier, a.nama_supplier	FROM
 					tr_kartu_hutang a
 				WHERE 1=1 
 				AND(
