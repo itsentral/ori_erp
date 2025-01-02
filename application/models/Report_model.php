@@ -1145,7 +1145,7 @@ class Report_model extends CI_Model {
 				$dp     =	0;
 				$unbill =	0;
 				$bayar  =	$row['debet'];
-				$saldo =	$total - $bayar;
+				$saldo =	$hutang - $bayar;
 				
 			 
 			$nestedData 	= array();
