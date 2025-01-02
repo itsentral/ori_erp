@@ -439,5 +439,13 @@ class Report extends CI_Controller {
 		echo json_encode($Arr_Kembali);
 	}
 
+	public function hutangidr(){
+		$this->report_model->index_hutangidr();
+	}
+
+	public function server_side_hutangidr(){
+		$this->report_model->get_data_json_hutangidr();
+	}
+
 }
 ?>
