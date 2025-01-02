@@ -985,12 +985,18 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Qty');
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
+		
 		$Mulai_Next++;
 		$Col_Name	= getColsChar($Mulai_Next);
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Saldo Awal');
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
 
-		
+		$Mulai_Next++;
+		$Col_Name	= getColsChar($Mulai_Next);
+		$sheet->setCellValue($Col_Name.$NextRow2, 'Transaksi');
+		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
+
+				
 		$Mulai_Next++;
 		$Col_Name	= getColsChar($Mulai_Next);
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Harga');
@@ -1118,7 +1124,7 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Akhir,$SaldoAwal_HPP,$Harga_HPP,$SaldoAkhir_HPP,$Qty_Temp,$Harga_HPP,$Total_Temp,$Selisih_Qty,$Selisih_Total);
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Akhir,$SaldoAwal_HPP,$Total_Trans,$Harga_HPP,$SaldoAkhir_HPP,$Qty_Temp,$Harga_HPP,$Total_Temp,$Selisih_Qty,$Selisih_Total);
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
