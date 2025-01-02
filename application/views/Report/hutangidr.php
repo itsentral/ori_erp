@@ -60,7 +60,7 @@ $this->load->view('include/side_menu');
 			}], 
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 10,
-			"aLengthMenu": [[10, 20, 50, 100, 150, 'All'], [10, 20, 50, 100, 150, 'All']],
+			"aLengthMenu": [[10, 20, 50, 100, 15000], [10, 20, 50, 100, 15000]],
 			"ajax":{
 				url : base_url + active_controller+'/server_side_hutangidr',
 				type: "post",
