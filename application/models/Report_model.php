@@ -1178,7 +1178,7 @@ class Report_model extends CI_Model {
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
 					tr_kartu_hutang a
-				WHERE 1=1 
+				WHERE 1=1 AND a.no_perkiraan='2101-01-01'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.id_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
