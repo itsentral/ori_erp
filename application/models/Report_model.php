@@ -1181,7 +1181,7 @@ class Report_model extends CI_Model {
 					a.*	FROM
 					tr_kartu_hutang a
 				WHERE 1=1 
-				AND AND (
+				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.id_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.nama_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
