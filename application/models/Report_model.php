@@ -1151,7 +1151,7 @@ class Report_model extends CI_Model {
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_reff']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['id_supplier']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['tanggal']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nama_supplier']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($hutang,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($bayar,2)."</div>";
@@ -1176,7 +1176,7 @@ class Report_model extends CI_Model {
 
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
-					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier	FROM
+					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
 					tr_kartu_hutang a
 				WHERE 1=1 
 				AND(
