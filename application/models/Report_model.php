@@ -1184,10 +1184,9 @@ class Report_model extends CI_Model {
 				WHERE 1=1 
 				AND (
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.nama_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
-				GROUP BY a.no_reff
-			";
+				GROUP BY a.no_reff ";
 		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
