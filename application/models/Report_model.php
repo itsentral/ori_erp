@@ -1307,7 +1307,7 @@ class Report_model extends CI_Model {
 					OR a.id_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.nama_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
-				ORDER BY a.tanggal ASC GROUP BY a.no_reff ";
+				GROUP BY a.no_reff ";
 		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
