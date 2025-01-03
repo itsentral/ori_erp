@@ -1273,12 +1273,12 @@ class Report_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_reff']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['tanggal']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nama_supplier']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($hutang,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($bayar,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($saldo,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($hutangusd,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($bayarusd,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($saldousd,2)."</div>";
+			$nestedData[]	= "<div align='right'>".$hutang."</div>";
+			$nestedData[]	= "<div align='right'>"$bayar."</div>";
+			$nestedData[]	= "<div align='right'>".$saldo."</div>";
+			$nestedData[]	= "<div align='right'>".$hutangusd."</div>";
+			$nestedData[]	= "<div align='right'>".$bayarusd."</div>";
+			$nestedData[]	= "<div align='right'>".$saldousd."</div>";
 			
 			$data[] = $nestedData;
             $urut1++;
