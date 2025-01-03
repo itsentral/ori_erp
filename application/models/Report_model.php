@@ -1274,7 +1274,7 @@ class Report_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".$row['tanggal']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nama_supplier']."</div>";
 			$nestedData[]	= "<div align='right'>".$hutang."</div>";
-			$nestedData[]	= "<div align='right'>"$bayar."</div>";
+			$nestedData[]	= "<div align='right'>".$bayar."</div>";
 			$nestedData[]	= "<div align='right'>".$saldo."</div>";
 			$nestedData[]	= "<div align='right'>".$hutangusd."</div>";
 			$nestedData[]	= "<div align='right'>".$bayarusd."</div>";
