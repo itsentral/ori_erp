@@ -447,5 +447,14 @@ class Report extends CI_Controller {
 		$this->report_model->get_data_json_hutangidr();
 	}
 
+	public function hutangusd(){
+		$this->report_model->index_hutangusd();
+	}
+
+	public function server_side_hutangusd(){
+		$this->report_model->get_data_json_hutangusd();
+	}
+
+
 }
 ?>
