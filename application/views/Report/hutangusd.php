@@ -64,6 +64,9 @@ $this->load->view('include/side_menu');
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 15000], [10, 20, 50, 100, 15000]],
+			"topStart": {
+            "buttons": ['copy', 'csv', 'excel', 'pdf', 'print']
+       		 },
 			"ajax":{
 				url : base_url + active_controller+'/server_side_hutangusd',
 				type: "post",
