@@ -1261,10 +1261,10 @@ class Report_model extends CI_Model {
 				$bayar  =	$row['debet'];
 				$saldo =	$hutang - $bayar;
 
-				$hutangusd  =	$row['kreditusd'];
+				$hutangusd  =	$row['kredit_usd'];
 				$dpusd     =	0;
 				$unbillusd =	0;
-				$bayarusd  =	$row['debetusd'];
+				$bayarusd  =	$row['debet_usd'];
 				$saldousd =	$hutangusd - $bayarusd;
 				
 			 
