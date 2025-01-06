@@ -5342,7 +5342,7 @@ class Delivery extends CI_Controller
 					}
 					
 					$id_milik 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_milik'] : 0;
-					$id_material 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_material'] : $GET_DETAIL[0]['id_material2'];
+					$id_material 	= (!empty($GET_DETAIL[0]['id_material'])) ? $GET_DETAIL[0]['id_material'] : $GET_DETAIL[0]['id_material2'];
 					$no_ipp 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['no_ipp'] : 0;
 					$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:0;
 					$qty_delivery 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['qty_delivery'] : 0;
