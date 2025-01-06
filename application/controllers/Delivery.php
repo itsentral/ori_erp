@@ -5327,7 +5327,7 @@ class Delivery extends CI_Controller
 						$GET_DETAIL 	= $this->db
 						->select('a.*, c.id as id_material')
 						->join('planning_tanki_detail b','a.id_milik=b.id')
-						->join('accessories c','b.id_material=c.id_acc_tanki')
+						->join('accessories c','b.id_material=c.id')
 						->get_where('request_accessories a', array('a.id'=>$ID_UNIQ))->result_array();
 					}
 					else{
