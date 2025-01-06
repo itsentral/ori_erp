@@ -875,9 +875,13 @@ class Mutation extends CI_Controller {
 					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
 					
 									
+					$Price_1 = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2));
+					$Price_2 = ($QTY_OKE+$stokjurnalakhir2);
 					
-					
-					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+					$PRICENEW = 0;
+					if($Price_1 > 0 AND $Price_2 > 0){
+						$PRICENEW = $Price_1 / $Price_2;
+					}
 					
 					
 					$ArrJurnalNew2[$key]['id_material'] 		= $rest_pusat[0]->id_material;
