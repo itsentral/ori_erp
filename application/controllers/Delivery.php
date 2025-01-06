@@ -5264,6 +5264,7 @@ class Delivery extends CI_Controller
                     OR c.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR c.project LIKE '%".$this->db->escape_like_str($like_value)."%'
                     OR e.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
+                    OR x.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                 )
             GROUP BY a.id
 		";
