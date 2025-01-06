@@ -5192,7 +5192,8 @@ class Delivery extends CI_Controller
 				$nestedData[]	= "<div align='center'>".$row['so_number_tanki']."</div>";
 				$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer_tanki'])."</div>";
 				$nestedData[]	= "<div align='left'>".strtoupper($row['project_tanki'])."</div>";
-				$nestedData[]	= "<div align='left'>".get_name_acc($row['id_material_tanki'])."</div>";
+				$id_material_tanki = (!empty($row['id_material_tanki']))?$row['id_material_tanki']:$row['id_material_tanki2'];
+				$nestedData[]	= "<div align='left'>".get_name_acc($id_material_tanki)."</div>";
 			}
 			else{
 				$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
@@ -5245,6 +5246,7 @@ class Delivery extends CI_Controller
 				x.project AS project_tanki,
                 d.id_material,
 				z.id AS id_material_tanki,
+				z1.id AS id_material_tanki2,
                 SUM(a.qty_out-a.qty_delivery) AS qty_fg
 			FROM
 				request_accessories a
@@ -5254,7 +5256,8 @@ class Delivery extends CI_Controller
                 LEFT JOIN so_acc_and_mat d ON a.id_milik = d.id
                 LEFT JOIN planning_tanki_detail y ON a.id_milik = y.id
                 LEFT JOIN accessories e ON d.id_material = e.id
-                LEFT JOIN accessories z ON y.id_material = z.id_acc_tanki,
+                LEFT JOIN accessories z ON y.id_material = z.id_acc_tanki
+                LEFT JOIN accessories z1 ON y.id_material = z1.id,
 				(SELECT @row:=0) r
 		    WHERE a.deleted_date IS NULL AND a.qty_out > 0
                 AND (
@@ -5325,9 +5328,10 @@ class Delivery extends CI_Controller
 					$CheckTanki = substr($NoIPP,0,4);
 					if($CheckTanki == 'IPPT'){
 						$GET_DETAIL 	= $this->db
-						->select('a.*, c.id as id_material')
+						->select('a.*, c.id as id_material, d.id as id_material2')
 						->join('planning_tanki_detail b','a.id_milik=b.id')
-						->join('accessories c','b.id_material=c.id_acc_tanki')
+						->join('accessories c','b.id_material=c.id_acc_tanki','left')
+						->join('accessories d','b.id_material=d.id','left')
 						->get_where('request_accessories a', array('a.id'=>$ID_UNIQ))->result_array();
 					}
 					else{
@@ -5338,7 +5342,7 @@ class Delivery extends CI_Controller
 					}
 					
 					$id_milik 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_milik'] : 0;
-					$id_material 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_material'] : 0;
+					$id_material 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['id_material'] : $GET_DETAIL[0]['id_material2'];
 					$no_ipp 		= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['no_ipp'] : 0;
 					$no_so 			= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:0;
 					$qty_delivery 	= (!empty($GET_DETAIL)) ? $GET_DETAIL[0]['qty_delivery'] : 0;
