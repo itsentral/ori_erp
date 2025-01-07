@@ -2930,11 +2930,11 @@ class Jurnal_temp extends CI_Controller {
 		$this->db->trans_start();
 
 		
-		$bulan=date("m");
-		$tahun=date("Y");
+		$bulan=date("11");
+		$tahun=date("2024");
 		
 		$DATE_NOW	= date('Y-m-d');
-		$date    = date('2024-11-25');
+		$date    = '2024-11-25';
 
 		$sqlHeader	= "select * from asset_jurnal_temp WHERE tanggal='".$date."'";
 		$Q_Awal	= $this->db->query($sqlHeader)->result();
@@ -2945,7 +2945,7 @@ class Jurnal_temp extends CI_Controller {
 			$det_Jurnaltes1=array();
 			$jenis_jurnal = 'DEPRESIASI';
 			$nomor_jurnal = $jenis_jurnal . $tahun.$bulan . rand(100, 999);
-			$payment_date=$date;
+			$payment_date== '2024-11-31';
 			foreach($Q_Awal AS $val => $valx){
 				
 
