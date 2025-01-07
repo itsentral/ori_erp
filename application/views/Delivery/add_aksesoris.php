@@ -29,9 +29,9 @@ $this->load->view('include/side_menu');
                 <tr class='bg-blue'>
                     <th class="text-center">#</th>
                     <th class="text-center">No SO</th>
-                    <th class="text-center">No SPK</th>
-                    <th class="text-center">Product</th>
-                    <th class="text-center">Spec</th>
+                    <th class="text-center">Nama Customer</th>
+                    <th class="text-center">Nama Project</th>
+                    <th class="text-center">Item Project</th>
                     <th class="text-center">Qty</th>
                     <th class="text-center">Qty Delivery</th>
                     <!-- <th class="text-center no-sort">#</th> -->
