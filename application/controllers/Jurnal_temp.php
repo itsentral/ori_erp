@@ -2923,4 +2923,90 @@ class Jurnal_temp extends CI_Controller {
 		echo json_encode($Arr_Data);
 	}
 
+	public function saved_jurnal_depresiasi(){
+		$username = 'sam';
+		$datetime = date('Y-m-d H:i:s');
+		
+		$this->db->trans_start();
+
+		
+		$bulan=date("m");
+		$tahun=date("Y");
+		
+		$DATE_NOW	= date('Y-m-d');
+		$date    = date('2024-11-25');
+
+		$sqlHeader	= "select * from asset_jurnal_temp WHERE tanggal='".$date."'";
+		$Q_Awal	= $this->db->query($sqlHeader)->result();
+
+		//echo $sqlHeader."<hr>";
+
+				
+			$det_Jurnaltes1=array();
+			$jenis_jurnal = 'DEPRESIASI';
+			$nomor_jurnal = $jenis_jurnal . $tahun.$bulan . rand(100, 999);
+			$payment_date=$date;
+			foreach($Q_Awal AS $val => $valx){
+				
+
+				$sqlinsert="insert into jurnaltras (nomor, tanggal, tipe, no_perkiraan, keterangan, no_request, debet, kredit, jenis_jurnal)
+				VALUE 
+				('".$nomor_jurnal."','".$payment_date."','JV','".$valx->no_perkiraan."','".$valx->keterangan."','-','".$valx->debet."','".$valx->kredit."','".$valx->tipe."')";
+				$this->db->query($sqlinsert);
+
+		//		echo $sqlinsert.'<hr>';
+
+		   }
+
+			$nocab	= 'A';
+			$Cabang	= '101';
+			$bulan_Proses	= date('Y',strtotime($payment_date));
+			$Urut			= 1;
+			$Pros_Cab		= $this->db->query("SELECT subcab,nomorJC FROM ".DBACC.".pastibisa_tb_cabang WHERE nocab='".$Cabang."' limit 1");
+			$det_Cab		= $Pros_Cab->row();
+			
+			
+			if($det_Cab){
+				$nocab		= $det_Cab ->subcab;
+				$Urut		= intval($det_Cab ->nomorJC) + 1;
+			}
+			$Format			= $Cabang.'-'.$nocab.'JV'.date('y',strtotime($payment_date));
+			$Nomor_JV		= $Format.str_pad($Urut, 5, "0", STR_PAD_LEFT);
+			$this->db->query("UPDATE ".DBACC.".pastibisa_tb_cabang SET nomorJC=(nomorJC + 1),lastupdate='".date("Y-m-d")."' WHERE nocab='".$Cabang."'");
+
+
+			$Bln	= substr($payment_date,5,2);
+			$Thn	= substr($payment_date,0,4);
+			$Q_Detail = "select * from jurnaltras where jenis_jurnal='JV' and stspos='0' and nomor='".$nomor_jurnal."'";
+			$DtJurnal = $this->db->query($Q_Detail)->result();
+			
+            $total = 0;
+			foreach($DtJurnal AS $keys => $vals){
+				$total += $vals->debet;
+			
+				$sqlinsert1="insert into ".DBACC.".jurnal (nomor, tipe, tanggal, no_reff, no_perkiraan, keterangan, debet, kredit )
+				VALUE 
+				('".$Nomor_JV."','JV','".$payment_date."','".$vals->no_request."','".$vals->no_perkiraan."','".$vals->keterangan."','".$vals->debet."','".$vals->kredit."')";
+				$this->db->query($sqlinsert1);
+			}
+
+			$sqlinsert="insert into ".DBACC.".javh (nomor, tgl, jml, kdcab, jenis, keterangan, bulan, tahun, user_id, ho_valid )
+			VALUE 
+			('".$Nomor_JV."','".$payment_date."','".$total."','101','JV','Depresiasi ".$Bln." - ".$Thn."','".$Bln."','".$Thn."','sam','')";
+			$this->db->query($sqlinsert);
+
+		
+		
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+		}
+		
+	
+	 }
+
 }
