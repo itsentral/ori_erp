@@ -2923,7 +2923,7 @@ class Jurnal_temp extends CI_Controller {
 		echo json_encode($Arr_Data);
 	}
 
-	public function saved_jurnal_depresiasi(){
+	public function saved_jurnal_depresiasiX(){
 		$username = 'sam';
 		$datetime = date('Y-m-d H:i:s');
 		
@@ -2945,7 +2945,7 @@ class Jurnal_temp extends CI_Controller {
 			$det_Jurnaltes1=array();
 			$jenis_jurnal = 'DEPRESIASI';
 			$nomor_jurnal = $jenis_jurnal . $tahun.$bulan . rand(100, 999);
-			$payment_date= '2024-11-31';
+			$payment_date= '2024-11-30';
 			foreach($Q_Awal AS $val => $valx){
 				
 
