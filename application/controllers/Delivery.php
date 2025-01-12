@@ -1663,12 +1663,17 @@ class Delivery extends CI_Controller
 
 				$ArrUpdateJoint[$value]['id'] = $id_uniq;
 				$ArrUpdateJoint[$value]['kode_delivery'] = NULL;
-				$ArrUpdateJoint[$value]['proccess_by'] = NULL;
-				$ArrUpdateJoint[$value]['proccess_date'] = NULL;
+				$ArrUpdateJoint[$value]['delivery_by'] = NULL;
+				$ArrUpdateJoint[$value]['delivery_date'] = NULL;
 
-				$ArrDeleteFieldJoint[] = $id_uniq;
+				$ArrDeleteFieldJoint[] = $ID;
 			}
 		}
+
+		// echo "<pre>";
+		// print_r($ArrUpdateJoint);
+		// print_r($ArrDeleteFieldJoint);
+		// exit;
 
 		$ArrUpdateCut = [];
 		if (!empty($data['check_cut'])) {
@@ -1837,9 +1842,9 @@ class Delivery extends CI_Controller
 			$this->db->update_batch('warehouse_adjustment_detail', $ArrUpdateMAT, 'id');
 		}
 
-		// if (!empty($ArrUpdateJoint)) {
-		// 	$this->db->update_batch('request_outgoing', $ArrUpdateJoint, 'id');
-		// }
+		if (!empty($ArrUpdateJoint)) {
+			$this->db->update_batch('outgoing_field_joint', $ArrUpdateJoint, 'id');
+		}
 
 		if (!empty($ArrDelete)) {
 			$this->db->where_in('id', $ArrDelete);
@@ -1848,7 +1853,7 @@ class Delivery extends CI_Controller
 
 		if (!empty($ArrDeleteFieldJoint)) {
 			$this->db->where_in('id', $ArrDeleteFieldJoint);
-			$this->db->delete('outgoing_field_joint');
+			$this->db->delete('delivery_product_detail');
 		}
 
 		$this->db->where('kode_delivery', $kode_delivery);
