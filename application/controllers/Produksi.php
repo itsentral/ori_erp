@@ -12680,6 +12680,7 @@ class Produksi extends CI_Controller {
 			$temp[$UNIQ]['costbook'] 		= $costbook;
 			$temp[$UNIQ]['kurs'] 			= $kurs;
 			$temp[$UNIQ]['total_price'] 	= round($costbook * $berat);
+			$temp[$UNIQ]['total_price_debet'] 	= 0;
 			$temp[$UNIQ]['created_by'] 		= $username;
 			$temp[$UNIQ]['created_date'] 	= $datetime;
 
@@ -12785,11 +12786,13 @@ class Produksi extends CI_Controller {
 
 					$temp2[$UNIQ]['berat'] 		= 0;
 
+					$WIPNmProduct = ($value2 == 'Total')?$value['product']:$value2;
+
 					$temp2[$UNIQ]['tanggal'] 		= date('Y-m-d');
 					$temp2[$UNIQ]['no_ipp'] 		= $value['no_ipp'];
 					$temp2[$UNIQ]['id_pro_det'] 	= $value['id_pro_det'];
 					$temp2[$UNIQ]['id_material'] = NULL;
-					$temp2[$UNIQ]['nm_material'] = 'WIP '.$value2;
+					$temp2[$UNIQ]['nm_material'] = 'WIP '.$WIPNmProduct;
 					$temp2[$UNIQ]['id_spk'] 		= $value['id_spk'];
 					$temp2[$UNIQ]['kode_trans'] 	= $value['kode_trans'];
 					$temp2[$UNIQ]['keterangan']	= "Gudang Produksi to WIP";
@@ -12811,6 +12814,7 @@ class Produksi extends CI_Controller {
 					$foh_consumable = (!empty($getDetailSPK[0]['foh_consumable']))?$getDetailSPK[0]['foh_consumable']:0;
 					
 					$nilai = 0;
+					$nilai2 = 0;
 					if($value2 == 'Direct labour'){
 						$nilai = round($direct_labour*$kurs);
 					}
@@ -12823,14 +12827,16 @@ class Produksi extends CI_Controller {
 					if($value2 == 'FOH'){
 						$nilai = round(($machine + $mould_mandrill + $foh_depresiasi + $biaya_rutin_bulanan + $foh_consumable)*$kurs);
 					}
-					if($value2 == 'Total'){
+					if($value2 == $value['product']){
 						$nilai1 = round(($direct_labour+ $indirect_labour+$consumable + $machine + $mould_mandrill + $foh_depresiasi + $biaya_rutin_bulanan + $foh_consumable)*$kurs);
 						$nilai  = $nilai1;
+						$nilai2 = $nilai1;
 					}					
 					
 					$temp2[$UNIQ]['costbook'] 		= 0;
 					$temp2[$UNIQ]['kurs'] 			= $kurs;
-					$temp2[$UNIQ]['total_price'] 	= $nilai;
+					$temp2[$UNIQ]['total_price'] 		= $nilai;
+					$temp2[$UNIQ]['total_price_debet'] 	= $nilai2;
 					$temp2[$UNIQ]['created_by'] 		= $username;
 					$temp2[$UNIQ]['created_date'] 	= $datetime;
 
@@ -12896,8 +12902,8 @@ class Produksi extends CI_Controller {
 				$ArrGroup[$value]['id_trans'] = $id_trans;
 				
 				$this->db->where('id_trans',$id_trans);
-				$this->db->where('nm_material','WIP Total');
-				$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip)); 
+				$this->db->where('nm_material','WIP '.$getSummary[0]['product']);
+				$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip,'total_price_debet'=>$nilai_wip)); 
 			}
 		}
 
