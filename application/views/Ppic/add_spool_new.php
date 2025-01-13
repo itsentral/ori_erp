@@ -11,7 +11,8 @@ $this->load->view('include/side_menu');
                 <?php
                 foreach($list_ipp as $val => $valx)
                 {
-                    echo "<option value='".$valx['id_produksi']."'>".str_replace('PRO-','',$valx['id_produksi'])."</option>";
+					$EXPLODE = explode('-',$valx['product_code']);
+                    echo "<option value='".$valx['id_produksi']."'>".str_replace('PRO-','',$valx['id_produksi'])."/".$EXPLODE[0]."</option>";
                 }
                 ?>
             </select>

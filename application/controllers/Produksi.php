@@ -10030,6 +10030,12 @@ class Produksi extends CI_Controller {
 		$nomor = 0;
 		$ID_PRODUKSI_DETAIL = [];
 		foreach ($get_detail_spk as $key => $value) {
+			$get_produksi 	= $this->db->limit(1)->select('id')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk'],'upload_date'=>$dateCreated))->result();
+			$id_pro_det		= (!empty($get_produksi[0]->id))?$get_produksi[0]->id:0;
+			
+			if($id_pro_det != 0){
+				$ID_PRODUKSI_DETAIL[] = $id_pro_det;
+			}
 			foreach ($ArrLooping as $valueX) {
 				if(!empty($data[$valueX])){
 					if($valueX == 'detail_liner'){
@@ -10054,12 +10060,7 @@ class Produksi extends CI_Controller {
 						$DETAIL_NAME = 'TOPCOAT';
 					}
 					$detailX = $data[$valueX];
-					$get_produksi 	= $this->db->limit(1)->select('id')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk'],'upload_date'=>$dateCreated))->result();
-					$id_pro_det		= (!empty($get_produksi[0]->id))?$get_produksi[0]->id:0;
 					
-					if($id_pro_det != 0){
-						$ID_PRODUKSI_DETAIL[] = $id_pro_det;
-					}
 					//LINER
 					foreach ($detailX as $key2 => $value2) {
 						//RESIN
@@ -10715,6 +10716,12 @@ class Produksi extends CI_Controller {
 		$nomor = 0;
 		$ID_PRODUKSI_DETAIL = [];
 		foreach ($get_detail_spk as $key => $value) {
+			$get_produksi 	= $this->db->limit(1)->select('id')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk'],'upload_date'=>$dateCreated))->result();
+			$id_pro_det		= (!empty($get_produksi[0]->id))?$get_produksi[0]->id:0;
+			
+			if($id_pro_det != 0){
+				$ID_PRODUKSI_DETAIL[] = $id_pro_det;
+			}
 			foreach ($ArrLooping as $valueX) {
 				if(!empty($data[$valueX])){
 					if($valueX == 'detail_liner'){
@@ -10739,12 +10746,7 @@ class Produksi extends CI_Controller {
 						$DETAIL_WHERE = 'topcoat';
 					}
 					$detailX = $data[$valueX];
-					$get_produksi 	= $this->db->limit(1)->select('id')->get_where('production_detail', array('id_milik'=>$value['id_milik'],'id_produksi'=>'PRO-'.$value['no_ipp'],'kode_spk'=>$value['kode_spk'],'upload_date'=>$dateCreated))->result();
-					$id_pro_det		= (!empty($get_produksi[0]->id))?$get_produksi[0]->id:0;
 					
-					if($id_pro_det != 0){
-						$ID_PRODUKSI_DETAIL[] = $id_pro_det;
-					}
 					//LINER
 					foreach ($detailX as $key2 => $value2) {
 						//RESIN
@@ -11975,7 +11977,7 @@ class Produksi extends CI_Controller {
 
 			foreach ($ARR_ID_PRO_UNIQ as $value) {
 
-				$QUERY_GET = "SELECT
+				$QUERY_GET1 = "(SELECT
 								a.id_produksi AS id_produksi,
 								b.id_category AS id_category,
 								a.id_product AS id_product,
@@ -12002,7 +12004,39 @@ class Produksi extends CI_Controller {
 								cast( a.updated_date AS DATE ),
 								a.id_production_detail 
 							ORDER BY
-								a.updated_date DESC";
+								a.updated_date DESC)";
+
+				$QUERY_GET2 = "(SELECT
+								a.id_produksi AS id_produksi,
+								b.id_category AS id_category,
+								a.id_product AS id_product,
+								b.qty_awal AS product_ke,
+								b.qty_akhir AS qty_akhir,
+								b.qty AS qty,
+								a.status_by AS status_by,
+								a.updated_date AS status_date,
+								a.id_production_detail AS id_production_detail,
+								a.id AS id,
+								a.id_spk AS id_spk,
+								b.id_milik AS id_milik,
+								a.catatan_programmer AS kode_trans
+							FROM
+								(
+									tmp_production_real_detail_plus a
+									LEFT JOIN update_real_list b ON ((
+											a.id_production_detail = b.id 
+										))) 
+								WHERE 
+									a.id_production_detail = '".$value."'
+									AND a.updated_date = '".$valx['updated_date']."'
+							GROUP BY
+								cast( a.updated_date AS DATE ),
+								a.id_production_detail 
+							ORDER BY
+								a.updated_date DESC)";
+				$QUERY_GET = $QUERY_GET1.'UNION'.$QUERY_GET2;
+				// echo $QUERY_GET;
+				// exit;
 				$getData = $this->db->query($QUERY_GET)->result_array();
 				
 				if(!empty($getData)){
@@ -12978,7 +13012,7 @@ class Produksi extends CI_Controller {
 
 			foreach ($ARR_ID_PRO_UNIQ as $value) {
 
-				$QUERY_GET = "SELECT
+				$QUERY_GET1 = "SELECT
 								a.id_produksi AS id_produksi,
 								b.id_category AS id_category,
 								a.id_product AS id_product,
@@ -13006,6 +13040,35 @@ class Produksi extends CI_Controller {
 								a.id_production_detail 
 							ORDER BY
 								a.updated_date DESC";
+				$QUERY_GET2 = "(SELECT
+								a.id_produksi AS id_produksi,
+								b.id_category AS id_category,
+								a.id_product AS id_product,
+								b.qty_awal AS product_ke,
+								b.qty_akhir AS qty_akhir,
+								b.qty AS qty,
+								a.status_by AS status_by,
+								a.updated_date AS status_date,
+								a.id_production_detail AS id_production_detail,
+								a.id AS id,
+								a.id_spk AS id_spk,
+								b.id_milik AS id_milik,
+								a.catatan_programmer AS kode_trans
+							FROM
+								(
+									tmp_production_real_detail_plus a
+									LEFT JOIN update_real_list b ON ((
+											a.id_production_detail = b.id 
+										))) 
+								WHERE 
+									a.id_production_detail = '".$value."'
+									AND a.updated_date = '".$valx['updated_date']."'
+							GROUP BY
+								cast( a.updated_date AS DATE ),
+								a.id_production_detail 
+							ORDER BY
+								a.updated_date DESC)";
+				$QUERY_GET = $QUERY_GET1.'UNION'.$QUERY_GET2;
 				$getData = $this->db->query($QUERY_GET)->result_array();
 				
 				if(!empty($getData)){

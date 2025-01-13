@@ -1420,7 +1420,8 @@ class Ppic extends CI_Controller {
 		$where2 = " AND a.id_produksi NOT IN ".filter_not_in()." ";
 		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 		$data_list = $this->db->query(" SELECT
-                                            a.id_produksi
+                                            a.id_produksi,
+											a.product_code
                                         FROM
                                             production_detail a 
                                         WHERE
@@ -1526,11 +1527,13 @@ class Ppic extends CI_Controller {
 			$nestedData[]	= "<div align='right'>".$LENGTH."</div>";
 			
 			$CUTTING_KE = (!empty($row['cutting_ke']))?'.'.$row['cutting_ke']:'';
+
+			$FG_DATE = (!empty($row['fg_date']))?'<br><i>FG Date: '.date('d-M-Y H:i',strtotime($row['fg_date'])).'</i>':'';
 							
 			$IMPLODE = explode('.', $row['product_code']);
 			$product_code = $IMPLODE[0].'.'.$row['product_ke'].$CUTTING_KE;
 			$nestedData[]	= "<div align='left'>".strtoupper($row['spool_drawing'])."</div>";
-			$nestedData[]	= "<div align='left'>".$product_code."</div>";
+			$nestedData[]	= "<div align='left'>".$product_code.$FG_DATE."</div>";
 			$nestedData[]	= "<div align='center'>".$CHECK."</div>";
 			
 			$data[] = $nestedData;
@@ -2572,10 +2575,85 @@ class Ppic extends CI_Controller {
 			// print_r($ArrIN_WIP_MATERIAL);
 			// print_r($ArrIN_FG_MATERIAL);
 			// exit;
+			//GROUPING
+
+			$ArrIN_WIP_Spool=[];
+			if(!empty($ArrIN_WIP_MATERIAL)){
+				$nilai_wip = 0;
+				$material = 0;
+				$wip_direct = 0;
+				$wip_indirect = 0;
+				$wip_consumable = 0;
+				$wip_foh = 0;
+
+				$no_so = [];
+				$no_spk = [];
+				$no_id_trans = [];
+				foreach ($ArrIN_WIP_MATERIAL as $key => $value) {
+					// if(!empty($value['id_trans']) AND $value['id_trans'] > 0){
+						$nilai_wip += $value['nilai_wip'];
+						$material += $value['material'];
+						$wip_direct += $value['wip_direct'];
+						$wip_indirect += $value['wip_indirect'];
+						$wip_consumable += $value['wip_consumable'];
+						$wip_foh += $value['wip_foh'];
+
+						$no_so[] = $value['no_so'];
+						$no_spk[] = $value['no_spk'];
+						$no_id_trans[] = $value['id_trans'];
+
+						$NmProductSpool = 'Spool '.$kode;
+						$TandaTanki = substr($value['no_so'],0,3);
+						if($TandaTanki=='SOC'){
+							$NmProductSpool = 'Tanki '.$kode;
+						}
+					// }
+				}
+
+				$Implode_noSO = null;
+				if(!empty($no_so)){
+					$Implode_noSO = implode(',',array_unique($no_so));
+				}
+
+				$Implode_noSPK = null;
+				if(!empty($no_spk)){
+					$Implode_noSPK = implode(',',array_unique($no_spk));
+				}
+
+				$Implode_noIDTrans = null;
+				if(!empty($no_id_trans)){
+					$Implode_noIDTrans = implode(',',array_unique($no_id_trans));
+				}
+
+				$ArrIN_WIP_Spool[0]['tanggal'] = date('Y-m-d');
+				$ArrIN_WIP_Spool[0]['keterangan'] = 'Finish Good to WIP (Spool)';
+				$ArrIN_WIP_Spool[0]['no_so'] = $Implode_noSO;
+				$ArrIN_WIP_Spool[0]['product'] = $NmProductSpool;
+				$ArrIN_WIP_Spool[0]['no_spk'] = $Implode_noSPK;
+				$ArrIN_WIP_Spool[0]['kode_trans'] = $kode;
+				$ArrIN_WIP_Spool[0]['id_pro_det'] = null;
+				$ArrIN_WIP_Spool[0]['qty'] = 1;
+				$ArrIN_WIP_Spool[0]['nilai_wip'] = $nilai_wip;
+				$ArrIN_WIP_Spool[0]['material'] = $material;
+				$ArrIN_WIP_Spool[0]['wip_direct'] =  $wip_direct;
+				$ArrIN_WIP_Spool[0]['wip_indirect'] =  $wip_indirect;
+				$ArrIN_WIP_Spool[0]['wip_consumable'] =  $wip_consumable;
+				$ArrIN_WIP_Spool[0]['wip_foh'] =  $wip_foh;
+				$ArrIN_WIP_Spool[0]['created_by'] = $username;
+				$ArrIN_WIP_Spool[0]['created_date'] = $dateTime;
+				$ArrIN_WIP_Spool[0]['id_trans'] =  $Implode_noIDTrans;
+				$ArrIN_WIP_Spool[0]['jenis'] =  'in spool';
+				$ArrIN_WIP_Spool[0]['id_material'] =  null;
+				$ArrIN_WIP_Spool[0]['nm_material'] = null;
+				$ArrIN_WIP_Spool[0]['qty_mat'] =  null;
+				$ArrIN_WIP_Spool[0]['cost_book'] =  null;
+				$ArrIN_WIP_Spool[0]['gudang'] =  null;
+				$ArrIN_WIP_Spool[0]['kode_spool'] =  $kode;
+			}
 
 			$this->db->trans_start();
-				if(!empty($ArrIN_WIP_MATERIAL)){
-					$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+				if(!empty($ArrIN_WIP_Spool)){
+					$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_Spool);
 				}
 
 				if(!empty($ArrIN_FG_MATERIAL)){

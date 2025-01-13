@@ -4582,7 +4582,7 @@ class Qc extends CI_Controller
 			$ArrIN_WIP_MATERIAL[$key]['kode_spool'] =  $kode;
 		}
 
-		$getQCDeadstockModif = $this->db->get_where('data_erp_fg',array('kode_spool'=>$kode,'jenis'=>'out spool'))->result_array();
+		$getQCDeadstockModif = $this->db->get_where('data_erp_wip_group',array('kode_spool'=>$kode,'jenis'=>'in spool'))->result_array();
 		foreach ($getQCDeadstockModif as $key => $value) {
 			$ArrIN_FG_MATERIAL[$key]['tanggal'] = date('Y-m-d');
 			$ArrIN_FG_MATERIAL[$key]['keterangan'] = 'WIP to Finish Good (Spool)';
@@ -4602,9 +4602,8 @@ class Qc extends CI_Controller
 			$ArrIN_FG_MATERIAL[$key]['created_by'] = $username;
 			$ArrIN_FG_MATERIAL[$key]['created_date'] = $dateTime;
 			$ArrIN_FG_MATERIAL[$key]['id_trans'] =  $value['id_trans'];
-			$ArrIN_FG_MATERIAL[$key]['id_pro'] =  $value['id_pro'];
-			$ArrIN_FG_MATERIAL[$key]['qty_ke'] =  $value['qty_ke'];
-			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] =  $value['nilai_unit'];
+			$ArrIN_FG_MATERIAL[$key]['id_pro'] =  null;
+			$ArrIN_FG_MATERIAL[$key]['qty_ke'] =  null;
 			$ArrIN_FG_MATERIAL[$key]['jenis'] =  'in';
 			$ArrIN_FG_MATERIAL[$key]['id_material'] =  $value['id_material'];
 			$ArrIN_FG_MATERIAL[$key]['nm_material'] = $value['nm_material'];
