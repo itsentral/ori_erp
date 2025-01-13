@@ -13213,9 +13213,9 @@ class Produksi extends CI_Controller {
 				$tgl_voucher = $data->tanggal;	
 				$keterangan  = $data->nm_material;
 				$id          = $data->id_trans;
-                $totalwip    =	$data->total_price;				
-				$no_request  = $data->no_spk;	
+                $no_request  = $data->no_spk;	
 				$kredit      = $data->total_price;
+				$totalwip       = $data->total_price_debet;	
 				
 				if($nm_material=='WIP Direct labour'){					
 					$nokir = '2107-01-02' ;
@@ -13225,25 +13225,30 @@ class Produksi extends CI_Controller {
 					$nokir = '2107-01-01' ;				
 				}elseif($nm_material=='WIP FOH'){					
 					$nokir = '2107-01-04' ;
-                }elseif($nm_material=='WIP Total'){	
+                }
+				else{
+					$nokir = '1103-01-03' ;
+				}
+				
+				
+				
+				
+				/*if($nm_material=='WIP Total'){	
     				if($product=='pipe'){
 						$nokir ='1103-03-02';	
 					}else{
 						$nokir ='1103-03-03';	
 					}					
-				}else{
-					$nokir = '1103-01-03' ;
-				}
-				
-							
+				}	*/
+
 			    $debit  = $totalwip;			
 				
-				if($nm_material=='WIP Total'){
+				if($totalwip != 0 ){
 					 $det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
+					  'no_perkiraan'  => '1103-03-02',
 					  'keterangan'    => $keterangan,
 					  'no_reff'       => $id,
 					  'debet'         => $debit,
