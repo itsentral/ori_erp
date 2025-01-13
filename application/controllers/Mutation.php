@@ -312,7 +312,7 @@ class Mutation extends CI_Controller {
 			}
 			
 			$data_Group		= $this->master_model->getArray('groups',array(),'id','name');
-			$gudang         = $this->db->get_where('warehouse',array('status'=>'Y'))->result_array();
+			$gudang         = $this->db->where_in('category',['subgudang','produksi'])->get_where('warehouse',array('status'=>'Y'))->result_array();
 			$data           = $this->db->get_where('warehouse_adjustment',array('kode_trans'=>$kode_trans))->result();
 			$data_detail    = $this->db->get_where('warehouse_adjustment_detail',array('kode_trans'=>$kode_trans))->result_array();
             $material	    = $this->master_model->getDataOrderBy('raw_materials','delete','N','nm_material');
@@ -338,8 +338,9 @@ class Mutation extends CI_Controller {
 		$tandax		= $this->input->post('tandax');
 
 		if($gudang <> '0'){
-			$queryIpp	= "SELECT b.urut2 FROM  warehouse b WHERE b.id = '".$gudang."' LIMIT 1";
+			$queryIpp	= "SELECT b.urut2, b.category FROM  warehouse b WHERE b.id = '".$gudang."' LIMIT 1";
 			$restIpp	= $this->db->query($queryIpp)->result();
+			$category = $restIpp[0]->category;
 
 			if($tandax == 'MOVE'){
 				$whLef = " id != '".$gudang."' AND status = 'Y' ";
@@ -347,8 +348,15 @@ class Mutation extends CI_Controller {
 			else{
 				$whLef = " urut2 > ".$restIpp[0]->urut2;
 			}
+			// echo $category;
+			if($category == 'subgudang'){
+				$WHERE_2 = "AND category='pusat'";
+			}
+			else{
+				$WHERE_2 = "AND category='subgudang'";
+			}
 
-			$query	 	= "SELECT id, kd_gudang, nm_gudang FROM warehouse WHERE ".$whLef." ORDER BY urut ASC";
+			$query	 	= "SELECT id, kd_gudang, nm_gudang FROM warehouse WHERE ".$whLef." ".$WHERE_2." ORDER BY urut ASC";
 			// echo $query;
 			$Q_result	= $this->db->query($query)->result();
 
