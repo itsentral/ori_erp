@@ -972,7 +972,7 @@ class Outgoing extends CI_Controller {
 		$data = array(
 			'tanda' => $tanda,
 			'QTY_SPK' => (is_numeric($QTY_SPK)?number_format($QTY_SPK):$QTY_SPK),
-			'QTY_DONE' => number_format($QTY_DONE),
+			'QTY_DONE' => number_format($QTY_DONE,2),
 			'tipe_out' => $tipe_out,
 			'field_joint' => $field_joint,
 			'gudang' => $gudang_before,
