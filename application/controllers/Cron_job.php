@@ -1039,4 +1039,188 @@ class Cron_job extends CI_Controller {
 			echo 'EMPTY REPORT';
 		}
 	}
+
+	public function cutoff_data_wip(){
+		$datetime = date('Y-m-d H:i:s');
+		$get_data = $this->db->query("SELECT * FROM data_erp_wip_group")->result_array();
+		$ArrJurnal = [];
+		foreach ($get_data as $key => $value) {
+			$ArrJurnal[$key]['tanggal'] = $value['tanggal'];
+			$ArrJurnal[$key]['keterangan'] = $value['keterangan'];
+			$ArrJurnal[$key]['no_so'] = $value['no_so'];
+			$ArrJurnal[$key]['product'] = $value['product'];
+			$ArrJurnal[$key]['no_spk'] = $value['no_spk'];
+			$ArrJurnal[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrJurnal[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrJurnal[$key]['qty'] = $value['qty'];
+			$ArrJurnal[$key]['nilai_wip'] = $value['nilai_wip'];
+            $ArrJurnal[$key]['material'] = $value['material'];
+            $ArrJurnal[$key]['wip_direct'] = $value['wip_direct'];
+            $ArrJurnal[$key]['wip_indirect'] = $value['wip_indirect'];
+            $ArrJurnal[$key]['wip_consumable'] = $value['wip_consumable'];
+			$ArrJurnal[$key]['wip_foh'] = $value['wip_foh'];
+			$ArrJurnal[$key]['created_by'] = $value['created_by'];
+			$ArrJurnal[$key]['created_date'] = $value['created_date'];
+			$ArrJurnal[$key]['id_trans'] = $value['id_trans'];
+			$ArrJurnal[$key]['jenis'] = $value['jenis'];
+			$ArrJurnal[$key]['id_material'] = $value['id_material'];
+			$ArrJurnal[$key]['nm_material'] = $value['nm_material'];
+			$ArrJurnal[$key]['qty_mat'] = $value['qty_mat'];
+			$ArrJurnal[$key]['cost_book'] = $value['cost_book'];
+			$ArrJurnal[$key]['gudang'] = $value['gudang'];
+			$ArrJurnal[$key]['kode_spool'] = $value['kode_spool'];
+			$ArrJurnal[$key]['hist_date'] = $datetime;
+		}
+
+		$this->db->trans_start();
+            if(!empty($ArrJurnal)){
+                $this->db->insert_batch('data_erp_cutoff_wip_group',$ArrJurnal);
+            }
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+		}
+	}
+
+	public function cutoff_data_fg(){
+		$datetime = date('Y-m-d H:i:s');
+		$get_data = $this->db->query("SELECT * FROM data_erp_fg")->result_array();
+		$ArrJurnal = [];
+		foreach ($get_data as $key => $value) {
+			$ArrJurnal[$key]['tanggal'] = $value['tanggal'];
+			$ArrJurnal[$key]['keterangan'] = $value['keterangan'];
+			$ArrJurnal[$key]['no_so'] = $value['no_so'];
+			$ArrJurnal[$key]['product'] = $value['product'];
+			$ArrJurnal[$key]['no_spk'] = $value['no_spk'];
+			$ArrJurnal[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrJurnal[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrJurnal[$key]['qty'] = $value['qty'];
+			$ArrJurnal[$key]['nilai_wip'] = $value['nilai_wip'];
+            $ArrJurnal[$key]['material'] = $value['material'];
+            $ArrJurnal[$key]['wip_direct'] = $value['wip_direct'];
+            $ArrJurnal[$key]['wip_indirect'] = $value['wip_indirect'];
+            $ArrJurnal[$key]['wip_consumable'] = $value['wip_consumable'];
+			$ArrJurnal[$key]['wip_foh'] = $value['wip_foh'];
+			$ArrJurnal[$key]['created_by'] = $value['created_by'];
+			$ArrJurnal[$key]['created_date'] = $value['created_date'];
+			$ArrJurnal[$key]['id_trans'] = $value['id_trans'];
+			$ArrJurnal[$key]['id_pro'] = $value['id_pro'];
+			$ArrJurnal[$key]['qty_ke'] = $value['qty_ke'];
+			$ArrJurnal[$key]['nilai_unit'] = $value['nilai_unit'];
+			$ArrJurnal[$key]['jenis'] = $value['jenis'];
+			$ArrJurnal[$key]['kode_delivery'] = $value['kode_delivery'];
+			$ArrJurnal[$key]['id_material'] = $value['id_material'];
+			$ArrJurnal[$key]['nm_material'] = $value['nm_material'];
+			$ArrJurnal[$key]['qty_mat'] = $value['qty_mat'];
+			$ArrJurnal[$key]['cost_book'] = $value['cost_book'];
+			$ArrJurnal[$key]['gudang'] = $value['gudang'];
+			$ArrJurnal[$key]['kode_spool'] = $value['kode_spool'];
+			$ArrJurnal[$key]['hist_date'] = $datetime;
+		}
+
+		$this->db->trans_start();
+            if(!empty($ArrJurnal)){
+                $this->db->insert_batch('data_erp_cutoff_fg',$ArrJurnal);
+            }
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+		}
+	}
+
+	public function cutoff_data_transit(){
+		$datetime = date('Y-m-d H:i:s');
+		$get_data = $this->db->query("SELECT * FROM data_erp_in_transit")->result_array();
+		$ArrJurnal = [];
+		foreach ($get_data as $key => $value) {
+			$ArrJurnal[$key]['tanggal'] = $value['tanggal'];
+			$ArrJurnal[$key]['keterangan'] = $value['keterangan'];
+			$ArrJurnal[$key]['no_so'] = $value['no_so'];
+			$ArrJurnal[$key]['product'] = $value['product'];
+			$ArrJurnal[$key]['no_spk'] = $value['no_spk'];
+			$ArrJurnal[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrJurnal[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrJurnal[$key]['qty'] = $value['qty'];
+			$ArrJurnal[$key]['nilai_unit'] = $value['nilai_unit'];
+            $ArrJurnal[$key]['created_by'] = $value['created_by'];
+            $ArrJurnal[$key]['created_date'] = $value['created_date'];
+            $ArrJurnal[$key]['id_trans'] = $value['id_trans'];
+            $ArrJurnal[$key]['id_pro'] = $value['id_pro'];
+			$ArrJurnal[$key]['qty_ke'] = $value['qty_ke'];
+			$ArrJurnal[$key]['kode_delivery'] = $value['kode_delivery'];
+			$ArrJurnal[$key]['jenis'] = $value['jenis'];
+			$ArrJurnal[$key]['id_material'] = $value['id_material'];
+			$ArrJurnal[$key]['nm_material'] = $value['nm_material'];
+			$ArrJurnal[$key]['qty_mat'] = $value['qty_mat'];
+			$ArrJurnal[$key]['cost_book'] = $value['cost_book'];
+			$ArrJurnal[$key]['gudang'] = $value['gudang'];
+			$ArrJurnal[$key]['kode_spool'] = $value['kode_spool'];
+			$ArrJurnal[$key]['hist_date'] = $datetime;
+		}
+
+		$this->db->trans_start();
+            if(!empty($ArrJurnal)){
+                $this->db->insert_batch('data_erp_cutoff_in_transit',$ArrJurnal);
+            }
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+		}
+	}
+
+	public function cutoff_data_customer(){
+		$datetime = date('Y-m-d H:i:s');
+		$get_data = $this->db->query("SELECT * FROM data_erp_in_customer")->result_array();
+		$ArrJurnal = [];
+		foreach ($get_data as $key => $value) {
+			$ArrJurnal[$key]['tanggal'] = $value['tanggal'];
+			$ArrJurnal[$key]['keterangan'] = $value['keterangan'];
+			$ArrJurnal[$key]['no_so'] = $value['no_so'];
+			$ArrJurnal[$key]['product'] = $value['product'];
+			$ArrJurnal[$key]['no_spk'] = $value['no_spk'];
+			$ArrJurnal[$key]['kode_trans'] = $value['kode_trans'];
+			$ArrJurnal[$key]['id_pro_det'] = $value['id_pro_det'];
+			$ArrJurnal[$key]['qty'] = $value['qty'];
+			$ArrJurnal[$key]['nilai_unit'] = $value['nilai_unit'];
+            $ArrJurnal[$key]['created_by'] = $value['created_by'];
+            $ArrJurnal[$key]['created_date'] = $value['created_date'];
+            $ArrJurnal[$key]['id_trans'] = $value['id_trans'];
+            $ArrJurnal[$key]['id_pro'] = $value['id_pro'];
+			$ArrJurnal[$key]['qty_ke'] = $value['qty_ke'];
+			$ArrJurnal[$key]['kode_delivery'] = $value['kode_delivery'];
+			$ArrJurnal[$key]['jenis'] = $value['jenis'];
+			$ArrJurnal[$key]['id_material'] = $value['id_material'];
+			$ArrJurnal[$key]['nm_material'] = $value['nm_material'];
+			$ArrJurnal[$key]['qty_mat'] = $value['qty_mat'];
+			$ArrJurnal[$key]['cost_book'] = $value['cost_book'];
+			$ArrJurnal[$key]['gudang'] = $value['gudang'];
+			$ArrJurnal[$key]['kode_spool'] = $value['kode_spool'];
+			$ArrJurnal[$key]['hist_date'] = $datetime;
+		}
+
+		$this->db->trans_start();
+            if(!empty($ArrJurnal)){
+                $this->db->insert_batch('data_erp_cutoff_in_customer',$ArrJurnal);
+            }
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+		}
+		else{
+			$this->db->trans_commit();
+		}
+	}
 }
