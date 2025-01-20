@@ -456,11 +456,19 @@ class Report extends CI_Controller {
 	}
 
 	public function unbillidr(){
-		$this->report_model->index_hutangidr();
+		$this->report_model->index_unbillidr();
 	}
 
 	public function server_side_unbillidr(){
-		$this->report_model->get_data_json_hutangidr();
+		$this->report_model->get_data_json_unbillidr();
+	}
+
+	public function unbillusd(){
+		$this->report_model->index_unbillusd();
+	}
+
+	public function server_side_unbillusd(){
+		$this->report_model->get_data_json_unbillusd();
 	}
 
 
