@@ -455,6 +455,15 @@ class Report extends CI_Controller {
 		$this->report_model->get_data_json_hutangusd();
 	}
 
+	public function unbillidr(){
+		$this->report_model->index_hutangidr();
+	}
+
+	public function server_side_unbillidr(){
+		$this->report_model->get_data_json_hutangidr();
+	}
+
+
 
 }
 ?>
