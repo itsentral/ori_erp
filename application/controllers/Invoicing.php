@@ -5,7 +5,7 @@ class Invoicing extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
-		$this->load->model('master_model');
+		$this->load->model('master_model'); 
 		$this->load->model('invoicing_model');
 		$this->load->model('Acc_model');
 		$this->load->model('Jurnal_model');
@@ -507,7 +507,7 @@ class Invoicing extends CI_Controller {
 		   <tr>
                  <td style="font-size:8pt !important;vertical-align:top"><b>Payment Term</b></td>
 				 <td style="font-size:8pt !important;vertical-align:top"><b>:</b></td>
-				 <td style="font-size:8pt !important;vertical-align:top"><b>' .(($val->payment_term==0)?"CASH BEFORE DELIVERY":$val->payment_term ." Days").'</b></td>
+				 <td style="font-size:8pt !important;vertical-align:top"><b>' .(($val->payment_term==100)?"CASH BEFORE DELIVERY":$val->payment_term ." Days").'</b></td>
 		    </tr>
           </table>
 		  ';
