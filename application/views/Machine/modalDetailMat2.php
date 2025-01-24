@@ -164,6 +164,7 @@
 			</table>
 		</div>
 	</div>
+	<?php if(!empty($restDetail1)){ ?>
 	<div class="box box-primary">
 		<div class="box-body" style="">
 			<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
@@ -243,7 +244,7 @@
 			</table>
 		</div>
 	</div>
-	
+	<?php } ?>
 	<!-- FLANGE -->
 	<?php
 	$TotStructureKgN1	= 0;
