@@ -1563,7 +1563,7 @@ class Report_model extends CI_Model {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Report >>  Unbill IDR ',
+			'title'			=> 'Report >>  DP IDR ',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
