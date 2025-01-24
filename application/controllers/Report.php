@@ -471,6 +471,22 @@ class Report extends CI_Controller {
 		$this->report_model->get_data_json_unbillusd();
 	}
 
+	public function dpidr(){
+		$this->report_model->index_dpidr();
+	}
+
+	public function server_side_dpidr(){
+		$this->report_model->get_data_json_dpidr();
+	}
+
+	public function dpusd(){
+		$this->report_model->index_dpusd();
+	}
+
+	public function server_side_dpusd(){
+		$this->report_model->get_data_json_dpusd();
+	}
+
 
 
 }
