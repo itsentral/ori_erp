@@ -462,160 +462,162 @@
 					}
 					else
 					{
+						if(!empty($restDetail1)){
 							?>
-						<tr>
-							<td class="text-left" colspan='12'><b><?= $restDetail1[0]['detail_name']; ?></b></td>
-						</tr>
-						<tr class='bg-blue'>
-							<td class="text-left" width='12%'>Category Name</td>
-							<td class="text-left" colspan='4'>Material Name</td>
-							<td class="text-right" width='6%'>Value</td>
-							<td class="text-right" width='6%'>Thickness</td>
-							<td class="text-right" width='6%'>Multiplier</td>
-							<!--
-							<td class="text-right" width='6%'>BW</td>
-							<td class="text-right" width='6%'>Sum</td>
-							<td class="text-right" width='6%'>Layer</td>
-							-->
-							<td class="text-right" width='6%'>Containing</td>
-							<td class="text-right" width='6%'>Thickness</td>
-							<td class="text-right" width='6%'>Total kg</td>
-						</tr>
-						<?php
-						foreach($restDetail1 AS $val => $valx){
-							$bgC1	= 'transparent';
-							$Cl1	= 'black';
-							$bgC2	= 'transparent';
-							$Cl2	= 'black';
-							$bgC3	= 'transparent';
-							$Cl3	= 'black';
-							$bgC4	= 'transparent';
-							$Cl4	= 'black';
-							$bgC5	= 'transparent';
-							$Cl5	= 'black';
-							$bgC6	= 'transparent';
-							$Cl6	= 'black';
-							$bgC7	= 'transparent';
-							$Cl7	= 'black';
-							$bgC8	= 'transparent';
-							$Cl8	= 'black';
-							$bgC0	= 'transparent';
-							$Cl0	= 'black';
-							if($valx['value'] != '0.00'){
-								$bgC1	= 'black';
-								$Cl1	= 'white';
-							}
-							if($valx['thickness'] != '0.0000'){
-								$bgC2	= 'black';
-								$Cl2	= 'white';
-							}
-							if($valx['fak_pengali'] != '0.00'){
-								$bgC3	= 'black';
-								$Cl3	= 'white';
-							}
-							if($valx['bw'] != '0.00'){
-								$bgC4	= 'black';
-								$Cl4	= 'white';
-							}
-							if($valx['jumlah'] != '0.00'){
-								$bgC5	= 'black';
-								$Cl5	= 'white';
-							}
-							if($valx['layer'] != '0.00'){
-								$bgC6	= 'black';
-								$Cl6	= 'white';
-							}
-							if($valx['containing'] != '0.000'){
-								$bgC7	= 'black';
-								$Cl7	= 'white';
-							}
-							if($valx['total_thickness'] != '0.0000'){
-								$bgC8	= 'black';
-								$Cl8	= 'white';
-							}
-							if($valx['last_cost'] != '0.000'){
-								$bgC0	= 'black';
-								$Cl0	= 'white';
-							}
-							?>
-						<tr>
-							<td class="text-left"><?= $valx['nm_category'];?></td>
-							<td class="text-left" colspan='4'><?= $valx['nm_material'];?></td>
-							<td class="text-center" style='background-color: <?=$bgC1;?>; color: <?= $Cl1;?>'><?= floatval($valx['value']);?></td>
-							<td class="text-right" style='background-color: <?=$bgC2;?>; color: <?= $Cl2;?>'><?= $valx['thickness'];?></td>
+								<tr>
+									<td class="text-left" colspan='12'><b><?= $restDetail1[0]['detail_name']; ?></b></td>
+								</tr>
+								<tr class='bg-blue'>
+									<td class="text-left" width='12%'>Category Name</td>
+									<td class="text-left" colspan='4'>Material Name</td>
+									<td class="text-right" width='6%'>Value</td>
+									<td class="text-right" width='6%'>Thickness</td>
+									<td class="text-right" width='6%'>Multiplier</td>
+									<!--
+									<td class="text-right" width='6%'>BW</td>
+									<td class="text-right" width='6%'>Sum</td>
+									<td class="text-right" width='6%'>Layer</td>
+									-->
+									<td class="text-right" width='6%'>Containing</td>
+									<td class="text-right" width='6%'>Thickness</td>
+									<td class="text-right" width='6%'>Total kg</td>
+								</tr>
+								<?php
+								foreach($restDetail1 AS $val => $valx){
+									$bgC1	= 'transparent';
+									$Cl1	= 'black';
+									$bgC2	= 'transparent';
+									$Cl2	= 'black';
+									$bgC3	= 'transparent';
+									$Cl3	= 'black';
+									$bgC4	= 'transparent';
+									$Cl4	= 'black';
+									$bgC5	= 'transparent';
+									$Cl5	= 'black';
+									$bgC6	= 'transparent';
+									$Cl6	= 'black';
+									$bgC7	= 'transparent';
+									$Cl7	= 'black';
+									$bgC8	= 'transparent';
+									$Cl8	= 'black';
+									$bgC0	= 'transparent';
+									$Cl0	= 'black';
+									if($valx['value'] != '0.00'){
+										$bgC1	= 'black';
+										$Cl1	= 'white';
+									}
+									if($valx['thickness'] != '0.0000'){
+										$bgC2	= 'black';
+										$Cl2	= 'white';
+									}
+									if($valx['fak_pengali'] != '0.00'){
+										$bgC3	= 'black';
+										$Cl3	= 'white';
+									}
+									if($valx['bw'] != '0.00'){
+										$bgC4	= 'black';
+										$Cl4	= 'white';
+									}
+									if($valx['jumlah'] != '0.00'){
+										$bgC5	= 'black';
+										$Cl5	= 'white';
+									}
+									if($valx['layer'] != '0.00'){
+										$bgC6	= 'black';
+										$Cl6	= 'white';
+									}
+									if($valx['containing'] != '0.000'){
+										$bgC7	= 'black';
+										$Cl7	= 'white';
+									}
+									if($valx['total_thickness'] != '0.0000'){
+										$bgC8	= 'black';
+										$Cl8	= 'white';
+									}
+									if($valx['last_cost'] != '0.000'){
+										$bgC0	= 'black';
+										$Cl0	= 'white';
+									}
+									?>
+								<tr>
+									<td class="text-left"><?= $valx['nm_category'];?></td>
+									<td class="text-left" colspan='4'><?= $valx['nm_material'];?></td>
+									<td class="text-center" style='background-color: <?=$bgC1;?>; color: <?= $Cl1;?>'><?= floatval($valx['value']);?></td>
+									<td class="text-right" style='background-color: <?=$bgC2;?>; color: <?= $Cl2;?>'><?= $valx['thickness'];?></td>
 
-							<td class="text-center" style='background-color: <?=$bgC6;?>; color: <?= $Cl6;?>'><?= floatval($valx['layer']);?></td>
-							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-							<td class="text-right" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= $valx['total_thickness'];?></td>
-							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-						</tr>
-							<?php
+									<td class="text-center" style='background-color: <?=$bgC6;?>; color: <?= $Cl6;?>'><?= floatval($valx['layer']);?></td>
+									<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+									<td class="text-right" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= $valx['total_thickness'];?></td>
+									<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+								</tr>
+									<?php
+								}
+								?>
+							</tbody>
+							<tbody>
+								<tr class='bg-blue'>
+									<td class="text-left">Category Name</td>
+									<td class="text-left" colspan='7'>Material Name</td>
+									<td class="text-right">Containing</td>
+									<td class="text-right">Perse</td>
+									<td class="text-right">Total kg</td>
+								</tr>
+								<?php
+								foreach($restResin1 AS $val => $valx){
+									$bgC7	= 'transparent';
+									$Cl7	= 'black';
+									$bgC0	= 'transparent';
+									$Cl0	= 'black';
+									if($valx['containing'] != '0.000'){
+										$bgC7	= 'black';
+										$Cl7	= 'white';
+									}
+									if($valx['last_cost'] != '0.000'){
+										$bgC0	= 'black';
+										$Cl0	= 'white';
+									}
+								?>
+								<tr>
+									<td class="text-left"><?= $valx['nm_category'];?> TOTAL</td>
+									<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
+									<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+									<td class="text-right"></td>
+									<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+								</tr>
+								<?php
+								}
+								
+								foreach($restDetailPlus1 AS $val => $valx){
+									$bgC7	= 'transparent';
+									$Cl7	= 'black';
+									$bgC8	= 'transparent';
+									$Cl8	= 'black';
+									$bgC0	= 'transparent';
+									$Cl0	= 'black';
+									if($valx['containing'] != '0.000'){
+										$bgC7	= 'black';
+										$Cl7	= 'white';
+									}
+									if($valx['perse'] != '0.0000'){
+										$bgC8	= 'black';
+										$Cl8	= 'white';
+									}
+									if($valx['last_cost'] != '0.000'){
+										$bgC0	= 'black';
+										$Cl0	= 'white';
+									}
+									?>
+								<tr>
+									<td class="text-left"><?= $valx['nm_category'];?></td>
+									<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
+									<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+									<td class="text-center" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= floatval($valx['perse']);?></td>
+									<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+								</tr>
+									<?php
+								}
+							}
 						}
-						?>
-					</tbody>
-					<tbody>
-						<tr class='bg-blue'>
-							<td class="text-left">Category Name</td>
-							<td class="text-left" colspan='7'>Material Name</td>
-							<td class="text-right">Containing</td>
-							<td class="text-right">Perse</td>
-							<td class="text-right">Total kg</td>
-						</tr>
-						<?php
-						foreach($restResin1 AS $val => $valx){
-							$bgC7	= 'transparent';
-							$Cl7	= 'black';
-							$bgC0	= 'transparent';
-							$Cl0	= 'black';
-							if($valx['containing'] != '0.000'){
-								$bgC7	= 'black';
-								$Cl7	= 'white';
-							}
-							if($valx['last_cost'] != '0.000'){
-								$bgC0	= 'black';
-								$Cl0	= 'white';
-							}
-						?>
-						<tr>
-							<td class="text-left"><?= $valx['nm_category'];?> TOTAL</td>
-							<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
-							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-							<td class="text-right"></td>
-							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-						</tr>
-						<?php
-						}
-						
-						foreach($restDetailPlus1 AS $val => $valx){
-							$bgC7	= 'transparent';
-							$Cl7	= 'black';
-							$bgC8	= 'transparent';
-							$Cl8	= 'black';
-							$bgC0	= 'transparent';
-							$Cl0	= 'black';
-							if($valx['containing'] != '0.000'){
-								$bgC7	= 'black';
-								$Cl7	= 'white';
-							}
-							if($valx['perse'] != '0.0000'){
-								$bgC8	= 'black';
-								$Cl8	= 'white';
-							}
-							if($valx['last_cost'] != '0.000'){
-								$bgC0	= 'black';
-								$Cl0	= 'white';
-							}
-							?>
-						<tr>
-							<td class="text-left"><?= $valx['nm_category'];?></td>
-							<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
-							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-							<td class="text-center" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= floatval($valx['perse']);?></td>
-							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-						</tr>
-							<?php
-						}
-					}
 					?>
 				</tbody>
 				<?php
