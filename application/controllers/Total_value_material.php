@@ -45,8 +45,8 @@ class Total_value_material extends CI_Controller {
     public function server_side_material_stock(){
 		$requestData	= $_REQUEST;
 		
-		 print_r($requestData['gudang']);
-		 exit;
+		// print_r($requestData['gudang']);
+		 //exit;
 
 		$fetch			= $this->query_data_json_material_stock(
 			$requestData['gudang'], 
@@ -514,7 +514,7 @@ class Total_value_material extends CI_Controller {
 		$nm_gudang = strtoupper(get_name('warehouse','nm_gudang','id',$gudang));
 		
 		$tanggal_update = (!empty($date_filter))?" (".date('d F Y', strtotime($date_filter)).")":" (".date('d F Y').")";
-		$tanggal_update2 = (!empty($date_filter))?date('Y-m-d', strtotime($date_filter)):date('Y-m-d');
+		$tanggal_update2 = $date_filter;
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
