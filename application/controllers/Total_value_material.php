@@ -458,10 +458,6 @@ class Total_value_material extends CI_Controller {
 		$gudang			= $this->uri->segment(3);
 		$date_filter	= $this->uri->segment(4);
 
-		print_r($date_filter);
-		exit;
-
-
 		$this->load->library("PHPExcel");
 		// $this->load->library("PHPExcel/Writer/Excel2007");
 		$objPHPExcel	= new PHPExcel();

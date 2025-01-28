@@ -1436,7 +1436,7 @@ function getPriceBookByDate2($dateFilter){
                             MAX( a.id ) AS id,
                             a.id_material 
                         FROM
-                            tran_warehouse_jurnal_detail_pusat a 
+                            tran_warehouse_jurnal_detail_pusatx a 
                         WHERE
                             a.updated_date >= '2023-05-11 21:24:48' 
                             AND DATE( a.updated_date ) <= '".$dateFilter."'
