@@ -577,8 +577,7 @@ class Total_value_material extends CI_Controller {
 
 		// echo $qDetail1; exit;
 		$GET_PRICEBOOK = getPriceBookByDate2($tanggal_update2);
-        print_r($restDetail1);
-		exit;
+       
 		if($restDetail1){
 			$awal_row	= $NextRow;
 			$no=0;
@@ -629,9 +628,8 @@ class Total_value_material extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				//$PRICEBOOK = (!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0;
-				$PRICEBOOK = ($row_Cek['costbook']==0)?((!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0):$row_Cek['costbook'];
-                
-				
+				//$PRICEBOOK = ($row_Cek['costbook']==0)?((!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0):$row_Cek['costbook'];
+                $PRICEBOOK = $GET_PRICEBOOK[$row_Cek['id_material']];
 				$TOTAL_VALUE = $qty_stock * $PRICEBOOK;
 
 				$awal_col++;
