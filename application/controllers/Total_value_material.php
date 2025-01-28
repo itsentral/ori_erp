@@ -45,8 +45,8 @@ class Total_value_material extends CI_Controller {
     public function server_side_material_stock(){
 		$requestData	= $_REQUEST;
 		
-		// print_r($requestData['gudang']);
-		// exit;
+		 print_r($requestData['gudang']);
+		 exit;
 
 		$fetch			= $this->query_data_json_material_stock(
 			$requestData['gudang'], 
