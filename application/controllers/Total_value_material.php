@@ -510,6 +510,9 @@ class Total_value_material extends CI_Controller {
 		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date."
 		";
 		$restDetail1	= $this->db->query($sql)->result_array();
+
+		
+
 		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$gudang))->result();
 		$nm_gudang = strtoupper(get_name('warehouse','nm_gudang','id',$gudang));
 		
@@ -574,7 +577,8 @@ class Total_value_material extends CI_Controller {
 
 		// echo $qDetail1; exit;
 		$GET_PRICEBOOK = getPriceBookByDate2($tanggal_update2);
-
+        print_r($restDetail1);
+		exit;
 		if($restDetail1){
 			$awal_row	= $NextRow;
 			$no=0;
@@ -582,8 +586,7 @@ class Total_value_material extends CI_Controller {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
-
-				$awal_col++;
+                $awal_col++;
 				$detail_name	= $no;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $detail_name);
@@ -627,7 +630,9 @@ class Total_value_material extends CI_Controller {
 				
 				//$PRICEBOOK = (!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0;
 				$PRICEBOOK = ($row_Cek['costbook']==0)?((!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0):$row_Cek['costbook'];
-                $TOTAL_VALUE = $qty_stock * $PRICEBOOK;
+                
+				
+				$TOTAL_VALUE = $qty_stock * $PRICEBOOK;
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
