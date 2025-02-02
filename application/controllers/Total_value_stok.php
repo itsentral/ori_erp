@@ -144,7 +144,7 @@ class Total_value_stok extends CI_Controller {
 			FROM
 				".$table." a
 				LEFT JOIN con_nonmat_new b ON a.code_group=b.code_group
-		    WHERE 1=1 AND a.gudang IN ('".getGudangIndirect()."','".getGudangHouseHold()."') ".$where_gudang." ".$where_date." AND (
+		    WHERE 1=1 AND a.gudang IN ('".getGudangIndirect()."','".getGudangHouseHold()."') ".$where_gudang." ".$where_date." AND b.status='1' AND b.deleted = 'N' AND (
 				a.code_group LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.material_name LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
