@@ -31,11 +31,13 @@ $this->load->view('include/side_menu');
 			$query 	= "	SELECT 
 							a.*,
 							z.price_supplier,
+							y.price_from_supplier AS price_supplier_master,
 							c.tgl_dibutuhkan
 						FROM 
 							tran_rfq_detail a 
 							LEFT JOIN tran_pr_detail c ON a.no_rfq = c.no_rfq AND a.id_barang = c.id_barang
 							LEFT JOIN price_ref z ON a.id_barang = z.code_group AND z.sts_price = 'N' AND z.deleted = 'N'
+							LEFT JOIN accessories y ON a.id_barang = y.id_material
 						WHERE 
 							a.hub_rfq='".$valx['hub_rfq']."'
 						GROUP BY a.id_barang
@@ -96,9 +98,10 @@ $this->load->view('include/side_menu');
 						$no2 = 0;
 						$SUM_HARGA = 0;
 						foreach($res AS $val2 => $valx2){ $no2++;
+							$price_supplier = (!empty($valx2['price_supplier_master']))?$valx2['price_supplier_master']:$valx2['price_supplier'];
 							echo "<tr>";
 								echo "<td>".strtoupper($valx2['nm_barang'].' '.$valx2['spec'].' '.$valx2['info'])."</td>";
-								echo "<td align='right'>".number_format($valx2['price_supplier'],2)."</td>";
+								echo "<td align='right'>".number_format($price_supplier,2)."</td>";
 								echo "<td class='mid' align='right'><input type='text' name='Detail[".$no."][detail][".$no2."][price_ref_sup]' class='form-control text-right input-md autoNumeric2 price_sub_".$no." changeKurs' value='".$valx2['price_ref_sup']."' data-no='".$no."'></td>";
 								echo "<td class='mid' align='center'><input type='text' name='Detail[".$no."][detail][".$no2."][qty]' class='form-control text-right input-md autoNumeric2 qty_pr changeKurs' value='".$valx2['qty']."'  data-no='".$no."'></td>";
 								// echo "<td class='mid qty_pr' align='center'>".number_format($valx2['qty'],2)."</td>";
@@ -106,7 +109,7 @@ $this->load->view('include/side_menu');
 								echo "<td class='mid' align='center'>
 										<input type='text' name='Detail[".$no."][detail][".$no2."][lead_time]' class='form-control text-center input-md maskM' value='".number_format($valx2['lead_time'])."' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>
 										<input type='hidden' name='Detail[".$no."][detail][".$no2."][id]' class='form-control input-sm' value='".$valx2['id']."'>
-										<input type='hidden' name='Detail[".$no."][detail][".$no2."][price_ref]' class='form-control input-sm' value='".$valx2['price_supplier']."'>
+										<input type='hidden' name='Detail[".$no."][detail][".$no2."][price_ref]' class='form-control input-sm' value='".$price_supplier."'>
 										<input type='hidden' name='Detail[".$no."][detail][".$no2."][tgl_dibutuhkan]' class='form-control input-sm' value='".$valx2['tgl_dibutuhkan']."'>
 										<input type='hidden' name='Detail[".$no."][detail][".$no2."][top]' class='form-control text-left input-sm' value='".strtoupper($valx2['top'])."'>
 										<input type='hidden' name='Detail[".$no."][detail][".$no2."][keterangan]' class='form-control text-left input-sm' value='".strtoupper($valx2['keterangan'])."'>
