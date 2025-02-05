@@ -409,7 +409,8 @@ class Gudang_wg extends CI_Controller {
 			$LEFT_JOIN 		= "";
 			$FIELD_CUTTING 	= "";
 			if($status == 'pipe'){
-				$where = " AND c.id_category='pipe' AND a.sts_cutting != 'Y' ";
+				// $where = " AND c.id_category='pipe' AND a.sts_cutting != 'Y' ";
+				$where = " AND c.id_category='pipe' ";
 				$LEFT_JOIN = ",";
 				$FIELD_CUTTING = "0 AS length_awal, c.length, NULL AS cutting_ke,";
 				$LIKE_PRODUCT_CODE = "CONCAT(SUBSTRING_INDEX(a.product_code, '.', 1),'.', a.product_ke)";
