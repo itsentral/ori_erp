@@ -598,9 +598,9 @@ class Request_mutasi extends CI_Controller {
 		if($jenistransaksi=='bank'){
 		$nokir_debet  = '1112-01-01';
 		}else{
-		$nokir_debet  = $jurnal->bank_tujuan;
+		$nokir_debet  = $jurnal->bank_asal;
 	    }
-		$nokir_kredit = $jurnal->bank_asal;
+		$nokir_kredit = $jurnal->bank_tujuan;
 		
 		
 		$Nomor_JV				= $this->Jurnal_model->get_Nomor_Jurnal_BUK2('101',$tgl_po);
