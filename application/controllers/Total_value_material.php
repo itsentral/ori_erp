@@ -837,7 +837,7 @@ class Total_value_material extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				//$PRICEBOOK = (!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0;
-				PRICEBOOK = ($GET_PRICEBOOK1[$row_Cek['id_material']]==0)?((!empty($GET_PRICEBOOK1[$row_Cek['id_material']]))?$GET_PRICEBOOK1[$row_Cek['id_material']]:0):$row_Cek['costbook'];
+				$PRICEBOOK = ($GET_PRICEBOOK1[$row_Cek['id_material']]==0)?((!empty($GET_PRICEBOOK1[$row_Cek['id_material']]))?$GET_PRICEBOOK1[$row_Cek['id_material']]:0):$row_Cek['costbook'];
 //$PRICEBOOK = $GET_PRICEBOOK1[$row_Cek['id_material']];
 				$TOTAL_VALUE = $qty_stock * $PRICEBOOK;
 
