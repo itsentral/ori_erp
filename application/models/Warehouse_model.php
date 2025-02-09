@@ -508,7 +508,7 @@ class Warehouse_model extends CI_Model {
 					$ArrDeatilAdj[$val2.$val]['qty_rusak'] 		= $QTY_RISK;
 					$ArrDeatilAdj[$val2.$val]['expired_date'] 	= $EXPIRED;
 					$ArrDeatilAdj[$val2.$val]['konversi'] 		= $KONVERSI;
-					$ArrDeatilAdj[$val2.$val]['keterangan'] 	= strtolower($valx['keterangan']);
+					$ArrDeatilAdj[$val2.$val]['keterangan'] 	= $valx['keterangan'];
 					$ArrDeatilAdj[$val2.$val]['update_by'] 		= $UserName;
 					$ArrDeatilAdj[$val2.$val]['update_date'] 	= $DateTime;
 					$ArrDeatilAdj[$val2.$val]['unit_price'] 	= $HARGA_UNIT;
