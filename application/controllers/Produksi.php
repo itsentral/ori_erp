@@ -10763,9 +10763,10 @@ class Produksi extends CI_Controller {
 
 									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
 									$total_est 	= $value3['berat'] * $QTY_INP;
-									$total_act  = str_replace(',','',$value2['terpakai']);
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
+									$total_act  = doubleval(str_replace(',','',$value2['terpakai']));
+									$kebutuhan  = doubleval(str_replace(',','',$value2['kebutuhan']));
+									if($kebutuhan > 0){
+										$total_act 	= ($total_est / $kebutuhan) * $total_act;
 									}
 									$unit_act 	= $total_act / $QTY_INP;
 
@@ -13019,7 +13020,7 @@ class Produksi extends CI_Controller {
 
 			foreach ($ARR_ID_PRO_UNIQ as $value) {
 
-				$QUERY_GET1 = "SELECT
+				$QUERY_GET1 = "(SELECT
 								a.id_produksi AS id_produksi,
 								b.id_category AS id_category,
 								a.id_product AS id_product,
@@ -13046,7 +13047,7 @@ class Produksi extends CI_Controller {
 								cast( a.updated_date AS DATE ),
 								a.id_production_detail 
 							ORDER BY
-								a.updated_date DESC";
+								a.updated_date DESC)";
 				$QUERY_GET2 = "(SELECT
 								a.id_produksi AS id_produksi,
 								b.id_category AS id_category,
