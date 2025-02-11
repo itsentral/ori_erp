@@ -12635,12 +12635,13 @@ class Produksi extends CI_Controller {
 		$restDetail3	= $this->db->select('REPLACE(id_produksi,"PRO-","") AS no_ipp, id_production_detail AS id_pro_det, actual_type AS id_material, SUM(CAST(material_terpakai AS DECIMAL(16,4))) AS berat, id_spk, catatan_programmer AS kode_trans')->group_by('id_production_detail,actual_type')->get_where('tmp_production_real_detail_add',array('catatan_programmer'=>$kode_spk_time,'CAST(material_terpakai AS DECIMAL(16,4)) >'=>0))->result_array();
 
 		$restDetail		= array_merge($restDetail1,$restDetail2,$restDetail3);
-
-		$GET_COSTBOOK = getPriceBookByDateproduksi(date('Y-m-d'));
+		$dateKurs = date('Y-m-d');
+		// $dateKurs = '2025-01-02';
+		$GET_COSTBOOK = getPriceBookByDateproduksi($dateKurs);
 		$GET_MAERIALS = get_detail_material();
 		$GET_MATERIAL	= get_detail_material();
 		//KURS
-		$sqlkurs	= "select * from ms_kurs where tanggal <='".date('Y-m-d')."' and mata_uang='USD' order by tanggal desc limit 1";
+		$sqlkurs	= "select * from ms_kurs where tanggal <='".$dateKurs."' and mata_uang='USD' order by tanggal desc limit 1";
 		$dtkurs		= $this->db->query($sqlkurs)->result_array();
 		$kurs		= (!empty($dtkurs[0]['kurs']))?$dtkurs[0]['kurs']:1; 
 
@@ -12651,14 +12652,14 @@ class Produksi extends CI_Controller {
 		$SUM_MATERIAL = 0;
 		$QTY_OKE = 0;
 		foreach ($restDetail as $key => $value) {
-			$UNIQ = $value['id_pro_det'].'-'.$value['id_material'];
+			$UNIQ = $value['kode_trans'].'-'.$value['id_material'];
 
 			if(!array_key_exists($UNIQ, $temp)) {
 				$temp[$UNIQ]['berat'] = 0;
 			}
 			$temp[$UNIQ]['berat'] += $value['berat'];
 
-			$temp[$UNIQ]['tanggal'] 	= date('Y-m-d');
+			$temp[$UNIQ]['tanggal'] 	= $dateKurs;
 			$temp[$UNIQ]['no_ipp'] 		= $value['no_ipp'];
 			$temp[$UNIQ]['id_pro_det'] 	= $value['id_pro_det'];
 			$temp[$UNIQ]['id_material'] = $value['id_material'];
@@ -12689,7 +12690,7 @@ class Produksi extends CI_Controller {
 			$ArrUpdateStock[$UNIQ]['id'] 	= $value['id_material'];
 			$ArrUpdateStock[$UNIQ]['qty'] 	= $berat;
 
-			$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans'],'id_production_detail'=>$value['id_pro_det']))->result_array();
+			$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans']))->result_array();
 			$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
 			$temp[$UNIQ]['id_trans'] = $id_trans;
 
@@ -12790,7 +12791,7 @@ class Produksi extends CI_Controller {
 
 					$WIPNmProduct = ($value2 == 'Total')?$value['product']:$value2;
 
-					$temp2[$UNIQ]['tanggal'] 		= date('Y-m-d');
+					$temp2[$UNIQ]['tanggal'] 		= $dateKurs;
 					$temp2[$UNIQ]['no_ipp'] 		= $value['no_ipp'];
 					$temp2[$UNIQ]['id_pro_det'] 	= $value['id_pro_det'];
 					$temp2[$UNIQ]['id_material'] = NULL;
@@ -12863,49 +12864,51 @@ class Produksi extends CI_Controller {
 		$ArrGroup = [];
 		if(!empty($ArrIDSPK)){
 			foreach ($ArrIDSPK as $value) {
-				$getSummary = $this->db->select('no_so,product,no_spk')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value))->result_array();
+				if($value > 0){
+					$getSummary = $this->db->select('no_so,product,no_spk')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time))->result_array();
 
-				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
-				$ArrGroup[$value]['keterangan'] = 'Gudang produksi to WIP';
-				$ArrGroup[$value]['no_so'] = (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
-				$ArrGroup[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
-				$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
-				$ArrGroup[$value]['kode_trans'] = $kode_spk_time;
-				$ArrGroup[$value]['id_pro_det'] = $value;
+					$ArrGroup[$value]['tanggal'] = $dateKurs;
+					$ArrGroup[$value]['keterangan'] = 'Gudang produksi to WIP';
+					$ArrGroup[$value]['no_so'] = (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					$ArrGroup[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					$ArrGroup[$value]['kode_trans'] = $kode_spk_time;
+					$ArrGroup[$value]['id_pro_det'] = $value;
 
-				$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$kode_spk_time,'id_production_detail'=>$value))->result_array();
-				$qty_awal = (!empty($getDetailSPK[0]['qty_awal']))?$getDetailSPK[0]['qty_awal']:0;
-				$qty_akhir = (!empty($getDetailSPK[0]['qty_akhir']))?$getDetailSPK[0]['qty_akhir']:0;
-				$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
+					$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$kode_spk_time,'id_production_detail'=>$value))->result_array();
+					$qty_awal = (!empty($getDetailSPK[0]['qty_awal']))?$getDetailSPK[0]['qty_awal']:0;
+					$qty_akhir = (!empty($getDetailSPK[0]['qty_akhir']))?$getDetailSPK[0]['qty_akhir']:0;
+					$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
 
-				$ArrGroup[$value]['qty'] = $qty_akhir - $qty_awal + 1;
+					$ArrGroup[$value]['qty'] = $qty_akhir - $qty_awal + 1;
 
-				$getSummaryMaterial 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value,'id_material <>'=>NULL))->result_array();
-				$getSummaryDirect 		= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value,'nm_material'=>'WIP Direct labour'))->result_array();
-				$getSummaryIndirect 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value,'nm_material'=>'WIP Indirect labour'))->result_array();
-				$getSummaryConsumable 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value,'nm_material'=>'WIP Consumable'))->result_array();
-				$getSummaryFOH 			= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_pro_det'=>$value,'nm_material'=>'WIP FOH'))->result_array();
-				
-				$nilai_material 	= (!empty($getSummaryMaterial[0]['nilai']))?$getSummaryMaterial[0]['nilai']:0;
-				$nilai_direct 		= (!empty($getSummaryDirect[0]['nilai']))?$getSummaryDirect[0]['nilai']:0;
-				$nilai_indirect 	= (!empty($getSummaryIndirect[0]['nilai']))?$getSummaryIndirect[0]['nilai']:0;
-				$nilai_consumable 	= (!empty($getSummaryConsumable[0]['nilai']))?$getSummaryConsumable[0]['nilai']:0;
-				$nilai_foh 			= (!empty($getSummaryFOH[0]['nilai']))?$getSummaryFOH[0]['nilai']:0;
-				$nilai_wip			= $nilai_material + $nilai_direct + $nilai_indirect + $nilai_consumable + $nilai_foh;
-				
-				$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
-				$ArrGroup[$value]['material'] = $nilai_material;
-				$ArrGroup[$value]['wip_direct'] =  $nilai_direct;
-				$ArrGroup[$value]['wip_indirect'] =  $nilai_indirect;
-				$ArrGroup[$value]['wip_consumable'] =  $nilai_consumable;
-				$ArrGroup[$value]['wip_foh'] =  $nilai_foh;
-				$ArrGroup[$value]['created_by'] = $username;
-				$ArrGroup[$value]['created_date'] = $datetime;
-				$ArrGroup[$value]['id_trans'] = $id_trans;
-				
-				$this->db->where('id_trans',$id_trans);
-				$this->db->where('nm_material','WIP '.$getSummary[0]['product']);
-				$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip,'total_price_debet'=>$nilai_wip)); 
+					$getSummaryMaterial 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'id_material <>'=>NULL))->result_array();
+					$getSummaryDirect 		= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'nm_material'=>'WIP Direct labour'))->result_array();
+					$getSummaryIndirect 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'nm_material'=>'WIP Indirect labour'))->result_array();
+					$getSummaryConsumable 	= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'nm_material'=>'WIP Consumable'))->result_array();
+					$getSummaryFOH 			= $this->db->select('SUM(total_price) AS nilai')->get_where('data_erp_wip',array('kode_trans'=>$kode_spk_time,'nm_material'=>'WIP FOH'))->result_array();
+					
+					$nilai_material 	= (!empty($getSummaryMaterial[0]['nilai']))?$getSummaryMaterial[0]['nilai']:0;
+					$nilai_direct 		= (!empty($getSummaryDirect[0]['nilai']))?$getSummaryDirect[0]['nilai']:0;
+					$nilai_indirect 	= (!empty($getSummaryIndirect[0]['nilai']))?$getSummaryIndirect[0]['nilai']:0;
+					$nilai_consumable 	= (!empty($getSummaryConsumable[0]['nilai']))?$getSummaryConsumable[0]['nilai']:0;
+					$nilai_foh 			= (!empty($getSummaryFOH[0]['nilai']))?$getSummaryFOH[0]['nilai']:0;
+					$nilai_wip			= $nilai_material + $nilai_direct + $nilai_indirect + $nilai_consumable + $nilai_foh;
+					
+					$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
+					$ArrGroup[$value]['material'] = $nilai_material;
+					$ArrGroup[$value]['wip_direct'] =  $nilai_direct;
+					$ArrGroup[$value]['wip_indirect'] =  $nilai_indirect;
+					$ArrGroup[$value]['wip_consumable'] =  $nilai_consumable;
+					$ArrGroup[$value]['wip_foh'] =  $nilai_foh;
+					$ArrGroup[$value]['created_by'] = $username;
+					$ArrGroup[$value]['created_date'] = $datetime;
+					$ArrGroup[$value]['id_trans'] = $id_trans;
+					
+					$this->db->where('id_trans',$id_trans);
+					$this->db->where('nm_material','WIP '.$getSummary[0]['product']);
+					$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip,'total_price_debet'=>$nilai_wip)); 
+				}
 			}
 		}
 
