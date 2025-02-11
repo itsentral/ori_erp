@@ -3670,8 +3670,10 @@ class Qc extends CI_Controller
 			$restWhDetail	= $this->db->get_where('request_outgoing', array('kode_trans' => $kode_trans, 'id_material' => $value['id_material']))->result();
 
 			//update request outgoing
+			if(!empty($restWhDetail[0]->id)){
 			$ArrUpdate[$key]['id'] 			= $restWhDetail[0]->id;
 			$ArrUpdate[$key]['qty_out'] 	= $restWhDetail[0]->qty_out - $value['qty'];
+			}
 
 			$ArrMaterial[$key]['id_material'] 	= $value['id_material'];
 			$ArrMaterial[$key]['gudang'] 	    = $value['id_gudang'];
@@ -3710,8 +3712,9 @@ class Qc extends CI_Controller
 
 		$this->db->where('kode_trans', $kode_trans);
 		$this->db->update('warehouse_adjustment', $ArrFlagReleaseAdjustment);
-
+		if(!empty($ArrUpdate)){
 		$this->db->update_batch('request_outgoing', $ArrUpdate, 'id');
+		}
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
