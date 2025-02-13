@@ -530,7 +530,7 @@
 				$numb9++;$harga_tot9=0;
 				$checked="";$readonly=" disabled";
 				if(isset($valx['total_deal_usd'])){
-					$harga_sat9= round($valx['total_deal_usd']/$valx['qty_total'],2);
+					$harga_sat9= round($valx['total_deal_usd']/$valx['qty'],2);
 				}else{
 					$harga_sat9= round($valx['harga_satuan_usd'],2);
 				}
