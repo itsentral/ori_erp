@@ -6342,6 +6342,7 @@ if($base_cur=='USD'){
 			$getPackCost= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','pack')->get('billing_so_add')->result_array();
 			$getTruck	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','ship')->get('billing_so_add')->result_array();
 			$getAcc  	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','lainnya')->get('billing_so_add')->result_array();
+			$getOther  	= $this->db->select('*,0 total_delivery ')->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','other')->get('billing_so_add')->result_array();
 			
 			//$non_frp	= $this->db->select('*,qty as qty_total, (qty-qty_inv) qty_inv,0 qty_delivery ')->from('billing_so_add')->where("(category='baut' OR category='plate' OR category='gasket' OR category='lainnya')")->where_in('no_ipp',$in_ipp)->get()->result_array();
 			//$non_frp    = $this->db->order_by('a.id', 'asc')->group_by('a.product')->select('SUM(a.berat) AS qty_product, a.*, "aksesoris" AS type_product')->where('(berat > 0 OR berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'aksesoris'))->result_array();
@@ -6387,6 +6388,7 @@ if($base_cur=='USD'){
 			'getEngCost' 	=> $getEngCost,
 			'getPackCost' 	=> $getPackCost,
 			'getTruck' 		=> $getTruck,
+			'other' 		=> $getOther,
 			'non_frp'		=> $non_frp,
 			'material'		=> $material,
 			'list_top'		=> $list_top,
