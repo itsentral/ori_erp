@@ -504,6 +504,97 @@
 	
 	
 	?>
+
+<?php
+	$SUM_OTHER = 0;
+	if(!empty($other)){
+		echo "<tbody>";
+			echo "<tr class='bg-blue'>";
+				echo "<td class='text-left headX HeaderHr' colspan='15'><b>OTHER</b></td>";
+			echo "</tr>";
+			echo "<tr class='bg-blue'>";
+				echo "<th class='text-center'>#</th>";
+				echo "<th class='text-center' colspan='7'>Material Name</th>";
+				echo "<th class='text-center'>Description</th>";
+				echo "<th class='text-center'>Qty Total</th>";
+				echo "<th class='text-center'>Qty Sisa</th>";
+				echo "<th class='text-center'>Qty-Inv</th>";
+				echo "<th class='text-center'>Unit</th>";
+				echo "<th class='text-center'>Unit Price</th>";
+				echo "<th class='text-center'>Total Price</th>";
+			echo "</tr>";
+		echo "</tbody>";
+		echo "<tbody class='body_x'>";
+			$numb9 =0;
+			foreach($other AS $val => $valx){
+				$numb9++;$harga_tot9=0;
+				$checked="";$readonly=" disabled";
+				if(isset($valx['total_deal'])){
+					$harga_sat9= round($valx['harga_total']/$valx['qty_total'],2);
+				}else{
+					$harga_sat9= round($valx['harga_total'],2);
+				}
+				if(isset($valx['checked'])){
+					if($valx['checked']!="") { 
+						$checked="checked";$readonly="";
+						$harga_tot9=round($harga_sat9*$valx['qty_delivery'],2);
+						$SUM_OTHER += ($harga_tot9);
+					}
+				}
+				?>
+				<tr id='tr8_<?= $numb9;?>' >
+					<td align='center'>
+						<input type="checkbox" <?=$checked?> id="ck8_<?= $numb9;?>" name="tr9_<?= $numb9;?>" value="<?=$numb9;?>" onclick="showdata('8',<?= $numb9;?>)">
+						<input type="hidden" id="data8_ipp_<?=$numb9?>" name="data9[<?=$numb9?>][no_ipp]" value="<?=$valx['no_ipp']?>">
+						<input type="hidden" id="data8_so_<?=$numb9?>" name="data9[<?=$numb9?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
+						<input type="hidden" id="data8_idmilik_<?=$numb9?>" name="data9[<?=$numb9?>][id_milik]" value="<?=$valx['id_milik']?>">
+					</td>
+					<td colspan='7'>
+						<?php
+						if(isset($valx['id_material'])){
+							$material_name9= get_nomor_so($valx['no_ipp']).' / '.strtoupper(get_name_acc($valx['id_material']));
+						}else{
+							$material_name9= $valx['nm_material'];
+						}
+						?>
+						<input type="text" class="form-control input-sm" id="material_name9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_name9]" value="<?=set_value('material_name9', isset($material_name9) ? $material_name9 : ''); ?>" readonly tabindex="-1">
+					</td>
+					<td><input type="text" class="form-control" id="material_desc9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_desc9]" value="<?=set_value('material_desc9', isset($valx['desc']) ? $valx['desc'] : ''); ?>" readonly tabindex="-1" ></td>
+					<td>
+					   <input type="text" class="form-control text-right input-sm divide" data-nomor='<?=$numb9 ?>' id="qty9_ori_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9_ori]" value="<?=set_value('qty9_ori', isset($valx['qty_total']) ? $valx['qty_total'] : '0'); ?>" readonly tabindex="-1">
+					</td>
+					<td>
+					   <input type="text" class="form-control text-right input-sm divide" data-nomor='<?=$numb9 ?>' id="qty9_belum_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9_belum]" value="<?=set_value('qty9_belum', isset($valx['qty_inv']) ? $valx['qty_inv'] : '0'); ?>" readonly tabindex="-1">
+					</td>
+					<td>
+					   <input type="text" class="form-control qty_oth input-sm text-right divide" data-nomor='<?=$numb9 ?>' id="qty9_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9]" value="<?=set_value('qty9', isset($valx['qty_delivery']) ? $valx['qty_delivery'] : '0'); ?>" <?=$readonly?>>
+					</td>
+					<td>
+						<?php $unit9= strtoupper($valx['satuan']); ?>
+						<input type="text" class="form-control text-center input-sm" id="unit9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][unit9]" value="<?=set_value('unit9', isset($unit9) ? $unit9 : ''); ?>" readonly  tabindex="-1">
+					</td>
+					<td>
+						<input type="text" class="form-control text-right divide input-sm" id="harga_sat9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][harga_sat9]" value="<?=set_value('harga_sat9', isset($harga_sat9) ? $harga_sat9 : '0'); ?>" readonly tabindex="-1">						
+					</td>
+					<td>
+						<input type="text" class="form-control text-right divide input-sm amount9" id="harga_tot9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][harga_tot9]" value="<?=set_value('harga_tot9', isset($harga_tot9) ? $harga_tot9 : '0'); ?>" readonly tabindex="-1" >						
+					</td>
+				</tr>
+				<?php
+			}
+			?>
+			<tr class='FootColor'>
+				<td colspan='14'><b>TOTAL OTHER</b></td>
+				<td align="right">
+					<?php $total_other= round($SUM_OTHER,2); ?>
+					<input type="text" class="form-control result9 text-right  divide input-sm" id="total_other" name="total_other" value="<?=set_value('total_other', isset($total_other) ? $total_other : '0'); ?>" readonly tabindex="-1" >
+				</td>
+			</tr>
+		</tbody>
+	<?php
+	}
+	
+	?>
 	<tfoot>
 		<tr class='HeaderHr'>
 			<td align='right' colspan='15' height='20px;'></td>
@@ -513,7 +604,7 @@
 			<td align='center' style='text-align:center;' colspan='2'></td>
 			<td align='right' style='text-align:center;' colspan='2'>
 				<?php
-					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
+					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM_OTHER + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
 					$down_payment=($sisa_um);
 					$down_payment2=0;
 				?>
