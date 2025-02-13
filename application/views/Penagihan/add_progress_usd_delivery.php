@@ -529,10 +529,10 @@
 			foreach($other AS $val => $valx){
 				$numb9++;$harga_tot9=0;
 				$checked="";$readonly=" disabled";
-				if(isset($valx['total_deal'])){
-					$harga_sat9= round($valx['harga_total']/$valx['qty_total'],2);
+				if(isset($valx['total_deal_usd'])){
+					$harga_sat9= round($valx['total_deal_usd']/$valx['qty_total'],2);
 				}else{
-					$harga_sat9= round($valx['harga_total'],2);
+					$harga_sat9= round($valx['harga_satuan_usd'],2);
 				}
 				if(isset($valx['checked'])){
 					if($valx['checked']!="") { 
