@@ -561,7 +561,7 @@
 					</td>
 					<td><input type="text" class="form-control" id="material_desc9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_desc9]" value="<?=set_value('material_desc9', isset($valx['desc']) ? $valx['desc'] : ''); ?>" readonly tabindex="-1" ></td>
 					<td>
-					   <input type="text" class="form-control text-right input-sm divide" data-nomor='<?=$numb9 ?>' id="qty9_ori_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9_ori]" value="<?=set_value('qty9_ori', isset($valx['qty_total']) ? $valx['qty_total'] : '0'); ?>" readonly tabindex="-1">
+					   <input type="text" class="form-control text-right input-sm divide" data-nomor='<?=$numb9 ?>' id="qty9_ori_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9_ori]" value="<?=set_value('qty9_ori', isset($valx['qty']) ? $valx['qty'] : '0'); ?>" readonly tabindex="-1">
 					</td>
 					<td>
 					   <input type="text" class="form-control text-right input-sm divide" data-nomor='<?=$numb9 ?>' id="qty9_belum_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9_belum]" value="<?=set_value('qty9_belum', isset($valx['qty_inv']) ? $valx['qty_inv'] : '0'); ?>" readonly tabindex="-1">
