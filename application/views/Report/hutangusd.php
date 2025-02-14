@@ -61,6 +61,10 @@ $this->load->view('include/side_menu');
 				"targets": 'no-sort',
 				"orderable": false,
 			}], 
+			"dom": 'Bfrtip',
+					"buttons": [
+					'excel'
+					],
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 15000,
 			"aLengthMenu": [[15000, 20, 50, 100, 15000], [15000, 20, 50, 100, 15000]],
