@@ -1177,7 +1177,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='2101-01-01'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1300,7 +1300,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, sum(a.kredit_usd) as kredit_usd, sum(a.debet_usd) as debet_usd, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='2101-01-04'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1414,7 +1414,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='2101-01-03'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1527,7 +1527,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='2101-01-05'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1641,7 +1641,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='1111-01-01'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1754,7 +1754,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT
 					(@row:=@row+1) AS nomor,
 					sum(a.kredit) as kredit, sum(a.debet) as debet, a.id_supplier, a.nama_supplier, a.no_reff, a.tanggal	FROM
-					tr_kartu_hutang a
+					view_tr_kartu_hutang a
 				WHERE 1=1 AND a.no_perkiraan='1111-01-02'
 				AND(
 					a.no_reff LIKE '%".$this->db->escape_like_str($like_value)."%'
