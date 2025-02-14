@@ -63,7 +63,7 @@ $this->load->view('include/side_menu');
 			}], 
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 15000,
-			"aLengthMenu": [[10, 20, 50, 100, 15000], [10, 20, 50, 100, 15000]],
+			"aLengthMenu": [[15000, 20, 50, 100, 15000], [15000, 20, 50, 100, 15000]],
 			"dom": 'Bfrtip',
 					"buttons": [
 					'excel'
