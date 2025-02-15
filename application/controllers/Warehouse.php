@@ -2299,7 +2299,7 @@ class Warehouse extends CI_Controller {
 		$option = "<option value='0'>Select Material</option>";
 		foreach($Q_result as $row)
 		{
-			$option .= "<option value='".$row->id_material."'>".$row->nm_material."</option>";
+			$option .= "<option value='".$row->id_material."'>".$row->id_material." - ".$row->nm_material."</option>";
 		}
 		echo json_encode(array(
 			'option' => $option
