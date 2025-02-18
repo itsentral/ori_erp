@@ -156,7 +156,7 @@ class Mutation extends CI_Controller {
 			FROM
 				warehouse_adjustment a,
 				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.category = 'mutation material' AND a.status_id = '0' ".$where." ".$whereMaterial." ".$WHERE_APP." ".$where_by."
+		    WHERE 1=1 AND a.category = 'mutation material' AND a.status_id = '1' ".$where." ".$whereMaterial." ".$WHERE_APP." ".$where_by."
 			AND(
 				a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.kd_gudang_dari LIKE '%".$this->db->escape_like_str($like_value)."%'
