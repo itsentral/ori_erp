@@ -4624,6 +4624,7 @@ class Warehouse_model extends CI_Model {
 			else{
 				$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
+								<button type='button' class='btn btn-sm btn-primary look_history_tras' title='History Tras' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								</div>";
 			}
 			$data[] = $nestedData;
