@@ -31,8 +31,8 @@
 				<th class="text-center" style='vertical-align:middle;'>No Dokumen</th>
 				<th class="text-center" style='vertical-align:middle;'>Gudang Dari</th>
 				<th class="text-center" style='vertical-align:middle;'>Gudang Ke</th>
-				<th class="text-center" style='vertical-align:middle;'>Qty Material</th>
 				<th class="text-center" style='vertical-align:middle;'>Stock Awal</th>
+				<th class="text-center" style='vertical-align:middle;'>Qty Material</th>
 				<th class="text-center" style='vertical-align:middle;'>Stock Akhir</th>
 				<th class="text-center" style='vertical-align:middle;'>Keterangan</th>
 				<th class="text-center" style='vertical-align:middle;'>Tanggal</th>
@@ -67,8 +67,8 @@
 					echo "<td>".strtoupper($valx['no_ipp'])."</td>";
 					echo "<td class='".$bold."'>".strtoupper(get_name('warehouse','nm_gudang','id',$valx['id_gudang_dari']))."</td>";
 					echo "<td class='".$bold2."'>".strtoupper(get_name('warehouse','nm_gudang','id',$valx['id_gudang_ke']))."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty_stock_awal'],4)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty_stock_akhir'],4)."</td>";
 					echo "<td class='".$color."'>".strtoupper($valx['ket'])."</td>";
 					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['update_date']))."</td>";
