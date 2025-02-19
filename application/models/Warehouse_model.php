@@ -5131,7 +5131,7 @@ class Warehouse_model extends CI_Model {
 		$id_gudang 		= $this->uri->segment(4);
 
 		$tanggalNow = date('Y-m-d H:i:s');
-		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-2 month', strtotime($tanggalNow)));
+		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-3 month', strtotime($tanggalNow)));
 
 		$result		= $this->db->get_where('warehouse_history', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'update_date >'=>$TanggalFirst))->result_array();
 		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
@@ -5255,7 +5255,7 @@ class Warehouse_model extends CI_Model {
 		$id_gudang 		= $this->uri->segment(4);
 
 		$tanggalNow = date('Y-m-d H:i:s');
-		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-2 month', strtotime($tanggalNow)));
+		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-3 month', strtotime($tanggalNow)));
 
 		$result		= $this->db->get_where('tran_warehouse_jurnal_detail', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'tgl_trans >'=>$TanggalFirst))->result_array();
 		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
