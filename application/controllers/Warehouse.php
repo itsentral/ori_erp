@@ -4165,4 +4165,21 @@ class Warehouse extends CI_Controller {
   		echo json_encode($Arr_Data);
 	}
 
+	//MATERIAL STOCK TRAS
+	public function material_stock_tras(){
+		$this->warehouse_model->index_material_stock_tras();
+	}
+	
+	public function server_side_material_stock_tras(){
+		$this->warehouse_model->get_data_json_material_stock_tras();
+	}
+
+	public function modal_history_tras(){
+		$this->warehouse_model->modal_history_tras();
+	}
+
+	public function modal_history_booking_tras(){
+		$this->warehouse_model->modal_history_booking_tras();
+	}
+
 }

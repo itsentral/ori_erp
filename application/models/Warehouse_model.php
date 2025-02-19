@@ -4617,6 +4617,7 @@ class Warehouse_model extends CI_Model {
 			if($requestData['category'] == 'pusat'){
 			$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
+								<button type='button' class='btn btn-sm btn-primary look_history_tras' title='History Tras' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								<button type='button' class='btn btn-sm btn-default lot_history' title='Lot' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								</div>";
 			}
@@ -5206,6 +5207,65 @@ class Warehouse_model extends CI_Model {
 			'hist_produksi'			=> $detAdjustment[0]['created_date']
 		);
 		$this->load->view('Warehouse/request_mat_resin', $data);
+	}
+
+
+	public function index_material_stock_tras(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'origa'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Material >> Gudang Origa >> Stock Tras";
+		}
+		elseif($this->uri->segment(3) == 'pusat'){
+			$judul = "Warehouse Material >> Gudang Pusat >> Stock Tras";
+		}
+		elseif($this->uri->segment(3) == 'subgudang'){
+			$judul = "Warehouse Material >> Sub Gudang >> Stock Tras";
+		}
+		elseif($this->uri->segment(3) == 'virtual'){
+			$judul = "Gudang Finish Good >> Stock Tras";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		else{
+			$judul = "Warehouse Material >> Gudang Produksi >> Stock Tras";
+		}
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Material Stock');
+		$this->load->view('Warehouse/material_stock_tras',$data);
+	}
+
+	public function modal_history_tras(){
+		$id_material 	= $this->uri->segment(3);
+		$id_gudang 		= $this->uri->segment(4);
+
+		$tanggalNow = date('Y-m-d H:i:s');
+		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-1 month', strtotime($tanggalNow)));
+
+		$result		= $this->db->get_where('tran_warehouse_jurnal_detail', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'tgl_trans >'=>$TanggalFirst))->result_array();
+		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
+
+		$data = array(
+			'result' => $result,
+			'material' => $material,
+			'id_gudang' => $id_gudang
+		);
+
+		$this->load->view('Warehouse/modal_history_tras', $data);
 	}
 
 
