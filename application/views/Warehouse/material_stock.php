@@ -165,6 +165,18 @@ $gudang = $this->uri->segment(3);
             $("#ModalView2").modal();
         });
 
+		$(document).on('click', '.look_history_tras', function(e){
+            e.preventDefault();
+            loading_spinner();
+
+			console.log(data('nm_material'));
+			die;
+
+            $("#head_title2").html("<b>History Tras "+$(this).data('nm_material')+"</b>");
+            $("#view2").load(base_url + active_controller + '/modal_history_tras/'+$(this).data('id_material')+'/'+$(this).data('id_gudang')+'/<?=(isset($akses_menu)?$akses_menu['approve']:'0')?>');
+            $("#ModalView2").modal();
+        });
+
 		$(document).on('click', '.lot_history', function(e){
             e.preventDefault();
             loading_spinner();
