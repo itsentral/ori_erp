@@ -1311,7 +1311,7 @@
 			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT;
 			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG + $NEW_BERAT;
 			$ArrInsertPriceBook[$key]['produksi'] = $KG_PRODUKSI;
-			$ArrInsertPriceBook[$key]['price_book'] = $harga_jurnal;
+			$ArrInsertPriceBook[$key]['price_book'] = $FINAL_PRICE_BOOK;
 			$ArrInsertPriceBook[$key]['delivery'] = $DELIVERY;
 			$ArrInsertPriceBook[$key]['delivery_proposional'] = $LOGISTIC_PROPOSIONAL;
 			$ArrInsertPriceBook[$key]['incoming'] = $NEW_BERAT;
@@ -1412,7 +1412,6 @@
 			
 			$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2, 'id_material'=>$key),1)->row();
 			if(!empty($harga_jurnal_akhir2)) $harga_jurnal=$harga_jurnal_akhir2->harga;
-
 			$PRICE_INCOMING = $value['price'];
 			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
 			$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
@@ -1437,7 +1436,7 @@
 			$ArrInsertPriceBook[$key]['pusat'] = $KG_PUSAT;
 			$ArrInsertPriceBook[$key]['subgudang'] = $KG_SUBGUDANG + $NEW_BERAT;
 			$ArrInsertPriceBook[$key]['produksi'] = $KG_PRODUKSI;
-			$ArrInsertPriceBook[$key]['price_book'] = $harga_jurnal;
+			$ArrInsertPriceBook[$key]['price_book'] = $FINAL_PRICE_BOOK;
 			$ArrInsertPriceBook[$key]['delivery'] = $DELIVERY;
 			$ArrInsertPriceBook[$key]['delivery_proposional'] = $LOGISTIC_PROPOSIONAL;
 			$ArrInsertPriceBook[$key]['incoming'] = $NEW_BERAT;
