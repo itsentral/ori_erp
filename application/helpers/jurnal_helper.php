@@ -1283,7 +1283,7 @@
 			$KG_PRODUKSI 	= getWeightMaterialWarehouse($key,'produksi');
 			$KG_ALL 		= getWeightMaterialWarehouse($key,'all');
 			
-			$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2, 'id_material'=>$key),1)->row();
+			$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2, 'id_material'=>$key),1)->row();
 			if(!empty($harga_jurnal_akhir2)) $harga_jurnal=$harga_jurnal_akhir2->harga;
 				
 			$get_price_book_pusat = $CI->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
@@ -1410,7 +1410,7 @@
 			$KG_PRODUKSI 	= getWeightMaterialWarehouse($key,'produksi');
 			$KG_ALL 		= getWeightMaterialWarehouse($key,'all');
 			
-			$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2, 'id_material'=>$key),1)->row();
+			$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2, 'id_material'=>$key),1)->row();
 			if(!empty($harga_jurnal_akhir2)) $harga_jurnal=$harga_jurnal_akhir2->harga;
 			$PRICE_INCOMING = $value['price'];
 			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
