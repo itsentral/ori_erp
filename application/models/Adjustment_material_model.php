@@ -749,7 +749,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['qty_stock_akhir'] 	= $stokjurnalakhir-$qty_oke;
 				$ArrJurnalNew['kode_trans'] 		= $kode_trans;
 				$ArrJurnalNew['tgl_trans'] 		= $DateTime;
-				$ArrJurnalNew['qty_in'] 			= $qty_oke;
+				$ArrJurnalNew['qty_out'] 			= $qty_oke;
 				$ArrJurnalNew['ket'] 				= 'ADJUSTMENT '.strtoupper($adjustment_type);
 				$ArrJurnalNew['harga'] 			= $PRICE * $qty_oke;
 				$ArrJurnalNew['harga_bm'] 		= 0;
@@ -906,11 +906,11 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['nm_material'] 		= $rest_gudang_ke[0]->nm_material;
 				$ArrJurnalNew['id_category'] 		= $rest_gudang_ke[0]->id_category;
 				$ArrJurnalNew['nm_category'] 		= $rest_gudang_ke[0]->nm_category;
-				$ArrJurnalNew['id_gudang'] 		= $id_gudang_ke_m;
-				$ArrJurnalNew['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke_m);
+				$ArrJurnalNew['id_gudang'] 		= $id_gudang_ke;
+				$ArrJurnalNew['kd_gudang'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
 				$ArrJurnalNew['kd_gudang_dari'] 	= 'ADJUSTMENT '.strtoupper($adjustment_type);
-				$ArrJurnalNew['id_gudang_ke'] 	= $id_gudang_ke_m;
-				$ArrJurnalNew['kd_gudang_ke'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke_m);
+				$ArrJurnalNew['id_gudang_ke'] 	= $id_gudang_ke;
+				$ArrJurnalNew['kd_gudang_ke'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_ke);
 				$ArrJurnalNew['qty_stock_awal'] 	= $stokjurnalakhir;
 				$ArrJurnalNew['qty_stock_akhir'] 	= $qty_oke+$stokjurnalakhir;
 				$ArrJurnalNew['kode_trans'] 		= $kode_trans;
