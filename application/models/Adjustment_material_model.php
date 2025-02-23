@@ -475,7 +475,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir1 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir1 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir1)) $PRICE=$harga_jurnal_akhir1->harga;
 				}elseif($Gudang2 == 'subgudang'){
 					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
@@ -502,7 +502,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 
 
@@ -750,7 +750,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -927,7 +927,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -1089,7 +1089,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
