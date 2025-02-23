@@ -497,12 +497,18 @@ class Mutation extends CI_Controller {
 				$gudang2 = $getGudang2[0]->category;
 				
 				if($gudang2 == 'subgudang'){
-				$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-				$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
+				//$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
+				//$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
+
+				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3,'id_material'=>$key),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE_INCOMING=$harga_jurnal_akhir2->harga;
 				
 				}elseif($gudang2 == 'produksi'){
-				$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
-				$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
+				//$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
+				//$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
+
+				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 				
 				}
 		
@@ -622,23 +628,34 @@ class Mutation extends CI_Controller {
 					$QTY_OKE      = $value;
 					
 					$GudangFrom = $kategori_gudang;
-					if($GudangFrom == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+				if($GudangFrom == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($GudangFrom == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+		
+				}elseif($GudangFrom == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+			
+					
+				}
 					
 					
 					$ArrJurnalNew[$key]['id_material'] 		= $rest_pusat[0]->id_material;
@@ -729,24 +746,34 @@ class Mutation extends CI_Controller {
 					$QTY_OKE      = $value;
 					
 					$GudangFrom = $kategori_gudang;
-					if($GudangFrom == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+				if($GudangFrom == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($GudangFrom == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+		
+				}elseif($GudangFrom == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+			
 					
+				}
 					
 					$ArrJurnalNew[$key]['id_material'] 		= $restMat[0]->id_material;
 					$ArrJurnalNew[$key]['idmaterial'] 		= $restMat[0]->idmaterial;
@@ -837,43 +864,66 @@ class Mutation extends CI_Controller {
 					
 					
 					$Gudang2 = $kategori_gudang2;
-					if($Gudang2 == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($Gudang2 == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($Gudang2 == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+					
+				if($Gudang2 == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($Gudang2 == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+		
+				}elseif($Gudang2 == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+			
+					
+				}
 					
 					
-					$GudangFrom = $kategori_gudang;
-					if($GudangFrom == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+				$GudangFrom = $kategori_gudang;
+				if($GudangFrom == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($GudangFrom == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+		
+				}elseif($GudangFrom == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+			
+					
+				}
 					
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
@@ -985,45 +1035,68 @@ class Mutation extends CI_Controller {
 					
 					
 					
+					
 					$Gudang2 = $kategori_gudang2;
-					if($Gudang2 == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($Gudang2 == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($Gudang2 == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-						$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+					
+				if($Gudang2 == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($Gudang2 == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+		
+				}elseif($Gudang2 == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+			
+					
+				}
 					
 					
-					$GudangFrom = $kategori_gudang;
-					if($GudangFrom == 'pusat'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'subgudang'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-					}elseif($GudangFrom == 'produksi'){
-						$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
-						$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-						$bmunit = 0;
-						$bm = 0;
-						
-					}
+				$GudangFrom = $kategori_gudang;
+				if($GudangFrom == 'pusat'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+
+
+				}elseif($GudangFrom == 'subgudang'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+		
+				}elseif($GudangFrom == 'produksi'){
+					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$id_material))->result();
+					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
+					$bmunit = 0;
+					$bm = 0;
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+			
 					
+				}
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
 					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
