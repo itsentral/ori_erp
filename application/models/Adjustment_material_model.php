@@ -328,7 +328,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $CI->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
