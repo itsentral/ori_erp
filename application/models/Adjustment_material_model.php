@@ -788,7 +788,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['qty_stock_akhir'] 	= $stokjurnalakhir-$qty_oke;
 				$ArrJurnalNew['kode_trans'] 		= $kode_trans;
 				$ArrJurnalNew['tgl_trans'] 		= $DateTime;
-				$ArrJurnalNew['qty_'] 			= $qty_oke;
+				$ArrJurnalNew['qty_out'] 			= $qty_oke;
 				$ArrJurnalNew['ket'] 				= 'ADJUSTMENT '.strtoupper($adjustment_type);
 				$ArrJurnalNew['harga'] 			= $PRICE * $qty_oke;
 				$ArrJurnalNew['harga_bm'] 		= 0;
@@ -967,7 +967,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['tgl_trans'] 		= $DateTime;
 				$ArrJurnalNew['qty_in'] 			= $qty_oke;
 				$ArrJurnalNew['ket'] 				= 'ADJUSTMENT '.strtoupper($adjustment_type);
-				$ArrJurnalNew['harga'] 			= $PRICE * $qty_oke;
+				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
 				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;;
@@ -1129,7 +1129,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['tgl_trans'] 		= $DateTime;
 				$ArrJurnalNew['qty_in'] 			= $qty_oke;
 				$ArrJurnalNew['ket'] 				= 'ADJUSTMENT '.strtoupper($adjustment_type);
-				$ArrJurnalNew['harga'] 			= $PRICE * $qty_oke;
+				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
 				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;;
