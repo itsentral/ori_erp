@@ -507,7 +507,7 @@ class Mutation extends CI_Controller {
 				//$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
 				//$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
 
-				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$key),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 				
 				}
