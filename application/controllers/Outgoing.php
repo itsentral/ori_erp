@@ -1885,7 +1885,7 @@ class Outgoing extends CI_Controller {
 						
 								
 							}
-							}
+							
 							$QTY_OKE  = $temp[$value['id']]['good'];
 							$ACTUAL_MAT = $id_material;
 							
@@ -1955,3 +1955,5 @@ class Outgoing extends CI_Controller {
 		echo json_encode($Arr_Data);
 	}
 }
+
+
