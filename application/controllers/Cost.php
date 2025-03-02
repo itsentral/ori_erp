@@ -1999,6 +1999,9 @@ class Cost extends CI_Controller {
 		
 		$name_lainnya 	= $this->db->group_by('nama')->get_where('accessories', array('category'=>'4','deleted'=>'N'))->result_array();
 		$brand_lainnya 	= $this->db->group_by('material')->get_where('accessories', array('category'=>'4','deleted'=>'N'))->result_array();
+
+		$name_tanki 	= $this->db->group_by('nama')->get_where('accessories', array('category'=>'5','deleted'=>'N'))->result_array();
+		$brand_tanki 	= $this->db->group_by('material')->get_where('accessories', array('category'=>'5','deleted'=>'N'))->result_array();
 	
 		$transport_export = $this->db
 									->select('a.*, b.country_name')
@@ -2051,6 +2054,8 @@ class Cost extends CI_Controller {
 			'brand_gasket'		=> $brand_gasket,
 			'name_lainnya'		=> $name_lainnya,
 			'brand_lainnya'		=> $brand_lainnya,
+			'name_tanki'		=> $name_tanki,
+			'brand_tanki'		=> $brand_tanki,
 			'transport_export'	=> $transport_export,
 			'category'			=> $category,
 			'area'				=> $area,
@@ -3089,6 +3094,178 @@ class Cost extends CI_Controller {
 		
 		
 		$where_category = " AND a.category = '4' ";
+		
+		$where_nama = "";
+		if($nama != '0'){
+			$where_nama = " AND a.nama='".$nama."'";
+		}
+		$where_brand = "";
+		if($brand != '0'){
+			$where_brand = " AND a.material='".$brand."'";
+		}
+		
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.*,
+				b.category AS category_,
+				c.kode_satuan
+			FROM
+				accessories a 
+				LEFT JOIN accessories_category b ON a.category = b.id
+				LEFT JOIN raw_pieces c ON a.satuan = c.id_satuan,
+				(SELECT @row:=0) r
+		    WHERE 1=1 AND 
+				a.deleted='N' 
+				".$where_category." ".$where_nama." ".$where_brand."
+			AND (
+				a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.category LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.dimensi LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.spesifikasi LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.id LIKE '%".$this->db->escape_like_str($like_value)."%'
+	        )
+		";
+		// echo $sql; exit; 
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'id_material',
+			2 => 'nama',
+			3 => 'material',
+			4 => 'dimensi',
+			5 => 'spesifikasi',
+			6 => 'ukuran_standart',
+			7 => 'standart',
+			8 => 'kode_satuan',
+			9 => 'keterangan',
+			10 => 'harga'
+		);
+
+		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	//Lainnya
+	public function data_side_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/supplier';
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->get_query_json_tanki(
+			$requestData['nama'],
+			$requestData['brand'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+      $start_dari     = $requestData['start'];
+      $asc_desc       = $requestData['order'][0]['dir'];
+      if($asc_desc == 'asc')
+      {
+          $nomor = $urut1 + $start_dari;
+      }
+      if($asc_desc == 'desc')
+      {
+          $nomor = ($total_data - $start_dari) - $urut2;
+      }
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['id']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['id_material']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nama']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['material']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['dimensi']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['spesifikasi']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['ukuran_standart']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['standart']))."</div>";
+			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['kode_satuan']))."</div>";
+			// $nestedData[]	= "<div align='left'>".ucfirst(strtolower($row['keterangan']))."</div>";
+			
+			//estimation
+			$date_now 	= date('Y-m-d');
+			$date_exp 	= $row['exp_price_ref_sup'];
+
+			$tgl1x = new DateTime($date_now);
+			$tgl2x = new DateTime($date_exp);
+			$selisihx = $tgl2x->diff($tgl1x)->days + 1;
+
+			$date_expv 	= date('d M Y', strtotime($date_exp));
+			$date_min 	= date('d-M-Y', strtotime('-7 days', strtotime($date_exp)));
+			// $selisih	= $date_expv->diff($date_now)->days;
+			
+			$waiting_app = '';
+			if($row['app_price_sup'] == 'Y'){
+				$waiting_app= "<br><span class='badge bg-purple'>Waiting Approval Price</span>";
+			}
+			
+			$tambahan = "No Set";
+			if($tgl2x < $tgl1x){
+				$status2="Expired price";
+				$tambahan = "<span class='badge bg-red'>$status2</span>".$waiting_app;
+			}
+			if($tgl2x >= $tgl1x AND $selisihx <= 7){
+				$status2="Less one week expired price";
+				$tambahan = "<span class='badge bg-blue'>$status2</span>".$waiting_app;
+			}
+			if($tgl2x >= $tgl1x AND $selisihx > 7){
+				$tambahan = "<span class='badge bg-green'>Price Oke</span>".$waiting_app;
+			}
+
+			if(empty($date_exp)){
+				$status2="Not Set";
+				$tambahan = "<span class='badge bg-red'>$status2</span>";
+				$date_expv 	= 'Not setting';
+			}
+			
+			$PRE = (!empty($row['price_from_supplier']))?$row['price_from_supplier']:0;
+			$nestedData[]	= "<div align='right'>".number_format($PRE,2)."</div>";
+			$nestedData[]	= "<div align='right'>".$date_expv."</div>";
+			$nestedData[]	= "<div align='left'>".$tambahan."</div>";
+			$nestedData[]	= "<div align='left'>".ucfirst(strtolower($row['reject_reason']))."</div>";
+				$edit	= '';
+				if($Arr_Akses['update']=='1'){
+					$edit	= "<a href='".site_url($this->uri->segment(1).'/edit_supplier_acc/'.$row['id'])."' class='btn btn-sm btn-primary' title='Edit Data' data-role='qtip'><i class='fa fa-edit'></i></a>";
+				}
+			$nestedData[]	= "<div align='center'>".$edit."</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function get_query_json_tanki($nama, $brand, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		
+		
+		$where_category = " AND a.category = '5' ";
 		
 		$where_nama = "";
 		if($nama != '0'){
