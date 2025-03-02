@@ -829,6 +829,18 @@ if($value1 == 'eksport'){
 			});
 		});
 
+		$(document).on('click','.tanki', function(e){
+			$.ajax({
+				url: base_url + active_controller+'/tab_last',
+				type		: "POST",
+				data		: {
+					'value1' : 'tanki'
+				},
+				cache		: false,
+				dataType	: 'json',
+			});
+		});
+
 		$(document).on('click','.lokal', function(e){
 			$.ajax({
 				url: base_url + active_controller+'/tab_last',
@@ -1140,19 +1152,6 @@ if($value1 == 'eksport'){
 			"fixedHeader": {
 				"header": true,
 				"footer": true
-			},
-			"oLanguage": {
-				"sSearch": "<b>Live Search : </b>",
-				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-				"sInfoFiltered": "(filtered from _MAX_ total entries)",
-				"sZeroRecords": "No matching records found",
-				"sEmptyTable": "No data available in table",
-				"sLoadingRecords": "Please wait - loading...",
-				"oPaginate": {
-					"sPrevious": "Prev",
-					"sNext": "Next"
-				}
 			},
 			"aaSorting": [[ 1, "asc" ]],
 			"columnDefs": [ {
