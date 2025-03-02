@@ -3194,9 +3194,9 @@ class Cost extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['id_material']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nama']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['material']))."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['dimensi']))."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['spesifikasi']))."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['ukuran_standart']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['dimensi'].' '.$row['spesifikasi']))."</div>";
+			// $nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['spesifikasi']))."</div>";
+			// $nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['ukuran_standart']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['standart']))."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['kode_satuan']))."</div>";
 			// $nestedData[]	= "<div align='left'>".ucfirst(strtolower($row['keterangan']))."</div>";

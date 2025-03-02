@@ -414,9 +414,9 @@ if($value1 == 'eksport'){
 											<th class="text-center">ID</th>
 											<th class="text-center">Name</th>
 											<th class="text-center">Material/Brand</th> 
-											<th class="text-center">Dimensi</th> 
-											<th class="text-center">Spesifikasi</th> 
-											<th class="text-center">Ukuran Standart</th> 
+											<th class="text-center">Dimensi/Spec</th> 
+											<!-- <th class="text-center">Spesifikasi</th> 
+											<th class="text-center">Ukuran Standart</th>  -->
 											<th class="text-center">Standart</th> 
 											<th class="text-center">Satuan</th> 
 											<!-- <th class="text-center">Keterangan</th> -->
