@@ -45,6 +45,11 @@ if($value1 == 'lainnya'){
 	$active4 = 'active';
 }
 
+$active4a = '';
+if($value1 == 'tanki'){
+	$active4a = 'active';
+}
+
 $active5 = '';
 if($value1 == 'lokal'){
 	$active5 = 'active';
@@ -177,6 +182,7 @@ if($value1 == 'eksport'){
 							<li role="presentation" class="<?=$active2;?>"><a href="#plate" class='plate' aria-controls="plate" role="tab" data-toggle="tab">Plate</a></li>
 							<li role="presentation" class="<?=$active3;?>"><a href="#gasket" class='gasket' aria-controls="gasket" role="tab" data-toggle="tab">Gasket</a></li>
 							<li role="presentation" class="<?=$active4;?>"><a href="#lainnya" class='lainnya' aria-controls="lainnya" role="tab" data-toggle="tab">Lainnya</a></li>
+							<li role="presentation" class="<?=$active4a;?>"><a href="#tanki" class='tanki' aria-controls="tanki" role="tab" data-toggle="tab">Tanki</a></li>
 						</ul>
 
 						<!-- Tab panes -->
@@ -362,6 +368,55 @@ if($value1 == 'eksport'){
 											<th class="text-center">Dimensi</th> 
 											<th class="text-center">Spesifikasi</th> 
 											<th class="text-center">Ukuran Standart</th> 
+											<th class="text-center">Standart</th> 
+											<th class="text-center">Satuan</th> 
+											<!-- <th class="text-center">Keterangan</th> -->
+											<th class="text-center">Price Supplier ($)</th>
+											<th class="text-center">Expired</th>
+											<th class="text-center">Status</th>
+											<th class="text-center">Alasan Reject</th>
+											<th class="text-center no-sort">Option</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+								</div>
+							</div>
+							<!--Tanki-->
+							<div role="tabpanel" class="tab-pane <?=$active4a;?>" id="tanki">
+								<div class="box-tool pull-right">
+									<select name='barang4a' id='barang4a' class='form-control input-sm chosen-select'>
+										<option value='0'>ALL NAME</option>
+										<?php
+										foreach($name_lainnya as $val => $valx)
+										{
+											echo "<option value='".$valx['nama']."'>".strtoupper($valx['nama'])."</option>";
+										}
+										?>
+									</select>
+									<select name='brand4a' id='brand4a' class='form-control input-sm chosen-select'>
+										<option value='0'>ALL MATERIAL</option>
+										<?php
+										foreach($brand_lainnya as $val => $valx)
+										{
+											echo "<option value='".$valx['material']."'>".strtoupper($valx['material'])."</option>";
+										}
+										?>
+									</select>
+								</div>
+								<br><br><br>
+								<div class="table-responsive">
+								<table class="table table-bordered table-striped" id="my-grid_tanki" width='100%'>
+									<thead width='100%'>
+										<tr class='bg-blue'>
+											<th class="text-center">#</th>
+											<th class="text-center">ID Program</th>
+											<th class="text-center">ID</th>
+											<th class="text-center">Name</th>
+											<th class="text-center">Material/Brand</th> 
+											<th class="text-center">Dimensi/Spec</th> 
+											<!-- <th class="text-center">Spesifikasi</th> 
+											<th class="text-center">Ukuran Standart</th>  -->
 											<th class="text-center">Standart</th> 
 											<th class="text-center">Satuan</th> 
 											<!-- <th class="text-center">Keterangan</th> -->
@@ -687,6 +742,12 @@ if($value1 == 'eksport'){
 			'brand4' : $('#brand4').val()
 		};
 		DataTables_lainnya(lainnya_filter.barang4, lainnya_filter.brand4);
+
+		let tanki_filter = {
+			'barang4a' : $('#barang4a').val(),
+			'brand4a' : $('#brand4a').val()
+		};
+		DataTables_tanki(tanki_filter.barang4a, tanki_filter.brand4a);
 		
 		$(document).on('change', '#barang1, #brand1', function(){
 			let baut_filter = {
@@ -762,6 +823,18 @@ if($value1 == 'eksport'){
 				type		: "POST",
 				data		: {
 					'value1' : 'lainnya'
+				},
+				cache		: false,
+				dataType	: 'json',
+			});
+		});
+
+		$(document).on('click','.tanki', function(e){
+			$.ajax({
+				url: base_url + active_controller+'/tab_last',
+				type		: "POST",
+				data		: {
+					'value1' : 'tanki'
 				},
 				cache		: false,
 				dataType	: 'json',
@@ -1053,6 +1126,43 @@ if($value1 == 'eksport'){
 			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
 			"ajax":{
 				url : base_url + active_controller+'/data_side_lainnya',
+				type: "post",
+				data: function(d){
+					d.nama = nama,
+					d.brand = brand
+				},
+				cache: false,
+				error: function(){
+					$(".my-grid-error").html("");
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+					$("#my-grid_processing").css("display","none");
+				}
+			}
+		});
+	}
+
+	function DataTables_tanki(nama=null,brand=null){
+		var dataTable = $('#my-grid_tanki').DataTable({
+			"serverSide": true,
+			"stateSave" : true,
+			"autoWidth": false,
+			"destroy": true,
+			"processing": true,
+			"responsive": true,
+			"fixedHeader": {
+				"header": true,
+				"footer": true
+			},
+			"aaSorting": [[ 1, "asc" ]],
+			"columnDefs": [ {
+				"targets": 'no-sort',
+				"orderable": false,
+			}],
+			"sPaginationType": "simple_numbers",
+			"iDisplayLength": 10,
+			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
+			"ajax":{
+				url : base_url + active_controller+'/data_side_tanki',
 				type: "post",
 				data: function(d){
 					d.nama = nama,
