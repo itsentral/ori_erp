@@ -7,11 +7,14 @@ $koneksi 		= $db1->connect();
 define('DBACC', 'gl');
 
 //cek if end of month
-$tanggal_exe=date("Y-m-t");
-if(date("Y-m-d")!=$tanggal_exe) die("Bukan akhir bulan");
+//$tanggal_exe=date("Y-m-t");
+//if(date("Y-m-d")!=$tanggal_exe) die("Bukan akhir bulan");
 
-$bulan=date("m");
-$tahun=date("Y");
+//$bulan=date("m");
+//$tahun=date("Y");
+
+$bulan='02';
+$tahun='2025';
 
 $sqlHeader	= "select * from amortisasi_generate WHERE bulan='".$bulan."' and tahun='".$tahun."' and kd_asset in (select kd_asset from amortisasi where status=1)";
 $Q_Awal	= $koneksi->query($sqlHeader);
@@ -26,7 +29,8 @@ if(!empty($ArrJurnal)){
 	$det_Jurnaltes1=array();
 	$jenis_jurnal = 'AMORTISASI';
 	$nomor_jurnal = $jenis_jurnal . $tahun.$bulan . rand(100, 999);
-	$payment_date=date("Y-m-d");
+	//$payment_date=date("Y-m-d");
+	$payment_date='2025-02-28';
 	foreach($ArrJurnal AS $val => $valx){
 		$dtrow	= $koneksi->query("select a.*,b.coa as cat_coa from amortisasi a left join amortisasi_category b on a.category=b.id  WHERE kd_asset='".$valx["kd_asset"]."'");
 
