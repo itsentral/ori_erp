@@ -13228,7 +13228,8 @@ class Produksi extends CI_Controller {
 				$id          = $data->id_trans;
                 $no_request  = $data->no_spk;	
 				$kredit      = $data->total_price;
-				$totalwip       = $data->total_price_debet;	
+				//$totalwip       = $data->total_price_debet;	
+				$totalwip       += $data->total_price;	
 				
 				if($nm_material=='WIP Direct labour'){					
 					$nokir = '2107-01-02' ;
