@@ -162,7 +162,14 @@ class Asset extends CI_Controller{
 			$this->load->library('upload', $config);
 			$this->upload->initialize($config);
 			if (!$this->upload->do_upload('foto')){
-				$result = $this->upload->display_errors();
+				// $result = $this->upload->display_errors();
+				$error = array('error' => $this->upload->display_errors());
+				$Arr_Kembali		= array(
+					'status'		=> 3,
+					'pesan'			=> $error['error']
+				);
+				echo json_encode($Arr_Kembali);
+				return false;
 			}
 			else{
 				$paths 		= $_SERVER['DOCUMENT_ROOT'].'/assets/foto/'.$pic; 
