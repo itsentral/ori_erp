@@ -12846,7 +12846,7 @@ class Produksi extends CI_Controller {
 					
 					$temp2[$UNIQ]['costbook'] 		= 0;
 					$temp2[$UNIQ]['kurs'] 			= $kurs;
-					$temp2[$UNIQ]['total_price'] 		= $nilai;
+					$temp2[$UNIQ]['total_price'] 		= 0;
 					$temp2[$UNIQ]['total_price_debet'] 	= $nilai2;
 					$temp2[$UNIQ]['created_by'] 		= $username;
 					$temp2[$UNIQ]['created_date'] 	= $datetime;
