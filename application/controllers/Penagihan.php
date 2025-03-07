@@ -6237,6 +6237,7 @@ if($base_cur=='USD'){
 			$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
 			$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
 			$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
+			$getOther  	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','OTHER')->get('penagihan_detail')->result_array();
 			$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 			$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
