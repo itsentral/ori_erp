@@ -12915,7 +12915,7 @@ class Produksi extends CI_Controller {
 					
 					$this->db->where('id_trans',$id_trans);
 					$this->db->where('nm_material','WIP '.$getSummary[0]['product']);
-					$this->db->update('data_erp_wip',array('total_price'=>$nilai_wip,'total_price_debet'=>$nilai_wip)); 
+					$this->db->update('data_erp_wip',array('total_price'=>0,'total_price_debet'=>$nilai_wip)); 
 				}
 			}
 		}
