@@ -13229,7 +13229,7 @@ class Produksi extends CI_Controller {
                 $no_request  = $data->no_spk;	
 				$kredit      = $data->total_price;
 				$totalwip       = $data->total_price_debet;	
-				//$totalwip       += $data->total_price;	
+				$wiptotal       += $data->total_price;	
 				
 				if($nm_material=='WIP Direct labour'){					
 					$nokir = '2107-01-02' ;
@@ -13265,7 +13265,7 @@ class Produksi extends CI_Controller {
 					  'no_perkiraan'  => '1103-03-02',
 					  'keterangan'    => $keterangan,
 					  'no_reff'       => $id,
-					  'debet'         => $debit,
+					  'debet'         => $wiptotal,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'produksi wip',
 					  'no_request'    => $no_request,
