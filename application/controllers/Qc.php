@@ -4371,7 +4371,7 @@ class Qc extends CI_Controller
 				$finishgood    	= $data->finishgood;
 				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
 				
-				$totalfg        = $data->finishgood;
+				$totalfg        = $cogs;
 				
 				
 				
@@ -4475,7 +4475,7 @@ class Qc extends CI_Controller
 					  'keterangan'    => $keterangan,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
-					  'kredit'        => $wip,
+					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
@@ -4490,7 +4490,7 @@ class Qc extends CI_Controller
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => 'FINISHED GOOD',
 					  'no_reff'       => $id,
-					  'debet'         => $finishgood,
+					  'debet'         => $cogs,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
@@ -4506,7 +4506,7 @@ class Qc extends CI_Controller
 					  'keterangan'    => 'COGS',
 					  'no_reff'       => $id,
 					  'debet'         => 0,
-					  'kredit'        => $wip,
+					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
