@@ -380,7 +380,7 @@ class Report_wip extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".str_replace(',','<br>',$row['no_spk'])."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
-			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
+			$nestedData[]	= "<div align='center'>".str_replace(',','<br>',$row['id_trans'])."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['qty']."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
