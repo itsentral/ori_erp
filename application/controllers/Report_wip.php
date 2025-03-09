@@ -377,7 +377,7 @@ class Report_wip extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['no_spk']."</div>";
+			$nestedData[]	= "<div align='left'>".str_replace(',','<br>',$row['no_spk'])."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
