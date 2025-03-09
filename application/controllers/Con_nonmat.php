@@ -397,7 +397,7 @@ class Con_nonmat extends CI_Controller {
 
 			//MASUK AKSESORIS
 			$ArrAKsesoris = [];
-			if($category_awal == '7'){
+			// if($category_awal == '7'){
 				$ArrAKsesoris = array(
 					'id_material' => $code_group,
 					'category' => $id_category_acc,
@@ -409,7 +409,7 @@ class Con_nonmat extends CI_Controller {
 					$LastBy => $data_session['ORI_User']['username'],
 					$LastDate => $dateTime
 				);
-			}
+			// }
 
 			$this->db->trans_start();
 				if(empty($tanda_edit)){
