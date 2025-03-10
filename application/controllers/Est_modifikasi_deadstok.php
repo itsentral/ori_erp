@@ -66,6 +66,7 @@ class Est_modifikasi_deadstok extends CI_Controller {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".$row['kode']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_spk']."</div>";
 			$nestedData[]	= "<div align='left'>".ucwords(strtolower($row['type']))."</div>";
@@ -150,6 +151,7 @@ class Est_modifikasi_deadstok extends CI_Controller {
 					OR b.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR b.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.kode LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
 				GROUP BY a.created_date
 		";
@@ -159,11 +161,12 @@ class Est_modifikasi_deadstok extends CI_Controller {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'b.product_name',
-			2 => 'b.product_spec',
-            3 => 'nomor',
-			4 => 'a.created_by',
-			5 => 'a.created_date',
+			1 => 'a.kode',
+			2 => 'b.product_name',
+			3 => 'b.product_spec',
+            4 => 'nomor',
+			5 => 'a.created_by',
+			6 => 'a.created_date',
 		);
 
 		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
