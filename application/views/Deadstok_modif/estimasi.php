@@ -16,6 +16,7 @@ $this->load->view('include/side_menu');
 				<thead class='thead'>
 					<tr class='bg-blue'>
 						<th class="text-center th">#</th>
+						<th class="text-center th">Kode Modif</th>
 						<th class="text-center th">SO</th>
 						<th class="text-center th">No. SPK</th>
 						<th class="text-center th">Category</th>
