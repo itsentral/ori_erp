@@ -2727,12 +2727,12 @@ class Ppic extends CI_Controller {
 						}
 						$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kd_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 						$this->db->insert(DBACC.'.javh',$dataJVhead);
-						if(!empty($det_Jurnaltes)){
-							$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
-						}
+						
 				}
 
-				
+					if(!empty($det_Jurnaltes)){
+					$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
+					}
 
 			}
 	}
