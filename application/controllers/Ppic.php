@@ -2701,7 +2701,7 @@ class Ppic extends CI_Controller {
                         $nilai = round($datasp->amount);
 						$total += $nilai;
 						if ($posisi=='DEBIT'){
-							$det_Jurnaltes = array(
+							$det_Jurnaltes1 = array(
 							'nomor'         => $Nomor_JV,
 							'tanggal'       => $tgl_voucher,
 							'tipe'          => 'JV',
@@ -2713,7 +2713,7 @@ class Ppic extends CI_Controller {
 							'created_on'    => $DateTime,
 							);
 
-							$det_Jurnaltes = array(
+							$det_Jurnaltes2 = array(
 								'nomor'         => $Nomor_JV,
 								'tanggal'       => $tgl_voucher,
 								'tipe'          => 'JV',
@@ -2731,7 +2731,10 @@ class Ppic extends CI_Controller {
 						$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kd_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 						$this->db->insert(DBACC.'.javh',$dataJVhead);
 						if(!empty($det_Jurnaltes)){
-							$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
+							$this->db->insert(DBACC.'.jurnal',$det_Jurnaltes1);
+						}
+						if(!empty($det_Jurnaltes)){
+							$this->db->insert(DBACC.'.jurnal',$det_Jurnaltes2);
 						}
 								
 				}
