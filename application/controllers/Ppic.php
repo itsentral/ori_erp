@@ -2687,6 +2687,7 @@ class Ppic extends CI_Controller {
 						$posisi        =$datasp->posisi;
 						$keterangan    =$datasp->keterangan;
 						$category      =$datasp->category;
+						$gudang        =$datasp->gudang;
 
 						$tgl_voucher = substr($tgl_spool,0,10);
 						$Bln	  = substr($tgl_voucher,5,2);
@@ -2701,8 +2702,8 @@ class Ppic extends CI_Controller {
                         $nilai = round($datasp->amount);
 						$total += $nilai;
 
-						if($category=='quality control spool'){
-								if ($posisi=='DEBIT'){
+						if($gudang=='15'){
+								
 									$det_Jurnaltes1 = array(
 									'nomor'         => $Nomor_JV,
 									'tanggal'       => $tgl_voucher,
@@ -2726,12 +2727,12 @@ class Ppic extends CI_Controller {
 										'kredit'        => $nilai,
 										'created_on'    => $DateTime,
 										);
-								}
 								
 								
-							}else{
+								
+							}elseif($gudang=='14'){
 
-								if ($posisi=='DEBIT'){
+							
 									$det_Jurnaltes1 = array(
 									'nomor'         => $Nomor_JV,
 									'tanggal'       => $tgl_voucher,
@@ -2755,7 +2756,7 @@ class Ppic extends CI_Controller {
 										'kredit'        => $nilai,
 										'created_on'    => $DateTime,
 										);
-								}
+							
 
 							}
 
