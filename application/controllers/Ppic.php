@@ -2679,8 +2679,6 @@ class Ppic extends CI_Controller {
 			foreach($dataspool AS $record){
                 $kd_trans = $record->kd_trans;
 				$datatemp = $this->db->query("select * from jurnal_temp WHERE kode_trans = '$kd_trans' AND updated_date LIKE '2024%' AND category LIKE '%spool%'")->result();				
-				$this->load->model('jurnal_model');
-				$Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl);
 				$nilai=0;
 				$total=0;
 				foreach($datatemp AS $datasp){	
@@ -2692,7 +2690,8 @@ class Ppic extends CI_Controller {
 						$tgl_voucher = substr($tgl_spool,0,10);
 						$Bln	  = substr($tgl_voucher,5,2);
 						$Thn	  = substr($tgl_voucher,0,4);
-
+                        $this->load->model('jurnal_model');
+				        $Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
 						if($keterangan=='wip'){
 							$nokir ='1103-03-05';
 						}elseif($keterangan=='finish good'){
@@ -2726,14 +2725,14 @@ class Ppic extends CI_Controller {
 							'created_on'    => $DateTime,
 							);
 						}
-
+						$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kd_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+						$this->db->insert(DBACC.'.javh',$dataJVhead);
+						if(!empty($det_Jurnaltes)){
+							$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
+						}
 				}
 
-				$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kd_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-				$this->db->insert(DBACC.'.javh',$dataJVhead);
-				if(!empty($det_Jurnaltes)){
-					$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
-				}
+				
 
 			}
 	}
