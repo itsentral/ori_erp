@@ -2673,52 +2673,53 @@ class Ppic extends CI_Controller {
 		    $data_session	= $this->session->userdata;
 			$UserName		= $data_session['ORI_User']['username'];
 			$DateTime		= date('Y-m-d H:i:s');
+			$tgl            = date('Y-m-d');
 			
 			$dataspool = $this->db->query("select * from dataspool_jurnal")->result();
 			foreach($dataspool AS $record){
                 $kd_trans = $record->kd_trans;
 				$datatemp = $this->db->query("select * from jurnal_temp WHERE kode_trans = '$kd_trans' AND updated_date LIKE '2024%' AND category LIKE '%spool%'")->result();				
+				$this->load->model('jurnal_model');
+				$Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl);
 				$nilai=0;
 				$total=0;
 				foreach($datatemp AS $datasp){	
-						$tgl_spool =$datasp->updated_date;
-						$posisi =$datasp->posisi;
+						$tgl_spool     =$datasp->updated_date;
+						$posisi        =$datasp->posisi;
 						$keterangan    =$datasp->keterangan;
 						$category      =$datasp->category;
 
 						$tgl_voucher = substr($tgl_spool,0,10);
-						$this->load->model('jurnal_model');
-						$Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
 						$Bln	  = substr($tgl_voucher,5,2);
 						$Thn	  = substr($tgl_voucher,0,4);
 
 						if($keterangan=='wip'){
-							$nokir ='';
+							$nokir ='1103-03-05';
 						}elseif($keterangan=='finish good'){
-                            $nokir ='';
+                            $nokir ='1103-04-01';
 						}
                         $nilai = round($datasp->amount);
 						$total += $nilai;
-						if ($posisi=='DEBET'){
+						if ($posisi=='DEBIT'){
 							$det_Jurnaltes[] = array(
 							'nomor'         => $Nomor_JV,
 							'tanggal'       => $tgl_voucher,
 							'tipe'          => 'JV',
 							'no_perkiraan'  => $nokir,
-							'keterangan'    => $category.' '.$kd_trans,
+							'keterangan'    => $category.' '.$posisi,
 							'no_reff'       => $kd_trans,
 							'debet'         => $nilai,
 							'kredit'        => 0,
 							'created_on'    => $DateTime,
 							);
 						}
-						if ($posisi=='KREDIT'){
+						elseif ($posisi=='KREDIT'){
 							$det_Jurnaltes[] = array(
 							'nomor'         => $Nomor_JV,
 							'tanggal'       => $tgl_voucher,
 							'tipe'          => 'JV',
 							'no_perkiraan'  => $nokir,
-							'keterangan'    => $category.' '.$kd_trans,
+							'keterangan'    => $category.' '.$posisi,
 							'no_reff'       => $kd_trans,
 							'debet'         => 0,
 							'kredit'        => $nilai,
