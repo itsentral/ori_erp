@@ -2670,7 +2670,69 @@ class Ppic extends CI_Controller {
 	}
 
 	public function jurnal_spool_manual(){
-		jurnal_spool_manual();
+		    $data_session	= $this->session->userdata;
+			$UserName		= $data_session['ORI_User']['username'];
+			$DateTime		= date('Y-m-d H:i:s');
+			
+			$dataspool = $this->db->query("select a.* from dataspool_jurnal")->result();
+			foreach($dataspool AS $record){
+                $kd_trans = $record->kd_trans;
+				$datatemp = $this->db->query("select a.* from jurnal_temp WHERE kd_trans = $kd_trans AND updated_date LIKE '2024%' AND category LIKE '%spool%'")->result();				
+				$nilai=0;
+				$total=0;
+				foreach($datatemp AS $datasp){	
+						$tgl_spool =$datasp->updated_date;
+						$posisi =$datasp->posisi;
+						$keterangan    =$datasp->keterangan;
+						$category      =$datasp->category;
+
+						$tgl_voucher = substr($tgl_spool,0,10);
+						$this->load->model('jurnal_model');
+						$Nomor_JV = $this->jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+						$Bln	  = substr($tgl_voucher,5,2);
+						$Thn	  = substr($tgl_voucher,0,4);
+
+						if($keterangan=='wip'){
+							$nokir ='';
+						}elseif($keterangan=='finish good'){
+                            $nokir ='';
+						}
+                        $nilai = round($datasp->amount);
+						$total += $nilai;
+						if ($posisi=='DEBET'){
+							$det_Jurnaltes[] = array(
+							'nomor'         => $Nomor_JV,
+							'tanggal'       => $tgl_voucher,
+							'tipe'          => 'JV',
+							'no_perkiraan'  => $nokir,
+							'keterangan'    => $category.' '.$kd_trans,
+							'no_reff'       => $kd_trans,
+							'debet'         => $nilai,
+							'kredit'        => 0,
+							);
+						}
+						if ($posisi=='KREDIT'){
+							$det_Jurnaltes[] = array(
+							'nomor'         => $Nomor_JV,
+							'tanggal'       => $tgl_voucher,
+							'tipe'          => 'JV',
+							'no_perkiraan'  => $nokir,
+							'keterangan'    => $category.' '.$kd_trans,
+							'no_reff'       => $kd_trans,
+							'debet'         => 0,
+							'kredit'        => $nilai,
+							);
+						}
+
+				}
+
+				$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kode_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+				$this->db->insert(DBACC.'.javh',$dataJVhead);
+				if(!empty($det_Jurnaltes)){
+					$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
+				}
+
+			}
 	}
 
 
