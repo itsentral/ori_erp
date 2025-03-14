@@ -2705,7 +2705,7 @@ class Ppic extends CI_Controller {
 							'nomor'         => $Nomor_JV,
 							'tanggal'       => $tgl_voucher,
 							'tipe'          => 'JV',
-							'no_perkiraan'  => $nokir,
+							'no_perkiraan'  => '1103-03-05',
 							'keterangan'    => $category.' '.$keterangan,
 							'no_reff'       => $kd_trans,
 							'debet'         => $nilai,
@@ -2717,7 +2717,7 @@ class Ppic extends CI_Controller {
 								'nomor'         => $Nomor_JV,
 								'tanggal'       => $tgl_voucher,
 								'tipe'          => 'JV',
-								'no_perkiraan'  => $nokir,
+								'no_perkiraan'  => '1103-04-01',
 								'keterangan'    => $category.' '.$keterangan,
 								'no_reff'       => $kd_trans,
 								'debet'         => 0,
@@ -2730,11 +2730,12 @@ class Ppic extends CI_Controller {
 
 						$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $category, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $kd_trans, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 						$this->db->insert(DBACC.'.javh',$dataJVhead);
-						if(!empty($det_Jurnaltes)){
-							$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
-						}
-
+						
 								
+				}
+
+				if(!empty($det_Jurnaltes)){
+					$this->db->insert_batch(DBACC.'.jurnal',$det_Jurnaltes);
 				}
                 
 			}
