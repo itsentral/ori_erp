@@ -2670,7 +2670,7 @@ class Ppic extends CI_Controller {
 	}
 
 	public function jurnal_spool_manual(){
-		jurnal_spool_manual()
+		jurnal_spool_manual();
 	}
 
 
