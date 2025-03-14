@@ -2736,7 +2736,7 @@ class Ppic extends CI_Controller {
 
 								
 				}
-
+                echo"<pre>";
 				print_r($det_Jurnaltes);
 				exit;
 			}
