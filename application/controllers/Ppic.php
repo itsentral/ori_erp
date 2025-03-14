@@ -2709,6 +2709,7 @@ class Ppic extends CI_Controller {
 							'no_reff'       => $kd_trans,
 							'debet'         => $nilai,
 							'kredit'        => 0,
+							'created_on'    => $DateTime,
 							);
 						}
 						if ($posisi=='KREDIT'){
@@ -2721,6 +2722,7 @@ class Ppic extends CI_Controller {
 							'no_reff'       => $kd_trans,
 							'debet'         => 0,
 							'kredit'        => $nilai,
+							'created_on'    => $DateTime,
 							);
 						}
 
