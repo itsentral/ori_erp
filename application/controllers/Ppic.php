@@ -2677,7 +2677,7 @@ class Ppic extends CI_Controller {
 			$dataspool = $this->db->query("select * from dataspool_jurnal")->result();
 			foreach($dataspool AS $record){
                 $kd_trans = $record->kd_trans;
-				$datatemp = $this->db->query("select * from jurnal_temp WHERE kd_trans = $kd_trans AND updated_date LIKE '2024%' AND category LIKE '%spool%'")->result();				
+				$datatemp = $this->db->query("select * from jurnal_temp WHERE kode_trans = $kd_trans AND updated_date LIKE '2024%' AND category LIKE '%spool%'")->result();				
 				$nilai=0;
 				$total=0;
 				foreach($datatemp AS $datasp){	
