@@ -1182,6 +1182,7 @@
 	<?php
 	}
 	if ($restHeader[0]['parent_product']!='branch joint' && $restHeader[0]['parent_product']!='field joint' && $restHeader[0]['parent_product']!='shop joint'){
+		if(!empty($restDetail2) OR !empty($restResin2) OR !empty($restDetailPlus2) OR !empty($restDetailAdd2)){
 		?>
 	<div class="box box-success">
 		<div class="box-body" style="">
@@ -1260,19 +1261,19 @@
 							$Cl0	= 'white';
 						}
 						?>
-					<tr>
-						<td class="text-left"><?= $valx['nm_category'];?></td>
-						<td class="text-left"><?= $valx['nm_material'];?></td>
-						<td class="text-center" style='background-color: <?=$bgC1;?>; color: <?= $Cl1;?>'><?= floatval($valx['value']);?></td>
-						<td class="text-right" style='background-color: <?=$bgC2;?>; color: <?= $Cl2;?>'><?= $valx['thickness'];?></td>
-						<td class="text-center" style='background-color: <?=$bgC3;?>; color: <?= $Cl3;?>'><?= floatval($valx['fak_pengali']);?></td>
-						<td class="text-center" style='background-color: <?=$bgC4;?>; color: <?= $Cl4;?>'><?= floatval($valx['bw']);?></td>
-						<td class="text-center" style='background-color: <?=$bgC5;?>; color: <?= $Cl5;?>'><?= floatval($valx['jumlah']);?></td>
-						<td class="text-center" style='background-color: <?=$bgC6;?>; color: <?= $Cl6;?>'><?= floatval($valx['layer']);?></td>
-						<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-						<td class="text-right" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= $valx['total_thickness'];?></td>
-						<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-					</tr>
+						<tr>
+							<td class="text-left"><?= $valx['nm_category'];?></td>
+							<td class="text-left"><?= $valx['nm_material'];?></td>
+							<td class="text-center" style='background-color: <?=$bgC1;?>; color: <?= $Cl1;?>'><?= floatval($valx['value']);?></td>
+							<td class="text-right" style='background-color: <?=$bgC2;?>; color: <?= $Cl2;?>'><?= $valx['thickness'];?></td>
+							<td class="text-center" style='background-color: <?=$bgC3;?>; color: <?= $Cl3;?>'><?= floatval($valx['fak_pengali']);?></td>
+							<td class="text-center" style='background-color: <?=$bgC4;?>; color: <?= $Cl4;?>'><?= floatval($valx['bw']);?></td>
+							<td class="text-center" style='background-color: <?=$bgC5;?>; color: <?= $Cl5;?>'><?= floatval($valx['jumlah']);?></td>
+							<td class="text-center" style='background-color: <?=$bgC6;?>; color: <?= $Cl6;?>'><?= floatval($valx['layer']);?></td>
+							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+							<td class="text-right" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= $valx['total_thickness'];?></td>
+							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+						</tr>
 						<?php
 					}
 					?>
@@ -1300,14 +1301,14 @@
 							$Cl0	= 'white';
 						}
 						?>
-					<tr>
-						<td class="text-left"><?= $valx['nm_category'];?> TOTAL</td>
-						<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
-						<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-						<td class="text-center">0</td>
-						<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-					</tr>
-					<?php 
+						<tr>
+							<td class="text-left"><?= $valx['nm_category'];?> TOTAL</td>
+							<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
+							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+							<td class="text-center">0</td>
+							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+						</tr>
+						<?php 
 					}
 					
 					foreach($restDetailPlus2 AS $val => $valx){
@@ -1330,13 +1331,13 @@
 							$Cl0	= 'white';
 						}
 						?>
-					<tr>
-						<td class="text-left"><?= $valx['nm_category'];?></td>
-						<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
-						<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
-						<td class="text-center" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= floatval($valx['perse']);?></td>
-						<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
-					</tr>
+						<tr>
+							<td class="text-left"><?= $valx['nm_category'];?></td>
+							<td class="text-left" colspan='7'><?= $valx['nm_material'];?></td>
+							<td class="text-center" style='background-color: <?=$bgC7;?>; color: <?= $Cl7;?>'><?= floatval($valx['containing']);?></td>
+							<td class="text-center" style='background-color: <?=$bgC8;?>; color: <?= $Cl8;?>'><?= floatval($valx['perse']);?></td>
+							<td class="text-right" style='background-color: <?=$bgC0;?>; color: <?= $Cl0;?>'><?= $valx['last_cost'];?></td>
+						</tr>
 						<?php
 					}
 					?>
@@ -1419,7 +1420,7 @@
 		</div>
 	</div>
 	<?php
-	
+	}
 	if(!empty($restDetail3)){
 	?>
 	<div class="box box-warning">

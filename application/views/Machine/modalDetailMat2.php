@@ -405,6 +405,7 @@
 		<?php
 	}
 	
+	$judul2 = "";
 	if(!empty($restDetail2)){
 		$judul2 = $restDetail2[0]['detail_name'];
 	}
