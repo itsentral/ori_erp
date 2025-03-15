@@ -79,7 +79,7 @@ class Report_fg extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".str_replace(',','<br>',str_replace(',,',',',$row['no_spk']))."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
-			$nestedData[]	= "<div align='center'>".$row['id_trans']."</div>";
+			$nestedData[]	= "<div align='center'>".str_replace(',','<br>',$row['id_trans'])."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$QTY = (!empty($row['id_material']))?'':1;
 			$nestedData[]	= "<div align='right'>".$QTY."</div>";
