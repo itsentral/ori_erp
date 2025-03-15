@@ -680,16 +680,12 @@ class Request_payment extends CI_Controller {
 					}
 					if ($tipe[$keys] == 'kasbon') {
 						$rec = $this->db->query("select * from " . DBACC . ".master_oto_jurnal_detail where kode_master_jurnal='" . $jenis_jurnal . "' and menu='" . $tipe[$keys] . "'")->row();
-						if($rec->menu=='kasbon'){
-							$coa_kasbon = $this->db->query("select * from tr_kasbon where no_doc'" . $no_doc[$keys] . "'")->row();
+					
+							$coa_kasbon = $this->db->query("select * from tr_kasbon where no_doc='" . $no_doc[$keys] . "'")->row();
 							$det_Jurnaltes1[] = array(
 								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $coa_kasbon->coa, 'keterangan' => $keterangan[$keys], 'no_request' => $no_doc[$keys], 'debet' => $bank_nilai[$keys], 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' =>  $no_doc[$keys], 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $nama[$keys], 'stspos' => '1'
 							);
-						}else{
-							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $keterangan[$keys], 'no_request' => $no_doc[$keys], 'debet' => $bank_nilai[$keys], 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' =>  $no_doc[$keys], 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $nama[$keys], 'stspos' => '1'
-							);
-						}
+						
 						
 						if ($bank_admin[$keys] > 0) {
 							$rec = $this->db->query("select * from " . DBACC . ".master_oto_jurnal_detail where kode_master_jurnal='" . $jenis_jurnal . "' and menu='admin'")->row();
@@ -703,6 +699,7 @@ class Request_payment extends CI_Controller {
 						$ketpetty='';
 						$recpc = $this->db->query("select * from " . DBERP . ".tr_expense where no_doc='" . $no_doc[$keys] . "'")->row();
 						$ketpetty=$recpc->pettycash.' ';
+						
 						$rec = $this->db->query("select * from " . DBERP . ".tr_expense_detail where no_doc='" . $no_doc[$keys] . "' and status = '1'")->result();
 						// $rec = $this->db->get_where('payment_approve_details', ['payment_id' => $val])->result();
 						$this->db->update('tr_expense_detail', ['status' => '2'], ['no_doc' => $no_doc[$keys], 'status' => '1']);

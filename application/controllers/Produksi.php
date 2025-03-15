@@ -13216,7 +13216,7 @@ class Produksi extends CI_Controller {
 			$wip = $this->db->query("SELECT * FROM data_erp_wip WHERE id_trans ='".$idtrans."'")->result();
 			
 			$totalwip =0;
-			  
+			$wiptotal =0; 
 			$det_Jurnaltes = [];
 			  
 			foreach($wip AS $data){

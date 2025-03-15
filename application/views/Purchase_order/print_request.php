@@ -40,6 +40,12 @@
             echo "<td class='header_style_alamat' colspan='4'>".strtoupper(get_name('supplier','nm_supplier','id_supplier',$datapo->id_supplier))."</td>";
         echo "</tr>";
 
+		echo "<tr>";
+		echo "<td class='header_style_alamat' width='15%'>Bank Account</td>";
+		echo "<td class='header_style_alamat' width='1%'>:</td>";
+		echo "<td class='header_style_alamat' colspan='4'>".strtoupper(get_name('supplier','data_bank','id_supplier',$datapo->id_supplier))."</td>";
+	    echo "</tr>";
+
 	echo "</table>";
 
 	echo "<br>";
