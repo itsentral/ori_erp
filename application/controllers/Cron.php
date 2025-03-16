@@ -4918,7 +4918,7 @@ class Cron extends CI_Controller {
 		$sheet->getColumnDimension('U')->setWidth(16);
 
 
-		$qSupplier	    = "	SELECT * FROM laporan_per_hari WHERE `date` >= '2024-01-01' ORDER BY id_produksi ASC ";
+		$qSupplier	    = "	SELECT * FROM laporan_per_hari WHERE `date` >= '2024-01-01' ORDER BY `date` ASC ";
 		$restDetail1	= $this->db->query($qSupplier)->result_array();
 		
 		if($restDetail1){
