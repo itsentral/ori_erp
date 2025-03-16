@@ -1360,7 +1360,7 @@ class Cron extends CI_Controller {
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
                 
                 $awal_col++;
-//				$real_harga	= $row_Cek['real_harga'];				
+				//$real_harga	= $row_Cek['real_harga'];				
 				$real_harga	= ($row_Cek['real_harga_rp']/$row_Cek['kurs']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $real_harga);
@@ -4757,5 +4757,374 @@ class Cron extends CI_Controller {
 		$data['query'] = $this->db->query($sql);
 		return $data;
     }
+
+	public function excel_detail_all(){
+		//membuat objek PHPExcel
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+
+		$this->load->library("PHPExcel");
+		$objPHPExcel	= new PHPExcel();
+		
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
+		 
+		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
+		$sheet 		= $objPHPExcel->getActiveSheet();
+		
+		$Row		= 1;
+		$NewRow		= $Row+1;
+		$Col_Akhir	= $Cols	= getColsChar(2243);
+		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI');
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
+		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
+		
+		$NewRow	= $NewRow +2;
+		$NextRow= $NewRow;
+		$NextRow1= $NewRow +1;
+		
+		$sheet->setCellValue('A'.$NewRow, 'Date'); 
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow1);
+		$sheet->getColumnDimension('A')->setAutoSize(true);
+		
+		$sheet->setCellValue('B'.$NewRow, 'IPP');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow1);
+		$sheet->getColumnDimension('B')->setAutoSize(true);
+		
+		$sheet->setCellValue('C'.$NewRow, 'Product');
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow1);
+		$sheet->getColumnDimension('C')->setAutoSize(true);
+		
+		$sheet->setCellValue('D'.$NewRow, 'ID Product');
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow1);
+		$sheet->getColumnDimension('D')->setWidth(16);
+		
+		$sheet->setCellValue('E'.$NewRow, 'Dim x Dim 2');
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow1);
+		$sheet->getColumnDimension('E')->setWidth(16);
+		
+		$sheet->setCellValue('F'.$NewRow, 'Pressure');
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow1);
+		$sheet->getColumnDimension('F')->setWidth(16);
+		
+		$sheet->setCellValue('G'.$NewRow, 'Liner');
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow1);
+		$sheet->getColumnDimension('G')->setWidth(16);
+		
+		$sheet->setCellValue('H'.$NewRow, 'Est Material (kg)');
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow1);
+        $sheet->getColumnDimension('H')->setWidth(16);
+        
+        $sheet->setCellValue('I'.$NewRow, 'Est Price ($)');
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow1);
+        $sheet->getColumnDimension('I')->setWidth(16);
+        
+        $sheet->setCellValue('J'.$NewRow, 'Aktual Material (kg)');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow1);
+        $sheet->getColumnDimension('J')->setWidth(16);
+        
+        $sheet->setCellValue('K'.$NewRow, 'Aktual Price ($)');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow1);
+        $sheet->getColumnDimension('K')->setWidth(16);
+        
+        $sheet->setCellValue('L'.$NewRow, 'Qty');
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow1);
+        $sheet->getColumnDimension('L')->setWidth(16);
+        
+        $sheet->setCellValue('M'.$NewRow, 'Revenue');
+		$sheet->getStyle('M'.$NewRow.':M'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('M'.$NewRow.':M'.$NextRow1);
+        $sheet->getColumnDimension('M')->setWidth(16);
+        
+        $sheet->setCellValue('N'.$NewRow, 'Direct Labour');
+		$sheet->getStyle('N'.$NewRow.':N'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('N'.$NewRow.':N'.$NextRow1);
+        $sheet->getColumnDimension('N')->setWidth(16);
+        
+        $sheet->setCellValue('O'.$NewRow, 'Indirect Labour');
+		$sheet->getStyle('O'.$NewRow.':O'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('O'.$NewRow.':O'.$NextRow1);
+        $sheet->getColumnDimension('O')->setWidth(16);
+        
+        $sheet->setCellValue('P'.$NewRow, 'Consumable');
+		$sheet->getStyle('P'.$NewRow.':P'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('P'.$NewRow.':P'.$NextRow1);
+        $sheet->getColumnDimension('P')->setWidth(16);
+
+        $sheet->setCellValue('Q'.$NewRow, 'FOH');
+		$sheet->getStyle('Q'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('Q'.$NewRow.':U'.$NextRow);
+        $sheet->getColumnDimension('Q')->setWidth(16);
+
+		$sheet->setCellValue('V'.$NewRow, 'Sales & Marketing');
+		$sheet->getStyle('V'.$NewRow.':V'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('V'.$NewRow.':V'.$NextRow1);
+		$sheet->getColumnDimension('V')->setWidth(16);
+
+		$sheet->setCellValue('W'.$NewRow, 'Umum & Admin');
+		$sheet->getStyle('W'.$NewRow.':W'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('W'.$NewRow.':W'.$NextRow1);
+		$sheet->getColumnDimension('W')->setWidth(16);
+
+		$sheet->setCellValue('X'.$NewRow, 'No SPK');
+		$sheet->getStyle('X'.$NewRow.':X'.$NextRow1)->applyFromArray($tableHeader);
+		$sheet->mergeCells('X'.$NewRow.':X'.$NextRow1);
+		$sheet->getColumnDimension('X')->setWidth(16);
+
+		$NewRow	= $NewRow +1;
+		$NextRow= $NewRow;
+        
+        $sheet->setCellValue('Q'.$NewRow, 'Machine Cost');
+		$sheet->getStyle('Q'.$NewRow.':Q'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('Q'.$NewRow.':Q'.$NextRow);
+        $sheet->getColumnDimension('Q')->setWidth(16);
+        
+        $sheet->setCellValue('R'.$NewRow, 'Mold mandril Cost');
+		$sheet->getStyle('R'.$NewRow.':R'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('R'.$NewRow.':R'.$NextRow);
+        $sheet->getColumnDimension('R')->setWidth(16);
+        
+        $sheet->setCellValue('S'.$NewRow, 'Depreciation FOH');
+		$sheet->getStyle('S'.$NewRow.':S'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('S'.$NewRow.':S'.$NextRow);
+        $sheet->getColumnDimension('S')->setWidth(16);
+        
+        $sheet->setCellValue('T'.$NewRow, 'Factory Overhead');
+		$sheet->getStyle('T'.$NewRow.':T'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('T'.$NewRow.':T'.$NextRow);
+        $sheet->getColumnDimension('T')->setWidth(16);
+        
+        $sheet->setCellValue('U'.$NewRow, 'Salary Factory Management');
+		$sheet->getStyle('U'.$NewRow.':U'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('U'.$NewRow.':U'.$NextRow);
+		$sheet->getColumnDimension('U')->setWidth(16);
+
+
+		$qSupplier	    = "	SELECT * FROM laporan_per_hari ORDER BY id_produksi ASC ";
+		$restDetail1	= $this->db->query($qSupplier)->result_array();
+		
+		if($restDetail1){
+			$awal_row	= $NextRow;
+			$no=0;
+			foreach($restDetail1 as $key => $row_Cek){
+				$no++;
+				$awal_row++;
+				$awal_col	= 0;
+				
+				
+				$awal_col++;
+				$date	= $row_Cek['date'];
+				$Cols	= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $date);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
+				$awal_col++;
+				$id_produksi	= $row_Cek['id_produksi'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_produksi);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
+				$awal_col++;
+				$id_category	= $row_Cek['id_category'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_category);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
+				$awal_col++;
+				$id_product	= $row_Cek['id_product'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_product);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
+				$awal_col++;
+				$diameter2	= $row_Cek['diameter'].' X '.$row_Cek['diameter2'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $diameter2);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				
+				$awal_col++;
+				$pressure	= $row_Cek['pressure'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $pressure);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				
+				$awal_col++;
+				$liner	= $row_Cek['liner'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $liner);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				
+				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
+				$tandaIPP = substr($NO_IPP,0,4);
+
+				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
+
+				$estimasi_material 	= $row_Cek['est_material'];
+				$estimasi_price 	= $row_Cek['est_harga'];
+				$real_material 		= $row_Cek['real_material'];
+				$no_spk 			= $row_Cek['no_spk'];
+				$revenue 			= $row_Cek['est_harga'];
+
+				if($tandaIPP != 'IPPT'){
+					$get_revenue = $this->db
+								->select('(d.price_total / e.qty) AS revenue, b.no_spk')
+								->from('laporan_per_hari a')
+								->join('so_detail_header b','a.id_milik=b.id')
+								->join('so_bf_detail_header c','b.id_milik=c.id')
+								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+								->join('bq_detail_header e','c.id_milik=e.id')
+								->where('a.id_milik', $row_Cek['id_milik'])
+								->limit(1)
+								->get()
+								->result();
+					$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+					$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
+					$revenue 	= $revenue2 * $qty;
+					
+					$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
+
+					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+					$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+					// $real_material 		= $row_Cek['real_material'];
+				}
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $estimasi_material);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $estimasi_price);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $real_material);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$real_harga	= ($row_Cek['real_harga_rp']/$row_Cek['kurs']);
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $real_harga);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$qty	= $qty;
+				$Cols	= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $qty);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$revenue	= $revenue;
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $revenue);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+
+				$awal_col++;
+				$direct_labour	= $row_Cek['direct_labour'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                
+                $awal_col++;
+				$indirect_labour	= $row_Cek['indirect_labour'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $indirect_labour);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+                $awal_col++;
+				$consumable	= $row_Cek['consumable'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $consumable);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+                $awal_col++;
+				$machine	= $row_Cek['machine'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $machine);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$mould_mandrill	= $row_Cek['mould_mandrill'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $mould_mandrill);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+
+                $awal_col++;
+				$foh_depresiasi	= $row_Cek['foh_depresiasi'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $foh_depresiasi);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$biaya_rutin_bulanan	= $row_Cek['biaya_rutin_bulanan'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $biaya_rutin_bulanan);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$foh_consumable	= $row_Cek['foh_consumable'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $foh_consumable);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$biaya_non_produksi	= $row_Cek['biaya_non_produksi'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $biaya_non_produksi);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+                
+                $awal_col++;
+				$biaya_gaji_non_produksi	= $row_Cek['biaya_gaji_non_produksi'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $biaya_gaji_non_produksi);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
+                $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+			}
+		}
+		
+		
+		$sheet->setTitle('Report');
+		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5          
+		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		ob_end_clean();
+		//sesuaikan headernya 
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		//ubah nama file saat diunduh
+		header('Content-Disposition: attachment;filename="all-report-produksi-detail.xls"');
+		//unduh file
+		$objWriter->save("php://output");
+	}
 
 }
