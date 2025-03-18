@@ -6,6 +6,7 @@ class Jurnal_temp extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->helper('jurnal_helper');
 
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
@@ -3010,7 +3011,7 @@ class Jurnal_temp extends CI_Controller {
 	 }
 
 	 public function jurnal_incustomer(){
-		jurnal_incustomer_manual();
+			jurnal_incustomer_manual();
 	 }
 
 }
