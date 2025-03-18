@@ -3016,7 +3016,7 @@ class Jurnal_temp extends CI_Controller {
 		$ket ='TRANSIT - CUSTOMER';
 		$kodejurnal ='JV007';
 		
-		$ArrDetailProduct = $this->db->query("SELECT a.* FROM jurnal_product_manual a ")->result();
+		$ArrDetailProduct = $this->db->query("SELECT a.* FROM jurnal_product_manual a ")->result_array();
 
 		foreach($ArrDetailProduct as $keys => $values) {
 		  $id=$values['id_detail'];		
