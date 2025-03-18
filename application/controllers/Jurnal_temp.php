@@ -7,6 +7,8 @@ class Jurnal_temp extends CI_Controller {
 		parent::__construct();
 		$this->load->model('master_model');
 		$this->load->helper('jurnal_helper');
+		$this->load->model('Jurnal_model');
+		$this->load->model('Acc_model');
 
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
@@ -3011,7 +3013,129 @@ class Jurnal_temp extends CI_Controller {
 	 }
 
 	 public function jurnal_incustomer(){
-			jurnal_incustomer_manual();
+		$ket ='TRANSIT - CUSTOMER';
+		$kodejurnal ='JV007';
+		
+		$ArrDetailProduct = $this->db->query("SELECT a.* FROM jurnal_product_manual a ")->result();
+
+		foreach($ArrDetailProduct as $keys => $values) {
+		  $id=$values['id_detail'];		
+		  
+		  $datajurnal = $this->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product_manual a join product_parent b on a.product=b.product_parent WHERE a.category='diterima customer' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
+		  $id=(!empty($datajurnal->id))?$datajurnal->id:0;
+		  $tgl_voucher = (!empty($datajurnal->tanggal))?$datajurnal->tanggal:'2024-01-31';
+		  $no_request = $id;
+
+		  $id_detail=(!empty($datajurnal->id_detail))?$datajurnal->id_detail:0;
+		  $id_milik=(!empty($datajurnal->id_milik))?$datajurnal->id_milik:0;
+		  $total_nilai=(!empty($datajurnal->total_nilai))?$datajurnal->total_nilai:0;
+		  $id_spk=(!empty($datajurnal->id_spk))?$datajurnal->id_spk:0;
+		  $no_so=(!empty($datajurnal->no_so))?$datajurnal->no_so:0;
+		  $product=(!empty($datajurnal->product))?$datajurnal->product:0;
+		  $no_surat_jalan=(!empty($datajurnal->no_surat_jalan))?$datajurnal->no_surat_jalan:0;
+
+		  $dataproductiondetail=$this->db->query("select * from production_detail where id='".$id_detail."' and id_milik ='".$id_milik."' limit 1")->row();
+		  
+		  
+		  if(!empty($dataproductiondetail->finish_good)){
+			  if($dataproductiondetail->finish_good==0){
+			  $datasodetailheader = $this->db->query("SELECT * FROM laporan_per_hari_action WHERE id_milik ='".$datajurnal->id_milik."' limit 1" )->row();
+		  
+			  
+			  $kurs=1;
+			  $sqlkurs="select * from ms_kurs where tanggal <='".$datajurnal->tanggal."' and mata_uang='USD' order by tanggal desc limit 1";
+			  $dtkurs	= $this->db->query($sqlkurs)->row();
+			  if(!empty($dtkurs)) $kurs=$dtkurs->kurs;
+			  $wip_material=$datajurnal->total_nilai;
+			  $pe_direct_labour=(($datasodetailheader->direct_labour*$datasodetailheader->man_hours)*$kurs);
+			  $pe_indirect_labour=(($datasodetailheader->indirect_labour*$datasodetailheader->man_hours)*$kurs);
+			  $foh=(($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable)*$kurs);
+			  $pe_consumable=($datasodetailheader->consumable*$kurs);
+			  $finish_good=($wip_material+$pe_direct_labour+$foh+$pe_indirect_labour+$pe_consumable);
+
+			  $this->db->query("update production_detail set wip_kurs='".$kurs."', wip_material='".$wip_material."' , wip_dl='".$pe_direct_labour."' , wip_foh='".$foh."', wip_il='".$pe_indirect_labour."', wip_consumable='".$pe_consumable."', finish_good='".$finish_good."' WHERE id='".$datajurnal->id_detail."' and id_milik ='".$datajurnal->id_milik."' limit 1" );
+		  
+			  $totalall=$finish_good;
+			  }
+			  else{
+			  $totalall= (!empty($dataproductiondetail->finish_good))?$dataproductiondetail->finish_good:0;
+			  }
+			  
+		  }
+		  
+		  // print_r($totalall);
+		  // exit;
+		  
+		  $no_spk=$id_spk;
+		  $Keterangan_INV=($ket).' ('.$no_so.' - '.$product.' - '.$no_spk.' - '.$no_surat_jalan.')';
+		  $datajurnal  	 = $this->Acc_model->GetTemplateJurnal($kodejurnal);
+		  $det_Jurnaltes = [];
+		  if(!empty($datajurnal)){
+			  foreach($datajurnal AS $record){
+				  $tabel  = $record->menu;
+				  $posisi = $record->posisi;
+				  $field  = $record->field;
+				  $nokir  = $record->no_perkiraan;
+				  $totalall2 = (!empty($totalall))?$totalall:0;
+				  $param  = 'id';
+				  if ($posisi=='D'){
+					  $value_param  = $id;
+					  $val = $this->Acc_model->GetData($tabel,$field,$param,$value_param);
+					  $nilaibayar = (!empty($val[0]->$field))?$val[0]->$field:0;
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $Keterangan_INV,
+					  'no_reff'       => $no_request,
+					  'debet'         => $totalall2,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'intransit incustomer',
+					  'no_request'    => $no_request,
+					  'stspos'		=>1
+					  );
+				  } elseif ($posisi=='K'){
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $Keterangan_INV,
+					  'no_reff'       => $no_request,
+					  'debet'         => 0,
+					  'kredit'        => $totalall2,
+					  'jenis_jurnal'  => 'intransit incustomer',
+					  'no_request'    => $no_request,
+					  'stspos'		=>1
+					  );
+				  }
+			  }
+		  }
+		  $this->db->query("delete from jurnaltras_manual WHERE jenis_jurnal='diterima customer' and no_reff ='$id'");
+		  $this->db->insert_batch('jurnaltras_manual',$det_Jurnaltes);
+		  $Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+		  $Bln	= substr($tgl_voucher,5,2);
+		  $Thn	= substr($tgl_voucher,0,4);
+		  $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall2, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.'-'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+		  $this->db->insert(DBACC.'.javh',$dataJVhead);
+		  $datadetail=array();
+		  foreach ($det_Jurnaltes as $vals) {
+			  $datadetail = array(
+				  'tipe'			=> 'JV',
+				  'nomor'			=> $Nomor_JV,
+				  'tanggal'		=> $tgl_voucher,
+				  'no_perkiraan'	=> $vals['no_perkiraan'],
+				  'keterangan'	=> $vals['keterangan'],
+				  'no_reff'		=> $vals['no_reff'],
+				  'debet'			=> $vals['debet'],
+				  'kredit'		=> $vals['kredit'],
+				  );
+			  $this->db->insert(DBACC.'.jurnal',$datadetail);
+		  }
+		  $this->db->query("UPDATE jurnal_product_manual SET status_jurnal='1',approval_by='".$UserName."',approval_date='".$DateTime."' WHERE id ='$id'");
+		  unset($det_Jurnaltes);unset($datadetail);
+		}
 	 }
 
 }
