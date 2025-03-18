@@ -3989,7 +3989,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 			  
 			  $datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product_manual a join product_parent b on a.product=b.product_parent WHERE a.category='diterima customer' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
 			  $id=(!empty($datajurnal->id))?$datajurnal->id:0;
-			  $tgl_voucher = (!empty($datajurnal->tanggal))?$datajurnal->tanggal:date('Y-m-d');
+			  $tgl_voucher = (!empty($datajurnal->tanggal))?$datajurnal->tanggal:'2024-01-31';
 			  $no_request = $id;
   
 			  $id_detail=(!empty($datajurnal->id_detail))?$datajurnal->id_detail:0;
