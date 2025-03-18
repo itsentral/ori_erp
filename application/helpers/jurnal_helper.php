@@ -3977,7 +3977,7 @@ function auto_jurnal_produksi($id,$milik,$category,$ket){
 			 
 		}
 
-        public function jurnal_incustomer_manual(){
+        function jurnal_incustomer_manual(){
 			$CI 	=& get_instance();
 		    $ket ='TRANSIT - CUSTOMER';
 			$kodejurnal ='JV007';
