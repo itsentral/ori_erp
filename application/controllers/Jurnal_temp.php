@@ -3021,7 +3021,7 @@ class Jurnal_temp extends CI_Controller {
 		foreach($ArrDetailProduct as $keys => $values) {
 		  $id=$values['id_detail'];		
 		  
-		  $datajurnal = $this->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product_manual a join product_parent b on a.product=b.product_parent WHERE a.category='diterima customer' and a.status_jurnal='0' and a.id_detail ='$id' limit 1" )->row();
+		  $datajurnal = $this->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product_manual a join product_parent b on a.product=b.product_parent WHERE a.category='diterima customer' and a.id_detail ='$id' limit 1" )->row();
 		  echo "<pre>";
 		  print_r($datajurnal);
 		  exit;
