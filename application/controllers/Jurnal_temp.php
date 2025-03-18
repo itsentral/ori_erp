@@ -3009,4 +3009,8 @@ class Jurnal_temp extends CI_Controller {
 	
 	 }
 
+	 public function jurnal_incustomer(){
+		jurnal_incustomer_manual();
+	 }
+
 }
