@@ -5550,6 +5550,7 @@ class Delivery extends CI_Controller
 			foreach ($ArrIdPro as $value => $valx) {
 				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro'=>$valx['id_pro']))->result_array();
 
+
 				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroup[$value]['keterangan'] = 'Finish Good to In Transit';
 				$ArrGroup[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
@@ -5565,6 +5566,7 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
 				$ArrGroup[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
 				$ArrGroup[$value]['kode_delivery'] = $kode_delivery;
+				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
 
 				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroupOut[$value]['keterangan'] = 'Finish Good to In Transit';
@@ -5802,6 +5804,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
+			$this->jurnalIntransit($id_trans);
 		}
 
 		if(!empty($ArrGroupOut)){
@@ -5861,6 +5864,9 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['gudang'] = $valx['gudang'];
 				$ArrGroup[$value]['kode_spool'] = $valx['kode_spool'];
 
+				$id_trans         = $valx['id_trans'];
+
+
 				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroupOut[$value]['keterangan'] = 'In Transit to Customer';
 				$ArrGroupOut[$value]['no_so'] 	= $valx['no_so'];
@@ -5892,6 +5898,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_customer',$ArrGroup);
+			$this->jurnalIntransitCustomer($id_trans)
 		}
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
@@ -6324,5 +6331,237 @@ class Delivery extends CI_Controller
 
 		return $ArrReturn;
 	}
+
+	//SYAMSUDIN 20/03/2024
+
+	function jurnalIntransit($idtrans){
+		
+		$data_session	= $this->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	
+		   
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			
+			$totalfg =0;
+			  
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$id          = $data->id_trans;
+               	$no_request  = $data->no_spk;	
+				
+				
+				$finishgood    	= $data->finishgood;
+				
+				
+				
+				
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+			    				
+				$coaintransit		='1103-04-06';
+				$coafg   		    ='1103-04-01';
+                				
+				
+								
+				    			 
+					 
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coaintransit,
+					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
+					  'no_reff'       => $id,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Finishgood-Intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coafg,
+					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Finishgood-Intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+					  	
+				
+				
+			}
+			
+			        
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'FINISHED GOOD - INTRANSIT'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $finishgood, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $Keterangan_INV,
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					'created_on'		=> date('Y-m-d H:i:s'),
+					'created_by'		=> 'intransit',
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
+
+
+
+		//SYAMSUDIN 20/03/2024
+
+	function jurnalIntransitCustomer($idtrans){
+		
+		$data_session	= $this->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	
+		   
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			
+			$totalfg =0;
+			  
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$id          = $data->id_trans;
+               	$no_request  = $data->no_spk;	
+				
+				
+				$finishgood    	= $data->finishgood;
+				
+				
+				
+				
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+			    				
+				$coaintransit		='1103-04-06';
+				$coacustomer   		    ='1103-04-07';
+                				
+				
+								
+				    			 
+					 
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coacustomer,
+					  'keterangan'    => 'INTRANSIT-CUSTOMER',
+					  'no_reff'       => $id,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Finishgood-Intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coaintransit,
+					  'keterangan'    => 'INTRANSIT-CUSTOMER',
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Finishgood-Intransit',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+					  	
+				
+				
+			}
+			
+			        
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'INTRANSIT-CUSTOMER'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $finishgood, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $Keterangan_INV,
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					'created_on'		=> date('Y-m-d H:i:s'),
+					'created_by'		=> 'customer'
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
 	
 }

@@ -1223,4 +1223,227 @@ class Cron_job extends CI_Controller {
 			$this->db->trans_commit();
 		}
 	}
+
+	public function jurnal_daily_report_maret(){
+		$dateC = date('Y-m-d');
+		$tanggal = date('Y-m-d', strtotime('-1 days', strtotime($dateC)));
+		$this->load->model('Jurnal_model');
+		$this->load->model('Acc_model');
+        $session = $this->session->userdata('app_session');
+		$data_session	= $this->session->userdata;
+		// update jurnal gudang produksi ke wip berdasarkan laporan produksi
+		$sql="select * from laporan_per_hari_maret where qty_awal is not null and kurs >1 order by `date`";
+		$result	= $this->db->query($sql)->result_array();
+        if(!empty($result)){
+			$nomor=0;
+		    foreach ($result as $data) { 
+				$id_milik=$data['id_milik'];
+				$qty_awal=$data['qty_awal'];
+				$qty_akhir=$data['qty_akhir'];
+				$total_qty=($qty_akhir-$qty_awal+1);
+				$material=$data['real_harga'];
+				$dl=$data['direct_labour'];
+				$idl=$data['indirect_labour'];
+				$mch=$data['machine'];
+				$mml=$data['mould_mandrill'];
+				$csm=$data['consumable'];
+				$fcsm=$data['foh_consumable'];
+				$fdpr=$data['foh_depresiasi'];
+				$bgnp=$data['biaya_gaji_non_produksi'];
+				$bnp=$data['biaya_non_produksi'];
+				$brb=$data['biaya_rutin_bulanan'];
+				$wip_kurs=$data['kurs'];
+				$wip_material=round($material*$wip_kurs/$total_qty);
+				$wip_dl=round($dl*$wip_kurs/$total_qty);
+				$wip_foh=round(($mch+$mml+$fdpr+$brb+$fcsm)*$wip_kurs/$total_qty);
+				$wip_il=round($idl*$wip_kurs/$total_qty);
+				$wip_consumable=round($csm*$wip_kurs/$total_qty);
+				$finish_good=($wip_material+$wip_dl+$wip_foh+$wip_il+$wip_consumable);
+				$this->db->query("update production_detail set wip_kurs='".$wip_kurs."', wip_material='".$wip_material."', wip_dl='".$wip_dl."', wip_foh='".$wip_foh."', wip_il='".$wip_il."', wip_consumable='".$wip_consumable."', finish_good='".$finish_good."' where id_milik ='".$id_milik."' and product_ke between ".$qty_awal." and ".$qty_akhir."");
+				$nomor++;
+		// jurnal
+				$tgl_po=$data['date'];
+				$tgl_voucher=$data['date'];
+				$total=round(($mch+$mml+$fdpr+$brb+$fcsm+$material+$dl+$idl+$csm)*$wip_kurs);
+				$keterangan='GD. PRODUKSI - WIP ( '.$tgl_po.' )';
+				$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_po);
+				$reff=$data['id'];
+				$no_spk=$data['no_spk'];
+				$no_so=$data['no_so'];
+				$Bln	= substr($tgl_po,5,2);
+				$Thn	= substr($tgl_po,0,4);
+				$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_po, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $keterangan, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => 'system', 'memo' => $reff, 'tgl_jvkoreksi' => $tgl_po, 'ho_valid' => '');
+				$this->db->insert(DBACC.'.javh',$dataJVhead);
+				$kodejurnal='JV004';
+				$datajurnal  	 = $this->Acc_model->GetTemplateJurnal($kodejurnal);
+				foreach($datajurnal AS $record) {
+					$posisi = $record->posisi;
+					$nokir  = $record->no_perkiraan;
+					$parameter_no = $record->parameter_no;
+					if ($posisi=='D'){
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $nokir,
+						  'keterangan'    => "WIP Material",
+						  'no_reff'       => $reff,
+						  'debet'         => round($material*$wip_kurs),
+						  'kredit'        => 0,
+						  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+						  'no_request'    => $reff,
+						  'stspos'		  =>1
+						 );
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $nokir,
+						  'keterangan'    => "WIP Direct Labour",
+						  'no_reff'       => $reff,
+						  'debet'         => round($dl*$wip_kurs),
+						  'kredit'        => 0,
+						  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+						  'no_request'    => $reff,
+						  'stspos'		  =>1
+						 );
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $nokir,
+						  'keterangan'    => "WIP Indirect Labour",
+						  'no_reff'       => $reff,
+						  'debet'         => round($idl*$wip_kurs),
+						  'kredit'        => 0,
+						  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+						  'no_request'    => $reff,
+						  'stspos'		  =>1
+						 );
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $nokir,
+						  'keterangan'    => "WIP Consumable",
+						  'no_reff'       => $reff,
+						  'debet'         => round($csm*$wip_kurs),
+						  'kredit'        => 0,
+						  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+						  'no_request'    => $reff,
+						  'stspos'		  =>1
+						 );
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $nokir,
+						  'keterangan'    => "WIP FOH",
+						  'no_reff'       => $reff,
+						  'debet'         => round(($mch+$mml+$fdpr+$brb+$fcsm)*$wip_kurs),
+						  'kredit'        => 0,
+						  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+						  'no_request'    => $reff,
+						  'stspos'		  =>1
+						 );
+					} elseif ($posisi=='K'){
+						if($parameter_no=="1") {
+							$det_Jurnaltes[]  = array(
+							  'nomor'         => '',
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'JV',
+							  'no_perkiraan'  => $nokir,
+							  'keterangan'    => "GUDANG PRODUKSI (Material)".$no_spk." ".$no_so,
+							  'no_reff'       => $reff,
+							  'debet'         => 0,
+							  'kredit'        => round($material*$wip_kurs),
+							  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+							   'no_request'    => $reff,
+							  'stspos'		  =>1
+							 );
+						}
+						if($parameter_no=="2") {
+							$det_Jurnaltes[]  = array(
+							  'nomor'         => '',
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'JV',
+							  'no_perkiraan'  => $nokir,
+							  'keterangan'    => "DIRECT LABOUR PC LIABILITIES",
+							  'no_reff'       => $reff,
+							  'debet'         => 0,
+							  'kredit'        => round($dl*$wip_kurs),
+							  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+							   'no_request'    => $reff,
+							  'stspos'		  =>1
+							 );
+						}
+						if($parameter_no=="3") {
+							$det_Jurnaltes[]  = array(
+							  'nomor'         => '',
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'JV',
+							  'no_perkiraan'  => $nokir,
+							  'keterangan'    => "INDIRECT LABOUR PC LIABILITIES",
+							  'no_reff'       => $reff,
+							  'debet'         => 0,
+							  'kredit'        => round($idl*$wip_kurs),
+							  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+							   'no_request'    => $reff,
+							  'stspos'		  =>1
+							 );
+						}
+						if($parameter_no=="4") {
+							$det_Jurnaltes[]  = array(
+							  'nomor'         => '',
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'JV',
+							  'no_perkiraan'  => $nokir,
+							  'keterangan'    => "CONSUMABLE PC LIABILITIES",
+							  'no_reff'       => $reff,
+							  'debet'         => 0,
+							  'kredit'        => round($csm*$wip_kurs),
+							  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+							   'no_request'    => $reff,
+							  'stspos'		  =>1
+							 );
+						}
+						if($parameter_no=="5") {
+							$det_Jurnaltes[]  = array(
+							  'nomor'         => '',
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'JV',
+							  'no_perkiraan'  => $nokir,
+							  'keterangan'    => "FOH PC LIABILITIES",
+							  'no_reff'       => $reff,
+							  'debet'         => 0,
+							  'kredit'        => round(($mch+$mml+$fdpr+$brb+$fcsm)*$wip_kurs),
+							  'jenis_jurnal'  => 'jurnal_laporan_produksi',
+							  'no_request'    => $reff,
+							  'stspos'		  =>1
+							 );
+						}
+					}
+				}
+				$this->db->insert_batch('jurnaltras',$det_Jurnaltes);
+				foreach ($det_Jurnaltes as $vals) {
+					$datadetail = array(
+						'tipe'			=> 'JV',
+						'nomor'			=> $Nomor_JV,
+						'tanggal'		=> $tgl_voucher,
+						'no_perkiraan'	=> $vals['no_perkiraan'],
+						'keterangan'	=> $vals['keterangan'],
+						'no_reff'		=> $vals['no_reff'],
+						'debet'			=> $vals['debet'],
+						'kredit'		=> $vals['kredit'],
+						'created_by'	=> 'system',
+						'created_on'	=> date("Y-m-d"),
+						);
+					$this->db->insert(DBACC.'.jurnal',$datadetail);
+				}
+				unset ($det_Jurnaltes);
+			}
+		}else{
+			echo 'EMPTY REPORT';
+		}
+	}
 }
