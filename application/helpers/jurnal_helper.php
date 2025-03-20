@@ -903,7 +903,7 @@
 		//$CI->db->insert_batch('jurnal_temp',$ArrJurnal);
 		//$CI->db->insert_batch('jurnal_temp_detail',$ArrDetail);
 		$CI->db->insert_batch('jurnal_product',$ArrDetailProduct);
-		auto_jurnal_product($ArrDetailProduct,'FINISH GOOD - TRANSIT');
+		//auto_jurnal_product($ArrDetailProduct,'FINISH GOOD - TRANSIT');
 	}
 
 	function insert_jurnal_delivery_reject($ArrData, $kode_pro){
@@ -1105,7 +1105,7 @@
 		$CI->db->insert_batch('jurnal_temp',$ArrJurnal);
 		$CI->db->insert_batch('jurnal_temp_detail',$ArrDetail);
 		$CI->db->insert_batch('jurnal_product',$ArrDetailProduct);
-		auto_jurnal_product($ArrDetailProduct,'TRANSIT - CUSTOMER');
+		//auto_jurnal_product($ArrDetailProduct,'TRANSIT - CUSTOMER');
 	}
 
     function insert_jurnal_qc_spool($ArrData, $kode_pro){
