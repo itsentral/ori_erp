@@ -16,7 +16,7 @@ class Warehouse_rutin_model extends CI_Model {
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 
 		$pusat				= $this->db->query("SELECT * FROM warehouse WHERE category='indirect' ORDER BY urut ASC")->result_array();
-		$CATEGORY = '1,6,7,8';
+		$CATEGORY = '1,6,7,8,11';
 		$SQL_OLD = "(SELECT a.no_po, 'PO' AS typ, a.nm_supplier AS ket_name, a.created_by FROM tran_po_header a WHERE a.category='rutin' AND (a.status='WAITING IN' OR a.status='IN PARSIAL') AND a.status_id='1' ORDER BY a.no_po ASC)";
 		$SQL_NEW = "(SELECT
 						a.no_po,
@@ -73,7 +73,7 @@ class Warehouse_rutin_model extends CI_Model {
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 
 		$pusat				= $this->db->query("SELECT * FROM warehouse WHERE category='consumable' ORDER BY urut ASC")->result_array();
-		$CATEGORY = '1,6,7,8';
+		$CATEGORY = '1,6,7,8,11';
 		$SQL_OLD = "(SELECT a.no_po, 'PO' AS typ, a.nm_supplier AS ket_name, a.created_by FROM tran_po_header a WHERE a.category='rutin' AND (a.status='WAITING IN' OR a.status='IN PARSIAL') AND a.status_id='1' ORDER BY a.no_po ASC)";
 		$SQL_NEW = "(SELECT
 						a.no_po,
@@ -1633,10 +1633,10 @@ class Warehouse_rutin_model extends CI_Model {
 		if(!empty($pusat)){
 			$where_pusat = " AND a.gudang = '".$pusat."' ";
 			if($pusat == '10'){
-				$where_pusat2 = " AND a.category_awal IN (1,6,7,8)  ";
+				$where_pusat2 = " AND a.category_awal IN (1,6,7,8,11)  ";
 			}
 			else{
-				$where_pusat2 = " AND a.category_awal NOT IN (1,6,7,8)  ";
+				$where_pusat2 = " AND a.category_awal NOT IN (1,6,7,8,11)  ";
 			}
 		}
 		
