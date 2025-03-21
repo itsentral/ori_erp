@@ -2469,10 +2469,10 @@ class Qc extends CI_Controller
 		$sheet->mergeCells('J' . $NewRow . ':J' . $NextRow);
 		$sheet->getColumnDimension('J')->setWidth(16);
 
-		$sheet->setCellValue('J' . $NewRow, 'Harga FG');
-		$sheet->getStyle('J' . $NewRow . ':J' . $NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('J' . $NewRow . ':J' . $NextRow);
-		$sheet->getColumnDimension('J')->setWidth(16);
+		$sheet->setCellValue('K' . $NewRow, 'Harga FG');
+		$sheet->getStyle('K' . $NewRow . ':K' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('K' . $NewRow . ':K' . $NextRow);
+		$sheet->getColumnDimension('K')->setWidth(16);
 		$where2 = "";
 		$where2 = " AND a.id_produksi NOT IN " . filter_not_in() . " ";
 
