@@ -2166,7 +2166,7 @@ class Qc extends CI_Controller
 			$tgl_label_aw = date('Y-m-d', strtotime($tgl_awal));
 			$tgl_label_ak = date('Y-m-d', strtotime($tgl_akhir));
 
-			$WHERE_DATERANGE = " AND DATE(a.release_to_costing_date) BETWEEN  '" . $tgl_label_aw . "' AND '" . $tgl_label_ak . "'";
+			$WHERE_DATERANGE = " AND DATE(a.fg_date) BETWEEN  '" . $tgl_label_aw . "' AND '" . $tgl_label_ak . "'";
 		}
 
 		$sql = "
