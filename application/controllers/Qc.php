@@ -2492,7 +2492,7 @@ class Qc extends CI_Controller
 			$tgl_label_aw = date('Y-m-d', strtotime($tgl_awal));
 			$tgl_label_ak = date('Y-m-d', strtotime($tgl_akhir));
 
-			$WHERE_DATERANGE = " AND a.qc_pass_date BETWEEN  '" . $tgl_label_aw . "' AND '" . $tgl_label_ak . "'";
+			$WHERE_DATERANGE = " AND a.fg_date BETWEEN  '" . $tgl_label_aw . "' AND '" . $tgl_label_ak . "'";
 		}
 
 		$sql = "
@@ -2595,11 +2595,18 @@ class Qc extends CI_Controller
 				$sheet->setCellValue($Cols . $awal_row, $sp_daycode);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
-				$datePass = (!empty($row_Cek['qc_pass_date'])) ? date('d-M-Y', strtotime($row_Cek['qc_pass_date'])) : '';
+				$datePass = (!empty($row_Cek['fg_date'])) ? date('d-M-Y', strtotime($row_Cek['qc_pass_date'])) : '';
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $datePass);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
+
+				$fg = $row_Cek['finishgood'];
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols . $awal_row, $fg);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 			}
 		}
