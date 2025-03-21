@@ -2602,7 +2602,7 @@ class Qc extends CI_Controller
 				$sheet->setCellValue($Cols . $awal_row, $datePass);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
-				$fg = $row_Cek['finishgood'];
+				$fg = $row_Cek['finish_good'];
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
