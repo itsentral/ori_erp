@@ -6376,7 +6376,7 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		 print_r($sisa_um);
+		 print_r($penagihan[0]->no_po);
 		 exit;
 
 		$data2 = array(
