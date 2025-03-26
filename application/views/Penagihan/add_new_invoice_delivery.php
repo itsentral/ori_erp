@@ -1058,7 +1058,7 @@ if(isset($approval)){
 						- getNum(down_payment_hidden1)
 						- getNum(down_payment_hidden12));
 
-		console.log(down_payment_hidden1);
+		console.log(getNum(down_payment_hidden1));
 		console.log(down_payment_hidden12);
 
 		
