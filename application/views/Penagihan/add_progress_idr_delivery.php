@@ -503,7 +503,7 @@
 			<td align='right' style='text-align:center;' colspan='2'>
 				<?php
 					$grand_total = round($SUM + $SUM_ACC + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
-					$down_payment=round($sisa_um,0);
+					$down_payment=round($sisa_um_idr,0);
 					$down_payment2=0;
 				?>
 				<input type="text" class="form-control grand_total text-right input-sm divide" id="grand_total" name="grand_total" value="<?= $grand_total ?>" tabindex="-1">				
