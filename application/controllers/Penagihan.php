@@ -6376,8 +6376,8 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		// print_r($in_ipp);
-		// exit;
+		 print_r($sisa_um);
+		 exit;
 
 		$data2 = array(
 			'title'			=> 'Indeks Of Create Invoice Progress',
