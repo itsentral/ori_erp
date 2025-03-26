@@ -11,7 +11,7 @@ class Expense_model extends CI_Model
     /**
      * @var string  User Table Name
      */
-    protected $table_name = 'tr_expense';
+    protected $table_name = 'tr_expensex';
     protected $key        = 'id';
 
     /**
