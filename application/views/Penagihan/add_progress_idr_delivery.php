@@ -587,8 +587,14 @@
 				if(isset($penagihan[0]->total_invoice)){
 					$grand_total = round($penagihan[0]->total_invoice_idr, 2);
 				}else{
-					$grand_total = round($SUM + $SUM_ACC + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP - ($down_payment + $down_payment2), 2);
+					$grand_total = round($SUM + $SUM_ACC + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP - ($sisa_um_idr + $down_payment2), 2);
 				}
+
+				print_r($grand_total);
+				echo"<br>";
+				print_r($sisa_um_idr);
+				exit;
+
 				?>
 				<input type="text" class="form-control total_invoice text-right input-sm divide" id="total_invoice" name="total_invoice" value="<?php echo set_value('total_invoice', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">
 			</td>
