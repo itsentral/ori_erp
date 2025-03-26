@@ -6354,7 +6354,7 @@ if($base_cur=='USD'){
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 
 //				$get_kurs	= $this->db->select(' (kurs_usd_dipakai) AS kurs,  (uang_muka_persen) AS uang_muka_persen,  (uang_muka_persen2) AS uang_muka_persen2')->where_in('no_ipp',$in_ipp)->get('billing_so')->result();
-			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um, sisa_um_idr AS sisa_um_idr from tr_kartu_po_customerx where nomor_po ='".$penagihan[0]->no_po."'")->result();
+			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um, sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 			$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 //				$uang_muka_persen = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
 			$sisa_um   = $get_kurs[0]->sisa_um;
