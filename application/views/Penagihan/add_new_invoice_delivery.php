@@ -1055,10 +1055,10 @@ if(isset($approval)){
 						- getNum(diskon_hidden)
 						- getNum(potongan_retensi_hidden1)
 						- getNum(potongan_retensi_hidden2)
-						- down_payment_hidden1
+						- getNum(down_payment_hidden1)
 						- getNum(down_payment_hidden12));
 
-		console.log(getNum(down_payment_hidden1));
+		console.log(down_payment_hidden1);
 		console.log(down_payment_hidden12);
 
 		
