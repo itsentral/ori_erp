@@ -1067,7 +1067,7 @@ if(isset($approval)){
 		
 						
 
-		$(".total_invoice").val(num(grandtotal));
+		//$(".total_invoice").val(num(grandtotal));
     }
 	
 	
