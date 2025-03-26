@@ -1070,7 +1070,9 @@ if(isset($approval)){
 		$(".total_invoice").val(num(grandtotal));
     }
 	
-	
+	function getNum(n) {
+      return (n).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
 	function num(n) {
       return (n).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
     }
