@@ -1001,7 +1001,7 @@ if(isset($approval)){
 		}
 
 		console.log(dp);
-		console.log(totalPpn);
+		console.log(grandtotal);
 
 		$('.ppn').val(num(totalPpn));
 		totalInvoice();
