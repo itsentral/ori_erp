@@ -978,6 +978,7 @@ if(isset($approval)){
 		let	potongan_retensi_hidden1 	= potongan_retensi_hidden==null ? 0 : potongan_retensi_hidden;
 		let	down_payment_hidden1 		= down_payment_hidden==null ? 0 : down_payment_hidden;
 		let	down_payment_hidden12 		= down_payment_hidden2==null ? 0 : down_payment_hidden2;
+		let dp                          = num2(down_payment_hidden1);
 		if(dataPpn=='0'){
 			totalPpn=0;
 		}
@@ -986,18 +987,22 @@ if(isset($approval)){
 		
 		if(dataPpn=='1'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.1));
+				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.1));
+				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}
 		}
 		if(dataPpn=='2'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.11));
+				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.11));
+				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}
 		}
+
+		console.log(dp);
+		console.log(totalPpn);
+
 		$('.ppn').val(num(totalPpn));
 		totalInvoice();
 	}
@@ -1058,13 +1063,7 @@ if(isset($approval)){
 						- getNum(num2(down_payment_hidden1))
 						- getNum(down_payment_hidden12));
 
-		console.log(num2(down_payment_hidden1));
-		console.log(grandtotal);
-
-		
-
-
-		
+	
 						
 
 		$(".total_invoice").val(num(grandtotal));
