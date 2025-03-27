@@ -993,7 +993,7 @@ if(isset($approval)){
 		}
 		if(dataPpn=='2'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dnum2(down_payment_hidden1)- down_payment_hidden12)*0.11));
+				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.11));
 			}else{
 				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - num2(down_payment_hidden1)- down_payment_hidden12)*0.11));
 			}
