@@ -1043,22 +1043,22 @@ if(isset($approval)){
 		down_payment_hidden1 		= down_payment_hidden==null ? 0 : down_payment_hidden;
 		down_payment_hidden12 		= down_payment_hidden2==null ? 0 : down_payment_hidden2;
 
-		grandtotal 	= 	(num(result1_hidden1)
-						+ num(result2_hidden1)
-						+ num(result3_hidden1)
-						+ num(result4_hidden1)
-						+ num(result5_hidden1)
-						+ num(result6_hidden1)
-						+ num(ppn_hidden)
-						+ num(result7_hidden1)
-						+ num(result8_hidden1)
-						- num(diskon_hidden)
-						- num(potongan_retensi_hidden1)
-						- num(potongan_retensi_hidden2)
-						- num(down_payment_hidden1)
-						- num(down_payment_hidden12));
+		grandtotal 	= 	(result1_hidden1
+						+ result2_hidden1
+						+ result3_hidden1
+						+ result4_hidden1
+						+ result5_hidden1
+						+ result6_hidden1
+						+ ppn_hidden
+						+ result7_hidden1
+						+ result8_hidden1
+						- diskon_hidden
+						- potongan_retensi_hidden1
+						- potongan_retensi_hidden2
+						- down_payment_hidden1
+						- down_payment_hidden12);
 
-		console.log(num(down_payment_hidden1));
+		console.log(down_payment_hidden1);
 		console.log(grandtotal);
 
 		
