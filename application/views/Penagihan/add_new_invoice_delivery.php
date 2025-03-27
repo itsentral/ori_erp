@@ -1049,6 +1049,7 @@ if(isset($approval)){
 						+ getNum(result4_hidden1)
 						+ getNum(result5_hidden1)
 						+ getNum(result6_hidden1)
+						+ getNum(ppn_hidden)
 						+ getNum(result7_hidden1)
 						+ getNum(result8_hidden1)
 						- getNum(diskon_hidden)
@@ -1058,7 +1059,7 @@ if(isset($approval)){
 						- getNum(down_payment_hidden12));
 
 		console.log(getNum(down_payment_hidden1));
-		console.log(down_payment_hidden12);
+		console.log(grandtotal);
 
 		
 
