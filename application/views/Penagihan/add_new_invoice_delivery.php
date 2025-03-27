@@ -1076,7 +1076,7 @@ if(isset($approval)){
     }
 
 	function num2(n) {
-      return (n).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+      return (n).replace(/\,/g, '') || 0;
     }
 
 	function num3(n) {
