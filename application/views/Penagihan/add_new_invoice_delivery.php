@@ -987,16 +987,16 @@ if(isset($approval)){
 		
 		if(dataPpn=='1'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
+				totalPpn = Math.floor(getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
+				totalPpn = (getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}
 		}
 		if(dataPpn=='2'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
+				totalPpn = Math.floor(getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
+				totalPpn = (getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}
 		}
 
