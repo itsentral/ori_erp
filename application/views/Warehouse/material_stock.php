@@ -40,6 +40,7 @@ $gudang = $this->uri->segment(3);
 			<thead>
 				<tr class='bg-blue'>
 					<th class="text-center">#</th>
+					<th class="text-center">Kode</th>
 					<th class="text-center">Id Material</th>
 					<th class="text-center">Material</th>
 					<th class="text-center">Category</th>
@@ -59,7 +60,7 @@ $gudang = $this->uri->segment(3);
 			<tbody></tbody>
 			<tfoot>
 				<tr>
-					<th colspan="5" style="text-align:center">SUM</th>
+					<th colspan="6" style="text-align:center">SUM</th>
 					<th></th>
 					<?php if($gudang != 'produksi'){?>
 					<th></th>
@@ -237,12 +238,12 @@ $gudang = $this->uri->segment(3);
 			},
 			drawCallback: function( settings ) {
 				var api = this.api();
-				$( api.column( 5 ).footer() ).html("<div align='right'>"+ number_format(qty_stock,4) +"</div>");
+				$( api.column( 6 ).footer() ).html("<div align='right'>"+ number_format(qty_stock,4) +"</div>");
 				if(category != 'produksi'){
-				$( api.column( 6 ).footer() ).html("<div align='right'>"+ number_format(qty_booking,4) +"</div>");
-				$( api.column( 7 ).footer() ).html("<div align='right'>"+ number_format(qty_available,4) +"</div>");
+				$( api.column( 7 ).footer() ).html("<div align='right'>"+ number_format(qty_booking,4) +"</div>");
+				$( api.column( 8 ).footer() ).html("<div align='right'>"+ number_format(qty_available,4) +"</div>");
 				if(category == 'pusat'){
-				$( api.column( 8 ).footer() ).html("<div align='right'>"+ number_format(qty_rusak,4) +"</div>");
+				$( api.column( 9 ).footer() ).html("<div align='right'>"+ number_format(qty_rusak,4) +"</div>");
 				}
 				}
 			}

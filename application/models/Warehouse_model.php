@@ -4612,6 +4612,7 @@ class Warehouse_model extends CI_Model {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['id_material'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['idmaterial'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_material'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_category'])."</div>";
@@ -4701,7 +4702,7 @@ class Warehouse_model extends CI_Model {
 				LEFT JOIN warehouse b ON a.id_gudang=b.id
 				LEFT JOIN raw_materials c ON a.id_material = c.id_material,
 				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date." AND (
+		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' AND c.delete = 'N' ".$where_gudang." ".$where_date." AND (
 				c.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR c.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR c.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'

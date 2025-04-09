@@ -2515,7 +2515,7 @@ class Warehouse extends CI_Controller {
 				LEFT JOIN warehouse b ON a.kd_gudang=b.kd_gudang
 				LEFT JOIN raw_materials c ON a.id_material = c.id_material,
 				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date."
+		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' AND c.delete = 'N' ".$where_gudang." ".$where_date."
 		".$group_by;
 		$restDetail1	= $this->db->query($sql)->result_array();
 		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$gudang))->result();
