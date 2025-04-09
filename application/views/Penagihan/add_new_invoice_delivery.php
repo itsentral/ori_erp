@@ -978,6 +978,7 @@ if(isset($approval)){
 		let	potongan_retensi_hidden1 	= potongan_retensi_hidden==null ? 0 : potongan_retensi_hidden;
 		let	down_payment_hidden1 		= down_payment_hidden==null ? 0 : down_payment_hidden;
 		let	down_payment_hidden12 		= down_payment_hidden2==null ? 0 : down_payment_hidden2;
+		let dp                          = num2(down_payment_hidden1);
 		if(dataPpn=='0'){
 			totalPpn=0;
 		}
@@ -986,18 +987,22 @@ if(isset($approval)){
 		
 		if(dataPpn=='1'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - down_payment_hidden1- down_payment_hidden12)*0.1));
+				totalPpn = Math.floor(getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - down_payment_hidden1- down_payment_hidden12)*0.1));
+				totalPpn = (getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.1));
 			}
 		}
 		if(dataPpn=='2'){
 			if(base_cur=='IDR'){
-				totalPpn = Math.floor(getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - down_payment_hidden1- down_payment_hidden12)*0.11));
+				totalPpn = Math.floor(getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}else{
-				totalPpn = (getNum((grandtotal - diskon_hidden1 - potongan_retensi_hidden1 - down_payment_hidden1- down_payment_hidden12)*0.11));
+				totalPpn = (getNum((num2(grandtotal) - diskon_hidden1 - potongan_retensi_hidden1 - dp - down_payment_hidden12)*0.11));
 			}
 		}
+
+		console.log(dp);
+		console.log(grandtotal);
+
 		$('.ppn').val(num(totalPpn));
 		totalInvoice();
 	}
@@ -1049,34 +1054,16 @@ if(isset($approval)){
 						+ getNum(result4_hidden1)
 						+ getNum(result5_hidden1)
 						+ getNum(result6_hidden1)
-						+ getNum(ppn_hidden)
+						+ getNum(num2(ppn_hidden))
 						+ getNum(result7_hidden1)
 						+ getNum(result8_hidden1)
 						- getNum(diskon_hidden)
 						- getNum(potongan_retensi_hidden1)
 						- getNum(potongan_retensi_hidden2)
-						- getNum(down_payment_hidden1)
+						- getNum(num2(down_payment_hidden1))
 						- getNum(down_payment_hidden12));
 
-		console.log(result1_hidden1);	
-		console.log(result2_hidden1);
-		console.log(result3_hidden1);
-		console.log(result4_hidden1);
-		console.log(result5_hidden1);
-		console.log(result6_hidden1);
-		console.log(ppn_hidden);
-		console.log(result7_hidden1);
-		console.log(result8_hidden1);
-		console.log(diskon_hidden);
-		console.log(potongan_retensi_hidden1);
-		console.log(potongan_retensi_hidden2);
-		console.log(down_payment_hidden1);
-		console.log(down_payment_hidden12);
-
-		
-
-
-		
+	
 						
 
 		$(".total_invoice").val(num(grandtotal));
@@ -1088,7 +1075,7 @@ if(isset($approval)){
     }
 
 	function num2(n) {
-      return (n).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+      return (n).replace(/\,/g, '') || 0;
     }
 
 	function num3(n) {
