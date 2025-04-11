@@ -45,7 +45,7 @@ $config['base_url'] = $root;
 */
 $config['index_page'] = '';
 /*
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
 
 
 |--------------------------------------------------------------------------
