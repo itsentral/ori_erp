@@ -480,6 +480,14 @@ if($restHeader[0]['parent_product'] == 'flange mould' OR $restHeader[0]['parent_
 		</div>
 	<?php
 }
+$sumTotDet2 = 0;
+$sumTotDet2Kg = 0;
+$sumTotDet2Pr = 0;
+$TotStructure	= 0;
+$TotStructureKg	= 0;
+$TotStructurePr	= 0;
+if(!empty($restDetail2[0]['detail_name'])){
+	
 ?>
 
 <div class="box box-success">
@@ -633,6 +641,7 @@ if($restHeader[0]['parent_product'] == 'flange mould' OR $restHeader[0]['parent_
 	</div>
 </div>
 <?php
+}
 if ($restHeader[0]['parent_product']!='branch joint' && $restHeader[0]['parent_product']!='field joint' && $restHeader[0]['parent_product']!='shop joint')
 {
 	$TotExternal = 0;
