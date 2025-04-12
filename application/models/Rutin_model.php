@@ -343,7 +343,7 @@ class Rutin_model extends CI_Model {
 						FROM 
 							rutin_planning_detail a 
 							LEFT JOIN rutin_planning_header b ON a.no_pengajuan=b.no_pengajuan
-							LEFT JOIN warehouse_rutin_stock d ON a.id_material = d.code_group
+							LEFT JOIN warehouse_rutin_stock d ON a.id_material = d.code_group AND d.gudang='10'
 						WHERE 
 							b.no_pengajuan_group='$pengajuangroup' 
 							AND a.purchase > 0 
