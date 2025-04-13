@@ -214,14 +214,14 @@ class Pembayaran_rutin_model extends CI_Model {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(get_name('department','nm_dept','id',$row['department']))."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['post_coa'].' - '.$row['nama'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nama_barang'])."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['biaya'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(get_name('department','nm_dept','id',$row['departement']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['coa'].' - '.$row['nama'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['nama'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai'])."</div>";
 				
-				$edit	= "&nbsp;<a href='".site_url($this->uri->segment(1)).'/add_master_pembayaran_rutin/'.$row['department']."' class='btn btn-sm btn-primary' title='Edit Data' data-role='qtip'><i class='fa fa-edit'></i></a>";
+				$edit	= "&nbsp;<a href='".site_url($this->uri->segment(1)).'/add_master_pembayaran_rutin/'.$row['departement']."' class='btn btn-sm btn-primary' title='Edit Data' data-role='qtip'><i class='fa fa-edit'></i></a>";
 			$nestedData[]	= "	<div align='left'>
-                                    <a href='".site_url($this->uri->segment(1)).'/add_master_pembayaran_rutin/'.$row['department']."/view' class='btn btn-sm btn-warning' title='View Data' data-role='qtip'><i class='fa fa-eye'></i></a>
+                                    <a href='".site_url($this->uri->segment(1)).'/add_master_pembayaran_rutin/'.$row['departement']."/view' class='btn btn-sm btn-warning' title='View Data' data-role='qtip'><i class='fa fa-eye'></i></a>
 									".$edit."
 								</div>";
 			$data[] = $nestedData;
@@ -244,15 +244,14 @@ class Pembayaran_rutin_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*,
-				b.nama
+				a.*
 			FROM
-				ms_budget_rutin a LEFT JOIN gl.COA b ON a.post_coa=b.no_perkiraan,
+				ms_budget_rutin a ,
 				(SELECT @row:=0) r
 		    WHERE deleted='N' AND (
 				a.departement LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.post_coa LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.coa LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -262,9 +261,9 @@ class Pembayaran_rutin_model extends CI_Model {
 		$columns_order_by = array(
 			0 => 'nomor',
 			1 => 'departement',
-			2 => 'post_coa',
+			2 => 'coa',
 			3 => 'nama',
-			4 => 'biaya'
+			4 => 'nilai'
 		);
 
 		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
