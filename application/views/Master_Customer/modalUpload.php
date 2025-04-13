@@ -28,7 +28,7 @@
 		</div>
 		<div class="box-body">
 			<button type='button' id='download' class='btn btn-warning'>Download Template Excell</button>
-			<button type='buttonPDF' id='downloadPDF' class='btn btn-success'>Download PDF</button>
+			<!-- <button type='buttonPDF' id='downloadPDF' class='btn btn-success'>Download PDF</button> -->
 		</div>
 	</div>
 
