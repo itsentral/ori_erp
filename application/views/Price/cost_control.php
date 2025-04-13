@@ -25,19 +25,20 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead> 
 				<tr class='bg-blue'>  
-					<th width='1%' class="text-center no-sort">No</th>
-					<th width='5%' class="text-center">IPP</th>  
-					<th width='21%' class="text-center">Customer</th>
-					<th width='8%' class="text-center no-sort">Type</th>
-					<th width='8%' class="text-center no-sort">Series</th>
-					<th width='10%' class="text-center no-sort">Material (Est)</th>
-					<th width='8%' class="text-center no-sort">Cost (Est)</th>
-					<th width='8%' class="text-center no-sort">Process Cost</th>
-					<th width='10%' class="text-center no-sort">Material (Real)</th>
-					<th width='8%' class="text-center no-sort">Cost (Real)</th>
-					<th width='1%' class="text-center no-sort">Rev</th>
-					<th width='10%' class="text-center no-sort">Status</th>
-					<th width='10%' class="text-center no-sort">Option</th>
+					<th class="text-center">No</th>
+					<th class="text-center">IPP</th>  
+					<th class="text-center">Customer</th>
+					<th class="text-center">Project</th>
+					<th class="text-center">Type</th>
+					<th class="text-center no-sort">Series</th>
+					<th class="text-right no-sort">Material<br>(Est)</th>
+					<th class="text-right no-sort">Cost<br>(Est)</th>
+					<!-- <th class="text-center no-sort">Process Cost</th> -->
+					<th class="text-right no-sort">Material<br>(Real)</th>
+					<th class="text-right no-sort">Cost<br>(Real)</th>
+					<th class="text-center no-sort">Rev</th>
+					<!-- <th width='10%' class="text-center no-sort">Status</th> -->
+					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -191,19 +192,6 @@ $this->load->view('include/side_menu');
 			"bAutoWidth": true,
 			"destroy": true,
 			"responsive": true,
-			"oLanguage": {
-				"sSearch": "<b>Search : </b>",
-				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-				"sInfoFiltered": "(filtered from _MAX_ total entries)",
-				"sZeroRecords": "No matching records found",
-				"sEmptyTable": "No data available in table",
-				"sLoadingRecords": "Please wait - loading...",
-				"oPaginate": {
-					"sPrevious": "Prev",
-					"sNext": "Next"
-				}
-			},
 			"aaSorting": [[ 1, "asc" ]],
 			"columnDefs": [ {
 				"targets": 'no-sort',
@@ -213,7 +201,7 @@ $this->load->view('include/side_menu');
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
 			"ajax":{
-				url : base_url +'index.php/'+active_controller+'/getDataJSON/cost_control',
+				url : base_url + active_controller+'/getDataJSON/cost_control',
 				type: "post",
 				data: function(d){
 					d.status = status

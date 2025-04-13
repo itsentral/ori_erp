@@ -752,7 +752,7 @@ class Price extends CI_Controller {
 				foreach($ListBQipp AS $val => $valx){
 					$dtListArray[$val] = $valx['series'];
 				}
-				$dtImplode	= "".implode(", ", $dtListArray)."";
+				$dtImplode	= "".implode("<br>", $dtListArray)."";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($dtImplode))."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['est_mat'], 3)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['est_harga'], 2)."</div>";
@@ -857,14 +857,14 @@ class Price extends CI_Controller {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'no_ipp',
+			1 => 'nomor',
 			2 => 'nm_customer',
 			3 => 'project',
 			4 => 'order_type'
 		);
 
 		// $sql .= " GROUP BY x.id_bq ORDER BY x.".$columns_order_by[$column_order]." ".$column_dir." ";
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.no_ipp DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 		// echo $sql; exit;
 		$data['query'] = $this->db->query($sql);
