@@ -250,8 +250,8 @@ class Pembayaran_rutin_model extends CI_Model {
 				ms_budget_rutin a LEFT JOIN gl.COA b ON a.post_coa=b.no_perkiraan,
 				(SELECT @row:=0) r
 		    WHERE deleted='N' AND (
-				a.department LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.nama_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
+				a.departement LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.nama LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.post_coa LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
@@ -261,9 +261,9 @@ class Pembayaran_rutin_model extends CI_Model {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'department',
+			1 => 'departement',
 			2 => 'post_coa',
-			3 => 'nama_barang',
+			3 => 'nama',
 			4 => 'biaya'
 		);
 
