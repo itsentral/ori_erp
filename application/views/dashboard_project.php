@@ -29,7 +29,11 @@ $this->load->view('include/side_menu_dashboard');
 						</div>
 						<!-- /.box-body -->
 						<?php
-						if(number_format(($finish[0]->real_harga / $finish[0]->est_harga) * 100) > 100){
+						$rasio = 0;
+						if($finish[0]->real_harga > 0 AND $finish[0]->est_harga > 0){
+							$rasio = $finish[0]->real_harga / $finish[0]->est_harga;
+						}
+						if(number_format(($rasio) * 100) > 100){
 							$warna = 'badge bg-red';
 						}
 						else{
@@ -47,7 +51,7 @@ $this->load->view('include/side_menu_dashboard');
 						<div class="box-footer  no-padding">
 							<table class="table table-condensed"  style='font-size: 22px;'>
 								<tr>
-									<td width='25%' style='text-align:right; padding-right:20px;'><a href="<?php echo site_url('cost_control/print_hasil_finish_project') ?>" target='_blank'><span class="<?=$warna;?>" style='font-size: 20px;'><?= number_format(($finish[0]->real_harga / $finish[0]->est_harga) * 100);?> %</span></a></td>
+									<td width='25%' style='text-align:right; padding-right:20px;'><a href="<?php echo site_url('cost_control/print_hasil_finish_project') ?>" target='_blank'><span class="<?=$warna;?>" style='font-size: 20px;'><?= number_format(($rasio) * 100);?> %</span></a></td>
 									<td width='75%'><a href="<?php echo site_url('cost_control/print_hasil_finish_project') ?>" target='_blank'>Material Digunakan Untuk Project Yang Selesai</a></td>
 								</tr>
 								<tr>
