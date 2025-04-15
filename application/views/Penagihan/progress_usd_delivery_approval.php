@@ -573,7 +573,7 @@
 					   <input type="text" class="form-control qty_oth input-sm text-right divide" data-nomor='<?=$numb9 ?>' id="qty9_<?=$numb9 ?>" name="data9[<?=$numb9 ?>][qty9]" value="<?=set_value('qty9', isset($valx['qty_delivery']) ? $valx['qty_delivery'] : '0'); ?>" <?=$readonly?>>
 					</td>
 					<td>
-						<?php $unit9= strtoupper($valx['satuan']); ?>
+						<?php $unit9= strtoupper($valx['unit']); ?>
 						<input type="text" class="form-control text-center input-sm" id="unit9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][unit9]" value="<?=set_value('unit9', isset($unit9) ? $unit9 : ''); ?>" readonly  tabindex="-1">
 					</td>
 					<td>
@@ -598,7 +598,7 @@
 	}
 	
 	?>
-	
+
 	<tfoot>
 		<tr class='HeaderHr'>
 			<td align='right' colspan='15' height='20px;'></td>
