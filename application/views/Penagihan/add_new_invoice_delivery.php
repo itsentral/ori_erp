@@ -935,6 +935,7 @@ if(isset($approval)){
 		let result6_hidden1 = 0;
 		let result7_hidden1 = 0;
 		let result8_hidden1 = 0;
+		let result9_hidden1 = 0;
 
 		let result1_hidden  = getNum($('.result1').val());
 		let result2_hidden  = getNum($('.result2').val());
@@ -944,6 +945,7 @@ if(isset($approval)){
 		let result6_hidden  = getNum($('.result6').val());
 		let result7_hidden  = getNum($('.result7').val());
 		let result8_hidden  = getNum($('.result8').val());
+		let result9_hidden  = getNum($('.result9').val());
 		let diskon_hidden  			= getNum($('.diskon').val());
 		let potongan_retensi_hidden = getNum($('.potongan_retensi').val());
 		let down_payment_hidden     = getNum($('.down_payment').val());
@@ -958,6 +960,7 @@ if(isset($approval)){
 		result6_hidden1 = result6_hidden==null ? 0 : result6_hidden;
 		result7_hidden1 = result7_hidden==null ? 0 : result7_hidden;
 		result8_hidden1 = result8_hidden==null ? 0 : result8_hidden;
+		result9_hidden1 = result9_hidden==null ? 0 : result9_hidden;
 
 		let grandtotal 	= 	getNum(result1_hidden1)
 							+ getNum(result2_hidden1)
@@ -966,7 +969,8 @@ if(isset($approval)){
 							+ getNum(result5_hidden1)
 							+ getNum(result6_hidden1)
 							+ getNum(result7_hidden1)
-							+ getNum(result8_hidden1);
+							+ getNum(result8_hidden1)
+							+ getNum(result9_hidden1);
 
 		let uangmuka   	= 	(down_payment_hidden);
 		let uangmuka2 = 0;
@@ -1045,6 +1049,7 @@ if(isset($approval)){
 		let result6_hidden1 = 0;
 		let result7_hidden1 = 0;
 		let result8_hidden1 = 0;
+		let result9_hidden1 = 0;
 		let potongan_retensi_hidden1 	= 0;
 		let down_payment_hidden1 		= 0;
 		let down_payment_hidden12 		= 0;
@@ -1056,6 +1061,7 @@ if(isset($approval)){
 		let result6_hidden  = $('.result6').val();
 		let result7_hidden  = $('.result7').val();
 		let result8_hidden  = $('.result8').val();
+		let result9_hidden  = $('.result9').val();
 		let diskon_hidden  				= $('.diskon').val();
 		let potongan_retensi_hidden  	= $('.potongan_retensi').val();
 		let potongan_retensi_hidden2  	= $('.potongan_retensi2').val();
@@ -1071,6 +1077,7 @@ if(isset($approval)){
 		result6_hidden1 = result6_hidden==null ? 0 : result6_hidden;
 		result7_hidden1 = result7_hidden==null ? 0 : result7_hidden;
 		result8_hidden1 = result8_hidden==null ? 0 : result8_hidden;
+		result9_hidden1 = result9_hidden==null ? 0 : result9_hidden;
 
 		potongan_retensi_hidden1 	= potongan_retensi_hidden==null ? 0 : potongan_retensi_hidden;
 		down_payment_hidden1 		= down_payment_hidden==null ? 0 : down_payment_hidden;
@@ -1085,6 +1092,7 @@ if(isset($approval)){
 						+ getNum(num2(ppn_hidden))
 						+ getNum(result7_hidden1)
 						+ getNum(result8_hidden1)
+						+ getNum(result9_hidden1)
 						- getNum(diskon_hidden)
 						- getNum(potongan_retensi_hidden1)
 						- getNum(potongan_retensi_hidden2)
