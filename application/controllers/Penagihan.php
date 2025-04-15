@@ -3428,10 +3428,15 @@ else
 				$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
 				$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
 				$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
+				$getOther  	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','OTHER')->get('penagihan_detail')->result_array();
 				$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 				$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+				$sisa_um   = $get_kurs[0]->sisa_um;
+				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
 
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
@@ -3455,31 +3460,34 @@ else
 			
 
 			$data2 = array(
-				'title'			=> 'Indeks Of Create Invoice Progress',
-				'action'		=> 'index',
-				'row_group'		=> $data_Group,
-				'akses_menu'	=> $Arr_Akses,
-				'getHeader'		=> $getHeader,
-				'getDetail' 	=> $getDetail,
-				'getEngCost' 	=> $getEngCost,
-				'getPackCost' 	=> $getPackCost,
-				'getTruck' 		=> $getTruck,
-				'non_frp'		=> $non_frp,
-				'material'		=> $material,
-				'list_top'		=> $list_top,
-				'base_cur'		=> $base_cur,
-				'in_ipp'		=> implode(',',$in_ipp),
-				'in_bq'			=> implode(',',$in_bq),
-				'in_so'			=> implode(',',$in_so),
-				'arr_in_ipp'	=> $in_ipp,
-				'penagihan'		=> $penagihan,
-				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $uang_muka_persen,
-				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> 0,
-				'down_payment2'	=> 0,
-				'id'			=> $id,
-				'approval'		=> $approval
+			'title'			=> 'Indeks Of Create Invoice Progress',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'getHeader'		=> $getHeader,
+			'getDetail' 	=> $getDetail,
+			'getEngCost' 	=> $getEngCost,
+			'getPackCost' 	=> $getPackCost,
+			'getTruck' 		=> $getTruck,
+			'other' 		=> $getOther,
+			'non_frp'		=> $non_frp,
+			'material'		=> $material,
+			'list_top'		=> $list_top,
+			'base_cur'		=> $base_cur,
+			'in_ipp'		=> implode(',',$in_ipp),
+			'in_bq'			=> implode(',',$in_bq),
+			'in_so'			=> implode(',',$in_so),
+			'arr_in_ipp'	=> $in_ipp,
+			'penagihan'		=> $penagihan,
+			'kurs'			=> $get_kurs[0]->kurs,
+			'uang_muka_persen'	=> $uang_muka_persen,
+			'uang_muka_persen2'	=> 0,
+			'down_payment'	=> $down_payment,
+			'sisa_um'	    => $sisa_um,
+			'sisa_um_idr'	    => $sisa_um_idr,
+			'down_payment2'	=> $down_payment2,
+			'id'			=> $id,
+			'approval'		=> $approval
 			);
 			$this->load->view('Penagihan/create_progress_new_delivery_approval',$data2);
 		
