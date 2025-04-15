@@ -2816,6 +2816,52 @@ if($base_cur=='USD'){
 
 					}
 				}
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -3325,6 +3371,53 @@ else
 						$detailInv6[$val]['id_milik']	    		= $d6['id_milik'];
 					}
 				}
+
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -3463,6 +3556,9 @@ else
 				}
 				if(!empty($detailInv6)){
 					$this->db->insert_batch('penagihan_detail',$detailInv6);
+				}
+				if(!empty($detailInv9)){
+					$this->db->insert_batch('penagihan_detail',$detailInv9);
 				}
 			$this->db->trans_complete();
 
