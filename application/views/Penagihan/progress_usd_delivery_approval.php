@@ -535,12 +535,12 @@
 				if(isset($valx['total_deal_usd'])){
 					$harga_sat9= round($valx['total_deal_usd']/$valx['qty'],2);
 				}else{
-					$harga_sat9= round($valx['harga_satuan_usd'],2);
+					$harga_sat9= round($valx['harga_satuan'],2);
 				}
 				if(isset($valx['checked'])){
 					if($valx['checked']!="") { 
 						$checked="checked";$readonly="";
-						$harga_tot9=round($harga_sat9*$valx['qty_delivery'],2);
+						$harga_tot9=round($harga_sat9*$valx['qty'],2);
 						$SUM_OTHER += ($harga_tot9);
 					}
 				}
