@@ -275,6 +275,10 @@ if(isset($approval)){
 				$("#harga_tot6"+row).val("0").change();
 				$("#harga_tot6"+row).prop('disabled', onoff);
 			break;
+			case "8":
+				$("#harga_tot9"+row).val("0").change();
+				$("#harga_tot9"+row).prop('disabled', onoff);
+			break;
 			default:
 				$("#qty_"+row).val("0").change();
 				$("#qty_"+row).prop('disabled', onoff);
