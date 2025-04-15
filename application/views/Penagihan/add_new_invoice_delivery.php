@@ -534,6 +534,20 @@ if(isset($approval)){
 			fnAlltotal7()
 		});
 
+		$(document).on('keyup change', '.qty_oth', function(){
+			let dataNomor9 = $(this).data('nomor');
+			let hargaSat9  = $('#harga_sat9'+dataNomor9).val();
+			let dataIni9   = $(this).val();			
+			let datasisa9=$("#qty9_belum_"+dataNomor9).val();
+			if(parseFloat(datasisa9)<parseFloat(dataIni9)) {
+				$(this).val(datasisa9);
+				dataIni9=datasisa9;
+			}
+			let total9     = getNum(hargaSat9*dataIni9).toFixed(2);
+			$('#harga_tot9'+dataNomor9).val(num2(total9));
+			fnAlltotal9()
+		});
+
 		$(document).on('blur', '.diskon', function(){
 			let dataPpn	  = $('#ppnselect').val();
 			let dataDiskon	 = $(this).val();
@@ -845,6 +859,16 @@ if(isset($approval)){
 			 total31 += getNum($(this).val()||0);
 		});
 		$(".result3").val(num(total31));
+		grandtotal();
+		totalInvoice();
+	}
+
+	let fnAlltotal9 = () => {
+		let total91=0
+		$(".amount9").each(function(){
+			 total91 += getNum($(this).val()||0);
+		});
+		$(".result9").val(num(total91));
 		grandtotal();
 		totalInvoice();
 	}
