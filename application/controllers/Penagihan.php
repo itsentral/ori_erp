@@ -865,6 +865,54 @@ if($base_cur=='USD'){
 
 					}
 				}
+
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
+
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -1370,6 +1418,52 @@ if($base_cur=='USD'){
 						$detailInv6[$val]['id_milik']	    		= $d6['id_milik'];
 					}
 				}
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -1509,6 +1603,9 @@ if($base_cur=='USD'){
 				}
 				if(!empty($detailInv6)){
 					$this->db->insert_batch('penagihan_detail',$detailInv6);
+				}
+				if(!empty($detailInv9)){
+					$this->db->insert_batch('penagihan_detail',$detailInv9);
 				}
 			$this->db->trans_complete();
 
@@ -2719,6 +2816,52 @@ if($base_cur=='USD'){
 
 					}
 				}
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -3228,6 +3371,53 @@ else
 						$detailInv6[$val]['id_milik']	    		= $d6['id_milik'];
 					}
 				}
+
+				$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d){
+						$material_name9	= $d9['material_name9'];
+						$harga_sat9		= $d9['harga_sat9'];
+						$qty9=0;$checked='';
+						if(isset($d9['qty9'])){
+							$qty9	= $d9['qty9'];
+							if($qty9>0) $checked='1';
+						}
+						$unit9			= $d9['unit9'];
+						$harga_tot9		= $d9['harga_tot9'];
+						$no_ippdtl		= $d9['no_ipp'];
+						$no_sodtl		= $d9['no_so'];
+						$product_cust	= $d9['product_cust'];
+						$product_desc	= $d9['product_desc'];
+						$qty9_ori		= $d9['qty9_ori'];
+						$qty9_belum		= $d9['qty9_belum'];
+
+						$detailInv9[$val]['id_penagihan']		= $id;
+						$detailInv9[$val]['id_bq'] 		     	= $no_bq;
+						$detailInv9[$val]['no_ipp'] 		    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		    = $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		= $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      	= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	= $id_customer;
+						$detailInv9[$val]['nm_customer'] 		= $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		= $jenis_invoice;
+						$detailInv9[$val]['nm_material']	    = $material_name9;
+						$detailInv9[$val]['unit']	            = $unit9;
+						$detailInv9[$val]['harga_satuan']	    = $harga_sat9;
+						$detailInv9[$val]['harga_satuan_idr']	= $harga_sat9*$kurs;
+						$detailInv9[$val]['qty']	            = $qty9;
+						$detailInv9[$val]['harga_total']	    = $harga_tot9;
+						$detailInv9[$val]['harga_total_idr']	= $harga_tot9*$kurs;
+						$detailInv9[$val]['kategori_detail']	= 'OTHER';
+						$detailInv9[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+						$detailInv9[$val]['product_cust']	    = $product_cust;
+						$detailInv9[$val]['desc']	    		= $product_desc;
+						$detailInv9[$val]['qty_total']			= $qty9_ori;
+						$detailInv9[$val]['qty_sisa']			= $qty9_belum;
+						$detailInv9[$val]['checked']			= $checked;
+						$detailInv9[$val]['id_milik']	    	= $d9['id_milik'];
+					}
+				}
 			}
 
 			if($jenis_invoice=='retensi'){
@@ -3367,6 +3557,9 @@ else
 				if(!empty($detailInv6)){
 					$this->db->insert_batch('penagihan_detail',$detailInv6);
 				}
+				if(!empty($detailInv9)){
+					$this->db->insert_batch('penagihan_detail',$detailInv9);
+				}
 			$this->db->trans_complete();
 
 			if($this->db->trans_status() === FALSE){
@@ -3428,10 +3621,15 @@ else
 				$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
 				$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
 				$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
+				$getOther  	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','OTHER')->get('penagihan_detail')->result_array();
 				$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 				$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+				$sisa_um   = $get_kurs[0]->sisa_um;
+				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
 
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
@@ -3455,31 +3653,34 @@ else
 			
 
 			$data2 = array(
-				'title'			=> 'Indeks Of Create Invoice Progress',
-				'action'		=> 'index',
-				'row_group'		=> $data_Group,
-				'akses_menu'	=> $Arr_Akses,
-				'getHeader'		=> $getHeader,
-				'getDetail' 	=> $getDetail,
-				'getEngCost' 	=> $getEngCost,
-				'getPackCost' 	=> $getPackCost,
-				'getTruck' 		=> $getTruck,
-				'non_frp'		=> $non_frp,
-				'material'		=> $material,
-				'list_top'		=> $list_top,
-				'base_cur'		=> $base_cur,
-				'in_ipp'		=> implode(',',$in_ipp),
-				'in_bq'			=> implode(',',$in_bq),
-				'in_so'			=> implode(',',$in_so),
-				'arr_in_ipp'	=> $in_ipp,
-				'penagihan'		=> $penagihan,
-				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $uang_muka_persen,
-				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> 0,
-				'down_payment2'	=> 0,
-				'id'			=> $id,
-				'approval'		=> $approval
+			'title'			=> 'Indeks Of Create Invoice Progress',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'getHeader'		=> $getHeader,
+			'getDetail' 	=> $getDetail,
+			'getEngCost' 	=> $getEngCost,
+			'getPackCost' 	=> $getPackCost,
+			'getTruck' 		=> $getTruck,
+			'other' 		=> $getOther,
+			'non_frp'		=> $non_frp,
+			'material'		=> $material,
+			'list_top'		=> $list_top,
+			'base_cur'		=> $base_cur,
+			'in_ipp'		=> implode(',',$in_ipp),
+			'in_bq'			=> implode(',',$in_bq),
+			'in_so'			=> implode(',',$in_so),
+			'arr_in_ipp'	=> $in_ipp,
+			'penagihan'		=> $penagihan,
+			'kurs'			=> $get_kurs[0]->kurs,
+			'uang_muka_persen'	=> $uang_muka_persen,
+			'uang_muka_persen2'	=> 0,
+			'down_payment'	=> $down_payment,
+			'sisa_um'	    => $sisa_um,
+			'sisa_um_idr'	    => $sisa_um_idr,
+			'down_payment2'	=> $down_payment2,
+			'id'			=> $id,
+			'approval'		=> $approval
 			);
 			$this->load->view('Penagihan/create_progress_new_delivery_approval',$data2);
 		
@@ -6237,9 +6438,9 @@ if($base_cur=='USD'){
 			$getEngCost	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','ENGINERING')->get('penagihan_detail')->result_array();
 			$getPackCost= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','PACKING')->get('penagihan_detail')->result_array();
 			$getTruck	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','TRUCKING')->get('penagihan_detail')->result_array();
-			$getOther  	= $this->db->select('*')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','OTHER')->get('penagihan_detail')->result_array();
-			$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
-			$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
+			$getOther  	= $this->db->select('*, harga_satuan as harga_satuan_usd, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv')->order_by('id','asc')->where('id_penagihan',$id)->where('kategori_detail','OTHER')->get('penagihan_detail')->result_array();
+			$non_frp	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
+			$material	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();

@@ -275,6 +275,10 @@ if(isset($approval)){
 				$("#harga_tot6"+row).val("0").change();
 				$("#harga_tot6"+row).prop('disabled', onoff);
 			break;
+			case "8":
+				$("#qty9_"+row).val("0").change();
+				$("#qty9_"+row).prop('disabled', onoff);
+			break;
 			default:
 				$("#qty_"+row).val("0").change();
 				$("#qty_"+row).prop('disabled', onoff);
@@ -528,6 +532,20 @@ if(isset($approval)){
 			$('#harga_tot7'+dataNomor7).val(num2(total7));
 			$('#harga_tot7_hidden'+dataNomor7).val(total7);
 			fnAlltotal7()
+		});
+
+		$(document).on('keyup change', '.qty_oth', function(){
+			let dataNomor9 = $(this).data('nomor');
+			let hargaSat9  = $('#harga_sat9'+dataNomor9).val();
+			let dataIni9   = $(this).val();			
+			let datasisa9=$("#qty9_belum_"+dataNomor9).val();
+			if(parseFloat(datasisa9)<parseFloat(dataIni9)) {
+				$(this).val(datasisa9);
+				dataIni9=datasisa9;
+			}
+			let total9     = getNum(hargaSat9*dataIni9).toFixed(2);
+			$('#harga_tot9'+dataNomor9).val(num2(total9));
+			fnAlltotal9()
 		});
 
 		$(document).on('blur', '.diskon', function(){
@@ -845,6 +863,16 @@ if(isset($approval)){
 		totalInvoice();
 	}
 
+	let fnAlltotal9 = () => {
+		let total91=0
+		$(".amount9").each(function(){
+			 total91 += getNum($(this).val()||0);
+		});
+		$(".result9").val(num(total91));
+		grandtotal();
+		totalInvoice();
+	}
+
 	let fnAlltotal4 = () => {
 	  let total41=0
 		$(".harga_tot4").each(function(){
@@ -907,6 +935,7 @@ if(isset($approval)){
 		let result6_hidden1 = 0;
 		let result7_hidden1 = 0;
 		let result8_hidden1 = 0;
+		let result9_hidden1 = 0;
 
 		let result1_hidden  = getNum($('.result1').val());
 		let result2_hidden  = getNum($('.result2').val());
@@ -916,6 +945,7 @@ if(isset($approval)){
 		let result6_hidden  = getNum($('.result6').val());
 		let result7_hidden  = getNum($('.result7').val());
 		let result8_hidden  = getNum($('.result8').val());
+		let result9_hidden  = getNum($('.result9').val());
 		let diskon_hidden  			= getNum($('.diskon').val());
 		let potongan_retensi_hidden = getNum($('.potongan_retensi').val());
 		let down_payment_hidden     = getNum($('.down_payment').val());
@@ -930,6 +960,7 @@ if(isset($approval)){
 		result6_hidden1 = result6_hidden==null ? 0 : result6_hidden;
 		result7_hidden1 = result7_hidden==null ? 0 : result7_hidden;
 		result8_hidden1 = result8_hidden==null ? 0 : result8_hidden;
+		result9_hidden1 = result9_hidden==null ? 0 : result9_hidden;
 
 		let grandtotal 	= 	getNum(result1_hidden1)
 							+ getNum(result2_hidden1)
@@ -938,7 +969,8 @@ if(isset($approval)){
 							+ getNum(result5_hidden1)
 							+ getNum(result6_hidden1)
 							+ getNum(result7_hidden1)
-							+ getNum(result8_hidden1);
+							+ getNum(result8_hidden1)
+							+ getNum(result9_hidden1);
 
 		let uangmuka   	= 	(down_payment_hidden);
 		let uangmuka2 = 0;
@@ -1017,6 +1049,7 @@ if(isset($approval)){
 		let result6_hidden1 = 0;
 		let result7_hidden1 = 0;
 		let result8_hidden1 = 0;
+		let result9_hidden1 = 0;
 		let potongan_retensi_hidden1 	= 0;
 		let down_payment_hidden1 		= 0;
 		let down_payment_hidden12 		= 0;
@@ -1028,6 +1061,7 @@ if(isset($approval)){
 		let result6_hidden  = $('.result6').val();
 		let result7_hidden  = $('.result7').val();
 		let result8_hidden  = $('.result8').val();
+		let result9_hidden  = $('.result9').val();
 		let diskon_hidden  				= $('.diskon').val();
 		let potongan_retensi_hidden  	= $('.potongan_retensi').val();
 		let potongan_retensi_hidden2  	= $('.potongan_retensi2').val();
@@ -1043,6 +1077,7 @@ if(isset($approval)){
 		result6_hidden1 = result6_hidden==null ? 0 : result6_hidden;
 		result7_hidden1 = result7_hidden==null ? 0 : result7_hidden;
 		result8_hidden1 = result8_hidden==null ? 0 : result8_hidden;
+		result9_hidden1 = result9_hidden==null ? 0 : result9_hidden;
 
 		potongan_retensi_hidden1 	= potongan_retensi_hidden==null ? 0 : potongan_retensi_hidden;
 		down_payment_hidden1 		= down_payment_hidden==null ? 0 : down_payment_hidden;
@@ -1057,6 +1092,7 @@ if(isset($approval)){
 						+ getNum(num2(ppn_hidden))
 						+ getNum(result7_hidden1)
 						+ getNum(result8_hidden1)
+						+ getNum(result9_hidden1)
 						- getNum(diskon_hidden)
 						- getNum(potongan_retensi_hidden1)
 						- getNum(potongan_retensi_hidden2)
