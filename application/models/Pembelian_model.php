@@ -989,7 +989,7 @@ class Pembelian_model extends CI_Model {
 									')
 								->from('tran_rfq_detail a')
 								->join('tran_pr_detail b','a.no_rfq=b.no_rfq','left')
-								->where('a.id_barang=b.id_barang')
+								// ->where('a.id_barang=b.id_barang')
 								->where('a.no_rfq',$no_rfq)
 								->where('a.deleted','N')
 								->group_by('a.id_barang')
