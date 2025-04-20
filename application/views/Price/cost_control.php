@@ -142,14 +142,14 @@ $this->load->view('include/side_menu');
 		e.preventDefault();
 		loading_spinner();
 		$("#head_title3").html("<b>DETAIL COST PROCESS BQ ["+$(this).data('id_bq')+"]</b>");
-		$("#view3").load(base_url +'index.php/'+ active_controller+'/modalDetailProcess/'+$(this).data('id_bq'));
+		$("#view3").load(base_url + active_controller+'/modalDetailProcess/'+$(this).data('id_bq'));
 		$("#ModalView3").modal();
 	});
 	
 	$(document).on('click', '#detailBQ', function(e){
 		e.preventDefault();
 		$("#head_title").html("<b>DETAIL STRUCTURE BQ ["+$(this).data('id_bq')+"]</b>");
-		$("#view").load(base_url +'index.php/'+ active_controller+'/modalDetailBQ/'+$(this).data('id_bq'));
+		$("#view").load(base_url + active_controller+'/modalDetailBQ/'+$(this).data('id_bq'));
 		$("#ModalView").modal();
 	});
 	
@@ -157,7 +157,7 @@ $this->load->view('include/side_menu');
 		e.preventDefault();
 		loading_spinner();
 		$("#head_title").html("<b>DETAIL DATA BQ ["+$(this).data('id_bq')+"]</b>");
-		$("#view").load(base_url +'index.php/'+ active_controller+'/modalviewDT/'+$(this).data('id_bq')+'/'+$(this).data('cost_control'));
+		$("#view").load(base_url + active_controller+'/modalviewDT/'+$(this).data('id_bq')+'/'+$(this).data('cost_control'));
 		$("#ModalView").modal();
 	});
 	
@@ -165,21 +165,21 @@ $this->load->view('include/side_menu');
 		e.preventDefault();
 		loading_spinner();
 		$("#head_title").html("<b>TOTAL METRIAL PROJECT ["+$(this).data('id_bq')+"]</b>");
-		$("#view").load(base_url +'index.php/'+ active_controller+'/modalTotalCost/'+$(this).data('id_bq'));
+		$("#view").load(base_url + active_controller+'/modalTotalCost/'+$(this).data('id_bq'));
 		$("#ModalView").modal();
 	});
 	
 	$(document).on('click', '#ApproveDT', function(e){
 		e.preventDefault();
 		$("#head_title").html("<b>APPROVE PROJECT PRICE ["+$(this).data('id_bq')+"]</b>");
-		$("#view").load(base_url +'index.php/'+ active_controller+'/modalAppCost/'+$(this).data('id_bq'));
+		$("#view").load(base_url + active_controller+'/modalAppCost/'+$(this).data('id_bq'));
 		$("#ModalView").modal();
 	});
 	
 	$(document).on('click', '#detailPlant', function(e){
 		e.preventDefault();
 		$("#head_title").html("<b>DETAIL PRODUCTION ["+$(this).data('id_produksi')+"]</b>");
-		$("#view").load(base_url +'index.php/'+ active_controller+'/modalDetailPrice/'+$(this).data('id_produksi'));
+		$("#view").load(base_url + active_controller+'/modalDetailPrice/'+$(this).data('id_produksi'));
 		$("#ModalView").modal();
 	});
 		

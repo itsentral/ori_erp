@@ -4,6 +4,8 @@ class Cron_model extends CI_Model {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('tanki_model');
+
+		$this->db2 = $this->load->database('tanki', TRUE);
 	}
 
 	//==========================================================================================================================
@@ -150,6 +152,15 @@ class Cron_model extends CI_Model {
 				$WH = $GET_DETAIL_SO[0]->total_time;
 				$MP = $GET_DETAIL_SO[0]->man_power;
 				$MH = $GET_DETAIL_SO[0]->man_hours;
+			}
+
+			if($tandaIPP == 'IPPT'){
+				$GET_DETAIL_SO_TANKI = $this->db2->get_where('bq_detail_detail',array('id'=>$id_milik))->result();
+				if(!empty($GET_DETAIL_SO_TANKI)){
+					$WH = $GET_DETAIL_SO_TANKI[0]->t_time;
+					$MP = $GET_DETAIL_SO_TANKI[0]->mp;
+					$MH = $GET_DETAIL_SO_TANKI[0]->man_hours;
+				}
 			}
 
 			$nestedData[]	= "<div align='right'>".number_format($TOTAL_MATERIAL,4)."</div>";
