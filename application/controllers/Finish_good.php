@@ -468,10 +468,18 @@ class Finish_good extends CI_Controller
 			$IPP[] = explode("-", $product->id_produksi)[1];
 		}
 
+		$arrContextOptions=array(
+			"ssl"=>array(
+				"verify_peer"=>false,
+				"verify_peer_name"=>false,
+			),
+		); 
+		
 		$explode = explode("-", $idmilik);
 		$this->db->where_in('id', $explode)->update('production_detail', ['flag_qr' => 'Y', 'date_qr' => date('Y-m-d H:i:s')]);
 		foreach ($explode as $key => $code) {
-			$img = file_get_contents(base_url('qrcodegen/generate/' . $code . '/' . $code), '');
+			// $img = file_get_contents(base_url('qrcodegen/generate/' . $code . '/' . $code), '');
+			$img = file_get_contents(base_url('qrcodegen/generate/' . $code . '/' . $code), false, stream_context_create($arrContextOptions));
 		}
 
 		$qSupplier 	= "SELECT * FROM production WHERE no_ipp IN ('" . implode("','", $IPP) . "') ";
