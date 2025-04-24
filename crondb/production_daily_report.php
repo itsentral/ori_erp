@@ -12,7 +12,7 @@ $dateC = date('Y-m-d');
 $date = date('Y-m-d', strtotime('-1 days', strtotime($dateC)));
 // echo $date; exit;
 // $date = date('2024-11-23');
-// $dateIN = "('2024-11-15','2024-11-16','2024-11-17','2024-11-18','2024-11-19','2024-11-20')";
+// $dateIN = "('2025-04-14','2025-04-15')";
 // echo"<pre>";
 $sqlHeader      = "SELECT a.*, b.id_milik FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date)='".$date."' ";
 // $sqlHeader      = "SELECT a.*, b.id_milik FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date) IN ".$dateIN."  ORDER BY a.status_date ASC ";
