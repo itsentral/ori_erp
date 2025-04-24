@@ -554,11 +554,7 @@
 					</td>
 					<td colspan='7'>
 						<?php
-						if(isset($valx['id_material'])){
-							$material_name9= get_nomor_so($valx['no_ipp']).' / '.strtoupper(get_name_acc($valx['id_material']));
-						}else{
-							$material_name9= $valx['nm_material'];
-						}
+						$material_name9= get_nomor_so($valx['no_ipp']).' / '.strtoupper('OTHER').' - '.get_name('cost_project_detail','caregory_sub','id',$valx['id_milik']);
 						?>
 						<input type="text" class="form-control input-sm" id="material_name9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_name9]" value="<?=set_value('material_name9', isset($material_name9) ? $material_name9 : ''); ?>" readonly tabindex="-1">
 					</td>
