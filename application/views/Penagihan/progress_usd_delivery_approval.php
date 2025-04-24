@@ -555,6 +555,9 @@
 					<td colspan='7'>
 						<?php
 						$material_name9= get_nomor_so($valx['no_ipp']).' / '.strtoupper('OTHER');
+
+						print_r('test');
+						exit;
 						?>
 						<input type="text" class="form-control input-sm" id="material_name9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_name9]" value="<?=set_value('material_name9', isset($valx['desc']) ? $valx['desc'] : ''); ?>" readonly tabindex="-1">
 					</td>
