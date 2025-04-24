@@ -2826,6 +2826,9 @@ if($base_cur=='USD'){
 							$qty9	= $d9['qty9'];
 							if($qty9>0) $checked='1';
 						}
+
+						print_r($d9);
+						exit;
 						$unit9			= $d9['unit9'];
 						$harga_tot9		= $d9['harga_tot9'];
 						$no_ippdtl		= $d9['no_ipp'];
