@@ -2818,7 +2818,7 @@ if($base_cur=='USD'){
 				}
 				$detailInv9 = [];
 				if(!empty($_POST['data9'])){
-					foreach($_POST['data9'] as $val => $d){
+					foreach($_POST['data9'] as $val => $d9){
 						$material_name9	= $d9['material_name9'];
 						$harga_sat9		= $d9['harga_sat9'];
 						$qty9=0;$checked='';
