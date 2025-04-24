@@ -2827,14 +2827,13 @@ if($base_cur=='USD'){
 							if($qty9>0) $checked='1';
 						}
 
-						print_r($d9);
-						exit;
+						
 						$unit9			= $d9['unit9'];
 						$harga_tot9		= $d9['harga_tot9'];
 						$no_ippdtl		= $d9['no_ipp'];
 						$no_sodtl		= $d9['no_so'];
-						$product_cust	= $d9['product_cust'];
-						$product_desc	= $d9['product_desc'];
+						$product_cust	= $d9['material_name9'];
+						$product_desc	= $d9['material_desc9'];
 						$qty9_ori		= $d9['qty9_ori'];
 						$qty9_belum		= $d9['qty9_belum'];
 
