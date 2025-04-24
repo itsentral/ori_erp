@@ -556,7 +556,7 @@
 						<?php
 						$material_name9= get_nomor_so($valx['no_ipp']).' / '.strtoupper('OTHER');
 						?>
-						<input type="text" class="form-control input-sm" id="material_name9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_name9]" value="<?=set_value('material_name9', isset($material_name9) ? $material_name9 : ''); ?>" readonly tabindex="-1">
+						<input type="text" class="form-control input-sm" id="material_name9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_name9]" value="<?=set_value('material_name9', isset($valx['desc']) ? $valx['desc'] : ''); ?>" readonly tabindex="-1">
 					</td>
 					<td><input type="text" class="form-control" id="material_desc9<?=$numb9 ?>" name="data9[<?=$numb9 ?>][material_desc9]" value="<?=set_value('material_desc9', isset($valx['desc']) ? $valx['desc'] : ''); ?>" readonly tabindex="-1" ></td>
 					<td>
