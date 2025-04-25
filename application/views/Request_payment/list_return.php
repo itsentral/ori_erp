@@ -70,6 +70,11 @@ $this->load->view('include/side_menu');
 <?php $this->load->view('include/footer'); ?>
 <script src="<?= base_url('assets/js/number-divider.min.js')?>"></script>
 <script type="text/javascript">
+
+$('#Mymodal').on('shown.bs.modal', function() {
+    $(document).off('focusin.modal');
+});
+
 	$("#mytabledata").DataTable({
 	"paging": false,
 	"ordering": false,
