@@ -318,7 +318,7 @@
 	$mpdf->AddPageByArray([
 		'margin-left' => 10,
 		'margin-right' => 10,
-		'margin-top' => 95,
+		'margin-top' => 45,
 		'margin-bottom' => 5,
 		'default-header-line' => 5,
 	]);
