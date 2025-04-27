@@ -268,13 +268,13 @@ if(!empty($data_header[0]->amount_words)){
                 echo "<td align='right'>".strtoupper(get_name('supplier','nm_supplier','id_supplier',$data_header[0]->id_supplier))."</td>";
             echo "</tr>";
 		echo "</tbody>";
-	echo "</table><br>";
+	echo "</table>";
 	// echo "<pagebreak />";
     echo "<hr>";
     echo "<table class='gridtable5' width='100%' border='0'>";
 		echo "<tbody>";
             echo "<tr>";
-                echo "<td colspan='2' style='font-size:12px;font-weight:bold;text-align:center;'>
+                echo "<td colspan='2' style='font-size:11px;font-weight:bold;text-align:center;'>
                     WE DO NOT ACCEPT COMMISSION / GIFTS IN ANY FORM,<br>
                     IF THERE IS A REQUEST FROM OUT EMPLOYEES OR<br>
                     THERE ARE SUGGESTIONS & CRITICISMS FOR US, YOU CAN CONTACT US<br>
