@@ -2177,14 +2177,15 @@ class Pembelian_model extends CI_Model {
 			$repeat_po = "";
 			$request_payment="";
 			$close_po="";
-			$print_tnc="&nbsp;<a href='".base_url('pembelian/print_po_tnc/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print T&C' data-role='qtip'>Print T&C</a>";
+			$print_old	= "&nbsp;<a href='".base_url('pembelian/print_po2/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'><i class='fa fa-print'></i></a>";
+			$print_tnc="&nbsp;<a href='".base_url('pembelian/print_po_tnc/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print T&C' data-role='qtip'><b>Print T&C</b></a>";
 			$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
 			if($row['status'] == 'IN PARSIAL'){
 				$close_po = "&nbsp;<button type='button' class='btn btn-sm btn-danger close_po' title='Close PO' data-no_po='".$row['no_po']."'><i class='fa fa-check'></i></button>";
 			}
 			if($row['status'] == 'WAITING IN' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
 				$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
-				$print_po	= "&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'>Print Nilai PO</a>";
+				$print_po	= $print_old."&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";
 				$close_po = "&nbsp;<button type='button' class='btn btn-sm btn-danger close_po' title='Close PO' data-no_po='".$row['no_po']."'><i class='fa fa-check'></i></button>";
 				// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 				// $delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
@@ -2192,14 +2193,14 @@ class Pembelian_model extends CI_Model {
 			if($row['status'] == 'WAITING IN' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
 				$request_payment = "";
 				$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
-				$print_po	= "&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'>Print Nilai PO</a>";
+				$print_po	= $print_old."&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";
 				$edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 				$delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 			}
 
 			if(!empty($row['valid_date']) AND $row['valid_date'] >= date('Y-m-d')){
 				$repeat_po	= "&nbsp;<button type='button' class='btn btn-sm bg-purple repeat_po' title='Repeat PO' data-no_po='".$row['no_po']."'><i class='fa fa-retweet'></i></button>";
-				$print_po	= "&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'>Print Nilai PO</a>";
+				$print_po	= $print_old."&nbsp;<a href='".base_url('pembelian/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";
 			}
 
 			

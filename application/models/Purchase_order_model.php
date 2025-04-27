@@ -2590,11 +2590,14 @@ class Purchase_order_model extends CI_Model {
 			$delete_po = "";
 			$close_po = "";
 			$request_payment = "";
-			$repeat_po = "";			
+			$repeat_po = "";		
+			$print_old	= "&nbsp;<a href='".base_url('purchase/print_po/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'><i class='fa fa-print'></i></a>";
+			$print_tnc="&nbsp;<a href='".base_url('purchase/print_po_tnc/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print T&C' data-role='qtip'><b>Print T&C</b></a>";
+
 			if($status_po==""){ 
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
 					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
-					$print_po = "&nbsp;<a href='".base_url('purchase/print_po/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'><i class='fa fa-print'></i></a>";				
+					$print_po = $print_old."&nbsp;<a href='".base_url('purchase/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";				
 					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					// $delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 				}
@@ -2604,12 +2607,12 @@ class Purchase_order_model extends CI_Model {
 					$delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 					//$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
 					//$close_po = "&nbsp;<button type='button' class='btn btn-sm btn-danger close_po' title='Close PO' data-no_po='".$row['no_po']."'><i class='fa fa-check'></i></button>";
-					$print_po = "&nbsp;<a href='".base_url('purchase/print_po/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'><i class='fa fa-print'></i></a>";
+					$print_po = $print_old."&nbsp;<a href='".base_url('purchase/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";
 				}
 				if($status_po=="" and $row['status1'] == 'Y') {
 					$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
 					$close_po = "&nbsp;<button type='button' class='btn btn-sm btn-danger close_po' title='Close PO' data-no_po='".$row['no_po']."'><i class='fa fa-check'></i></button>";
-					$print_po = "&nbsp;<a href='".base_url('purchase/print_po/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-info' title='Print PO' data-role='qtip'><i class='fa fa-print'></i></a>";
+					$print_po = $print_old."&nbsp;<a href='".base_url('purchase/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";
 				}
 			}
 
@@ -2625,6 +2628,7 @@ class Purchase_order_model extends CI_Model {
 									".$request_payment."
 									".$close_po."
 									".$repeat_po."
+									".$print_tnc."
 								</div>";
 			$data[] = $nestedData;
             $urut1++;
