@@ -53,7 +53,7 @@
     echo "<table class='gridtable5' width='100%' border='0'>";
 		echo "<tbody>";
             echo "<tr>";
-                echo "<td colspan='2'>Terms & Condition</td>";
+                echo "<td colspan='2'><b>Terms & Condition</b></td>";
             echo "</tr>";
             echo "<tr>";
                 echo "<td width='4%'>1.</td>";
@@ -293,6 +293,7 @@
 		table.gridtable5 td {
 			padding: 1px;
 			border-color: #dddddd;
+            vertical-align: top;
 		}
 		table.gridtable5 td.cols {
 			padding: 1px;
