@@ -6694,7 +6694,7 @@ if($base_cur=='USD'){
 				where b.id_bq in ('BQ-".$id_bq."') order by a.id_milik";
 				*/
 				
-				$sqlDetail="select a.*,a.qty as qty_total,(a.qty-a.qty_inv) qty_inv,0 qty_delivery,0 cogs from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik
+				$sqlDetail="select a.*,a.qty as qty_total,(a.qty-a.qty_inv) qty_inv,(a.qty-a.qty_inv) qty_delivery,0 cogs from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik
 				where b.id_bq in ('BQ-".$id_bq."') order by a.id_milik";
 
 //				$sqlDetail="select a.*,a.qty as qty_total,(a.qty-a.qty_inv) qty_inv,(a.qty-a.qty_inv) qty_delivery,0 cogs from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik where b.id_bq in ('BQ-".$id_bq."') order by a.id_milik";
