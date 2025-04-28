@@ -175,6 +175,43 @@ class Purchase extends CI_Controller {
 		history('Print Purchase Order '.$no_po);
 		$this->load->view('Print/print_po_dotmatrik', $data); 
 	}
+
+	public function print_po3(){
+		$no_po		= $this->uri->segment(3);
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+		
+		$data_url		= base_url();
+		$Split_Beda		= explode('/',$data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'printby' => $printby,
+			'no_po' => $no_po
+		);
+		history('Print Purchase Order '.$no_po);
+		$this->load->view('Print/print_po_dotmatrik_revisi1', $data); 
+	}
+
+	public function print_po_tnc(){
+		$no_po		= $this->uri->segment(3);
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+		
+		$data_url		= base_url();
+		$Split_Beda		= explode('/',$data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'printby' => $printby, 
+			'no_po' => $no_po
+		);
+		$this->load->view('Print/print_po_terms_condition', $data); 
+	}
 	
 	public function modal_po(){
 		$this->purchase_order_model->modal_po();

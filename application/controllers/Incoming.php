@@ -129,7 +129,8 @@ class Incoming extends CI_Controller {
 		
 		$sql = "
 			SELECT
-				a.*,b.nm_supplier
+				a.*,
+				b.nm_supplier
 			FROM
 				warehouse_adjustment a
 				left join tran_po_header b on a.no_ipp=b.no_po
@@ -139,6 +140,7 @@ class Incoming extends CI_Controller {
 			AND(
 				a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_gudang_ke LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.jumlah_mat LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
