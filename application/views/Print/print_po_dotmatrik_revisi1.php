@@ -271,7 +271,7 @@ if(!empty($data_header[0]->amount_words)){
             echo "<tr>";
                 echo "<td colspan='2' style='font-size:11px;font-weight:bold;text-align:center;'>
                 WE DO NOT ACCEPT COMMISSION / GIFTS IN ANY FORM,<br>
-                IF THERE IS A REQUEST FROM OUT EMPLOYEES OR<br>
+                IF THERE IS A REQUEST FROM OUR EMPLOYEES OR<br>
                 THERE ARE SUGGESTIONS & CRITICISMS FOR US, YOU CAN CONTACT US<br>
                 AT NUMBER 08111 - 466 - 097.
             </td>";
