@@ -34,7 +34,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_liner[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -47,7 +47,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_liner[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>
+                            <input type='hidden' name='detail_liner[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>
                             <input type='text' name='detail_liner[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -93,7 +93,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_strn1[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -106,7 +106,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_strn1[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>
+                            <input type='hidden' name='detail_strn1[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>
                             <input type='text' name='detail_strn1[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -152,7 +152,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_strn2[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -165,7 +165,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_strn2[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>  
+                            <input type='hidden' name='detail_strn2[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>  
                             <input type='text' name='detail_strn2[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -211,7 +211,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_str[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -224,7 +224,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>
+                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>
                             <input type='text' name='detail_str[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -270,7 +270,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_ext[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -283,7 +283,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>
+                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>
                             <input type='text' name='detail_ext[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -329,7 +329,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki * $qty,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat_all'] / $qty_est_tanki * $qty,3);?></td>
                         <td hidden>
                             <select name='detail_topcoat[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -342,7 +342,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'] / $qty_est_tanki * $qty;?>'>
+                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat_all'] / $qty_est_tanki * $qty;?>'>
                             <input type='text' name='detail_topcoat[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
