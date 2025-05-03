@@ -9087,6 +9087,11 @@ class Produksi extends CI_Controller {
 				$data_html = $this->load->view('Produksi/input_material_request', $data, TRUE);
 			}
 			else{
+
+				$GET_DETSPEC_TANKI     	= $this->tanki_model->get_detail_tanki($get_detail_spk[0]['id_milik']);
+				$qty                 	= $get_detail_spk[0]['qty'];
+				$qty_est_tanki         	= (!empty($GET_DETSPEC_TANKI['qty']))?$GET_DETSPEC_TANKI['qty']:0;
+
 				$get_liner_mix = $this->db->query("	SELECT
 														a.id_det AS id_milik,
 														a.id_material,
@@ -9141,7 +9146,9 @@ class Produksi extends CI_Controller {
 					'get_topcoat_utama' 	=> $this->getDataGroupMaterialNew($get_topcoat_mix, $WHERE_KEY, $WHERE_KEY_QTY, $WHERE_KEY_QTY_ALL),
 					'kode_spk' 				=> $kode_spk,
 					'id_spk' 				=> $WHERE_KEY,
-					'hist_produksi'			=> $hist_produksi
+					'hist_produksi'			=> $hist_produksi,
+					'qty'					=> $qty,
+					'qty_est_tanki'			=> $qty_est_tanki
 				);
 				
 				$data_html = $this->load->view('Produksi/input_material_request_tanki', $data, TRUE);
