@@ -34,7 +34,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_liner[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -93,7 +93,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_strn1[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -152,7 +152,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_strn2[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -211,7 +211,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_str[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -270,7 +270,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_ext[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -329,7 +329,7 @@ if(!empty($get_liner_utama)){ ?>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
                         <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'],3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
                         <td hidden>
                             <select name='detail_topcoat[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
