@@ -948,14 +948,17 @@ class Produksi extends CI_Controller {
 			}
 		}
 		else{
-			$UNIQ_MAT = $get_detail_spk[0]['id_milik'].'-';
-			$GET_EST_TANKI = $this->tanki_model->get_est_material_tanki($get_detail_spk[0]['no_ipp']);
+			$UNIQ_MAT 			= $get_detail_spk[0]['id_milik'].'-';
+			$GET_EST_TANKI 		= $this->tanki_model->get_est_material_tanki($get_detail_spk[0]['no_ipp']);
+			$GET_DETSPEC_TANKI 	= $this->tanki_model->get_detail_tanki($get_detail_spk[0]['id_milik']);
 			// echo '<pre>';
 			// print_r($GET_EST_TANKI[$UNIQ_MAT.'liner-1']);
 			// exit;
 			$qty 				= $get_detail_spk[0]['qty'];
+			$qty_est_tanki 		= (!empty($GET_DETSPEC_TANKI['qty']))?$GET_DETSPEC_TANKI['qty']:0;
 			$data = array(
-				'qty' 			=> $qty,
+				'qty_est_tanki' 		=> $qty_est_tanki,
+				'qty' 					=> $qty,
 				'Nama_Beda' 			=> $Nama_Beda,
 				'printby' 				=> $printby,
 				'get_detail_spk' 		=> $get_detail_spk,
