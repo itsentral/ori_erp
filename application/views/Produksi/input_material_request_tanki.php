@@ -47,7 +47,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_liner[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>
+                            <input type='hidden' name='detail_liner[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
                             <input type='text' name='detail_liner[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -106,7 +106,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_strn1[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>
+                            <input type='hidden' name='detail_strn1[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
                             <input type='text' name='detail_strn1[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -165,7 +165,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_strn2[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>  
+                            <input type='hidden' name='detail_strn2[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>  
                             <input type='text' name='detail_strn2[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -224,7 +224,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>
+                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
                             <input type='text' name='detail_str[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -283,7 +283,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>
+                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
                             <input type='text' name='detail_ext[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -342,7 +342,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat'];?>'>
+                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
                             <input type='text' name='detail_topcoat[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
