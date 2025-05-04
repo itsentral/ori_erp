@@ -14,7 +14,7 @@ $koneksi_tanki 		= $db2->connect();
 //echo $db1;exit;
 $dateC = date('Y-m-d');
 $date = date('Y-m-d', strtotime('-1 days', strtotime($dateC)));
-$date = '2025-04-30';
+$date = '2025-04-29';
 $sqlHeader      = "SELECT a.*, b.id_milik, b.no_spk, b.product_code, b.id_product AS nm_tanki FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date)='".$date."' and a.id_product='tanki' ";
 
 
