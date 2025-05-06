@@ -5629,7 +5629,7 @@ if($base_cur=='USD'){
 
 		$dt_no_ipp 	= explode(",",$gethd->no_ipp);
 		if($jenis_invoice=='progress'){
-			if($base_cur=='IDR'){				
+			if($base_cur=='IDR'||$base_cur==''){				
 				$kodejurnal1		= 'JV061';
 				if($gethd->instalasi=='1') {
 					$kodejurnal1		= 'JV068';
@@ -5708,7 +5708,7 @@ if($base_cur=='USD'){
 		}
 		elseif($jenis_invoice=='retensi'){
 			if($isppn>0){
-				if($base_cur=='IDR'){
+				if($base_cur=='IDR'||$base_cur==''){
 					$kodejurnal1	= 'JV052';
 					// update kartu po customer uang muka
 					$this->db->query("update tr_kartu_po_customer set 
@@ -5726,7 +5726,7 @@ if($base_cur=='USD'){
 					$this->db->query("update tr_kartu_po_customer set kurs_um=ROUND((total_um_idr/total_um),0) WHERE nomor_po='$no_po'");
 				}				
 			}else{
-				if($base_cur=='IDR'){
+				if($base_cur=='IDR'||$base_cur==''){
 					$kodejurnal1	= 'JV054';
 					// update kartu po customer uang muka
 					$this->db->query("update tr_kartu_po_customer set 
