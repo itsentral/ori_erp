@@ -6359,6 +6359,10 @@ if($base_cur=='USD'){
 					}
 				}
 			}
+
+			print_r($uang_muka_persen);
+			exit;
+
 			$approval	= $this->uri->segment(4);
 			$data2 = array(
 				'title'			=> 'Indeks Of Create Invoice Progress',
