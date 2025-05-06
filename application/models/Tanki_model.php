@@ -185,6 +185,17 @@ class Tanki_model extends CI_Model {
 		return $ArrDetail;
 	}
 
+    function get_detail_tanki($id_milik){ 
+		$array = [
+            'id'=>$id_milik
+        ];
+		$result = $this->tanki->get_where('bq_detail_detail',$array)->result();
+        $Array = [
+            'qty' => $result[0]->jml
+        ];
+        return $Array;
+	}
+
 
 }
 

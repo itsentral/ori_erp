@@ -60,7 +60,7 @@ class App_engine_model extends CI_Model {
 	public function approve_est_modal(){
 		$id_bq 		= $this->uri->segment(3);
 
-		$sql 		= "SELECT a.*, b.sum_mat FROM bq_detail_header a INNER JOIN estimasi_cost_and_mat b ON a.id=b.id_milik WHERE a.id_bq = '".$id_bq."' AND b.id_bq = '".$id_bq."' AND b.parent_product <> 'pipe slongsong' ORDER BY a.id ASC";
+		$sql 		= "SELECT a.*, b.sum_mat FROM bq_detail_header a INNER JOIN estimasi_cost_and_mat_fast b ON a.id=b.id_milik WHERE a.id_bq = '".$id_bq."' AND b.id_bq = '".$id_bq."' ORDER BY a.id ASC";
 		// echo $sql;
 		$result		= $this->db->query($sql)->result_array();
 
