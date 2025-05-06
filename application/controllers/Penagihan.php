@@ -6383,9 +6383,9 @@ if($base_cur=='USD'){
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
 				'kurs'			=> (!empty($get_kurs))?$get_kurs[0]->kurs:0,
-				'uang_muka_persen'	=> (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0,
+				'uang_muka_persen'	=> $uang_muka_persen,//(!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0,
 				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> 0,
+				'down_payment'	=> $down_payment,
 				'down_payment2'	=> 0,
 				'id'			=> $id,
 				'approval'		=> $approval
