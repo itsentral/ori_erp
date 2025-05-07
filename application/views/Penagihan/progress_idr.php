@@ -661,7 +661,7 @@
 				}
 				?>
 				<input type="hidden" class="form-control grand_total text-right input-sm divide" id="grand_total" name="grand_total" value="<?php echo set_value('grand_total', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">
-				<input type="text" class="form-control grand_total text-right input-sm divide" id="dpp_grand_total" name="dpp_grand_total" value="<?php echo set_value('grand_total', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">				
+				<input type="text" class="form-control grand_total_dpp text-right input-sm divide" id="dpp_grand_total" name="dpp_grand_total" value="<?php echo set_value('grand_total', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">				
 					
 			</td>
 		</tr>
