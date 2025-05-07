@@ -578,6 +578,7 @@ if(isset($approval)){
 			var datRetensi         	= $('#persen_retensi').val();
 			totalret=(parseFloat(grand_total_hidden)*parseFloat(datRetensi/100)).toFixed(2);
 			$('.potongan_retensi').val(num2(totalret));
+			$('.grand_total_dpp').val(number_format(grand_total_hidden,2));
 			ppn();
 		});
 
