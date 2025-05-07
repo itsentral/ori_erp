@@ -582,7 +582,7 @@ if(isset($approval)){
 		});
 
 		$(document).on('change', '#persen_retensi2', function(){
-			var grand_total_hidden	= $("#grand_total").val();
+			var grand_total_hidden	= $("#grand_total_dpp").val();
 			var datRetensi         	= $('#persen_retensi2').val();
 			Retensi2=(parseFloat(grand_total_hidden)*parseFloat(datRetensi/100)).toFixed(2);
 			$('.potongan_retensi2').val(number_format(Retensi2,2));
