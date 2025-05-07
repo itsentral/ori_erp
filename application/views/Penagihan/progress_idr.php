@@ -652,6 +652,7 @@
 				<?php
 				if($penagihan[0]->total_dpp_rp!=0) {
 					$grand_total = round($penagihan[0]->total_dpp_rp, 2);
+					$grand_total2 = round($penagihan[0]->total_gab_product_idr, 2);
 					$down_payment=($penagihan[0]->total_um_idr);
 					$down_payment2=0;
 				}else{
