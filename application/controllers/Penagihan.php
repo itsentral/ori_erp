@@ -5629,7 +5629,7 @@ if($base_cur=='USD'){
 
 		$dt_no_ipp 	= explode(",",$gethd->no_ipp);
 		if($jenis_invoice=='progress'){
-			if($base_cur=='IDR'){				
+			if($base_cur=='IDR'||$base_cur==''){				
 				$kodejurnal1		= 'JV061';
 				if($gethd->instalasi=='1') {
 					$kodejurnal1		= 'JV068';
@@ -5708,7 +5708,7 @@ if($base_cur=='USD'){
 		}
 		elseif($jenis_invoice=='retensi'){
 			if($isppn>0){
-				if($base_cur=='IDR'){
+				if($base_cur=='IDR'||$base_cur==''){
 					$kodejurnal1	= 'JV052';
 					// update kartu po customer uang muka
 					$this->db->query("update tr_kartu_po_customer set 
@@ -5726,7 +5726,7 @@ if($base_cur=='USD'){
 					$this->db->query("update tr_kartu_po_customer set kurs_um=ROUND((total_um_idr/total_um),0) WHERE nomor_po='$no_po'");
 				}				
 			}else{
-				if($base_cur=='IDR'){
+				if($base_cur=='IDR'||$base_cur==''){
 					$kodejurnal1	= 'JV054';
 					// update kartu po customer uang muka
 					$this->db->query("update tr_kartu_po_customer set 
@@ -6359,6 +6359,7 @@ if($base_cur=='USD'){
 					}
 				}
 			}
+			
 			$approval	= $this->uri->segment(4);
 			$data2 = array(
 				'title'			=> 'Indeks Of Create Invoice Progress',
@@ -6383,9 +6384,9 @@ if($base_cur=='USD'){
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
 				'kurs'			=> (!empty($get_kurs))?$get_kurs[0]->kurs:0,
-				'uang_muka_persen'	=> (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0,
+				'uang_muka_persen'	=> $uang_muka_persen,//(!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0,
 				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> 0,
+				'down_payment'	=> $down_payment,
 				'down_payment2'	=> 0,
 				'id'			=> $id,
 				'approval'		=> $approval

@@ -1003,6 +1003,7 @@ class Pembelian extends CI_Controller {
 
 	function receive_invoice_save(){
 		$data = $this->input->post();
+	
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
