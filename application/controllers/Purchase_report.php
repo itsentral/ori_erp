@@ -150,7 +150,6 @@ class Purchase_report extends CI_Controller {
 		    WHERE 1=1 ".$where." AND (
 				a.no_pr_group LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.category LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
