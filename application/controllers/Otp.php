@@ -7,6 +7,7 @@ class Otp extends CI_Controller {
         parent::__construct();
         $this->load->helper(['url', 'string']);
         $this->load->library('session');
+        $this->load->model('master_model');
     }
 
     public function index(){
