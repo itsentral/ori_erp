@@ -26,7 +26,7 @@ class Otp extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses,
 		);
 		history('View OTP');
-		$this->load->view('Setting/otp',$data);
+		$this->load->view('Users/otp',$data);
 	}
 
     public function send_otp() {
