@@ -19,11 +19,14 @@ class Otp extends CI_Controller {
 		}
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+        $Data_Identitas			= $this->master_model->getData('identitas');
 		$data = array(
 			'title'			=> 'Indeks Of OTP',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses,
+            'title'			=> 'Login',
+			'idt'			=> $Data_Identitas[0]
 		);
 		history('View OTP');
 		$this->load->view('Users/otp',$data);
