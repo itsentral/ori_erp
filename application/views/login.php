@@ -332,7 +332,7 @@
 						$('#spinner').hide();
 						
 						if(data.status == 1){
-							window.location.href = base_url + 'otp';
+							window.location.href = base_url + 'dashboard';
 						}else{
 							if(data.status == 2){
 								$('#modal_text').html(data.pesan);
