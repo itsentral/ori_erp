@@ -9,6 +9,25 @@ class Otp extends CI_Controller {
         $this->load->library('session');
     }
 
+    public function index(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Indeks Of OTP',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+		);
+		history('View OTP');
+		$this->load->view('Setting/otp',$data);
+	}
+
     public function send_otp() {
         $phone = $this->input->post('phone'); // Nomor hp dengan kode negara, contoh: 6281234567890
 
