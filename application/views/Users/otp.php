@@ -38,21 +38,14 @@
 
 <!-- form_otp.php -->
 <form method="post" action="<?= base_url('otp/send_otp') ?>">
-    <input type="text" name="phone" placeholder="Nomor WhatsApp (628xxxx)">
-    <button type="submit">Kirim OTP</button>
+    <input type="text" name="phone" class="form-control input-md" placeholder="Nomor WhatsApp (628xxxx)">
+    <button type="submit" class="btn btn-md btn-success">Kirim OTP</button>
 </form>
 
 <form method="post" action="<?= base_url('otp/verify_otp') ?>">
-    <input type="text" name="otp" placeholder="Masukkan OTP">
-    <button type="submit">Verifikasi</button>
-</form>
-<footer>
-			<font color="white">  
-				<p>Copyright &copy; <?php echo $idt->nm_perusahaan.' '.date('Y');?></p>
-				<p>This page is loaded for <strong>{elapsed_time}</strong> seconds</p>
-			</font>
-		</footer>
-		</p>
+    <input type="text" name="otp" class="form-control input-md"  placeholder="Masukkan OTP">
+    <button type="submit" class="btn btn-md btn-success">Verifikasi</button>
+</form>		
 	</div>
 	<script  src="<?php echo base_url();?>assets/login/js/index.js"></script>
 </body>
