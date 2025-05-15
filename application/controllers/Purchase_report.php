@@ -96,7 +96,7 @@ class Purchase_report extends CI_Controller {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['no_pr_group'].'/'.$row['no_pr']))."</div>";
+			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['no_pr_group']))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tgl_pr']))."</div>";
 			$nestedData[]	= "<div align='center'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['app_by']))."</div>";
@@ -150,7 +150,6 @@ class Purchase_report extends CI_Controller {
 		    WHERE 1=1 ".$where." AND (
 				a.no_pr_group LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.category LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
