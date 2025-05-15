@@ -99,10 +99,10 @@ if(!empty($dtdepartment)) $nm_dept=$dtdepartment->nm_dept;
 	$all_total=(($total_expense+$data->add_ppn_nilai-$data->add_pph_nilai-$total_kasbon));
 	if ($total_expense>$total_kasbon){
 //		$text="(Kurang)";
-		$sisakurang=number_format($total_expense-$total_kasbon);
+		$sisakurang=number_format(($total_expense+$data->add_ppn_nilai)-$total_kasbon);
 	}else{
 //		$text="Sisa Lebih";
-		$sisakurang="( ".number_format($total_expense-$total_kasbon)." )";
+		$sisakurang="( ".number_format(($total_expense+$data->add_ppn_nilai)-$total_kasbon)." )";
 	}
 ?>
 	<tr>
