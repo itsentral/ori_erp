@@ -6,6 +6,7 @@ class Production extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->model('tanki_model');
 		$this->load->model('update_produksi_model');
 		$this->load->model('produksi_model');
 		// Your own constructor code
@@ -4388,6 +4389,622 @@ class Production extends CI_Controller {
 		);
 		history('Print Qrcode'); 
 		$this->load->view('Production/print_qrcode', $data);
+	}
+
+	//PROGRESS PRODUKSI TANKI
+	public function progress_produksi_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/progress_produksi';
+		$Arr_Akses			= getAcccesmenu($controller);
+		
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$GET_DELIVERY_DATE = get_delivery_date();
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Progress Production Tanki',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+		$this->load->view('Production/progress_produksi_tanki',$data);
+	}
+	
+	public function server_side_spk_produksi_progress_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/progress_produksi';
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_spk_produksi_progress_tanki(
+			$requestData['tgl_awal'],
+			$requestData['tgl_akhir'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		// $GET_DELIVERY_DATE = get_delivery_date();
+		// print_r($GET_DELIVERY_DATE);
+		// exit;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
+				$so_number = (!empty($row['so_number2']))?$row['so_number2']:'';
+			$nestedData[]	= "<div align='center'>".$so_number."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
+
+			// $DELIVERY_DATE = (!empty($GET_DELIVERY_DATE[$row['no_ipp']]))?$GET_DELIVERY_DATE[$row['no_ipp']]:array();
+			// $DELIVERY_DATE_ = '';
+			// if(!empty($DELIVERY_DATE)){
+			// 	$DELIVERY_DATE_UNIQ = array_unique($DELIVERY_DATE);
+			// 	$DELIVERY_DATE_ = implode('<br>',$DELIVERY_DATE_UNIQ);
+			// }
+
+			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
+			// $nestedData[]	= "<div align='center'>".$DELIVERY_DATE_."</div>";
+			$nestedData[]	= "<div align='center'>".number_format(persen_progress_produksi_tanki($row['id_produksi']))." %</div>";
+			// $nestedData[]	= "<div align='center'>0 %</div>";
+			
+			// $class = Color_status($row['sts_produksi']);
+			// $nestedData[]	= "<div align='center'><span class='badge' style='background-color:".$class."'>".$row['sts_produksi']."</span></div>";
+				$create = "";
+				$excel = "";
+				if($Arr_Akses['read']=='1'){
+					$create = "<button type='button' class='btn btn-sm btn-success detail_spk' title='Detail Production' data-id_produksi='".$row['id_produksi']."'  data-no_so='".$so_number."'><i class='fa fa-eye'></i></button>";
+				}
+				if($Arr_Akses['download']=='1'){
+					$excel = "<button type='button' class='btn btn-sm btn-info download_excel' title='Download' data-id_produksi='".$row['id_produksi']."'  data-no_so='".$so_number."'><i class='fa fa-file-excel-o'></i></button>";
+				}
+			$nestedData[]	= "<div align='center'>
+									".$create."
+									".$excel."
+									</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_spk_produksi_progress_tanki($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$WHERE_IPP = '';
+		if($tgl_awal != '0'){
+			// $GET_DELIVERY_DATE_RANGE = get_delivery_date_between($tgl_awal,$tgl_akhir);
+			// // echo '<pre>';
+			// // print_r($GET_DELIVERY_DATE_RANGE);
+			// // exit;
+			// $ArrDeliv = [];
+			// if(!empty($GET_DELIVERY_DATE_RANGE)){
+			// 	$ArrDeliv = $GET_DELIVERY_DATE_RANGE;
+			// 	$DELIVERY_IMP = implode("','",$ArrDeliv);
+			// 	$WHERE_IPP = "AND a.no_ipp IN ('".$DELIVERY_IMP."')";
+			// }
+
+			$WHERE_IPP = "AND DATE(a.created_date) BETWEEN '".date('Y-m-d',strtotime($tgl_awal))."' AND '".date('Y-m-d',strtotime($tgl_akhir))."' ";
+		}
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.no_ipp,
+				CONCAT('PRO-',a.no_ipp) AS id_produksi,
+				'Y' AS sts_produksi,
+				a.created_date,
+				a.project,
+				a.no_so AS so_number2
+			FROM
+				planning_tanki a,
+                (SELECT @row:=0) r
+		    WHERE 1=1 $WHERE_IPP
+				AND (
+					a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.project LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				)
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_ipp',
+			2 => 'no_so',
+			3 => 'project',
+			4 => 'created_date'
+		);
+
+		$sql .= " ORDER BY a.created_date DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	public function modal_detail_progress_tanki(){
+		$id_produksi= $this->uri->segment(3);
+		$qDetail	= "	SELECT a.* FROM production_detail a WHERE a.id_produksi = '".$id_produksi."' GROUP BY a.id_milik ORDER BY a.id ASC";
+		// echo $qDetail;
+		$rowD		= $this->db->query($qDetail)->result_array();
+		$data = array(
+			'id_produksi' 	=> $id_produksi,
+			'rowD' 			=> $rowD,
+			'tanki_model'	=> $this->tanki_model
+		);
+		
+		$this->load->view('Production/modal_detail_progress_tanki', $data);
+	}
+
+	public function data_progress_produksi_excel_tanki(){
+		//membuat objek PHPExcel
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+		$tgl_awal		= $this->uri->segment(3);
+		$tgl_akhir		= $this->uri->segment(4);
+
+		$this->load->library("PHPExcel");
+		// $this->load->library("PHPExcel/Writer/Excel2007");
+		$objPHPExcel	= new PHPExcel();
+
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
+
+		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$sheet 		= $objPHPExcel->getActiveSheet();
+
+		$WHERE_IPP = '';
+		if($tgl_awal != '0'){
+			// $GET_DELIVERY_DATE_RANGE = get_delivery_date_between($tgl_awal,$tgl_akhir);
+			// // echo '<pre>';
+			// // print_r($GET_DELIVERY_DATE_RANGE);
+			// // exit;
+			// $ArrDeliv = [];
+			// if(!empty($GET_DELIVERY_DATE_RANGE)){
+			// 	$ArrDeliv = $GET_DELIVERY_DATE_RANGE;
+			// 	$DELIVERY_IMP = implode("','",$ArrDeliv);
+			// 	$WHERE_IPP = "AND b.no_ipp IN ('".$DELIVERY_IMP."')";
+			// }
+
+			$WHERE_IPP = "AND DATE(a.created_date) BETWEEN '".date('Y-m-d',strtotime($tgl_awal))."' AND '".date('Y-m-d',strtotime($tgl_akhir))."' ";
+		}
+		$qDetail1 = "SELECT
+						a.no_ipp,
+						CONCAT('PRO-',a.no_ipp) AS id_produksi,
+						'Y' AS sts_produksi,
+						a.created_date,
+						a.project,
+						a.no_so AS so_number2
+					FROM
+						planning_tanki a
+					WHERE 1=1 $WHERE_IPP
+		";
+		// echo $qDetail1; exit;
+		$restDetail1	= $this->db->query($qDetail1)->result_array();
+
+
+		$Row		= 1;
+		$NewRow		= $Row+1;
+		$Col_Akhir	= $Cols	= getColsChar(6);
+		$sheet->setCellValue('A'.$Row, 'PROGRESS PRODUKSI TANKI');
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
+		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
+
+		$NewRow	= $NewRow +2;
+		$NextRow= $NewRow;
+
+		$sheet->setCellValue('A'.$NewRow, '#');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+		$sheet->getColumnDimension('A')->setWidth(10);
+
+		$sheet->setCellValue('B'.$NewRow, 'IPP');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+		$sheet->getColumnDimension('B')->setWidth(20);
+
+		$sheet->setCellValue('C'.$NewRow, 'SO');
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
+		$sheet->getColumnDimension('C')->setAutoSize(true);
+
+		$sheet->setCellValue('D'.$NewRow, 'PROJECT');
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
+		$sheet->getColumnDimension('D')->setAutoSize(true);
+
+		$sheet->setCellValue('E'.$NewRow, 'TANGGAL MULAI');
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
+		$sheet->getColumnDimension('E')->setWidth(10);
+
+		$sheet->setCellValue('F'.$NewRow, 'PROGRESS');
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
+		$sheet->getColumnDimension('F')->setWidth(10);
+		
+		// $sheet->setCellValue('G'.$NewRow, 'PROGRESS');
+		// $sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
+		// $sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
+		// $sheet->getColumnDimension('G')->setWidth(20);
+
+
+		// echo $qDetail1; exit;
+		$GET_DELIVERY_DATE = get_delivery_date();
+		if($restDetail1){
+			$awal_row	= $NextRow;
+			$no=0;
+			foreach($restDetail1 as $key => $valx){
+				$no++;
+				$awal_row++;
+				$awal_col	= 0;
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$no_ipp	= strtoupper($valx['no_ipp']);
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_ipp);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$so_number = (!empty($valx['so_number2']))?$valx['so_number2']:'';
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $so_number);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$project	= $valx['project'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $project);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, date('Y-m-d', strtotime($valx['created_date'])));
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, persen_progress_produksi_tanki($valx['id_produksi']));
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+			}
+		}
+
+
+		$sheet->setTitle('Progress Produksi');
+		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5
+		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		ob_end_clean();
+		//sesuaikan headernya
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		//ubah nama file saat diunduh
+		header('Content-Disposition: attachment;filename="progress-produksi-tanki.xls"');
+		//unduh file
+		$objWriter->save("php://output");
+	}
+
+	public function progress_produksi_excel_tanki(){
+		//membuat objek PHPExcel
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+		$id_produksi		= $this->uri->segment(3);
+		$no_so		= $this->uri->segment(4);
+
+		$this->load->library("PHPExcel");
+		// $this->load->library("PHPExcel/Writer/Excel2007");
+		$objPHPExcel	= new PHPExcel();
+
+		$whiteCenterBold    = whiteCenterBold();
+		$whiteRightBold    	= whiteRightBold();
+		$whiteCenter    	= whiteCenter();
+		$mainTitle    		= mainTitle();
+		$tableHeader    	= tableHeader();
+		$tableBodyCenter    = tableBodyCenter();
+		$tableBodyLeft    	= tableBodyLeft();
+		$tableBodyRight    	= tableBodyRight();
+
+		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$sheet 		= $objPHPExcel->getActiveSheet();
+
+		$no_ipp		= str_replace('PRO-','',$id_produksi);
+		$qHeaderx	= "SELECT * FROM planning_tanki WHERE no_ipp='".$no_ipp."' ";
+		$getData	= $this->db->query($qHeaderx)->row();
+
+		$qDetail	= "	SELECT a.* FROM production_detail a WHERE a.id_produksi = '".$id_produksi."' GROUP BY a.id_milik ORDER BY a.id ASC";
+		$restDetail1	= $this->db->query($qDetail)->result_array();
+
+
+		$Row		= 1;
+		$NewRow		= $Row+1;
+		$Col_Akhir	= $Cols	= getColsChar(12);
+		$sheet->setCellValue('A'.$Row, 'DETAIL PROGRESS PRODUKSI');
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
+		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
+
+		$NewRow	= $NewRow +2;
+		$NextRow= $NewRow;
+
+		$sheet->setCellValue('A'.$NewRow, 'IPP');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+
+		$sheet->setCellValue('B'.$NewRow, $no_ipp);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+
+		$NewRow	= $NewRow +1;
+		$NextRow= $NewRow;
+
+		$sheet->setCellValue('A'.$NewRow, 'No SO');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+
+		$sheet->setCellValue('B'.$NewRow, $no_so);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+
+		$NewRow	= $NewRow +1;
+		$NextRow= $NewRow;
+
+		$sheet->setCellValue('A'.$NewRow, 'Project');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+
+		$sheet->setCellValue('B'.$NewRow, $getData->project);
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableBodyLeft);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+
+		// $nm_category	= $row_Cek['no_komponen'];
+		// $Cols			= getColsChar($awal_col);
+		// $sheet->setCellValue($Cols.$awal_row, $nm_category);
+		// $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+
+		$NewRow	= $NewRow +2;
+		$NextRow= $NewRow;
+
+		$sheet->setCellValue('A'.$NewRow, '#');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+		$sheet->getColumnDimension('A')->setWidth(10);
+
+		$sheet->setCellValue('B'.$NewRow, 'PRODUCT TYPE');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+		$sheet->getColumnDimension('B')->setWidth(20);
+
+		$sheet->setCellValue('C'.$NewRow, 'NO SPK');
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
+		$sheet->getColumnDimension('C')->setAutoSize(true);
+
+		$sheet->setCellValue('D'.$NewRow, 'SPEC');
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
+		$sheet->getColumnDimension('D')->setAutoSize(true);
+
+		$sheet->setCellValue('E'.$NewRow, 'PRODUCT NAME');
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
+		$sheet->getColumnDimension('E')->setWidth(10);
+
+		$sheet->setCellValue('F'.$NewRow, 'QTY ORDER');
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
+		$sheet->getColumnDimension('F')->setWidth(10);
+		
+		$sheet->setCellValue('G'.$NewRow, 'QTY ACTUAL');
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
+		$sheet->getColumnDimension('G')->setWidth(20);
+
+		$sheet->setCellValue('H'.$NewRow, 'QTY BALANCE');
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
+		$sheet->getColumnDimension('H')->setWidth(20);
+
+		$sheet->setCellValue('I'.$NewRow, 'QTY DELIVERY');
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+		$sheet->getColumnDimension('I')->setWidth(20);
+
+		$sheet->setCellValue('J'.$NewRow, 'QTY FG');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+		$sheet->getColumnDimension('J')->setWidth(20);
+
+		$sheet->setCellValue('K'.$NewRow, 'PROGRESS (%)');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+		$sheet->getColumnDimension('K')->setWidth(20);
+
+		// $sheet->setCellValue('L'.$NewRow, 'DELIVERY DATE');
+		// $sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
+		// $sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+		// $sheet->getColumnDimension('L')->setWidth(20);
+
+
+		$tanki_model	= $this->tanki_model;
+		// echo $qDetail1; exit;
+
+		if($restDetail1){
+			$awal_row	= $NextRow;
+			$no=0;
+			foreach($restDetail1 as $key => $valx){
+				$no++;
+				$awal_row++;
+				$awal_col	= 0;
+
+				//check delivery
+				$sqlCheck3 	= $this->db->select('COUNT(*) as Numc')->get_where('production_detail', array('id_milik'=>$valx['id_milik'],'id_produksi'=>$valx['id_produksi'],'kode_delivery !='=>NULL))->result();
+				$sqlCheckDead 	= $this->db->select('COUNT(*) as Numc')->get_where('deadstok', array('id_milik'=>$valx['id_milik'],'no_ipp'=>str_replace('PRO-','',$valx['id_produksi']),'kode_delivery !='=>NULL))->result();
+				$QTY_DELIVERY	= $sqlCheck3[0]->Numc + $sqlCheckDead[0]->Numc;
+
+				
+				$sqlCheck2 	= $this->db
+												->select('COUNT(*) as Numc')
+												->group_start()
+												->where('daycode !=', NULL)
+												->or_where('id_deadstok_dipakai !=', NULL)
+												->group_end()
+												->get_where('production_detail', 
+													array(
+														'id_milik'=>$valx['id_milik'],
+														'id_produksi'=>$valx['id_produksi']
+														)
+													)
+												->result();
+				$QTY_PRODUCT 		= $valx['qty'];
+				$QTY 		= $valx['qty'];
+				$ACT 		= $sqlCheck2[0]->Numc;
+				$ACT_OUT 	= $sqlCheck2[0]->Numc;
+				$balance 	= $QTY - $ACT;
+				$progress = 0;
+				if($ACT != 0 AND $QTY != 0){
+				$progress 	= ($ACT/$QTY) *(100);
+				}
+				if($progress == 100){
+					$bgc = '#75e975';
+				}
+				else if($progress == 0){
+					$bgc = '#f65b5b';
+				}
+				else{
+					$bgc = '#67a4ff';
+				}
+
+				$bal_dev	=$ACT_OUT-$QTY_DELIVERY;
+
+				
+				
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$comp	= strtoupper($valx['id_product']);
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $comp);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$no_spk	= $valx['no_spk'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $no_spk);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$spec = $tanki_model->get_spec($valx['id_milik']);
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $spec);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$id_product	= $valx['id_product'];
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $id_product);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $QTY);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $ACT_OUT);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $balance);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $QTY_DELIVERY);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $bal_dev);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				$awal_col++;
+				$Cols			= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $progress);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+				// $awal_col++;
+				// $delivery_date	= $valx['delivery_date2'];
+				// $Cols			= getColsChar($awal_col);
+				// $sheet->setCellValue($Cols.$awal_row, $delivery_date);
+				// $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+
+			}
+		}
+
+		$sheet->setTitle('Detail Progress Produksi');
+		//mulai menyimpan excel format xlsx, kalau ingin xls ganti Excel2007 menjadi Excel5
+		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		ob_end_clean();
+		//sesuaikan headernya
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		//ubah nama file saat diunduh
+		header('Content-Disposition: attachment;filename="detail-progress-produksi-'.$no_so.'.xls"');
+		//unduh file
+		$objWriter->save("php://output");
 	}
 
 }

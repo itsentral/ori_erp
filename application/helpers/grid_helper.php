@@ -6520,4 +6520,46 @@
 		
 	}
 
+	function persen_progress_produksi_tanki($id_produksi){
+		$CI 		=& get_instance();
+		
+		$rowD		= $CI->db->select('id_milik,id_produksi,qty')->group_by('id_milik')->get_where('production_detail',['id_produksi'=>$id_produksi])->result_array();
+		
+		$SUM_PROGRESS = 0;
+		foreach($rowD AS $val => $valx){
+			$sqlCheck2 	= $CI->db
+								->select('COUNT(*) as Numc')
+								->group_start()
+								->group_start()
+								->where('daycode !=', NULL)
+								->where('daycode !=', '')
+								->group_end()
+								->or_where('id_deadstok_dipakai !=', NULL)
+								->group_end()
+								->get_where('production_detail', 
+									array(
+										'id_milik'=>$valx['id_milik'],
+										'id_produksi'=>$valx['id_produksi']
+										)
+									)
+								->result();
+			$QTY 		= $valx['qty'];
+			$ACT 		= $sqlCheck2[0]->Numc;
+			
+			$progress = 0;
+			if($ACT != 0 AND $QTY != 0){
+				$progress 	= ($ACT/$QTY) *(100);
+			}
+
+			$SUM_PROGRESS += $progress;
+		}
+
+		$Progresss = 0;
+		if($SUM_PROGRESS > 0 AND COUNT($rowD) > 0 ){
+			$Progresss = $SUM_PROGRESS / COUNT($rowD);
+		}
+		
+		return $Progresss;
+	}
+
 ?>

@@ -1445,6 +1445,12 @@ class Ppic extends CI_Controller {
 											a.spool_induk 
 										ORDER BY
 											a.spool_induk ASC")->result_array();
+
+		$data_session	= $this->session->userdata;
+		$username 		= $data_session['ORI_User']['username'];
+		$this->db->where('insert_by',$username);
+		$this->db->delete('spool_temp');
+
 		$data = array(
 			'title'			=> 'Add Spool',
 			'action'		=> 'index',
@@ -1472,6 +1478,10 @@ class Ppic extends CI_Controller {
 		$totalFiltered	= $fetch['totalFiltered'];
 		$query			= $fetch['query'];
 
+		$data_session	= $this->session->userdata;
+		$username 		= $data_session['ORI_User']['username'];
+		$SpoolSelect 	= $this->checkSpoolSelected($username);
+
 		$data	= array();
 		$urut1  = 1;
         $urut2  = 0;
@@ -1495,13 +1505,17 @@ class Ppic extends CI_Controller {
             $project = get_name('production','project','no_ipp', $row['no_ipp']);
 			
 			$LENGTH = number_format($row['length']);
-			$CHECK = "<input type='checkbox' name='check[$nomor]' class='chk_personal' data-nomor='$nomor' value='".$row['id']."-H".$row['id_cutting']."-C".$row['id_split']."' >";
+			$value_check = $row['id']."-H".$row['id_cutting']."-C".$row['id_split'];
+
+			$selected = (!empty($SpoolSelect[$value_check]))?'checked':'';
+
+			$CHECK = "<input type='checkbox' name='check[$nomor]' class='chk_personal' data-nomor='$nomor' value='".$value_check."' $selected >";
 			if(!empty($row['id_cutting'])){
 				$LENGTH = "<span class='text-red'><b>Belum Dicutting</b></span>";
 				$CHECK = "<span cla";
 				if(!empty($row['id_split'])){
 					$LENGTH = $row['length_split'];
-					$CHECK = "<input type='checkbox' name='check[$nomor]' class='chk_personal' data-nomor='$nomor' value='".$row['id']."-H".$row['id_cutting']."-C".$row['id_split']."' >";
+					$CHECK = "<input type='checkbox' name='check[$nomor]' class='chk_personal' data-nomor='$nomor' value='".$value_check."' $selected >";
 				}
 			}
 
@@ -1619,10 +1633,25 @@ class Ppic extends CI_Controller {
 
 	public function create_spool_new(){
 		$data 			= $this->input->post();
-		
-		if(!empty($data['check'])){
-			$check 			= $data['check'];
+
+		$data_session	= $this->session->userdata;
+		$username 		= $data_session['ORI_User']['username'];
+		$dataList 		= $this->db->get_where('spool_temp',['insert_by'=>$username])->result_array();
+		$ArrayList = [];
+		foreach ($dataList as $key => $value) {
+			$ArrayList[$key] = $value['key_spool'];
 		}
+
+		// print_r($ArrayList);
+		// print_r($data['check']);
+		// exit;
+
+		if(!empty($ArrayList)){
+			$check 			= $ArrayList;
+		}
+		// if(!empty($data['check'])){
+		// 	$check 			= $data['check'];
+		// }
 		if(!empty($data['check2'])){
 			$check2 		= $data['check2'];
 		}
@@ -2773,5 +2802,64 @@ class Ppic extends CI_Controller {
 			}
 	}
 
+
+
+	public function saveTempSpool(){
+		$data			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$dateTime		= date('Y-m-d H:i:s');
+
+		$username 		= $data_session['ORI_User']['username'];
+		$dataspool     	= $data['dataspool'];
+		$checked 		= $data['checked'];
+
+		$tanda = ($checked=='true')?'insert':'delete';
+
+		$ArrInsert = [
+			'key_spool' => $dataspool,
+			'insert_by' => $username
+		];
+		
+		$this->db->trans_start();
+			if($checked == 'true'){
+				$this->db->insert('spool_temp', $ArrInsert);
+			}
+			else{
+				$this->db->where('key_spool',$dataspool);
+				$this->db->where('insert_by',$username);
+				$this->db->delete('spool_temp');
+			}
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Failed Process !!!',
+				'alert'		=>'Product gagal ditambahkan! Try Again !',
+				'status'	=> 2
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$dataList = $this->db->get_where('spool_temp',['insert_by'=>$username])->result_array();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Process Success ['.$tanda.']',
+				'alert'		=>'['.COUNT($dataList).'] Product berhasil ditambahkan!',
+				'status'	=> 1
+			);
+		}
+
+		echo json_encode($Arr_Kembali);
+	}
+
+	public function checkSpoolSelected($username){
+		$dataList = $this->db->get_where('spool_temp',['insert_by'=>$username])->result_array();
+		$ArrayList = [];
+		foreach ($dataList as $key => $value) {
+			$ArrayList[$value['key_spool']] = TRUE;
+		}
+
+		return $ArrayList;
+	}
 
 }

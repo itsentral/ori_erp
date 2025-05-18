@@ -370,7 +370,10 @@ class Produksi_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*,
+				a.no_ipp,
+				a.id_produksi,
+				a.sts_produksi,
+				a.created_date,
 				b.project,
 				c.so_number AS so_number2
 			FROM

@@ -5,6 +5,7 @@ $this->load->view('include/side_menu');
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3><br><br>
+		<b class='text-danger'>Merefresh halaman akan menghapus data yang sudah di checklist!</b><br>
 		<div class="box-tool pull-left">
             <select name='no_ipp' id='no_ipp' class='form-control input-sm chosen-select' style='width:200px; float:right;'>
                 <!-- <option value='0'>ALL IPP</option> -->
@@ -18,7 +19,6 @@ $this->load->view('include/side_menu');
             </select>
 
 		<input type="text" class='form-control' name='nm_tanki' placeholder='Nama Tanki untuk product tanki' style='float:right; margin-bottom:10px; margin-right:5px; width:400px;'>
-
 		</div>
 		<div class="box-tool pull-right">
 			<select name='spool_induk' id='spool_induk' class='form-control input-sm chosen-select' style='width:250px; float:right; margin-top:10px;'>
@@ -43,6 +43,8 @@ $this->load->view('include/side_menu');
 		<input type="text" class='form-control' name='no_drawing' placeholder='No Drawing' style='float:right; margin-bottom:10px; margin-right:5px; width:200px;'>
 		<label style='float:right; margin-right:5px;'>No Drawing : </label>
         <br>
+		<h4>Pipe Fitting</h4>
+		<b><span class='text-success' id='alertID'></span></b>
 		<div class='table-responsive'>
 			<table class="table table-sm table-bordered table-striped" id="my-grid" width='100%'>
 				<thead>
@@ -162,6 +164,28 @@ $this->load->view('include/side_menu');
 				dataType: "json",
 				success: function(data){
 					$(kode_spool).html(data.option).trigger("chosen:updated");
+				}
+			});
+		});
+
+		$(document).on('change','.chk_personal', function(){
+			let dataspool = $(this).val();
+			let checked = $(this).is(':checked');
+
+			// console.log(dataspool)
+			// console.log(checked)
+			$.ajax({
+				url: base_url + active_controller+'/saveTempSpool',
+				cache: false,
+				type: "POST",
+				data: {
+					'dataspool':dataspool,
+					'checked':checked,
+				},
+				dataType: "json",
+				success: function(data){
+					// console.log(data)
+					$('#alertID').text(data.alert)
 				}
 			});
 		});

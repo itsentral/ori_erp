@@ -2057,11 +2057,12 @@ class Pembelian_model extends CI_Model {
 
 			//NO PR
 			$list_pr		= $this->db
-									->select('b.no_pr_group AS no_pr, b.no_pr AS no_pr_dept')
+									->select('b.no_pr_group AS no_pr, b.no_pr AS no_pr_dept, a.id_barang')
 									->join('tran_pr_detail b','a.id_barang=b.id_barang AND a.no_rfq=b.no_rfq')
 									->get_where('tran_rfq_detail a',array('a.no_po'=>$row['no_po']))
 									->result_array();
 			$arr_pr = array();
+			$ArrNamaCategory = [];
 			foreach($list_pr AS $val => $valx){
 				if($row['category'] == 'non rutin'){
 					$arr_pr[$val] = $valx['no_pr_dept'];
@@ -2069,9 +2070,24 @@ class Pembelian_model extends CI_Model {
 				else{
 					$arr_pr[$val] = $valx['no_pr'];
 				}
+
+				$typeStock 	= substr($valx['id_barang'],0,2);
+				$typeAsset 	= substr($valx['id_barang'],0,3);
+				if($typeStock == 'CN'){
+					$ArrNamaCategory[] = 'stok';
+				}
+				elseif($typeStock == 'PLA'){
+					$ArrNamaCategory[] = 'asset';
+				}
+				else{
+					$ArrNamaCategory[] = 'department';
+				}
 			}
 			$arr_pr = array_unique($arr_pr);
 			$dt_pr	= implode("<br>", $arr_pr);
+
+			$ArrTypeCategory = array_unique($ArrNamaCategory);
+			$dataTypeCategory = implode("<br>", $ArrTypeCategory);
 			
 			// $list_material		= $this->db->query("SELECT nm_barang, qty_purchase, price_ref, price_ref_sup, net_price FROM tran_po_detail WHERE no_po='".$row['no_po']."' GROUP BY id_barang")->result_array();
 			// if($row['status'] != 'DELETED'){
@@ -2100,25 +2116,28 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
 			$nestedData[]	= "<div align='center'>".$dt_pr."</div>";
-			if($row['category'] == 'asset'){
+
+			$category = $row['category'];
+
+			if($category == 'asset'){
 				$warna = '#a9179e';
 			}
-			elseif($row['category'] == 'rutin'){
+			elseif($category == 'rutin'){
 				$warna = '#a19012';
 			}
 			else{
 				$warna = '#1bb885';
 			}
-			$category = $row['category'];
-			if($category == 'rutin'){
-				$category = 'stok';
-			}
+			
+			// if($category == 'rutin'){
+			// 	$category = 'stok';
+			// }
 
-			if($category == 'non rutin'){
-				$category = 'departemen';
-			}
+			// if($category == 'non rutin'){
+			// 	$category = 'departemen';
+			// }
 			$status_po=$row['status_po'];
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($dataTypeCategory)."</span></div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
 			$nestedData[]	= "<div align='left'>".strtolower($row['nm_barang_group'])."</div>";
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
