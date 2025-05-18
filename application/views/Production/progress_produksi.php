@@ -6,8 +6,9 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-		<button type='button' class='btn btn-sm btn-primary' id='download_excel_header' style='float:right;' title='Excel'><i class='fa fa-file-excel-o'> &nbsp;Download Excel</i></button>
-		</div>
+		<button type='button' class='btn btn-sm btn-primary' id='download_excel_header' style='float:right; margin-left:10px;' title='Excel'><i class='fa fa-file-excel-o'> &nbsp;Download Excel</i></button>
+		<a href="<?=base_url('production/progress_produksi_tanki');?>"  class='btn btn-sm btn-warning'>PROGRESS TANKI</a>	
+	</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">

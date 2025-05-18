@@ -6,6 +6,7 @@ class Production extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->model('tanki_model');
 		$this->load->model('update_produksi_model');
 		$this->load->model('produksi_model');
 		// Your own constructor code
@@ -4388,6 +4389,179 @@ class Production extends CI_Controller {
 		);
 		history('Print Qrcode'); 
 		$this->load->view('Production/print_qrcode', $data);
+	}
+
+	//PROGRESS PRODUKSI TANKI
+	public function progress_produksi_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/progress_produksi';
+		$Arr_Akses			= getAcccesmenu($controller);
+		
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$GET_DELIVERY_DATE = get_delivery_date();
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Progress Production Tanki',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+		$this->load->view('Production/progress_produksi_tanki',$data);
+	}
+	
+	public function server_side_spk_produksi_progress_tanki(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/progress_produksi';
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_spk_produksi_progress_tanki(
+			$requestData['tgl_awal'],
+			$requestData['tgl_akhir'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		// $GET_DELIVERY_DATE = get_delivery_date();
+		// print_r($GET_DELIVERY_DATE);
+		// exit;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
+				$so_number = (!empty($row['so_number2']))?$row['so_number2']:'';
+			$nestedData[]	= "<div align='center'>".$so_number."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
+
+			// $DELIVERY_DATE = (!empty($GET_DELIVERY_DATE[$row['no_ipp']]))?$GET_DELIVERY_DATE[$row['no_ipp']]:array();
+			// $DELIVERY_DATE_ = '';
+			// if(!empty($DELIVERY_DATE)){
+			// 	$DELIVERY_DATE_UNIQ = array_unique($DELIVERY_DATE);
+			// 	$DELIVERY_DATE_ = implode('<br>',$DELIVERY_DATE_UNIQ);
+			// }
+
+			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
+			// $nestedData[]	= "<div align='center'>".$DELIVERY_DATE_."</div>";
+			$nestedData[]	= "<div align='center'>".number_format(persen_progress_produksi_tanki($row['id_produksi']))." %</div>";
+			// $nestedData[]	= "<div align='center'>0 %</div>";
+			
+			// $class = Color_status($row['sts_produksi']);
+			// $nestedData[]	= "<div align='center'><span class='badge' style='background-color:".$class."'>".$row['sts_produksi']."</span></div>";
+				$create = "";
+				$excel = "";
+				if($Arr_Akses['read']=='1'){
+					$create = "<button type='button' class='btn btn-sm btn-success detail_spk' title='Detail Production' data-id_produksi='".$row['id_produksi']."'  data-no_so='".$so_number."'><i class='fa fa-eye'></i></button>";
+				}
+				// if($Arr_Akses['download']=='1'){
+				// 	$excel = "<button type='button' class='btn btn-sm btn-info download_excel' title='Download' data-id_produksi='".$row['id_produksi']."'  data-no_so='".$so_number."'><i class='fa fa-file-excel-o'></i></button>";
+				// }
+			$nestedData[]	= "<div align='center'>
+									".$create."
+									".$excel."
+									</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_spk_produksi_progress_tanki($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$WHERE_IPP = '';
+		if($tgl_awal != '0'){
+			$GET_DELIVERY_DATE_RANGE = get_delivery_date_between($tgl_awal,$tgl_akhir);
+			// echo '<pre>';
+			// print_r($GET_DELIVERY_DATE_RANGE);
+			// exit;
+			$ArrDeliv = [];
+			if(!empty($GET_DELIVERY_DATE_RANGE)){
+				$ArrDeliv = $GET_DELIVERY_DATE_RANGE;
+				$DELIVERY_IMP = implode("','",$ArrDeliv);
+				$WHERE_IPP = "AND a.no_ipp IN ('".$DELIVERY_IMP."')";
+			}
+		}
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.no_ipp,
+				CONCAT('PRO-',a.no_ipp) AS id_produksi,
+				'Y' AS sts_produksi,
+				a.created_date,
+				a.project,
+				a.no_so AS so_number2
+			FROM
+				planning_tanki a,
+                (SELECT @row:=0) r
+		    WHERE 1=1 $WHERE_IPP
+				AND (
+					a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.project LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				)
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_ipp',
+			2 => 'no_so',
+			3 => 'project',
+			4 => 'created_date'
+		);
+
+		$sql .= " ORDER BY a.created_date DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	public function modal_detail_progress_tanki(){
+		$id_produksi= $this->uri->segment(3);
+		$qDetail	= "	SELECT a.* FROM production_detail a WHERE a.id_produksi = '".$id_produksi."' GROUP BY a.id_milik ORDER BY a.id ASC";
+		// echo $qDetail;
+		$rowD		= $this->db->query($qDetail)->result_array();
+		$data = array(
+			'id_produksi' 	=> $id_produksi,
+			'rowD' 			=> $rowD,
+			'tanki_model'	=> $this->tanki_model
+		);
+		
+		$this->load->view('Production/modal_detail_progress_tanki', $data);
 	}
 
 }
