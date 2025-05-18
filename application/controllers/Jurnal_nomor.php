@@ -2921,4 +2921,226 @@ class Jurnal_nomor extends CI_Controller {
 		}
 		  
 	}
+
+	function jurnalFGtanki(){
+		
+		$data_session	= $this->session->userdata;
+		//$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	        $dataspool = $this->db->query("select * from data_jurnal_fg_spool_erp_baru")->result();
+			foreach($dataspool AS $record){
+		    $idtrans = $record->kode_trans;
+		   
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg_tanki_baru WHERE id ='".$idtrans."' AND jenis ='in' AND created_by='manual system 2' AND tanggal < '2024-09-01' ")->result();
+			
+			$totalfg =0;
+			  
+			$det_Jurnaltes = [];
+			
+			
+			foreach($wip AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$FG = 'FINISHED GOOD';
+				$cog = 'COGS';
+				$finish = $FG.$keterangan;
+				$coges = $cog.$keterangan;
+				
+				$id          = $data->id_trans;
+               	$no_request  = $data->no_spk;	
+				
+				$wip           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalfg        = $cogs;
+				
+				
+				
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+			    $debit  		= $totalfg;	
+				
+				$coa_material	='5101-01-01';
+				$coa_direct 	='5101-03-01';
+				$coa_indirect 	='5101-04-01';
+				$coa_foh 		='5101-05-01';
+				$coa_consumable ='5101-02-01';
+				
+				$coacogs 		='5103-01-01';
+				$coafg   		='1103-04-01';
+                				
+				
+								
+				     $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_material,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $material,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_direct,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $wip_direct,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_indirect,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $wip_indirect,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_foh,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $wip_foh,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_consumable,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $wip_consumable,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 
+					 
+					 
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_wip,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $cogs,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+					 
+					 
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coafg,
+					  'keterangan'    => $finish,
+					  'no_reff'       => $id,
+					  'debet'         => $cogs,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					 
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coacogs,
+					  'keterangan'    => $coges,
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $cogs,
+					  'jenis_jurnal'  => 'WIP-Finishgood tanki',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+					  	
+				
+				
+			}
+			
+			        
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='wip finishgood tanki' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'WIP-Finishgood tanki'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => 'Manual System', 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
+		
+	}
 }
