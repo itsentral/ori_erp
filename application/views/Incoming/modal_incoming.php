@@ -39,7 +39,9 @@
                 foreach($result AS $val => $valx){
                     $No++;
                     $EXPLODE = explode(' - ',$valx['nm_barang']);
-					if(count($EXPLODE<1)) $EXPLODE[1]="";
+                    if($cek_type != 'POX'){
+					    if(count($EXPLODE<1)) $EXPLODE[1]="";
+                    }
 
                     $cek_type = substr($no_po,0,3);
 
@@ -57,18 +59,21 @@
                         $no_pox = $valx['no_po'];
                     }
 
+                    $nm_barang = (!empty($EXPLODE[0]))?$EXPLODE[0]:'';
+                    $spec_barang = (!empty($EXPLODE[1]))?$EXPLODE[1]:'';
+
                     $Qty_kurang = $qty - $valx['qty_in'];
                     echo "<tr>";
                         echo "<td align='center'>".$No."
                             <input type='hidden' name='addInMat[$No][no_po]' value='".$no_pox."'>
-                            <input type='hidden' name='addInMat[$No][nm_barang]' value='".$EXPLODE[0]."'>
-                            <input type='hidden' name='addInMat[$No][spec]' value='".$EXPLODE[1]."'>
+                            <input type='hidden' name='addInMat[$No][nm_barang]' value='".$nm_barang."'>
+                            <input type='hidden' name='addInMat[$No][spec]' value='".$spec_barang."'>
                             <input type='hidden' name='addInMat[$No][id]' value='".$valx['id']."'>
                             <input type='hidden' name='addInMat[$No][qty_rev]' value='".$qty."'>
                         </td>";
                         echo "<td>".strtoupper($dept)."</td>";
-                        echo "<td>".strtoupper($EXPLODE[0])."</td>";
-                        echo "<td>".strtoupper($EXPLODE[1])."</td>";
+                        echo "<td>".strtoupper($nm_barang)."</td>";
+                        echo "<td>".strtoupper($spec_barang)."</td>";
                         echo "<td align='center'>".number_format($qty,2)."</td>";
                         echo "<td align='center' class='belumDiterima'>".number_format($Qty_kurang,2)."</td>";
                         // echo "<td align='center'>".strtoupper($satuan)."</td>";

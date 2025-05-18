@@ -31,7 +31,8 @@ class Warehouse_rutin_model extends CI_Model {
 						LEFT JOIN tran_pr_detail y ON x.no_rfq=y.no_rfq AND x.id_barang=y.id_barang
 					WHERE
 						a.qty_in < a.qty_po 
-						AND c.category = 'rutin' 
+						-- AND c.category = 'rutin' 
+						AND a.id_barang LIKE 'CN%'
 						AND c.status_id = '1'
 						AND b.category_awal IN ($CATEGORY)
 						AND (y.in_gudang != 'project' OR y.in_gudang IS NULL)
@@ -86,7 +87,8 @@ class Warehouse_rutin_model extends CI_Model {
 						LEFT JOIN con_nonmat_new b ON a.id_barang = b.code_group 
 					WHERE
 						a.qty_in < a.qty_po 
-						AND c.category = 'rutin' 
+						-- AND c.category = 'rutin' 
+						AND a.id_barang LIKE 'CN%'
 						AND c.status_id = '1'
 						AND b.category_awal IN ($CATEGORY)
 					GROUP BY 
@@ -102,6 +104,7 @@ class Warehouse_rutin_model extends CI_Model {
 		$data = array( 
 			'title'			=> 'Warehouse Stok >> Incoming Consumable',
 			'action'		=> 'index',
+			'uri_back' 		=> strtolower($this->uri->segment(2)),
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses,
 			'pusat'			=> $pusat,
@@ -139,7 +142,8 @@ class Warehouse_rutin_model extends CI_Model {
 						LEFT JOIN con_nonmat_new b ON a.id_barang = b.code_group 
 					WHERE
 						a.qty_in < a.qty_po 
-						AND c.category = 'rutin' 
+						-- AND c.category = 'rutin' 
+						AND a.id_barang LIKE 'CN%'
 						AND c.status_id = '1'
 						AND b.category_awal IN ($CATEGORY)
 					GROUP BY 

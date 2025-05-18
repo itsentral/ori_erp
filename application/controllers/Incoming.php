@@ -22,7 +22,22 @@ class Incoming extends CI_Controller {
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$pusat				= $this->db->query("SELECT * FROM warehouse WHERE category='indirect' ORDER BY urut ASC")->result_array();
         $inventory 			= $this->db->query("SELECT * FROM con_nonmat_category_awal WHERE `delete`='N' ORDER BY category ASC")->result_array();
-		$no_po				= $this->db->query("(SELECT a.no_po, 'PO' AS ket, a.nm_supplier AS nm_supplier FROM tran_po_header a WHERE a.category='non rutin' AND (a.status='WAITING IN' OR a.status='IN PARSIAL') AND a.status_id='1' AND a.deleted='N' ORDER BY a.no_po ASC)
+		$no_po				= $this->db->query("(
+												SELECT 
+													a.no_po, 
+													'PO' AS ket, 
+													a.nm_supplier AS nm_supplier 
+												FROM 
+													tran_po_detail b 
+													LEFT JOIN tran_po_header a ON b.no_po = a.no_po
+												WHERE 1=1
+													-- a.category='non rutin' 
+													AND (b.id_barang NOT LIKE 'CN%' AND b.id_barang NOT LIKE 'PLA%')
+													AND (a.status='WAITING IN' OR a.status='IN PARSIAL') 
+													AND a.status_id='1' 
+													AND a.deleted='N' 
+												ORDER BY a.no_po ASC
+												)
 												UNION
 												(SELECT b.no_non_po AS no_po, 'NON-PO' AS ket, '' AS nm_supplier FROM tran_non_po_header b WHERE b.category='non rutin' AND (b.status !='COMPLETE') AND b.app_status = 'Y' ORDER BY b.no_non_po ASC)")->result_array();
 		$list_po	= $this->db->group_by('no_ipp')->get_where('warehouse_adjustment',array('category'=>'incoming non rutin'))->result_array();
@@ -88,11 +103,10 @@ class Incoming extends CI_Controller {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div>".$row['kode_trans']."</div>"; 
+			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>"; 
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($TANGGAL))."</div>"; 
 			$nestedData[]	= "<div>".$row['no_ipp']."</div>"; 
-			$nestedData[]	= "<div align='center'>".$row['jumlah_mat']."</div>"; 
-"</div>";
+			$nestedData[]	= "<div align='right'>".$row['jumlah_mat']."</div>";
 			$nestedData[]	= "<div>".strtoupper($row['pic'])."</div>";
 			$nestedData[]	= "<div>".strtoupper($NM_LENGKAP)."</div>";
 			$nestedData[]	= "<div>".strtoupper($row['nm_supplier'])."</div>";
@@ -175,7 +189,7 @@ class Incoming extends CI_Controller {
 
         $cek_type = substr($no_po,0,3);
         if($cek_type == 'POX'){
-            $result	= $this->db->get_where('tran_po_detail',array('no_po'=>$no_po))->result_array();
+            $result	= $this->db->not_like('id_barang','CN')->not_like('id_barang','PLA')->get_where('tran_po_detail',array('no_po'=>$no_po))->result_array();
         }
         else{
             $result	= $this->db->get_where('tran_non_po_detail',array('no_non_po'=>$no_po))->result_array();
@@ -183,6 +197,7 @@ class Incoming extends CI_Controller {
 		
 		$data = array(
 			'no_po' => $no_po,
+			'cek_type' => $cek_type,
 			'inventory' => $inventory,
 			'id_dept' => $id_dept,
 			'id_costcenter' => $id_costcenter,
@@ -442,7 +457,20 @@ class Incoming extends CI_Controller {
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$pusat				= $this->db->query("SELECT * FROM warehouse WHERE category='indirect' ORDER BY urut ASC")->result_array();
         $inventory 			= $this->db->query("SELECT * FROM con_nonmat_category_awal WHERE `delete`='N' ORDER BY category ASC")->result_array();
-		$no_po				= $this->db->query("(SELECT a.no_po, 'PO' AS ket, a.nm_supplier AS nm_supplier FROM tran_po_header a WHERE a.category='asset' AND (a.status='WAITING IN' OR a.status='IN PARSIAL') ORDER BY a.no_po ASC)
+		$no_po				= $this->db->query("(
+												SELECT 
+													a.no_po, 
+													'PO' AS ket, 
+													a.nm_supplier AS nm_supplier 
+												FROM 
+													tran_po_detail b 
+													LEFT JOIN tran_po_header a ON b.no_po = a.no_po
+												WHERE 1=1
+													-- a.category='asset' 
+													AND b.id_barang LIKE 'PLA%'
+													AND (a.status='WAITING IN' OR a.status='IN PARSIAL') 
+												ORDER BY a.no_po ASC
+												)
 												UNION
 												(SELECT b.no_non_po AS no_po, 'NON-PO' AS ket, '' AS nm_supplier FROM tran_non_po_header b WHERE b.category='asset' AND (b.status !='COMPLETE') AND b.app_status = 'Y' ORDER BY b.no_non_po ASC)")->result_array();
 		$list_po	= $this->db->group_by('no_ipp')->get_where('warehouse_adjustment',array('category'=>'incoming asset'))->result_array();
@@ -511,10 +539,14 @@ class Incoming extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($TANGGAL))."</div>"; 
 			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>"; 
 			// $nestedData[]	= "<div align='left'>".$row['kd_gudang_dari']."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(get_name('department', 'nm_dept', 'id', $row['id_gudang_ke']))."</div>";
-			$nestedData[]	= "<div align='center'>".strtoupper($row['pic'])."</div>";
+			$nm_dept = get_name('department', 'nm_dept', 'id', $row['id_gudang_ke']);
+			if($nm_dept=='0'){
+				$nm_dept = '-';
+			}
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_dept)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['pic'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['note'])."</div>";
-			$nestedData[]	= "<div align='center'>".strtoupper($NM_LENGKAP)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($NM_LENGKAP)."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i:s', strtotime($row['created_date']))."</div>";
 			$nestedData[]	= "<div align='center'>".$link."</div>";
 			$nestedData[]	= "<div align='center'>
@@ -591,7 +623,7 @@ class Incoming extends CI_Controller {
 
         $cek_type = substr($no_po,0,3);
         if($cek_type == 'POX'){
-            $result	= $this->db->where('qty_in < qty_po')->get_where('tran_po_detail',array('no_po'=>$no_po))->result_array();
+            $result	= $this->db->where('qty_in < qty_po')->like('id_barang','PLA')->get_where('tran_po_detail',array('no_po'=>$no_po))->result_array();
         }
         else{
             $result	= $this->db->where('qty_in < qty_rev')->get_where('tran_non_po_detail',array('no_non_po'=>$no_po))->result_array();
