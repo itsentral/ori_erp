@@ -6,7 +6,7 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-		<!-- <button type='button' class='btn btn-sm btn-primary' id='download_excel_header' style='float:right; margin-left:10px;' title='Excel'><i class='fa fa-file-excel-o'> &nbsp;Download Excel</i></button> -->
+		<button type='button' class='btn btn-sm btn-primary' id='download_excel_header' style='float:right; margin-left:10px;' title='Excel'><i class='fa fa-file-excel-o'> &nbsp;Download Excel</i></button>
 		<a href="<?=base_url('production/progress_produksi');?>"  class='btn btn-sm btn-warning'>PROGRESS PIPE FITTING</a>	
 	</div>
 	</div>
@@ -121,7 +121,7 @@ $this->load->view('include/side_menu');
 		var id_produksi		= $(this).data('id_produksi');
 		var no_so		= $(this).data('no_so');
 		
-		var Links		= base_url + active_controller+'/progress_produksi_excel/'+id_produksi+'/'+no_so;
+		var Links		= base_url + active_controller+'/progress_produksi_excel_tanki/'+id_produksi+'/'+no_so;
 		window.open(Links,'_blank');
 	});
 
@@ -138,7 +138,7 @@ $this->load->view('include/side_menu');
 			var tgl_awal 	= sPLT[0];
 			var tgl_akhir 	= sPLT[1];
 		}
-		var Links		= base_url + active_controller+'/data_progress_produksi_excel/'+tgl_awal+'/'+tgl_akhir;
+		var Links		= base_url + active_controller+'/data_progress_produksi_excel_tanki/'+tgl_awal+'/'+tgl_akhir;
 		window.open(Links,'_blank');
 	});
 	
