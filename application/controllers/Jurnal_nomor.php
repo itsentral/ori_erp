@@ -2934,7 +2934,7 @@ class Jurnal_nomor extends CI_Controller {
 			foreach($dataspool AS $record){
 		    $idtrans = $record->kode_trans;
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg_tanki_baru WHERE id ='".$idtrans."' AND jenis ='in' AND created_by='manual system 2' AND tanggal < '2024-09-01' ")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg_tanki_baru WHERE id_trans ='".$idtrans."' AND jenis ='in' AND created_by='manual system 2' AND tanggal < '2024-09-01' ")->result();
 			
 			$totalfg =0;
 			  
