@@ -2930,7 +2930,7 @@ class Jurnal_nomor extends CI_Controller {
 		$Date		    = date('Y-m-d'); 
 		
 		
-	        $dataspool = $this->db->query("select * from data_jurnal_fg_spool_erp_baru")->result();
+	        $dataspool = $this->db->query("select * from data_jurnal_fg_erp_baru")->result();
 			foreach($dataspool AS $record){
 		    $idtrans = $record->kode_trans;
 		   
@@ -2945,7 +2945,7 @@ class Jurnal_nomor extends CI_Controller {
 				
 				$nm_material = $data->product;	
 				$tgl_voucher = $data->tanggal;	
-				$spasi       = ',';
+				$spasi       = ',Tanki';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$FG = 'FINISHED GOOD';
 				$cog = 'COGS';
