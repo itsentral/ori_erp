@@ -2930,7 +2930,7 @@ class Jurnal_nomor extends CI_Controller {
 		$Date		    = date('Y-m-d'); 
 		
 		
-	        $dataspool = $this->db->query("select * from data_jurnal_fg_erp_baru")->result();
+	        $dataspool = $this->db->query("select * from data_jurnal_fg_tanki_erp_baru")->result();
 			foreach($dataspool AS $record){
 		    $idtrans = $record->kode_trans;
 		   
