@@ -205,13 +205,16 @@ if(!empty($get_liner_utama)){ ?>
 
                     $get_edit2 = $this->db->group_by('id_material')->limit(1)->select('id_material, SUM(aktual_total) AS aktual_total')->where_in('id_spk',$id_spk)->get_where('production_spk_input',array('id_material'=>$value['id_material'],'layer'=>'STRUKTUR THICKNESS','spk'=>'2','kode_spk'=>$kode_spk))->result();
                     $terpakai2 = (!empty($get_edit2))?$get_edit2[0]->aktual_total:0;
+
+                    $QTYEST_ALL = ($value['berat_all'] > 0 AND $qty_est_tanki > 0)?$value['berat_all'] / $qty_est_tanki:0; 
+                    $QTYEST_BRT = ($value['berat'] > 0 AND $qty_est_tanki > 0)?$value['berat'] / $qty_est_tanki:0; 
                     ?>
                     <tr>
                         <td class='text-center'><?=$nomor;?></td>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
-                        <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
+                        <td class='text-right text-bold text-blue'><?=number_format($QTYEST_ALL,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($QTYEST_BRT, 3);?></td>
                         <td hidden>
                             <select name='detail_str[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -224,7 +227,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
+                            <input type='hidden' name='detail_str[<?=$nomor;?>][kebutuhan]' value='<?=$QTYEST_BRT;?>'>
                             <input type='text' name='detail_str[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -264,13 +267,17 @@ if(!empty($get_liner_utama)){ ?>
 
                     $get_edit2 = $this->db->group_by('id_material')->limit(1)->select('id_material, SUM(aktual_total) AS aktual_total')->where_in('id_spk',$id_spk)->get_where('production_spk_input',array('id_material'=>$value['id_material'],'layer'=>'EXTERNAL LAYER THICKNESS','spk'=>'2','kode_spk'=>$kode_spk))->result();
                     $terpakai2 = (!empty($get_edit2))?$get_edit2[0]->aktual_total:0;
+
+                    $QTYEST_ALL = ($value['berat_all'] > 0 AND $qty_est_tanki > 0)?$value['berat_all'] / $qty_est_tanki:0; 
+                    $QTYEST_BRT = ($value['berat'] > 0 AND $qty_est_tanki > 0)?$value['berat'] / $qty_est_tanki:0; 
+                    
                     ?>
                     <tr>
                         <td class='text-center'><?=$nomor;?></td>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
-                        <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
+                        <td class='text-right text-bold text-blue'><?=number_format($QTYEST_ALL,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($QTYEST_BRT, 3);?></td>
                         <td hidden>
                             <select name='detail_ext[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -283,7 +290,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
+                            <input type='hidden' name='detail_ext[<?=$nomor;?>][kebutuhan]' value='<?=$QTYEST_BRT;?>'>
                             <input type='text' name='detail_ext[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
@@ -323,13 +330,16 @@ if(!empty($get_liner_utama)){ ?>
 
                     $get_edit2 = $this->db->group_by('id_material')->limit(1)->select('id_material, SUM(aktual_total) AS aktual_total')->where_in('id_spk',$id_spk)->get_where('production_spk_input',array('id_material'=>$value['id_material'],'layer'=>'TOPCOAT','spk'=>'2','kode_spk'=>$kode_spk))->result();
                     $terpakai2 = (!empty($get_edit2))?$get_edit2[0]->aktual_total:0;
+
+                    $QTYEST_ALL = ($value['berat_all'] > 0 AND $qty_est_tanki > 0)?$value['berat_all'] / $qty_est_tanki:0; 
+                    $QTYEST_BRT = ($value['berat'] > 0 AND $qty_est_tanki > 0)?$value['berat'] / $qty_est_tanki:0; 
                     ?>
                     <tr>
                         <td class='text-center'><?=$nomor;?></td>
                         <td><?=$value['nm_category'];?></td>
                         <td><?=$value['nm_material'];?></td>
-                        <td class='text-right text-bold text-blue'><?=number_format($value['berat_all'] / $qty_est_tanki,3);?></td>
-                        <td class='text-right text-bold text-black'><?=number_format($value['berat'] / $qty_est_tanki, 3);?></td>
+                        <td class='text-right text-bold text-blue'><?=number_format($QTYEST_ALL,3);?></td>
+                        <td class='text-right text-bold text-black'><?=number_format($QTYEST_BRT, 3);?></td>
                         <td hidden>
                             <select name='detail_topcoat[<?=$nomor;?>][actual_type]' class='form-control chosen_select'>
                                 <option value="MTL-1903000">NONE MATERIAL</option>
@@ -342,7 +352,7 @@ if(!empty($get_liner_utama)){ ?>
                             </select>
                         </td>
                         <td hidden>
-                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$value['berat']  / $qty_est_tanki;?>'>
+                            <input type='hidden' name='detail_topcoat[<?=$nomor;?>][kebutuhan]' value='<?=$QTYEST_BRT;?>'>
                             <input type='text' name='detail_topcoat[<?=$nomor;?>][terpakai]' class='form-control input-sm text-center autoNumeric3' autocomplete='off' value='<?=$terpakai;?>'>
                         </td>
                         <td hidden>
