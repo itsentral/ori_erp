@@ -2061,6 +2061,12 @@ class Pembelian_model extends CI_Model {
 									->join('tran_pr_detail b','a.id_barang=b.id_barang AND a.no_rfq=b.no_rfq')
 									->get_where('tran_rfq_detail a',array('a.no_po'=>$row['no_po']))
 									->result_array();
+
+			$list_inv		= $this->db
+									->select('a.invoice_no')
+									->get_where('billing_top a',array('a.no_po'=>$row['no_po']))
+									->result_array();
+			$arr_inv = array();
 			$arr_pr = array();
 			$ArrNamaCategory = [];
 			foreach($list_pr AS $val => $valx){
@@ -2085,6 +2091,13 @@ class Pembelian_model extends CI_Model {
 			}
 			$arr_pr = array_unique($arr_pr);
 			$dt_pr	= implode("<br>", $arr_pr);
+
+			foreach($list_inv AS $val1 => $val1x){
+					$arr_inv[$val] = $valx['invoice_no'];
+			}
+
+			$arr_inv = array_unique($arr_inv);
+			$dt_inv	= implode("<br>", $arr_inv);
 
 			$ArrTypeCategory = array_unique($ArrNamaCategory);
 			$dataTypeCategory = implode("<br>", $ArrTypeCategory);
@@ -2116,6 +2129,7 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
 			$nestedData[]	= "<div align='center'>".$dt_pr."</div>";
+			$nestedData[]	= "<div align='center'>".$dt_inv."</div>";
 
 			$category = $row['category'];
 

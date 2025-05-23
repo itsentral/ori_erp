@@ -29,6 +29,7 @@ $this->load->view('include/side_menu');
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">No PR</th> 
+					<th class="text-center">No Invoice</th> 
 					<th class="text-center">Category</th>
 					<th class="text-center">Suppier</th>
 					<th class="text-center">Material Name</th>
