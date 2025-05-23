@@ -2093,7 +2093,7 @@ class Pembelian_model extends CI_Model {
 			$dt_pr	= implode("<br>", $arr_pr);
 
 			foreach($list_inv AS $val1 => $val1x){
-					$arr_inv[$val] = $valx['invoice_no'];
+					$arr_inv[$val1] = $val1x['invoice_no'];
 			}
 
 			$arr_inv = array_unique($arr_inv);
