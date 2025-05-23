@@ -745,7 +745,7 @@ $this->load->view('include/side_menu');
 			}], 
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 10,
-			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
+			"aLengthMenu": [[10, 20, 50, 100, 150, 1500], [10, 20, 50, 100, 150, 1500]],
 			"ajax":{
 				url : base_url + active_controller+'/server_side_purchase_order',
 				type: "post",
