@@ -2532,9 +2532,23 @@ class Purchase_order_model extends CI_Model {
 			// }
 			// $dt_qty	= implode("<br>", $arr_qty);
 
+			$list_inv		= $this->db
+									->select('a.invoice_no')
+									->get_where('billing_top a',array('a.no_po'=>$row['no_po']))
+									->result_array();
+			$arr_inv = array();
+
+			foreach($list_inv AS $val1 => $val1x){
+					$arr_inv[$val1] = $val1x['invoice_no'];
+			}
+
+			$arr_inv = array_unique($arr_inv);
+			$dt_inv	= implode("<br>", $arr_inv);
+
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_po']."</div>";
+			$nestedData[]	= "<div align='center'>".$dt_inv."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_supplier']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_barang_group']."</div>";
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
