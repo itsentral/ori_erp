@@ -83,5 +83,5 @@ $this->load->view('include/side_menu');
 	var url_view = base_url+'expense/view/';
 </script>
 <script src="<?= base_url('assets/js/basic.js')?>">
-//$("#mytabledata").DataTable();
+$("#mytabledata").DataTable();
 </script>
