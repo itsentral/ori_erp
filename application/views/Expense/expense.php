@@ -77,9 +77,11 @@ $this->load->view('include/side_menu');
 <div id="form-data"></div>
 <?php $this->load->view('include/footer'); ?>
 <script>
-    var url_add = base_url+'expense/create/';
+    var url_add = base_url+'expense/create/'; 
 	var url_edit = base_url+'expense/edit/';
 	var url_delete = base_url+'expense/delete/';
 	var url_view = base_url+'expense/view/';
 </script>
-<script src="<?= base_url('assets/js/basic.js')?>"></script>
+<script src="<?= base_url('assets/js/basic.js')?>">
+$("#mytabledata").DataTable();
+</script>
