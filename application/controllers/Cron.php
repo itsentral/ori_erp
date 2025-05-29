@@ -4198,16 +4198,6 @@ class Cron extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $liner);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
-				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
-				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
-				$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
-
-				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
-				// $real_material 		= $row_Cek['real_material'];
-
-
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_material);
@@ -4229,36 +4219,14 @@ class Cron extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $real_harga);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
-				
-				$get_revenue = $this->db
-							->select('(d.price_total / e.qty) AS revenue, b.no_spk')
-							->from('laporan_wip_per_hari a')
-							->join('so_detail_header b','a.id_milik=b.id')
-							->join('so_bf_detail_header c','b.id_milik=c.id')
-							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('a.id_milik', $row_Cek['id_milik'])
-							->limit(1)
-							->get()
-							->result();
-				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-				$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
-				$revenue 	= $revenue2 * $qty;
-
-				if($tandaIPP == 'IPPT'){
-					$no_spk 	= $row_Cek['no_spk'];
-				}
-
                 $awal_col++;
-				$direct_labour	= $qty;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
+				$sheet->setCellValue($Cols.$awal_row, $qty);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
-				$direct_labour	= $revenue;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
+				$sheet->setCellValue($Cols.$awal_row, $revenue);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
