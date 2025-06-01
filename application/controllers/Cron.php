@@ -3778,7 +3778,7 @@ class Cron extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Production Report WIP',
+			'title'			=> 'Production Report',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
@@ -3954,7 +3954,7 @@ class Cron extends CI_Controller {
 		$Row		= 1;
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(2243);
-		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI WIP ('.date('d F Y', strtotime($tanggal)).')');
+		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI ('.date('d F Y', strtotime($tanggal)).')');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
@@ -4311,7 +4311,7 @@ class Cron extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="report-produksi-wip-'.date('d-m-Y', strtotime($tanggal)).'.xls"');
+		header('Content-Disposition: attachment;filename="report-produksi-'.date('d-m-Y', strtotime($tanggal)).'.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
@@ -4424,7 +4424,7 @@ class Cron extends CI_Controller {
 		$Row		= 1;
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(15);
-		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI WIP PER DAY ('.$bulan.' '.$tahun.')');
+		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI PER DAY ('.$bulan.' '.$tahun.')');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
@@ -4704,7 +4704,7 @@ class Cron extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="Report Produksi WIP Per Day '.$bulan.' '.$tahun.' '.date('YmdHis').'.xls"');
+		header('Content-Disposition: attachment;filename="Report Produksi Per Day '.$bulan.' '.$tahun.' '.date('YmdHis').'.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
