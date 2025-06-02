@@ -334,7 +334,7 @@ class Report_in_customer extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses
 		);
 
-		$this->load->view('Report_new/Report_in_customer/index',$data);
+		$this->load->view('Report_new/Report_in_customer/cogs',$data);
 	}
 
 }
