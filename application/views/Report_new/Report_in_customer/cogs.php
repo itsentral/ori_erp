@@ -8,6 +8,19 @@ $this->load->view('include/side_menu');
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
+         <h5>Data Group</h5>
+        <div class='form-group row'>
+            <div class='col-sm-4'>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                        </span>
+                    </div>
+                    <input type="text" class="form-control float-right text-center" id="range_picker2" placeholder='Select range date' readonly value='' style='width:300px;'>
+                </div>
+            </div>
+        </div>
         <div class='form-group row'>
             <div class='col-sm-12'>
                 <table class="table table-bordered table-striped" id="my-grid2" width='100%'>
