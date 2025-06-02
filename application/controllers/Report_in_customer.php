@@ -408,7 +408,10 @@ class Report_in_customer extends CI_Controller {
 	}
 
 	public function query_data_erp_incustomer($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
-		
+		$WHERE_DATE = "AND a.tanggal LIKE '".date('Y')."-".date('m')."%' ";
+		if($tgl_awal != '0'){
+			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
+		}
         $sql = "SELECT 
                     (@row:=@row+1) AS nomor,
                     a.*
