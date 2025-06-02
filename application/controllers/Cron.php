@@ -469,13 +469,12 @@ class Cron extends CI_Controller {
 
 			$get_revenue = $this->db
 							->select('SUM((( d.price_total / e.qty ) * (a.qty_akhir - a.qty_awal + 1))) AS revenue')
-							->from('laporan_per_bulan z')
-							->join('laporan_per_hari a','z.date=a.date')
+							->from('laporan_per_hari_action a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
 							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
 							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('z.date', $row['date'])
+							->where('a.date', $row['date'])
 							->get()
 							->result();
 			$revenue 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
@@ -521,22 +520,40 @@ class Cron extends CI_Controller {
 	public function queryDataJSON($bulan, $tahun, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
         $where_bln = "";
         if($bulan > 0){
-            $where_bln = "AND MONTH(date) = '".$bulan."' ";
+            $where_bln = "AND MONTH(`date`) = '".$bulan."' ";
         }
 
         $where_thn = "";
         if($tahun > 0){
-            $where_thn = "AND YEAR(date) = '".$tahun."' ";
+            $where_thn = "AND YEAR(`date`) = '".$tahun."' ";
         }
 
 		$sql = "
 			SELECT
-				*
+				`date`, 
+				SUM(est_material) AS est_material,
+				SUM(est_harga) AS est_harga,
+				SUM(real_material) AS real_material,
+				SUM(real_harga) AS real_harga,
+				SUM(direct_labour) AS direct_labour,
+				SUM(indirect_labour) AS indirect_labour,
+				SUM(machine) AS machine,
+				SUM(mould_mandrill) AS mould_mandrill,
+				SUM(consumable) AS consumable,
+				SUM(foh_consumable) AS foh_consumable,
+				SUM(foh_depresiasi) AS foh_depresiasi,
+				SUM(biaya_gaji_non_produksi) AS biaya_gaji_non_produksi,
+				SUM(biaya_non_produksi) AS biaya_non_produksi,
+				SUM(biaya_rutin_bulanan) AS biaya_rutin_bulanan,
+				SUM(man_hours) AS man_hours,
+				SUM(real_harga_rp) AS real_harga_rp,
+				kurs AS kurs
 			FROM
-				laporan_per_bulan
+				laporan_per_hari_action
 		    WHERE 1=1 ".$where_bln." ".$where_thn." AND (
 				`date` LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
+			group by `date`
 		";
 		// echo $sql; exit;
 
@@ -600,19 +617,23 @@ class Cron extends CI_Controller {
 			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
 			$tandaIPP = substr($NO_IPP,0,4);
 			
-			$no_so = $row['no_so'];
-			$no_spk = $row['no_spk'];
+			$product_code = explode('-',$row['product_code']);
+
+			$no_so = $product_code[0];
+			$no_spk = $row['no_spk2'];
+			
+			$nm_product = $row['nm_tanki'];
+			$id_product = 'tanki';
 			$revenue = 0;
 			$estimasi_material 	= $row['est_material'];
 			$estimasi_price 	= $row['est_harga'];
 			$real_material 		= $row['real_material'];
 			if($tandaIPP != 'IPPT'){
-				$no_so = get_detail_ipp()[$NO_IPP]['so_number'];
-				$no_spk = $row['no_spk2'];
-
+				$nm_product = $row['id_category'];
+				$id_product = $row['id_product'];
 				$get_revenue = $this->db
 							->select('(d.price_total / e.qty) AS revenue')
-							->from('laporan_per_hari a')
+							->from('laporan_per_hari_action a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
 							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
@@ -637,8 +658,8 @@ class Cron extends CI_Controller {
 			// $nestedData[]	= "<div align='left'>".$row['id']."</div>";
             $nestedData[]	= "<div align='left'>".$NO_IPP."</div>";
             $nestedData[]	= "<div align='left'>".$no_so."</div>";
-            $nestedData[]	= "<div align='left'>".$row['id_category']."</div>";
-            $nestedData[]	= "<div align='left'>".$row['id_product']."</div>";
+            $nestedData[]	= "<div align='left'>".$nm_product."</div>";
+            $nestedData[]	= "<div align='left'>".$id_product."</div>";
             $nestedData[]	= "<div align='left'>".$no_spk."</div>";
             $nestedData[]	= "<div align='right'>".$row['diameter']."</div>";
             $nestedData[]	= "<div align='right'>".$row['diameter2']."</div>";
@@ -683,16 +704,16 @@ class Cron extends CI_Controller {
 		$sql = "
 			SELECT
 				a.*,
-				b.no_spk as no_spk2
+				b.no_spk as no_spk2,
+				b.product_code,
+				b.id_product AS nm_tanki
 			FROM
-				laporan_per_hari a
-				LEFT JOIN so_detail_header b ON a.id_milik=b.id
+				laporan_per_hari_action a
+				LEFT JOIN production_detail b ON a.id_production_detail=b.id
 		    WHERE a.date='".$tanggal."' AND (
 				a.id_produksi LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
@@ -706,7 +727,7 @@ class Cron extends CI_Controller {
 			
 		);
 
-		$sql .= " ORDER BY a.id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.id ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
@@ -883,8 +904,19 @@ class Cron extends CI_Controller {
 		$sheet->getColumnDimension('U')->setWidth(16);
 
 
-		$qSupplier	    = "	SELECT * FROM laporan_per_hari WHERE `date` = '".$tanggal."' ORDER BY id_produksi ASC ";
-		$restDetail1	= $this->db->query($qSupplier)->result_array();
+		$SQL = "
+				SELECT
+					a.*,
+					b.no_spk as no_spk2,
+					b.product_code,
+					b.id_product AS nm_tanki
+				FROM
+					laporan_per_hari_action a
+					LEFT JOIN production_detail b ON a.id_production_detail=b.id
+				WHERE a.date='".$tanggal."' 
+				ORDER BY a.id ASC
+			";
+		$restDetail1	= $this->db->query($SQL)->result_array();
         // echo "<pre>";
         // print_r($restDetail1);        
         // exit;
@@ -896,6 +928,46 @@ class Cron extends CI_Controller {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
+
+				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
+
+				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
+				$tandaIPP = substr($NO_IPP,0,4);
+				
+				$product_code = explode('-',$row_Cek['product_code']);
+
+				$no_so = $product_code[0];
+				$no_spk = $row_Cek['no_spk2'];
+				$nm_product = $row_Cek['id_category'];
+				$id_product = $row_Cek['id_product'];
+				$revenue = 0;
+				$estimasi_material 	= $row_Cek['est_material'];
+				$estimasi_price 	= $row_Cek['est_harga'];
+				$real_material 		= $row_Cek['real_material'];
+				if($tandaIPP != 'IPPT'){
+					$nm_product = $row_Cek['nm_tanki'];
+					$id_product = 'tanki';
+					$get_revenue = $this->db
+								->select('(d.price_total / e.qty) AS revenue')
+								->from('laporan_per_hari_action a')
+								->join('so_detail_header b','a.id_milik=b.id')
+								->join('so_bf_detail_header c','b.id_milik=c.id')
+								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+								->join('bq_detail_header e','c.id_milik=e.id')
+								->where('a.id_milik', $row_Cek['id_milik'])
+								->limit(1)
+								->get()
+								->result();
+					$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+					$revenue 	= $revenue2 * $qty;
+
+					$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
+
+					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+					$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+					// $real_material 		= $row_Cek['real_material'];
+				}
 				
 				
 				// $awal_col++;
@@ -911,13 +983,11 @@ class Cron extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
-				$id_category	= $row_Cek['id_category'];
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $id_category);
+				$sheet->setCellValue($Cols.$awal_row, $nm_product);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
-				$id_product	= $row_Cek['id_product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_product);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
@@ -945,41 +1015,6 @@ class Cron extends CI_Controller {
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $liner);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
-				
-				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
-				$tandaIPP = substr($NO_IPP,0,4);
-
-				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
-
-				$estimasi_material 	= $row_Cek['est_material'];
-				$estimasi_price 	= $row_Cek['est_harga'];
-				$real_material 		= $row_Cek['real_material'];
-				$no_spk 			= $row_Cek['no_spk'];
-				$revenue 			= $row_Cek['est_harga'];
-
-				if($tandaIPP != 'IPPT'){
-					$get_revenue = $this->db
-								->select('(d.price_total / e.qty) AS revenue, b.no_spk')
-								->from('laporan_per_hari a')
-								->join('so_detail_header b','a.id_milik=b.id')
-								->join('so_bf_detail_header c','b.id_milik=c.id')
-								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-								->join('bq_detail_header e','c.id_milik=e.id')
-								->where('a.id_milik', $row_Cek['id_milik'])
-								->limit(1)
-								->get()
-								->result();
-					$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-					$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
-					$revenue 	= $revenue2 * $qty;
-					
-					$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
-
-					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-					$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
-					// $real_material 		= $row_Cek['real_material'];
-				}
 
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
@@ -1313,16 +1348,40 @@ class Cron extends CI_Controller {
 
 		$where_bln = "";
         if($bulan > 0){
-            $where_bln = "AND MONTH(date) = '".$bulan."' ";
+            $where_bln = "AND MONTH(`date`) = '".$bulan."' ";
         }
 
         $where_thn = "";
         if($tahun > 0){
-            $where_thn = "AND YEAR(date) = '".$tahun."' ";
+            $where_thn = "AND YEAR(`date`) = '".$tahun."' ";
         }
 		
-		$qSupplier	    = "	SELECT * FROM laporan_per_bulan WHERE 1=1 ".$where_bln." ".$where_thn." ORDER BY `date` ASC ";
-		$restDetail1	= $this->db->query($qSupplier)->result_array();
+		$SQL = "
+			SELECT
+				`date`, 
+				SUM(est_material) AS est_material,
+				SUM(est_harga) AS est_harga,
+				SUM(real_material) AS real_material,
+				SUM(real_harga) AS real_harga,
+				SUM(direct_labour) AS direct_labour,
+				SUM(indirect_labour) AS indirect_labour,
+				SUM(machine) AS machine,
+				SUM(mould_mandrill) AS mould_mandrill,
+				SUM(consumable) AS consumable,
+				SUM(foh_consumable) AS foh_consumable,
+				SUM(foh_depresiasi) AS foh_depresiasi,
+				SUM(biaya_gaji_non_produksi) AS biaya_gaji_non_produksi,
+				SUM(biaya_non_produksi) AS biaya_non_produksi,
+				SUM(biaya_rutin_bulanan) AS biaya_rutin_bulanan,
+				SUM(man_hours) AS man_hours,
+				SUM(real_harga_rp) AS real_harga_rp,
+				kurs AS kurs
+			FROM
+				laporan_per_hari_action
+		    WHERE 1=1 ".$where_bln." ".$where_thn."
+			group by `date` ORDER BY `date` DESC
+		";
+		$restDetail1	= $this->db->query($SQL)->result_array();
         // echo "<pre>";
         // print_r($restDetail1);        
         // exit;
@@ -1368,13 +1427,12 @@ class Cron extends CI_Controller {
                 
 				$get_revenue = $this->db
 							->select('SUM((( d.price_total / e.qty ) * (a.qty_akhir - a.qty_awal + 1))) AS revenue, AVG(a.kurs) as kurs_det')
-							->from('laporan_per_bulan z')
-							->join('laporan_per_hari a','z.date=a.date')
+							->from('laporan_per_hari_action a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
 							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
 							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('z.date', $row_Cek['date'])
+							->where('a.date', $row_Cek['date'])
 							->get()
 							->result();
 				$revenue 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
@@ -3720,7 +3778,7 @@ class Cron extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Production Report WIP',
+			'title'			=> 'Production Report',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
@@ -3768,13 +3826,12 @@ class Cron extends CI_Controller {
 
 			$get_revenue = $this->db
 							->select('SUM((( d.price_total / e.qty ) * (a.qty_akhir - a.qty_awal + 1))) AS revenue')
-							->from('laporan_per_bulan z')
-							->join('laporan_per_hari a','z.date=a.date')
+							->from('laporan_wip_per_hari_action a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
 							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
 							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('z.date', $row['date'])
+							->where('a.date', $row['date'])
 							->get()
 							->result();
 			$revenue 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
@@ -3830,12 +3887,30 @@ class Cron extends CI_Controller {
 
 		$sql = "
 			SELECT
-				*
+				`date`, 
+				SUM(est_material) AS est_material,
+				SUM(est_harga) AS est_harga,
+				SUM(real_material) AS real_material,
+				SUM(real_harga) AS real_harga,
+				SUM(direct_labour) AS direct_labour,
+				SUM(indirect_labour) AS indirect_labour,
+				SUM(machine) AS machine,
+				SUM(mould_mandrill) AS mould_mandrill,
+				SUM(consumable) AS consumable,
+				SUM(foh_consumable) AS foh_consumable,
+				SUM(foh_depresiasi) AS foh_depresiasi,
+				SUM(biaya_gaji_non_produksi) AS biaya_gaji_non_produksi,
+				SUM(biaya_non_produksi) AS biaya_non_produksi,
+				SUM(biaya_rutin_bulanan) AS biaya_rutin_bulanan,
+				SUM(man_hours) AS man_hours,
+				SUM(real_harga_rp) AS real_harga_rp,
+				kurs AS kurs
 			FROM
-				laporan_wip_per_bulan
+				laporan_wip_per_hari_action
 		    WHERE 1=1 ".$where_bln." ".$where_thn." AND (
 				`date` LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
+			group by `date`
 		";
 		// echo $sql; exit;
 
@@ -3879,7 +3954,7 @@ class Cron extends CI_Controller {
 		$Row		= 1;
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(2243);
-		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI WIP ('.date('d F Y', strtotime($tanggal)).')');
+		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI ('.date('d F Y', strtotime($tanggal)).')');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
@@ -4019,8 +4094,18 @@ class Cron extends CI_Controller {
 		$sheet->getColumnDimension('U')->setWidth(16);
 
 
-		$qSupplier	    = "	SELECT a.*, b.no_spk AS no_spk2 FROM laporan_wip_per_hari a LEFT JOIN so_detail_header b ON a.id_milik = b.id WHERE a.date = '".$tanggal."' ORDER BY a.id_produksi ASC ";
-		$restDetail1	= $this->db->query($qSupplier)->result_array();
+		$SQL = "
+			SELECT
+				a.*,
+				b.no_spk as no_spk2,
+				b.product_code,
+				b.id_product AS nm_tanki
+			FROM
+				laporan_wip_per_hari_action a
+				LEFT JOIN production_detail b ON a.id_production_detail=b.id
+		    WHERE a.date='".$tanggal."'
+			ORDER BY a.id ASC";
+		$restDetail1	= $this->db->query($SQL)->result_array();
         // echo "<pre>";
         // print_r($restDetail1);        
         // exit;
@@ -4033,8 +4118,45 @@ class Cron extends CI_Controller {
 				$awal_row++;
 				$awal_col	= 0;
 
-				$NO_IPP 				= str_replace('PRO-','',$row_Cek['id_produksi']);
+				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
+
+				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
 				$tandaIPP = substr($NO_IPP,0,4);
+				
+				$product_code = explode('-',$row_Cek['product_code']);
+
+				$no_so = $product_code[0];
+				$no_spk = $row_Cek['no_spk2'];
+				$id_product = $row_Cek['nm_tanki'];
+				$nm_product = 'tanki';
+				$revenue = 0;
+				$estimasi_material 	= $row_Cek['est_material'];
+				$estimasi_price 	= $row_Cek['est_harga'];
+				$real_material 		= $row_Cek['real_material'];
+				if($tandaIPP != 'IPPT'){
+					$nm_product = $row_Cek['id_category'];
+					$id_product = $row_Cek['id_product'];
+					$get_revenue = $this->db
+								->select('(d.price_total / e.qty) AS revenue')
+								->from('laporan_wip_per_hari_action a')
+								->join('so_detail_header b','a.id_milik=b.id')
+								->join('so_bf_detail_header c','b.id_milik=c.id')
+								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+								->join('bq_detail_header e','c.id_milik=e.id')
+								->where('a.id_milik', $row_Cek['id_milik'])
+								->limit(1)
+								->get()
+								->result();
+					$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
+					$revenue 	= $revenue2 * $qty;
+
+					$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
+
+					$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
+					$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
+					$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+					// $real_material 		= $row_Cek['real_material'];
+				}
 				
 				$awal_col++;
 				$id_produksi	= $row_Cek['id_produksi'];
@@ -4043,13 +4165,11 @@ class Cron extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
-				$id_category	= $row_Cek['id_category'];
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $id_category);
+				$sheet->setCellValue($Cols.$awal_row, $nm_product);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 				
 				$awal_col++;
-				$id_product	= $row_Cek['id_product'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_product);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
@@ -4078,16 +4198,6 @@ class Cron extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $liner);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
-				$NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
-				$qty = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
-				$GET_EST_ACT = getEstimasiVsAktual($row_Cek['id_milik'], $NO_IPP, $qty, $row_Cek['id_production_detail']);
-
-				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
-				// $real_material 		= $row_Cek['real_material'];
-
-
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $estimasi_material);
@@ -4109,36 +4219,14 @@ class Cron extends CI_Controller {
 				$sheet->setCellValue($Cols.$awal_row, $real_harga);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
-				
-				$get_revenue = $this->db
-							->select('(d.price_total / e.qty) AS revenue, b.no_spk')
-							->from('laporan_wip_per_hari a')
-							->join('so_detail_header b','a.id_milik=b.id')
-							->join('so_bf_detail_header c','b.id_milik=c.id')
-							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('a.id_milik', $row_Cek['id_milik'])
-							->limit(1)
-							->get()
-							->result();
-				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
-				$no_spk 	= (!empty($get_revenue[0]->no_spk))?$get_revenue[0]->no_spk:'';
-				$revenue 	= $revenue2 * $qty;
-
-				if($tandaIPP == 'IPPT'){
-					$no_spk 	= $row_Cek['no_spk'];
-				}
-
                 $awal_col++;
-				$direct_labour	= $qty;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
+				$sheet->setCellValue($Cols.$awal_row, $qty);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
-				$direct_labour	= $revenue;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $direct_labour);
+				$sheet->setCellValue($Cols.$awal_row, $revenue);
                 $sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
                 
 
@@ -4223,7 +4311,7 @@ class Cron extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="report-produksi-wip-'.date('d-m-Y', strtotime($tanggal)).'.xls"');
+		header('Content-Disposition: attachment;filename="report-produksi-'.date('d-m-Y', strtotime($tanggal)).'.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
@@ -4336,7 +4424,7 @@ class Cron extends CI_Controller {
 		$Row		= 1;
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(15);
-		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI WIP PER DAY ('.$bulan.' '.$tahun.')');
+		$sheet->setCellValue('A'.$Row, 'LAPORAN PRODUKSI PER DAY ('.$bulan.' '.$tahun.')');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 		
@@ -4448,8 +4536,33 @@ class Cron extends CI_Controller {
             $where_thn = "AND YEAR(date) = '".$tahun."' ";
         }
 		
-		$qSupplier	    = "	SELECT * FROM laporan_wip_per_bulan WHERE 1=1 ".$where_bln." ".$where_thn." ORDER BY `date` ASC ";
-		$restDetail1	= $this->db->query($qSupplier)->result_array();
+		$SQL = "
+			SELECT
+				`date`, 
+				SUM(est_material) AS est_material,
+				SUM(est_harga) AS est_harga,
+				SUM(real_material) AS real_material,
+				SUM(real_harga) AS real_harga,
+				SUM(direct_labour) AS direct_labour,
+				SUM(indirect_labour) AS indirect_labour,
+				SUM(machine) AS machine,
+				SUM(mould_mandrill) AS mould_mandrill,
+				SUM(consumable) AS consumable,
+				SUM(foh_consumable) AS foh_consumable,
+				SUM(foh_depresiasi) AS foh_depresiasi,
+				SUM(biaya_gaji_non_produksi) AS biaya_gaji_non_produksi,
+				SUM(biaya_non_produksi) AS biaya_non_produksi,
+				SUM(biaya_rutin_bulanan) AS biaya_rutin_bulanan,
+				SUM(man_hours) AS man_hours,
+				SUM(real_harga_rp) AS real_harga_rp,
+				kurs AS kurs
+			FROM
+				laporan_wip_per_hari_action
+		    WHERE 1=1 ".$where_bln." ".$where_thn."
+			group by `date`
+			ORDER BY `date` DESC
+		";
+		$restDetail1	= $this->db->query($SQL)->result_array();
         // echo "<pre>";
         // print_r($restDetail1);        
         // exit;
@@ -4494,13 +4607,12 @@ class Cron extends CI_Controller {
                 
 				$get_revenue = $this->db
 							->select('SUM((( d.price_total / e.qty ) * (a.qty_akhir - a.qty_awal + 1))) AS revenue, AVG(a.kurs) as kurs_det')
-							->from('laporan_wip_per_bulan z')
-							->join('laporan_wip_per_hari a','z.date=a.date')
+							->from('laporan_wip_per_hari_action a')
 							->join('so_detail_header b','a.id_milik=b.id')
 							->join('so_bf_detail_header c','b.id_milik=c.id')
 							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
 							->join('bq_detail_header e','c.id_milik=e.id')
-							->where('z.date', $row_Cek['date'])
+							->where('a.date', $row_Cek['date'])
 							->get()
 							->result();
 				$revenue 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
@@ -4592,7 +4704,7 @@ class Cron extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="Report Produksi WIP Per Day '.$bulan.' '.$tahun.' '.date('YmdHis').'.xls"');
+		header('Content-Disposition: attachment;filename="Report Produksi Per Day '.$bulan.' '.$tahun.' '.date('YmdHis').'.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
@@ -4642,34 +4754,39 @@ class Cron extends CI_Controller {
 			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
 			$tandaIPP = substr($NO_IPP,0,4);
 			
-			$no_so = $row['no_so'];
-			$no_spk = $row['no_spk'];
+			$product_code = explode('-',$row['product_code']);
+
+			$no_so = $product_code[0];
+			$no_spk = $row['no_spk2'];
+			$id_product = $row['nm_tanki'];
+			$nm_product = 'tanki';
 			$revenue = 0;
 			$estimasi_material 	= $row['est_material'];
 			$estimasi_price 	= $row['est_harga'];
 			$real_material 		= $row['real_material'];
 			if($tandaIPP != 'IPPT'){
-				$no_so = get_detail_ipp()[$NO_IPP]['so_number'];
-				$no_spk = $row['no_spk2'];
-
+				$nm_product = $row['id_category'];
+				$id_product = $row['id_product'];
 				$get_revenue = $this->db
-								->select('(d.price_total / e.qty) AS revenue')
-								->from('laporan_wip_per_hari a')
-								->join('so_detail_header b','a.id_milik=b.id')
-								->join('so_bf_detail_header c','b.id_milik=c.id')
-								->join('cost_project_detail d','c.id_milik=d.caregory_sub')
-								->join('bq_detail_header e','c.id_milik=e.id')
-								->where('a.id_milik', $row['id_milik'])
-								->limit(1)
-								->get()
-								->result();
+							->select('(d.price_total / e.qty) AS revenue')
+							->from('laporan_wip_per_hari_action a')
+							->join('so_detail_header b','a.id_milik=b.id')
+							->join('so_bf_detail_header c','b.id_milik=c.id')
+							->join('cost_project_detail d','c.id_milik=d.caregory_sub')
+							->join('bq_detail_header e','c.id_milik=e.id')
+							->where('a.id_milik', $row['id_milik'])
+							->limit(1)
+							->get()
+							->result();
 				$revenue2 	= (!empty($get_revenue))?$get_revenue[0]->revenue:0;
 				$revenue 	= $revenue2 * $qty;
+
 				$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty, $row['id_production_detail']);
 
 				$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
 				$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
 				$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
+				// $real_material 		= $row['real_material'];
 			}
 
 			$NO_IPP = str_replace('PRO-','',$row['id_produksi']);
@@ -4678,24 +4795,17 @@ class Cron extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".$row['id']."</div>";
             $nestedData[]	= "<div align='left'>".$NO_IPP."</div>";
             $nestedData[]	= "<div align='left'>".$no_so."</div>";
-            $nestedData[]	= "<div align='left'>".$row['id_category']."</div>";
-            $nestedData[]	= "<div align='left'>".$row['id_product']."</div>";
+           	$nestedData[]	= "<div align='left'>".$nm_product."</div>";
+            $nestedData[]	= "<div align='left'>".$id_product."</div>";
             $nestedData[]	= "<div align='right'>".$no_spk."</div>";
-            $nestedData[]	= "<div align='right'>".$row['diameter']."</div>"; 
-            $nestedData[]	= "<div align='right'>".$row['diameter2']."</div>";
+            $nestedData[]	= "<div align='right'>".number_format($row['diameter'],2)."</div>"; 
+            $nestedData[]	= "<div align='right'>".number_format($row['diameter2'],2)."</div>";
             $nestedData[]	= "<div align='center'>".$row['pressure']."</div>";
             $nestedData[]	= "<div align='center'>".$row['liner']."</div>";
             $nestedData[]	= "<div align='right'>".$qty."</div>";
             $nestedData[]	= "<div align='right'>".number_format($revenue,2)."</div>";
 
-			$GET_EST_ACT = getEstimasiVsAktual($row['id_milik'], $NO_IPP, $qty, $row['id_production_detail']);
-
-			$estimasi_material 	= (!empty($GET_EST_ACT['est_mat']))?$GET_EST_ACT['est_mat']:0;
-			$estimasi_price 	= (!empty($GET_EST_ACT['act_mat']))?$GET_EST_ACT['act_mat']:0;
-			$real_material 		= (!empty($GET_EST_ACT['est_price']))?$GET_EST_ACT['est_price']:0;
-			// $real_material 		= $row['real_material'];
-
-            $nestedData[]	= "<div align='right'>".number_format($estimasi_material,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($estimasi_material,2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($estimasi_price,2)."</div>";
             $nestedData[]	= "<div align='right'>".number_format($real_material,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['real_harga'],2)."</div>";
@@ -4729,17 +4839,18 @@ class Cron extends CI_Controller {
 		$sql = "
 			SELECT
 				a.*,
-				b.no_spk as no_spk2
+				b.no_spk as no_spk2,
+				b.product_code,
+				b.id_product AS nm_tanki
 			FROM
-				laporan_wip_per_hari a
-				LEFT JOIN so_detail_header b ON a.id_milik=b.id
+				laporan_wip_per_hari_action a
+				LEFT JOIN production_detail b ON a.id_production_detail=b.id
 		    WHERE a.date='".$tanggal."' AND (
 				a.id_produksi LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
-	        )
+			)
 		";
 		// echo $sql; exit;
 
@@ -4751,7 +4862,7 @@ class Cron extends CI_Controller {
 			
 		);
 
-		$sql .= " ORDER BY a.id_produksi ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.id ASC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);

@@ -2446,10 +2446,10 @@ class Component extends CI_Controller {
 					$ArrDetail1[$val]['id_product'] 	= $kode_product;
 					$ArrDetail1[$val]['detail_name'] 	= $data['detail_name'];
 					$ArrDetail1[$val]['acuhan'] 		= $data['acuhan_1'];
-					$ArrDetail1[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetail1[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetail1[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetail1[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetail1[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetail1[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetail1[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$valueM							= (!empty($valx['value']))?$valx['value']:'';
 					$ArrDetail1[$val]['value'] 			= $valueM;
 						$thicknessM						= (!empty($valx['thickness']))?$valx['thickness']:'';
@@ -2480,10 +2480,10 @@ class Component extends CI_Controller {
 					$ArrDetail2[$val]['id_product'] 	= $kode_product;
 					$ArrDetail2[$val]['detail_name'] 	= $data['detail_name2'];
 					$ArrDetail2[$val]['acuhan'] 		= $data['acuhan_2'];
-					$ArrDetail2[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetail2[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetail2[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetail2[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetail2[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetail2[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetail2[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$valueM							= (!empty($valx['value']))?$valx['value']:'';
 					$ArrDetail2[$val]['value'] 			= $valueM;
 						$thicknessM						= (!empty($valx['thickness']))?$valx['thickness']:'';
@@ -2514,10 +2514,10 @@ class Component extends CI_Controller {
 					$ArrDetail2_neck1[$val]['id_product'] 	= $kode_product;
 					$ArrDetail2_neck1[$val]['detail_name'] 	= $data['detail_name2_neck1'];
 					$ArrDetail2_neck1[$val]['acuhan'] 		= $data['acuhan_2_neck1'];
-					$ArrDetail2_neck1[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetail2_neck1[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetail2_neck1[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;;
+					$ArrDetail2_neck1[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;;
 					$ArrDetail2_neck1[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetail2_neck1[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetail2_neck1[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;;
 						$valueM							= (!empty($valx['value']))?$valx['value']:'';
 					$ArrDetail2_neck1[$val]['value'] 			= $valueM;
 						$thicknessM						= (!empty($valx['thickness']))?$valx['thickness']:'';
@@ -2548,10 +2548,10 @@ class Component extends CI_Controller {
 					$ArrDetail2_neck2[$val]['id_product'] 	= $kode_product;
 					$ArrDetail2_neck2[$val]['detail_name'] 	= $data['detail_name2_neck2'];
 					$ArrDetail2_neck2[$val]['acuhan'] 		= $data['acuhan_2_neck2'];
-					$ArrDetail2_neck2[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetail2_neck2[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetail2_neck2[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetail2_neck2[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetail2_neck2[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetail2_neck2[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetail2_neck2[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$valueM							= (!empty($valx['value']))?$valx['value']:'';
 					$ArrDetail2_neck2[$val]['value'] 			= $valueM;
 						$thicknessM						= (!empty($valx['thickness']))?$valx['thickness']:'';
@@ -2585,10 +2585,10 @@ class Component extends CI_Controller {
 					$ArrDetail13[$val]['id_product'] 	= $kode_product;
 					$ArrDetail13[$val]['detail_name'] 	= $data['detail_name3'];
 					$ArrDetail13[$val]['acuhan'] 		= $data['acuhan_3'];
-					$ArrDetail13[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetail13[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetail13[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetail13[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetail13[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetail13[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetail13[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$valueM							= (!empty($valx['value']))?$valx['value']:'';
 					$ArrDetail13[$val]['value'] 			= $valueM;
 						$thicknessM						= (!empty($valx['thickness']))?$valx['thickness']:'';
@@ -2617,10 +2617,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus1[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus1[$val]['detail_name'] 	= $data['detail_name'];
-					$ArrDetailPlus1[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus1[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus1[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus1[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus1[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus1[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus1[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus1[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
@@ -2637,10 +2637,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus2[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus2[$val]['detail_name'] 	= $data['detail_name2'];
-					$ArrDetailPlus2[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus2[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus2[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus2[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus2[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus2[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus2[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus2[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
@@ -2657,10 +2657,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus2_neck1[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus2_neck1[$val]['detail_name'] 	= $data['detail_name2_neck1'];
-					$ArrDetailPlus2_neck1[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus2_neck1[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus2_neck1[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus2_neck1[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus2_neck1[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus2_neck1[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus2_neck1[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus2_neck1[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
@@ -2677,10 +2677,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus2_neck2[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus2_neck2[$val]['detail_name'] 	= $data['detail_name2_neck2'];
-					$ArrDetailPlus2_neck2[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus2_neck2[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus2_neck2[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus2_neck2[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus2_neck2[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus2_neck2[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus2_neck2[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus2_neck2[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
@@ -2697,10 +2697,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus3[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus3[$val]['detail_name'] 	= $data['detail_name3'];
-					$ArrDetailPlus3[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus3[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus3[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus3[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus3[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus3[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus3[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus3[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
@@ -2717,10 +2717,10 @@ class Component extends CI_Controller {
 
 					$ArrDetailPlus4[$val]['id_product'] 	= $kode_product;
 					$ArrDetailPlus4[$val]['detail_name'] 	= $data['detail_name4'];
-					$ArrDetailPlus4[$val]['id_category'] 	= $dataMaterial[0]['id_category'];
-					$ArrDetailPlus4[$val]['nm_category'] 	= $dataMaterial[0]['nm_category'];
+					$ArrDetailPlus4[$val]['id_category'] 	= (!empty($dataMaterial[0]['id_category']))?$dataMaterial[0]['id_category']:null;
+					$ArrDetailPlus4[$val]['nm_category'] 	= (!empty($dataMaterial[0]['nm_category']))?$dataMaterial[0]['nm_category']:null;
 					$ArrDetailPlus4[$val]['id_material'] 	= $valx['id_material'];
-					$ArrDetailPlus4[$val]['nm_material'] 	= $dataMaterial[0]['nm_material'];
+					$ArrDetailPlus4[$val]['nm_material'] 	= (!empty($dataMaterial[0]['nm_material']))?$dataMaterial[0]['nm_material']:null;
 						$containingM					= (!empty($valx['containing']))?$valx['containing']:'';
 					$ArrDetailPlus4[$val]['containing'] 	= $containingM;
 						$perseM				= (!empty($valx['perse']))?$valx['perse']:'';
