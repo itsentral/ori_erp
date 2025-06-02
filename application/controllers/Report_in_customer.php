@@ -317,4 +317,24 @@ class Report_in_customer extends CI_Controller {
 		$objWriter->save("php://output");
 	}
 
+	 public function cogs(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Report COGS',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+
+		$this->load->view('Report_new/Report_in_customer/index',$data);
+	}
+
 }
