@@ -21,6 +21,7 @@ $this->load->view('include/side_menu');
                             <th class="text-center">JENIS TRANS</th>
                             <th class="text-center">ID TRANS</th>
                             <th class="text-center">NO TRANS</th>
+                            <th class="text-center">KODE DELIVERY</th>
                             <th class="text-center">QTY</th>
                             <th class="text-center">NILAI IN CUSTOMER</th>
 							<th class="text-center">Material Name</th>
