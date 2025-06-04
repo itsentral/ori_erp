@@ -2670,7 +2670,7 @@ class Ppic extends CI_Controller {
 				$ArrIN_WIP_Spool[0]['wip_foh'] =  $wip_foh;
 				$ArrIN_WIP_Spool[0]['created_by'] = $username;
 				$ArrIN_WIP_Spool[0]['created_date'] = $dateTime;
-				$ArrIN_WIP_Spool[0]['id_trans'] =  $Implode_noIDTrans;
+				$ArrIN_WIP_Spool[0]['id_trans'] =  str_replace('-','',$kode);
 				$ArrIN_WIP_Spool[0]['jenis'] =  'in spool';
 				$ArrIN_WIP_Spool[0]['id_material'] =  null;
 				$ArrIN_WIP_Spool[0]['nm_material'] = null;
