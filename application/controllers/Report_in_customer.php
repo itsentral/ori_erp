@@ -317,4 +317,130 @@ class Report_in_customer extends CI_Controller {
 		$objWriter->save("php://output");
 	}
 
+	 public function cogs(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data = array(
+			'title'			=> 'Report COGS',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+
+		$this->load->view('Report_new/Report_in_customer/cogs',$data);
+	}
+
+	 //GROUP
+    public function get_data_json_data_erp_incustomer(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_erp_incustomer(
+			$requestData['tgl_awal'],
+			$requestData['tgl_akhir'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		$GET_DET_IPP = get_detail_ipp();
+		// print_r($GET_DELIVERY_DATE);
+		// exit;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
+			$nestedData[]	= "<div align='left'>".str_replace(',','<br>',str_replace(',,',',',$row['no_spk']))."</div>";
+			$nestedData[]	= "<div align='left'>".$row['product']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
+			$nestedData[]	= "<div align='center'>".str_replace(',','<br>',$row['id_trans'])."</div>";
+			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['kode_delivery']."</div>";
+			$nestedData[]	= "<div align='center'>1</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_unit'],2)."</div>";
+			$QTY = (!empty($row['id_material']))?number_format($row['qty_mat'],4):'';
+			$cost_book = (!empty($row['id_material']))?number_format($row['cost_book'],2):'';
+			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
+			$nestedData[]	= "<div align='right'>".$QTY."</div>";
+			$nestedData[]	= "<div align='right'>".$cost_book."</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_erp_incustomer($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$WHERE_DATE = "AND a.tanggal LIKE '".date('Y')."-".date('m')."%' ";
+		if($tgl_awal != '0'){
+			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
+		}
+        $sql = "SELECT 
+                    (@row:=@row+1) AS nomor,
+                    a.*
+                FROM
+                    data_erp_in_customer a,
+                    (SELECT @row:=0) r
+                WHERE 1=1 ".$WHERE_DATE." 
+                    AND (
+                        a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+						OR a.kode_delivery LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.id_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.product LIKE '%".$this->db->escape_like_str($like_value)."%'
+                        OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				    )";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'a.tanggal'
+		);
+
+		$sql .= " ORDER BY a.id DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
 }
