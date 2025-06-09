@@ -2588,8 +2588,11 @@ class Delivery extends CI_Controller
 							->select('a.*, COUNT(id) AS qtyCount')
 							->group_by('a.id_milik')
 							->order_by('a.id', 'asc')
+							->group_start()
 							->where_not_in('sts_product',['so material','field joint'])
-							->get_where('delivery_product_detail a', 
+							->or_where('sts_product',NULL)
+							->group_end()
+							->get_where('delivery_product_detailx a', 
 								array(
 									'a.kode_delivery' => $kode_delivery, 
 									'a.spool_induk' => NULL
