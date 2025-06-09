@@ -2592,7 +2592,7 @@ class Delivery extends CI_Controller
 							->where_not_in('sts_product',['so material','field joint'])
 							->or_where('sts_product',NULL)
 							->group_end()
-							->get_where('delivery_product_detailx a', 
+							->get_where('delivery_product_detail a', 
 								array(
 									'a.kode_delivery' => $kode_delivery, 
 									'a.spool_induk' => NULL
