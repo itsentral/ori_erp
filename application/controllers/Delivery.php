@@ -2598,7 +2598,7 @@ class Delivery extends CI_Controller
 									'a.spool_induk' => NULL
 									)
 								)->result_array();
-		$result2 = $this->db->order_by('id', 'asc')->group_by('kode_spool', 'spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk <>' => NULL))->result_array();
+		$result2 = $this->db->order_by('id', 'asc')->group_by('kode_spool')->group_by('spool_induk')->get_where('delivery_product_detailx', array('kode_delivery' => $kode_delivery, 'spool_induk <>' => NULL))->result_array();
 		$result3 = $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'sts_product' => 'so material'))->result_array();
 		$result4 = $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'sts_product' => 'field joint'))->result_array();
 		$data = [
