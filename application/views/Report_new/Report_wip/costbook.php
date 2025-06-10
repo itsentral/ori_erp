@@ -40,7 +40,7 @@ $this->load->view('include/side_menu');
 							<th class="text-center">Qty In</th>
                             <th class="text-center">Qty Out</th>
                             <th class="text-center">Qty Stok</th>
-                            <th class="text-center">Nilai FG</th>
+                            <th class="text-center">Nilai WIP</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

@@ -686,7 +686,7 @@ class Report_wip extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Report Finish Good Costbook' ,
+			'title'			=> 'Report WIP Costbook' ,
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
@@ -700,7 +700,7 @@ class Report_wip extends CI_Controller {
 		$controller			= ucfirst(strtolower($this->uri->segment(1)));
 		$Arr_Akses			= getAcccesmenu($controller);
 		$requestData	= $_REQUEST;
-		$fetch			= $this->query_data_fg_costbook(
+		$fetch			= $this->query_data_wip_costbook(
 			$requestData['tgl_awal'],
 			$requestData['tgl_akhir'],
 			$requestData['search']['value'],
@@ -734,7 +734,7 @@ class Report_wip extends CI_Controller {
             }
             
 			$idtrans = $row['id_trans'];
-			$out = $this->db->query("SELECT a.qty as qty_out FROM data_erp_in_transit a WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
+			$out = $this->db->query("SELECT a.qty as qty_out FROM data_erp_fg a WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
             
 			if(!empty($out)){
 			$qty_out = 	$out->qty_out;
@@ -806,7 +806,7 @@ class Report_wip extends CI_Controller {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_fg_costbook($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_wip_costbook($tgl_awal,$tgl_akhir,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		$WHERE_DATE = "AND a.tanggal LIKE '".date('Y')."-".date('m')."%' ";
 		if($tgl_awal != '0'){
 			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
@@ -816,9 +816,9 @@ class Report_wip extends CI_Controller {
                     (@row:=@row+1) AS nomor,
                     a.*, a.qty as total_qty
                 FROM
-                    data_erp_fg a,
+                    data_erp_wip_group a,
                     (SELECT @row:=0) r
-                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in' AND keterangan='WIP to Finish Good'
+                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in' AND keterangan='Gudang produksi to WIP'
                     AND (
                         a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
