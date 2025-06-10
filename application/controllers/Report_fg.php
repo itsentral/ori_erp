@@ -544,7 +544,7 @@ class Report_fg extends CI_Controller {
             }
             
 			$idtrans = $row['id_trans'];
-			$out = $this->db->query("SELECT SUM(qty)as qty_out FROM data_erp_in_transit WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
+			$out = $this->db->query("SELECT qty as qty_out FROM data_erp_in_transit WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
             $qty = $row['total_qty'];
 			$qty_out = (!empty($row['id_material']))?$out->qty_out:0;				
 			$qty_sisa = $qty - $qty_out;
@@ -619,7 +619,7 @@ class Report_fg extends CI_Controller {
 
         $sql = "SELECT 
                     (@row:=@row+1) AS nomor,
-                    a.*, sum(a.qty) as total_qty
+                    a.*, a.qty as total_qty
                 FROM
                     data_erp_fg a,
                     (SELECT @row:=0) r
