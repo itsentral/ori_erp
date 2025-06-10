@@ -376,8 +376,9 @@ class Report_in_transit extends CI_Controller {
             }
             
 			$idtrans = $row['id_trans'];
+			if(!empty($idtrans)){
 			$out = $this->db->query("SELECT a.qty as qty_out FROM data_erp_in_customer a WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
-            
+			}
 			if(!empty($out)){
 			$qty_out = 	$out->qty_out;
 			}else{
