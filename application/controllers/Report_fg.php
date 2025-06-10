@@ -626,7 +626,7 @@ class Report_fg extends CI_Controller {
                 FROM
                     data_erp_fg a,
                     (SELECT @row:=0) r
-                WHERE 1=1 ".$WHERE_DATE." 
+                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in'
                     AND (
                         a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
