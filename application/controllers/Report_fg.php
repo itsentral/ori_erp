@@ -622,7 +622,7 @@ class Report_fg extends CI_Controller {
 
         $sql = "SELECT 
                     (@row:=@row+1) AS nomor,
-                    a.*, sum(a.qtyx) as total_qty
+                    a.*, sum(a.qty) as total_qty
                 FROM
                     data_erp_fg a,
                     (SELECT @row:=0) r
@@ -633,7 +633,8 @@ class Report_fg extends CI_Controller {
                         OR a.id_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.product LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
-				    )";
+				    )
+				GROUP BY a.id_trans ";
 		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
@@ -642,7 +643,6 @@ class Report_fg extends CI_Controller {
 			0 => 'nomor',
 			1 => 'a.tanggal'
 		);
-        $sql .= " GROUP BY a.id_trans ";
 		$sql .= " ORDER BY a.id DESC,  ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
