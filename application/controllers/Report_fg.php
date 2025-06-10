@@ -622,7 +622,7 @@ class Report_fg extends CI_Controller {
 
         $sql = "SELECT 
                     (@row:=@row+1) AS nomor,
-                    a.*, sum(a.qty)as total_qty
+                    a.*, sum(a.qty) as total_qtyx
                 FROM
                     data_erp_fg a,
                     (SELECT @row:=0) r
