@@ -39,14 +39,6 @@ $this->load->view('include/side_menu');
                             <th class="text-center">No Trans</th>
 							<th class="text-center">Qty</th>
                             <th class="text-center">Nilai FG</th>
-                            <th class="text-center">Material</th>
-                            <th class="text-center">Direct Labour PC</th>
-                            <th class="text-center">Indirect Labour PC</th>
-                            <th class="text-center">Consumable PC</th>
-                            <th class="text-center">FOH PC</th>
-                            <th class="text-center">Material Name</th>
-							<th class="text-center">Qty/Berat</th>
-                            <th class="text-center">Costbook</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

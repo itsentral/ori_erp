@@ -588,17 +588,7 @@ class Report_fg extends CI_Controller {
 			$wip_foh = (empty($row['id_material']))?number_format($wip_foh,2):'';
 
 			$nestedData[]	= "<div align='right'>".number_format($nilai_wip,2)."</div>";
-			$nestedData[]	= "<div align='right'>".$material."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_direct."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_indirect."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_consumable."</div>";
-			$nestedData[]	= "<div align='right'>".$wip_foh."</div>";
-
-			$QTY = (!empty($row['id_material']))?number_format($row['qty_mat'],4):'';
-			$cost_book = (!empty($row['id_material']))?number_format($row['cost_book'],2):'';
-			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='right'>".$QTY."</div>";
-			$nestedData[]	= "<div align='right'>".$cost_book."</div>";
+			
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
