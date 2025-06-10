@@ -408,7 +408,7 @@ class Report_in_transit extends CI_Controller {
 			// }
 			$material	= 0;
 			// if($row['material'] > 0 AND $qty > 0){
-				$material	= $row['material'];
+				//$material	= $row['material'];
 			// }
 			$wip_direct	= 0;
 			// if($row['wip_direct'] > 0 AND $qty > 0){
