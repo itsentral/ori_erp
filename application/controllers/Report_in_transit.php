@@ -403,7 +403,7 @@ class Report_in_transit extends CI_Controller {
 
 			$nilai_wip	= 0;
 			// if($row['nilai_wip'] > 0 AND $qty > 0){
-				$nilai_wip	= $row['nilai_wip'];
+				$nilai_wip	= $row['nilai_unit'];
 			// }
 			$material	= 0;
 			// if($row['material'] > 0 AND $qty > 0){
