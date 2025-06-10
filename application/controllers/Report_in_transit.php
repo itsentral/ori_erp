@@ -406,31 +406,7 @@ class Report_in_transit extends CI_Controller {
 			// if($row['nilai_wip'] > 0 AND $qty > 0){
 				$nilai_wip	= $row['nilai_unit'];
 			// }
-			$material	= 0;
-			// if($row['material'] > 0 AND $qty > 0){
-				//$material	= $row['material'];
-			// }
-			$wip_direct	= 0;
-			// if($row['wip_direct'] > 0 AND $qty > 0){
-				$wip_direct	= $row['wip_direct'];
-			// }
-			$wip_indirect	= 0;
-			// if($row['wip_indirect'] > 0 AND $qty > 0){
-				$wip_indirect	= $row['wip_indirect'];
-			// }
-			$wip_consumable	= 0;
-			// if($row['wip_consumable'] > 0 AND $qty > 0){
-				$wip_consumable	= $row['wip_consumable'];
-			// }
-			$wip_foh	= 0;
-			// if($row['wip_foh'] > 0 AND $qty > 0){
-				$wip_foh	= $row['wip_foh'];
-			// }
-			$material = (empty($row['id_material']))?number_format($material,2):'';
-			$wip_direct = (empty($row['id_material']))?number_format($wip_direct,2):'';
-			$wip_indirect = (empty($row['id_material']))?number_format($wip_indirect,2):'';
-			$wip_consumable = (empty($row['id_material']))?number_format($wip_consumable,2):'';
-			$wip_foh = (empty($row['id_material']))?number_format($wip_foh,2):'';
+		
 
 			$nestedData[]	= "<div align='right'>".number_format($nilai_wip,2)."</div>";
 			
