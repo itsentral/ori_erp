@@ -542,7 +542,12 @@ class Report_fg extends CI_Controller {
             {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
-
+            
+			$idtrans = $row['id_trans'];
+			$out = $this->db->query("SELECT SUM(qty)as qty_out FROM data_erp_in_transit WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
+            $qty = $row['total_qty'];
+			$qty_out = $out->qty_out;
+			$qty_sisa = $qty - $qty_out;
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tanggal']))."</div>";
@@ -554,8 +559,10 @@ class Report_fg extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$QTY = (!empty($row['id_material']))?'':1;		
 
-			$qty = $row['total_qty'];
+			
 			$nestedData[]	= "<div align='right'>".$qty."</div>";
+			$nestedData[]	= "<div align='right'>".$qty_out."</div>";
+			$nestedData[]	= "<div align='right'>".$qty_sisa."</div>";
 
 			$nilai_wip	= 0;
 			// if($row['nilai_wip'] > 0 AND $qty > 0){

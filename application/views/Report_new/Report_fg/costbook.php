@@ -37,7 +37,9 @@ $this->load->view('include/side_menu');
                             <th class="text-center">Jenis Trans</th>
                             <th class="text-center">Id Trans</th>
                             <th class="text-center">No Trans</th>
-							<th class="text-center">Qty</th>
+							<th class="text-center">Qty In</th>
+                            <th class="text-center">Qty Out</th>
+                            <th class="text-center">Qty Stok</th>
                             <th class="text-center">Nilai FG</th>
                         </tr>
                     </thead>
