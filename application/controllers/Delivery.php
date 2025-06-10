@@ -2588,14 +2588,17 @@ class Delivery extends CI_Controller
 							->select('a.*, COUNT(id) AS qtyCount')
 							->group_by('a.id_milik')
 							->order_by('a.id', 'asc')
+							->group_start()
 							->where_not_in('sts_product',['so material','field joint'])
+							->or_where('sts_product',NULL)
+							->group_end()
 							->get_where('delivery_product_detail a', 
 								array(
 									'a.kode_delivery' => $kode_delivery, 
 									'a.spool_induk' => NULL
 									)
 								)->result_array();
-		$result2 = $this->db->order_by('id', 'asc')->group_by('kode_spool', 'spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk <>' => NULL))->result_array();
+		$result2 = $this->db->order_by('id', 'asc')->group_by('kode_spool')->group_by('spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk <>' => NULL))->result_array();
 		$result3 = $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'sts_product' => 'so material'))->result_array();
 		$result4 = $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'sts_product' => 'field joint'))->result_array();
 		$data = [
@@ -6212,7 +6215,7 @@ class Delivery extends CI_Controller
 		$get_split_ipp3 = $this->db->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where('(a.berat > 0 OR a.berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'field joint'))->result_array();
 		$get_split_ipp4 = $this->db->select('COUNT(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL OR a.sts = 'loose_dead')")->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'deadstok'))->result_array();
 		$get_split_ipp4a = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_milik')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'kode_spk' => 'deadstok'))->result_array();
-		$get_split_ipp4b = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'cut'))->result_array();
+		$get_split_ipp4b = $this->db->select('COUNT(a.id) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_uniq')->order_by('a.id', 'asc')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts' => 'cut', 'spool_induk' => null))->result_array();
 		$get_split_ipp5 = $this->db->select('SUM(a.berat) AS qty_product, a.*, "" AS type_product,"" AS product_tanki')->group_by('a.id_pro')->order_by('a.spool_induk', 'asc')->order_by('a.kode_spool', 'asc')->order_by('a.id', 'asc')->where("(a.berat > 0 OR a.berat IS NULL)")->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'aksesoris'))->result_array();
 		$get_split_ipp = array_merge($get_split_ipp1, $get_split_ipp2, $get_split_ipp3, $get_split_ipp4, $get_split_ipp4a, $get_split_ipp5, $get_split_ipp4b);
 		$ArrNo_IPP = [];

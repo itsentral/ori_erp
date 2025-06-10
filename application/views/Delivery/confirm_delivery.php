@@ -123,7 +123,7 @@ $diterima_oleh			= (!empty($get_spk))?$get_spk[0]->diterima_oleh:'';
 					$ArrNo_SPK = [];
 					$ArrNo_ID = [];
 					$ArrNo_Drawing = [];
-					foreach ($get_split_ipp as $key2 => $value2) { $key2++;
+					foreach ($get_split_ipp as $key2 => $value2) {
 						$key2++;
                         $LENGTH = '';
                         if ($value2['product'] == 'pipe') {
