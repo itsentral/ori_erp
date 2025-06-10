@@ -552,10 +552,10 @@ class Report_fg extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".$row['jenis']."</div>";
 			$nestedData[]	= "<div align='center'>".str_replace(',','<br>',$row['id_trans'])."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
-			$QTY = (!empty($row['id_material']))?'':1;
-			$nestedData[]	= "<div align='right'>".$QTY."</div>";
+			$QTY = (!empty($row['id_material']))?'':1;		
 
 			$qty = $row['total_qty'];
+			$nestedData[]	= "<div align='right'>".$qty."</div>";
 
 			$nilai_wip	= 0;
 			// if($row['nilai_wip'] > 0 AND $qty > 0){
