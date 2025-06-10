@@ -544,9 +544,9 @@ class Report_fg extends CI_Controller {
             }
             
 			$idtrans = $row['id_trans'];
-			$out = $this->db->query("SELECT qty as qty_out FROM data_erp_in_transit WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
+			$out = $this->db->query("SELECT a.qty as qty_out FROM data_erp_in_transit a WHERE jenis='in' AND id_trans=$idtrans GROUP BY id_trans")->row();
             $qty = $row['total_qty'];
-			$qty_out = (!empty($row['id_material']))?$out->qty_out:0;				
+			$qty_out = (!empty($out->qty_out))?$out->qty_out:0;				
 			$qty_sisa = $qty - $qty_out;
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
