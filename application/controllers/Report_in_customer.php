@@ -563,7 +563,7 @@ class Report_in_customer extends CI_Controller {
                 FROM
                     data_erp_in_customer a,
                     (SELECT @row:=0) r
-                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in' AND keterangan='Finish Good to In Transit'
+                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in' AND keterangan='In Transit to Customer'
                     AND (
                         a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
