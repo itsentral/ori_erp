@@ -544,7 +544,7 @@ class Report_fg extends CI_Controller {
             }
             
 			$idtrans = $row['id_trans'];
-			$out = $this->db->query("SELECT COUNT(a.qty_ke) as qty_out FROM data_erp_in_transit a WHERE jenis='in' AND id_trans=$idtrans  GROUP BY a.id_trans DESC")->row();
+			$out = $this->db->query("SELECT COUNT(a.qty_ke) as qty_out FROM data_erp_in_transit a WHERE jenis='in' AND id_trans=$idtrans  GROUP BY a.id_trans")->row();
             
 			if(!empty($out)){
 			$qty_out = 	$out->qty_out;
