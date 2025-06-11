@@ -454,7 +454,7 @@ class Report_in_customer extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data = array(
-			'title'			=> 'Report Intransit Costbook' ,
+			'title'			=> 'Report Incustomer Costbook' ,
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'akses_menu'	=> $Arr_Akses
