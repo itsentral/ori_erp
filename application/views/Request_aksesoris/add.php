@@ -65,6 +65,10 @@ $this->load->view('include/side_menu');
                     }
 
                     $qty_req = $valx['qty_req'];
+                    $id_material = $valx['id_material'];
+                    if($tandaTanki == 'IPPT'){
+                        $id_material = $valx['id_material_tanki'];
+                    }
                     echo "<tr>";
                         echo "<td align='center'>".$No."
                                 <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>
@@ -80,10 +84,10 @@ $this->load->view('include/side_menu');
                         // echo "</select>";
                         // if($tandaTanki != 'IPPT'){
                             $ArrSelect = [];
-                            if(!empty($valx['id_material'])){
-                                $ArrSelect[$valx['id_material']] = strtoupper(get_name_accessories($valx['id_material']));
+                            if(!empty($id_material)){
+                                $ArrSelect[$id_material] = strtoupper(get_name_accessories($id_material));
                             }
-                            echo form_dropdown("add[".$No."][id_material2]",$ArrSelect, $valx['id_material'], array('class'=>'cb_bu_info'));
+                            echo form_dropdown("add[".$No."][id_material2]",$ArrSelect, $id_material, array('class'=>'cb_bu_info'));
                         // }
                         // else{
                         //     echo  $ArrSelect[$valx['id_material']];
