@@ -231,9 +231,18 @@ class Request_aksesoris extends CI_Controller {
 			$list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			if($tandaTanki == 'IPPT'){
 				$result_aksesoris   = $this->db
-                                        ->select('a.*, a.berat as qty, a.request as qty_req')
+                                        ->select('
+											a.id,
+											a.id_material AS id_material_tanki,
+											a.satuan,
+											a.berat as qty,
+											a.category,
+											c.id AS id_material,
+											a.request AS qty_req 
+										')
 										->group_by('a.id')
                                         ->where('a.close_sts','0')
+                                        ->join('accessories c','a.id_material=c.id_acc_tanki','left')
                                         ->get_where('planning_tanki_detail a',
                                             array(
                                                 'a.no_ipp'=>$id_bq,
