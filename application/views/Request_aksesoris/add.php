@@ -93,7 +93,7 @@ $this->load->view('include/side_menu');
                         echo "<td align='right' class='text-primary text-bold'>".number_format($qty,2)."</td>";
                         echo "<td align='right' class='text-success text-bold'>".number_format($qty_req,2)."</td>";
                         echo "<td align='right' class='text-danger text-bold' id='maxRequest".$No."'>".number_format($qty-$qty_req,2)."</td>";
-                        echo "<td align='center'>".strtoupper(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan))."</td>";
+                        echo "<td align='center'>".ucwords(strtolower(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan)))."</td>";
                         echo "<td align='right'><input type='text' name='add[".$No."][request]' data-no='".$No."' class='form-control input-sm text-center autoNumeric2 requestQty'></td>";
                     echo "</tr>";
                 }
