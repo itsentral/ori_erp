@@ -9,21 +9,29 @@ $this->load->view('include/side_menu');
 		<a href="<?php echo site_url($this->uri->segment(1).'/'.$this->uri->segment(4)) ?>" class="btn btn-md btn-danger">Back</a>
 		</div>
 	</div>
+    <?php
+        echo form_input(array('type'=>'hidden','id'=>'no_ipp','name'=>'no_ipp','class'=>'form-control input-md','readonly'=>'readonly'),str_replace('BQ-','',$id_bq));
+    ?>
     <div class="box-body">
         <div class='form-group row'>
-            <label class='label-control col-sm-2'><b>Nomor IPP</b></label>
-            <div class='col-sm-4'>
-                <?php
-                    echo form_input(array('id'=>'no_ipp','name'=>'no_ipp','class'=>'form-control input-md','readonly'=>'readonly'),str_replace('BQ-','',$id_bq));
-                ?>
-            </div>
-        </div>
-        <div class='form-group row'>
-            <label class='label-control col-sm-2'><b>Project</b></label>
-            <div class='col-sm-4'>
-                <?php
-                    echo form_textarea(array('id'=>'project','name'=>'project','class'=>'form-control input-md','rows'=>'2','cols'=>'75','readonly'=>'readonly'),strtoupper(get_name('production','project','no_ipp',str_replace('BQ-','',$id_bq))));
-                ?>
+            <div class='col-sm-12'>
+                <table style='width:100%'>
+                    <tr>
+                        <th width='15%'>IPP Number</th>
+                        <td width='1%'>:</td>
+                        <td><?=$no_ipp;?></td>
+                    </tr>
+                    <tr>
+                        <th>Customer Name</th>
+                        <td>:</td>
+                        <td><?=$nm_customer;?></td>
+                    </tr>
+                    <tr>
+                        <th>Project Name</th>
+                        <td>:</td>
+                        <td><?=$nm_project;?></td>
+                    </tr>
+                </table>
             </div>
         </div>
         <!-- <select id="cb_info" class="cb_bu_info" style='width:100%'></select> -->
@@ -82,9 +90,9 @@ $this->load->view('include/side_menu');
                         // }
                         echo "</td>";
                         // echo "<td>".strtoupper(get_name('accessories','material','id',$valx['id_material']))."</td>";
-                        echo "<td align='right'>".number_format($qty,2)."</td>";
-                        echo "<td align='right'>".number_format($qty_req,2)."</td>";
-                        echo "<td align='right' id='maxRequest".$No."'>".number_format($qty-$qty_req,2)."</td>";
+                        echo "<td align='right' class='text-primary text-bold'>".number_format($qty,2)."</td>";
+                        echo "<td align='right' class='text-success text-bold'>".number_format($qty_req,2)."</td>";
+                        echo "<td align='right' class='text-danger text-bold' id='maxRequest".$No."'>".number_format($qty-$qty_req,2)."</td>";
                         echo "<td align='center'>".strtoupper(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan))."</td>";
                         echo "<td align='right'><input type='text' name='add[".$No."][request]' data-no='".$No."' class='form-control input-sm text-center autoNumeric2 requestQty'></td>";
                     echo "</tr>";

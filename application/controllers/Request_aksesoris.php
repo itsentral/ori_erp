@@ -226,10 +226,14 @@ class Request_aksesoris extends CI_Controller {
 		}
 		else{
 			$id_bq              = $this->uri->segment(3);
-			$tandaTanki 	= substr($id_bq,0,4);
+			$tandaTanki 		= substr($id_bq,0,4);
 			$result_aksesoris   = $this->db->get_where('so_acc_and_mat',array('category <>'=>'mat','id_bq'=>$id_bq,'qty >'=>0))->result_array();
 			$list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL))->result_array();
+			$nm_project			= strtoupper(get_name('production','project','no_ipp',str_replace('BQ-','',$id_bq)));
+			$nm_customer		= strtoupper(get_name('production','nm_customer','no_ipp',str_replace('BQ-','',$id_bq)));
 			if($tandaTanki == 'IPPT'){
+				$nm_project			= strtoupper(get_name('planning_tanki','project','no_ipp',str_replace('BQ-','',$id_bq)));
+				$nm_customer		= strtoupper(get_name('planning_tanki','customer','no_ipp',str_replace('BQ-','',$id_bq)));
 				$result_aksesoris   = $this->db
                                         ->select('
 											a.id,
@@ -253,10 +257,13 @@ class Request_aksesoris extends CI_Controller {
 				// $list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			}
 			$data = array(
-				 'title'			=> 'Request Item Project',
+				'title'				=> 'Request Item Project',
 		  		'action'		    => 'index',
+				'nm_project' 		=> $nm_project,
+				'nm_customer' 		=> $nm_customer,
 				'tandaTanki' 		=> $tandaTanki,
 				'id_bq' 		    => $id_bq,
+				'no_ipp' 		    => str_replace('BQ-','',$id_bq),
 				'result_aksesoris' 	=> $result_aksesoris,
 				'list_aksesoris' 	=> $list_aksesoris,
 			);
