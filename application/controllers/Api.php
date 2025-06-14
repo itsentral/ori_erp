@@ -276,7 +276,7 @@ class Api extends CI_Controller {
 				FROM 
 					accessories 
 				WHERE 
-					nama LIKE '%".$term."%' 
+					(nama LIKE '%".$term."%' OR id_material LIKE '%".$term."%' OR spesifikasi LIKE '%".$term."%' OR material LIKE '%".$term."%')
 					AND deleted_date IS NULL
 				LIMIT 50 ";
 		// echo $SQL;
