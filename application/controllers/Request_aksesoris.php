@@ -245,6 +245,7 @@ class Request_aksesoris extends CI_Controller {
 											a.request AS qty_req 
 										')
 										->group_by('a.id')
+										->order_by('a.id','asc')
                                         ->where('a.close_sts','0')
                                         ->join('accessories c','a.id_material=c.id_acc_tanki','left')
                                         ->get_where('planning_tanki_detail a',
