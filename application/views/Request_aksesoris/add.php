@@ -67,7 +67,7 @@ $this->load->view('include/side_menu');
                     $qty_req = $valx['qty_req'];
                     $id_material = $valx['id_material'];
                     if($tandaTanki == 'IPPT'){
-                        $id_material = $valx['id_material_tanki'];
+                        $id_material = (!empty($valx['id_material']))?$valx['id_material']:$valx['id_material_tanki'];
                     }
                     echo "<tr>";
                         echo "<td align='center'>".$No."
