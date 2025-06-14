@@ -45,10 +45,6 @@ $this->load->view('include/side_menu');
                 <?php
                 $Total1 = 0;
                 $No=0;
-                // $ArrSelect = [];
-                // foreach ($list_aksesoris as $key => $value) {
-                //     $ArrSelect[$value['id']] = strtoupper($value['id_material']." - ".$value['nama'].", ".$value['spesifikasi'].", ".$value['material']);
-                // }
 
                 foreach($result_aksesoris AS $val => $valx){
                     $No++;
@@ -61,23 +57,6 @@ $this->load->view('include/side_menu');
                     }
 
                     $qty_req = $valx['qty_req'];
-
-                    // if($valx['category'] == 'lainnya'){
-                    //     $list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki'=>NULL,'category'=>4))->result_array();
-                    // }
-
-                    // if($valx['category'] == 'gasket'){
-                    //     $list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki'=>NULL,'category'=>3))->result_array();
-                    // }
-
-                    // if($valx['category'] == 'plate'){
-                    //     $list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki'=>NULL,'category'=>2))->result_array();
-                    // }
-
-                    // if($valx['category'] == 'baut'){
-                    //     $list_aksesoris   	= $this->db->get_where('accessories',array('deleted_date'=>NULL,'id_acc_tanki'=>NULL,'category'=>1))->result_array();
-                    // }
-                    
                     echo "<tr>";
                         echo "<td align='center'>".$No."
                                 <input type='hidden' name='add[".$No."][id]' value='".$valx['id']."'>
