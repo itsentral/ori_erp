@@ -4437,6 +4437,15 @@
 		return $price;
 	}
 
+	function get_name_accessories($id_material){
+		$CI 		=& get_instance();
+		$SQL 		= "SELECT id, id_material, nama, SUBSTRING(spesifikasi,1,30) as spesifikasi2, SUBSTRING(material,1,30) as material FROM accessories WHERE id='".$id_material."' LIMIT 1";
+		$Result 	= $CI->db->query($SQL)->result();
+
+		$name_acc	= (!empty($Result[0]->id_material))?$Result[0]->id_material.' - '.$Result[0]->nama." ".$Result[0]->spesifikasi2." ".$Result[0]->material:'';
+		return $name_acc;
+	}
+
 	function check_approve_201111($id_bq){
 		$CI 		=& get_instance();
 		$data_session	= $CI->session->userdata;

@@ -26,7 +26,7 @@
 	<link rel="stylesheet" href="<?php echo base_url('chosen/chosen.min.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('sweetalert/dist/sweetalert.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('assets/datetimepicker/jquery.datetimepicker.css');?>">
-
+   	<link rel="stylesheet" href="<?php echo base_url('assets/select2/select2.min.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('assets/jquery-ui-1.12.1/jquery-ui.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('assets/wysihtml5/bootstrap3-wysihtml5.min.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('assets/css/buttons.dataTables.min.css'); ?>">

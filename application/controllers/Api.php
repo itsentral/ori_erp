@@ -267,6 +267,22 @@ class Api extends CI_Controller {
 		$machine_cost_per_hour 	= (!empty($data_result[0]->machine_cost_per_hour))?$data_result[0]->machine_cost_per_hour:0;
 		echo $machine_cost_per_hour;
 	}
+
+	public function getDataAccessories(){
+		$term2 = $this->input->get('term');
+		$term = $term2['term'];
+		$SQL = "SELECT id, id_material, nama, SUBSTRING(spesifikasi,1,30) as spesifikasi2, SUBSTRING(material,1,30) as material FROM accessories WHERE nama LIKE '%".$term."%' LIMIT 50 ";
+		// echo $SQL;
+		$result = $this->db->query($SQL)->result_array();
+
+		$Array = [];
+		foreach ($result as $key => $value) {
+			$Array[$key]['id'] 		= $value['id'];
+			$Array[$key]['title'] 	= strtoupper($value['id_material']." - ".$value['nama']." ".$value['spesifikasi2']." ".$value['material']);
+		}
+
+		echo json_encode($Array);
+	}
 	
 	
 }

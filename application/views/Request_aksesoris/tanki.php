@@ -32,7 +32,7 @@ $this->load->view('include/side_menu');
 
   <!-- modal -->
 	<div class="modal fade" id="ModalView"  style='overflow-x: auto;'>
-		<div class="modal-dialog"  style='min-width:100%;'>
+		<div class="modal-dialog"  style='width:80%'>
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -94,67 +94,6 @@ $this->load->view('include/side_menu');
 				  type	: "warning",
 				  timer	: 5000
 				});
-			}
-		});
-	});
-
-    $(document).on('click', '#btnRequest', function(e){
-		e.preventDefault();
-
-		swal({
-			title: "Are you sure?",
-			text: "You will not be able to process again this data!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonClass: "btn-danger",
-			confirmButtonText: "Yes, Process it!",
-			cancelButtonText: "No, cancel process!",
-			closeOnConfirm: false,
-			closeOnCancel: false
-		},
-		function(isConfirm) {
-			if (isConfirm) {
-				loading_spinner();
-				var formData  	= new FormData($('#form_proses')[0]);
-				$.ajax({
-					url			: base_url + active_controller+'/add',
-					type		: "POST",
-					data		: formData,
-					cache		: false,
-					dataType	: 'json',
-					processData	: false,
-					contentType	: false,
-					success		: function(data){
-						if(data.status == 1){
-							swal({
-									title	: "Save Success!",
-									text	: data.pesan,
-									type	: "success",
-									timer	: 7000
-								});
-							window.location.href = base_url + active_controller+'/tanki';
-						}
-						else if(data.status == 0){
-							swal({
-								title	: "Save Failed!",
-								text	: data.pesan,
-								type	: "warning",
-								timer	: 7000
-							});
-						}
-					},
-					error: function() {
-						swal({
-							title   : "Error Message !",
-							text    : 'An Error Occured During Process. Please try again..',
-							type    : "warning",
-							timer   : 7000
-						});
-					}
-				});
-			} else {
-			swal("Cancelled", "Data can be process again :)", "error");
-			return false;
 			}
 		});
 	});

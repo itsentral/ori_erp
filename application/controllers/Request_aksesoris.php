@@ -73,7 +73,9 @@ class Request_aksesoris extends CI_Controller {
 
             $create	= "";
             if($Arr_Akses['create']=='1'){
-                $create	= "<button class='btn btn-sm btn-success request' title='Request' data-id_bq='".$row['id_bq']."'><i class='fa fa-plus'></i></button>";
+                // $create	= "<button class='btn btn-sm btn-success request' title='Request' data-id_bq='".$row['id_bq']."'><i class='fa fa-plus'></i></button>";
+                $create	= "<a href='".base_url('request_aksesoris/add/'.$row['id_bq'])."' class='btn btn-sm btn-success' title='Request' data-id_bq='".$row['id_bq']."'><i class='fa fa-plus'></i></a>";
+
             }
 
             $nestedData[]	= "<div align='center'>".$create."</div>";
@@ -245,6 +247,8 @@ class Request_aksesoris extends CI_Controller {
 				// $list_aksesoris   	= $this->db->select('id_material,nama,spesifikasi,material,id_acc_tanki as id')->get_where('accessories',array('deleted_date'=>NULL))->result_array();
 			}
 			$data = array(
+				 'title'			=> 'Request Item Project',
+		  		'action'		    => 'index',
 				'tandaTanki' 		=> $tandaTanki,
 				'id_bq' 		    => $id_bq,
 				'result_aksesoris' 	=> $result_aksesoris,
@@ -316,7 +320,7 @@ class Request_aksesoris extends CI_Controller {
 
             $create	= "";
             if($Arr_Akses['create']=='1'){
-                $create	= "<button class='btn btn-sm btn-success request' title='Request' data-id_bq='".$row['id_bq']."'><i class='fa fa-plus'></i></button>";
+                $create	= "<a href='".base_url('request_aksesoris/add/'.$row['id_bq'].'/tanki')."' class='btn btn-sm btn-success' title='Request' data-id_bq='".$row['id_bq']."'><i class='fa fa-plus'></i></a>";
             }
 
             $nestedData[]	= "<div align='center'>".$create."</div>";

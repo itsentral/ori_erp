@@ -139,6 +139,7 @@
 	<!-- iCheck 1.0.1 -->
 	<script src="<?php echo base_url('adminlte/plugins/iCheck/icheck.min.js') ?>"></script>
 	<script src="<?php echo base_url('chosen/chosen.jquery.min.js') ?>"></script>
+	<script src="<?php echo base_url('assets/select2/select2.min.js') ?>"></script>
 	<script src="<?php echo base_url('assets/dist/event_keypress.js'); ?>"></script>
 	<script src="<?php echo base_url('assets/dist/jquery.maskMoney.js'); ?>"></script>
 	<script src="<?php echo base_url('assets/dist/jquery.maskedinput.min.js'); ?>"></script>
@@ -241,7 +242,7 @@
 					"footer": true
 				}
 			});
-			$('select').addClass('chosen-select');
+			// $('select').addClass('chosen-select');
 			$('input[type="text"][data-role="datepicker"]').datepicker({
 				dateFormat: 'yy-mm-dd',
 				changeMonth:true,
