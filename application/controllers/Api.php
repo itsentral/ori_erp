@@ -271,7 +271,14 @@ class Api extends CI_Controller {
 	public function getDataAccessories(){
 		$term2 = $this->input->get('term');
 		$term = $term2['term'];
-		$SQL = "SELECT id, id_material, nama, SUBSTRING(spesifikasi,1,30) as spesifikasi2, SUBSTRING(material,1,30) as material FROM accessories WHERE nama LIKE '%".$term."%' LIMIT 50 ";
+		$SQL = "SELECT 
+					id, id_material, nama, SUBSTRING(spesifikasi,1,30) as spesifikasi2, SUBSTRING(material,1,30) as material 
+				FROM 
+					accessories 
+				WHERE 
+					nama LIKE '%".$term."%' 
+					AND deleted_date IS NULL
+				LIMIT 50 ";
 		// echo $SQL;
 		$result = $this->db->query($SQL)->result_array();
 
