@@ -238,7 +238,7 @@ class Request_aksesoris extends CI_Controller {
                                         ->select('
 											a.id,
 											a.id_material AS id_material_tanki,
-											a.satuan,
+											c.satuan,
 											a.berat as qty,
 											a.category,
 											c.id AS id_material,
