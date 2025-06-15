@@ -14,7 +14,7 @@ $date = date('Y-m-d', strtotime('-1 days', strtotime($dateC)));
 // $date = date('2024-11-23');
 // $dateIN = "('2025-04-14','2025-04-15')";
 // echo"<pre>";
-$sqlHeader      = "SELECT a.*, b.id_milik FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date)='".$date."' ";
+$sqlHeader      = "SELECT a.*, b.id_milik FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date)='".$date."' and a.id_product!='tanki' ";
 // $sqlHeader      = "SELECT a.*, b.id_milik FROM history_pro_header_cron a LEFT JOIN production_detail b ON a.id_production_detail = b.id  WHERE DATE(a.status_date) IN ".$dateIN."  ORDER BY a.status_date ASC ";
 // echo $sqlHeader;exit;
 
@@ -43,7 +43,7 @@ if(!empty($restHeader)){
     // echo $sqlHeader; 
 	//!!!==================================DIAKTIFKAN
     $sqlDel1 = "DELETE FROM laporan_per_bulan WHERE `date`='".$date."' ";
-    $sqlDel2 = "DELETE FROM laporan_per_hari WHERE `date`='".$date."' ";
+    $sqlDel2 = "DELETE FROM laporan_per_hari WHERE `date`='".$date."' and id_product!='tanki' ";
     $koneksi->query($sqlDel1);
     $koneksi->query($sqlDel2);
 
