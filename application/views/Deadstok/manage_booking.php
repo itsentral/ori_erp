@@ -29,23 +29,39 @@ $this->load->view('include/side_menu');
 				<tbody>
                     <?php
                     foreach ($listBooking as $key => $value) { $key++;
-                        $no_ipp = str_replace('PRO-','',$value['id_produksi']);
-                        $no_spk = (!empty($GET_NO_SPK[$value['id_milik']]['no_spk']))?$GET_NO_SPK[$value['id_milik']]['no_spk']:'';
-                        $no_so = (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+                        $no_ipp 	= str_replace('PRO-','',$value['id_produksi']);
+						$id_milik 	= $value['id_milik'];
+						$ID			= $value['id'];
+
+						$tandaTanki	= substr($no_ipp,0,4);
+						if($tandaTanki == 'IPPT'){
+							$no_spk 	= spec_deadstok_tanki($id_milik)['no_spk'];
+                        	$no_so 		= spec_deadstok_tanki($id_milik)['no_so'];
+							$nm_product = strtoupper($value['id_product']);
+							$spec		= '';
+							$nm_comp	= '';
+						}else{
+							$no_spk 	= (!empty($GET_NO_SPK[$id_milik]['no_spk']))?$GET_NO_SPK[$id_milik]['no_spk']:'';
+                        	$no_so 		= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'';
+							$nm_product = strtoupper($value['id_category']);
+							$spec		= spec_bq2($id_milik);
+							$nm_comp	= $value['id_product'];
+						}
+                       
                         echo "<tr>";
                             echo "<td align='center'>".$key."</td>";
-                            echo "<td>".strtoupper($value['id_category'])."</td>";
-                            echo "<td>".spec_bq2($value['id_milik'])."</td>";
-                            echo "<td>".$value['id_product']."</td>";
+                            echo "<td>".$nm_product."</td>";
+                            echo "<td>".$spec."</td>";
+                            echo "<td>".$nm_comp."</td>";
                             echo "<td align='center'>".$no_spk."</td>";
                             echo "<td align='center'>".$no_so."</td>";
                             echo "<td hidden>";
-                                echo "<input type='hidden' name='detail[".$value['id']."][id]' value='".$value['id']."'>";
-                                echo "<input type='hidden' name='detail[".$value['id']."][id_product]' id='id_deadstok_".$value['id']."' data-id='".$value['id']."' class='form-control text-center checkID' value='".$id_product."'>";
+                                echo "<input type='hidden' name='detail[".$ID."][id]' value='".$ID."'>";
+                                echo "<input type='hidden' name='detail[".$ID."][id_product]' id='id_deadstok_".$ID."' data-id='".$ID."' class='form-control text-center checkID' value='".$id_product."'>";
                                 echo "<span class='ket_id text-bold text-primary'></span>";
                             echo "</td>";
                             echo "<td>";
-                                echo "<select name='detail[".$value['id']."][proses_next]' class='form-control'>";
+                                echo "<select name='detail[".$ID."][proses_next]' class='form-control'>";
                                 echo "<option value='1'>Delivery</option>";
                                 echo "<option value='2'>Spool</option>";
                                 echo "<option value='3'>Cutting</option>";
@@ -53,7 +69,7 @@ $this->load->view('include/side_menu');
                                 echo "</select>";
                             echo "</td>";
 							echo "<td>";
-								echo "<input type='text' name='detail[".$value['id']."][proses]' class='form-control' placeholder='Proses'>";
+								echo "<input type='text' name='detail[".$ID."][proses]' class='form-control' placeholder='Proses'>";
 							echo "</td>";
                         echo "</tr>";
                     }

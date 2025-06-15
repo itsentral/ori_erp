@@ -405,12 +405,15 @@ class Deadstok_fg extends CI_Controller {
 				$spec = $row['spec'];
 			}
 
+			$nm_customer 	= (!empty($row['nm_customer']))?$row['nm_customer']:$row['customer_tanki'];
+			$project 		= (!empty($row['project']))?$row['project']:$row['project_tanki'];
+
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper($row['no_so'])."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper($row['no_spk'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";  
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_customer)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($project)."</div>";  
 			$nestedData[]	= "<div align='left'>".$row['product_name']."</div>";
 			$nestedData[]	= "<div align='left'>".$spec."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row['qty_stock'])."</div>";
@@ -444,11 +447,14 @@ class Deadstok_fg extends CI_Controller {
 						b.nm_customer AS nm_customer,
 						b.project AS project,
 						z.cutting,
-						z.id AS id_modif
+						z.id AS id_modif,
+						d.customer AS customer_tanki,
+						d.project AS project_tanki
 					FROM
 						deadstok_modif z
 						LEFT JOIN deadstok a ON z.id_deadstok = a.id AND a.deleted_date IS NULL
-						INNER JOIN production b ON a.no_ipp=b.no_ipp,
+						LEFT JOIN production b ON a.no_ipp=b.no_ipp
+						LEFT JOIN planning_tanki d ON a.no_ipp=d.no_ipp,
 						(SELECT @row:=0) r
 					WHERE  
 						a.deleted_date IS NULL 
@@ -463,6 +469,7 @@ class Deadstok_fg extends CI_Controller {
 							OR b.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
 							OR b.project LIKE '%".$this->db->escape_like_str($like_value)."%'
 						)
+					GROUP BY z.id
 					
 			";
 		}
@@ -488,7 +495,7 @@ class Deadstok_fg extends CI_Controller {
 						OR a.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR a.nm_project LIKE '%".$this->db->escape_like_str($like_value)."%'
 					)
-				GROUP BY a.qty_order
+				GROUP BY a.id
 			";
 		}
 		// echo $sql; exit;

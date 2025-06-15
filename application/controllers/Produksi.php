@@ -2987,7 +2987,7 @@ class Produksi extends CI_Controller {
 			else{
 				$nestedData[]	= "<div align='center'><button type='button' class='btn btn-sm btn-primary go_to_outgoing' data-nomor='$nomor' data-no_ipp='".$row['no_ipp']."' data-id_milik='".$row['id_milik']."' title='Pindahkan Ke Outgoing'><i class='fa fa-external-link' aria-hidden='true'></i></button>";
 			}
-			if($row['type_product'] != 'field' AND $row['sts_tanki'] != 'tanki' AND $sisa_spk[0]->sisa_spk > 0){				
+			if($row['type_product'] != 'field' AND $sisa_spk[0]->sisa_spk > 0){				
 				$nestedData[]	= "<div align='center'><button type='button' class='btn btn-sm btn-warning go_to_deadstok' data-nomor='$nomor' data-no_ipp='".$row['no_ipp']."' data-id_milik='".$row['id_milik']."' data-sisa_spk='".$sisa_spk[0]->sisa_spk."' title='Booking dari Deadstok'><i class='fa fa-hand-lizard-o' aria-hidden='true'></i></button>";
 			}
 			else{
@@ -12199,6 +12199,7 @@ class Produksi extends CI_Controller {
 			'no_ipp'		=> $no_ipp,
 			'id_milik'		=> $id_milik,
 			'max_booking'	=> $max_booking,
+			'tandaTanki'	=> substr($no_ipp,0,4),
 			'GET_NO_SPK'	=> get_detail_final_drawing()
 		);
 		$this->load->view('Deadstok/booking_deadstok', $data);

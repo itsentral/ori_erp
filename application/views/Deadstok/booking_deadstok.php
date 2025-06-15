@@ -23,13 +23,25 @@ $this->load->view('include/side_menu');
         <div class='form-group row'>
             <label class='label-control col-sm-2'><b>Product</b></label>
             <div class='col-sm-4'>
-                <?=spec_deadstok($id_milik);?>			
+                <?php
+				if($tandaTanki == 'IPPT'){
+					echo spec_deadstok_tanki($id_milik)['nm_product'];
+				}else{
+					echo spec_deadstok($id_milik);
+				}
+				?>			
             </div>
         </div>
 		<div class='form-group row'>
             <label class='label-control col-sm-2'><b>No SPK</b></label>
             <div class='col-sm-4'>
-                <?=(!empty($GET_NO_SPK[$id_milik]['no_spk']))?$GET_NO_SPK[$id_milik]['no_spk']:'-';?>			
+				<?php
+				if($tandaTanki == 'IPPT'){
+					echo spec_deadstok_tanki($id_milik)['no_spk'];
+				}else{
+					echo (!empty($GET_NO_SPK[$id_milik]['no_spk']))?$GET_NO_SPK[$id_milik]['no_spk']:'-';
+				}
+				?>		
             </div>
         </div>
         <div class='form-group row'>

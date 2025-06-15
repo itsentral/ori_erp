@@ -64,12 +64,15 @@ class Approval_est_deadstok extends CI_Controller {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
+			$nm_customer 	= (!empty($row['nm_customer']))?$row['nm_customer']:$row['customer_tanki'];
+			$project 		= (!empty($row['project']))?$row['project']:$row['project_tanki'];
+
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_customer'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['project'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($nm_customer)."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($project)."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product_name']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['product_spec']."</div>";
 
@@ -111,17 +114,22 @@ class Approval_est_deadstok extends CI_Controller {
                     b.no_ipp,
                     b.no_so,
                     c.nm_customer,
-                    c.project
+                    c.project,
+					d.customer AS customer_tanki,
+					d.project AS project_tanki
 				FROM
 					deadstok_modif a
                     LEFT JOIN deadstok b ON a.id_deadstok = b.id
-                    LEFT JOIN production c ON b.no_ipp=c.no_ipp,
+                    LEFT JOIN production c ON b.no_ipp=c.no_ipp
+                    LEFT JOIN planning_tanki d ON b.no_ipp=d.no_ipp,
 					(SELECT @row:=0) r
 				WHERE a.deleted_date IS NULL AND a.status='WAITING APPROVE' AND(
 					b.type LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR b.product_name LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR b.product_spec LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR b.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR d.customer LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR d.project LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
 				GROUP BY a.created_date
 		";

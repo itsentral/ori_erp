@@ -6571,4 +6571,19 @@
 		return $Progresss;
 	}
 
+	function spec_deadstok_tanki($id_milik){
+		$CI 			=& get_instance();
+		$restHeader		= $CI->db->limit(1)->get_where('production_detail',array('id_milik'=>$id_milik))->result_array();
+		$nm_product		= (!empty($restHeader[0]['id_product']))?$restHeader[0]['id_product']:'';
+		$no_spk			= (!empty($restHeader[0]['no_spk']))?$restHeader[0]['no_spk']:'';
+		$no_so			= (!empty($restHeader[0]['product_code']))?substr($restHeader[0]['product_code'],0,9):'';
+
+		$Array = [
+			'nm_product' => $nm_product,
+			'no_spk' => $no_spk,
+			'no_so' => $no_so
+		];
+		return $Array;
+	}
+
 ?>

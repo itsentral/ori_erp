@@ -661,9 +661,17 @@ class Deadstok extends CI_Controller {
 					$nm_product 	= (!empty($getDetailPro[0]['id_category']))?$getDetailPro[0]['id_category']:NULL;
 					$id_milik 		= (!empty($getDetailPro[0]['id_milik']))?$getDetailPro[0]['id_milik']:NULL;
 					$no_ipp 		= (!empty($getDetailPro[0]['id_produksi']))?str_replace('PRO-','',$getDetailPro[0]['id_produksi']):NULL;
-					$so_number		= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:NULL;
-					$no_spk			= (!empty($GET_DET_FD[$id_milik]['no_spk']))?$GET_DET_FD[$id_milik]['no_spk']:NULL;
 
+					$tandaTanki		= substr($no_ipp,0,4);
+					if($tandaTanki == 'IPPT'){
+						$so_number	= spec_deadstok_tanki($id_milik)['no_so'];
+						$no_spk		= spec_deadstok_tanki($id_milik)['no_spk'];
+					}
+					else{
+						$so_number	= (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:NULL;
+						$no_spk		= (!empty($GET_DET_FD[$id_milik]['no_spk']))?$GET_DET_FD[$id_milik]['no_spk']:NULL;
+					}
+					
 					$ArrUpdate[$key]['id'] = $value['id'];
 					$ArrUpdate[$key]['id_product_deadstok'] = $value['id_product'];
 					$ArrUpdate[$key]['id_deadstok_dipakai'] = $deadstokDipakai;
