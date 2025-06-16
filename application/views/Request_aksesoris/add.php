@@ -122,9 +122,9 @@ $this->load->view('include/side_menu');
 <script>
 	$(document).ready(function(){
         swal.close();
-        $('select').removeClass('chosen-select');
+        // $('select').removeClass('chosen-select');
 		$('.autoNumeric2').autoNumeric();
-		// $('.chosen-select').chosen({width:'100%'});
+		$('.chosen-select').chosen('destroy');
 
         $(document).on('keyup','.requestQty', function(){
             var nomor   = $(this).data('no');
