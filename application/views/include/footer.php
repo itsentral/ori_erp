@@ -242,7 +242,7 @@
 					"footer": true
 				}
 			});
-			// $('select').addClass('chosen-select');
+			$('select').addClass('chosen-select');
 			$('input[type="text"][data-role="datepicker"]').datepicker({
 				dateFormat: 'yy-mm-dd',
 				changeMonth:true,
