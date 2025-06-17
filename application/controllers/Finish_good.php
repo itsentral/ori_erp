@@ -586,7 +586,16 @@ $arrContextOptions=array(
 			->join('production z', 'REPLACE(a.id_produksi, "PRO-", "") = z.no_ipp', 'left')
 			->where(['spool_induk'=> $id_spool, 'no_drawing !='=>''])
 			->get()->row();
-		$img = file_get_contents(base_url('qrcodegen/generate/' . $id_spool . '/' . $id_spool), '');
+		$arrContextOptions=array(
+    "ssl"=>array(
+        "verify_peer"=>false,
+        "verify_peer_name"=>false,
+    ),
+); 		
+
+		$img = file_get_contents(base_url('qrcodegen/generate/' . $id_spool . '/' . $id_spool),false, stream_context_create($arrContextOptions));
+
+//		$img = file_get_contents(base_url('qrcodegen/generate/' . $id_spool . '/' . $id_spool), '');
 
 		$IPP[] = explode("-", $products->id_produksi)[1];
 		$qSupplier 	= "SELECT * FROM production WHERE no_ipp IN ('" . implode("','", $IPP) . "') ";
