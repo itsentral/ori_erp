@@ -375,6 +375,7 @@ class Request_aksesoris_gudang extends CI_Controller {
 											->join('planning_tanki_detail b','a.id_milik=b.id')
 											->join('accessories c','b.id_material=c.id_acc_tanki','left')
 											->join('accessories d','b.id_material=d.id','left')
+											->order_by('b.id','ASC')
 											->get_where('request_accessories a',array('a.kode'=>$kode))
 											->result_array();
 				}
