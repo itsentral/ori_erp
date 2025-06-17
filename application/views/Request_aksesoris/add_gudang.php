@@ -67,6 +67,8 @@
                     $nm_material = get_name_by_code_group($valx['code_group']);
                     $material = get_name('con_nonmat_new','material_name','code_group',$code_group);
                 }
+                $nm_material    = get_name_by_code_group($code_group);
+                $material       = get_name('con_nonmat_new','material_name','code_group',$code_group);
                 $STOK = (!empty($GET_STOK[$code_group]))?$GET_STOK[$code_group]:0;
                 
                 echo "<tr>";
