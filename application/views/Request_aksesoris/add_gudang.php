@@ -30,7 +30,7 @@
 				<th class="text-center" style='vertical-align:middle;' width='3%'>#</th>
 				<th class="text-center" style='vertical-align:middle;'>Kode</th>
 				<th class="text-center" style='vertical-align:middle;'>Material Name</th>
-				<th class="text-center" style='vertical-align:middle;'>Material Name</th>
+				<th class="text-center" style='vertical-align:middle;' hidden>Material Name</th>
 				<th class="text-center" style='vertical-align:middle;' width='7%'>Estimasi</th>
 				<th class="text-center" style='vertical-align:middle;' width='7%'>Qty Req</th>
 				<th class="text-center" style='vertical-align:middle;' width='7%'>Sudah Out</th>
@@ -81,7 +81,7 @@
                             </td>";
                     echo "<td align='center'>".$code_group."</td>";
                     echo "<td title='".$code_group."'>".$nm_material."</td>";
-                    echo "<td>".$material."</td>";
+                    echo "<td hidden>".$material."</td>";
                     echo "<td align='right'>".number_format($qty,2)."</td>";
                     echo "<td align='right'>".number_format($qty_req,2)."</td>";
                     echo "<td align='right'>".number_format($qty_out,2)."</td>";

@@ -51,7 +51,7 @@ $this->load->view('include/side_menu');
 	<!-- modal -->
 	<!-- modal -->
 	<div class="modal fade" id="ModalView2" style='overflow-y: auto;'>
-		<div class="modal-dialog"  style='width:80%; '>
+		<div class="modal-dialog"  style='width:90%; '>
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
