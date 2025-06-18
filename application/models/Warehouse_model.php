@@ -5209,7 +5209,7 @@ class Warehouse_model extends CI_Model {
 							->result_array();
 		$getWherehouse = $this->db->get_where('warehouse', array('category'=>'produksi'))->result_array();
 		$getWherehouse2 = $this->db->get_where('warehouse', array('category'=>'subgudang'))->result_array();
-		$no_request = $this->db->order_by('tgl_trans','desc')->get_where('print_header', array('kode_trans'=>$detAdjustment[0]['kode_trans'],'aktual_date'=>NULL))->result_array();
+		$no_request = $this->db->order_by('id','desc')->get_where('print_header', array('kode_trans'=>$detAdjustment[0]['kode_trans'],'aktual_date'=>NULL))->result_array();
 
 		$data = array(
 			'title'			=> 'Request SPK Mixing',
