@@ -670,7 +670,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHist[$key]['harga'] 			= $value['unit_price']; 
 				//ambil saldo akhir 
 				$saldoakhir=0;
-				$saldo_akhir_gudang = $this->db->order_by('tgl_trans', 'desc')->get_where('warehouse_history',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
+				$saldo_akhir_gudang = $this->db->order_by('id', 'desc')->get_where('warehouse_history',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				if(!empty($saldo_akhir_gudang)) $saldoakhir=$saldo_akhir_gudang->saldo_akhir;
 				$ArrHist[$key]['saldo_awal']		= $saldoakhir;
 				$ArrHist[$key]['saldo_akhir']		= ($saldoakhir+( $value['unit_price']*$qtyIN));
