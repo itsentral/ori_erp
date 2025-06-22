@@ -19,6 +19,7 @@ $this->load->view('include/side_menu');
 						<th class="text-center th">IPP</th>
 						<th class="text-center th">SO</th>
 						<th class="text-center th">Product</th>
+						<th class="text-center th">Deadstock</th>
 						<th class="text-center th">No SPK</th>
 						<th class="text-center th">Spec Product</th>
 						<th class="text-center th">Qty Booking</th>
@@ -30,13 +31,26 @@ $this->load->view('include/side_menu');
 				<tbody>
                     <?php
                     foreach ($result as $key => $value) { $key++;
+						$TandaTanki = substr($value['no_ipp'],0,4);
+						$SOTanki 	= substr($value['product_code'],0,9);
+
+						$product 	= ($TandaTanki=='IPPT')?$value['id_product']:$value['product'];
+						$so_number 	= ($TandaTanki=='IPPT')?$SOTanki:$value['so_number'];
+						$spec 		= ($TandaTanki=='IPPT')?'':spec_bq2($value['id_milik']);
+
+						$id_deadstok = $value['id_product_deadstok'];
+
+                		$getDeadstok = $this->db->get_where('deadstok',array('id_product'=>$id_deadstok))->result_array();
+						$product_deadstock = (!empty($getDeadstok[0]['product_name']))?$getDeadstok[0]['product_name']:'';
+
                         echo "<tr>";
                             echo "<td align='center'>".$key."</td>";
                             echo "<td align='left'>".$value['no_ipp']."</td>";
-                            echo "<td align='center'>".$value['so_number']."</td>";
-                            echo "<td align='left'>".$value['product']."</td>";
+                            echo "<td align='center'>".$so_number."</td>";
+                            echo "<td align='left'>".$product."</td>";
+                            echo "<td align='left'>".$product_deadstock."</td>";
                             echo "<td align='left'>".$value['no_spk']."</td>";
-                            echo "<td align='left'>".spec_bq2($value['id_milik'])."</td>";
+                            echo "<td align='left'>".$spec."</td>";
                             echo "<td align='center'>".number_format($value['qty_booking'])."</td>";
                             echo "<td align='left'>".$value['booking_by']."</td>";
                             echo "<td align='center'>".date('d-M-Y H:i',strtotime($value['booking_date']))."</td>";

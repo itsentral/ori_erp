@@ -12469,8 +12469,19 @@ class Produksi extends CI_Controller {
 		$GET_NO_SPK = get_detail_final_drawing();
 		$GET_DET_IPP = get_detail_ipp();
 
-		$detail = $this->db->select('a.*, COUNT(id) AS qty_booking')->group_by('id_product_deadstok')->get_where('production_detail a', array('a.kode_booking_deadstok'=>$id_booking))->result_array();
-		$no_ipp = str_replace('PRO-','',$detail[0]['id_produksi']);
+		$detail = $this->db
+							->select('a.*, COUNT(id) AS qty_booking')
+							->group_by('id_product_deadstok')
+							->get_where('production_detail a', array('a.kode_booking_deadstok'=>$id_booking))
+							->result_array();
+		$no_ipp 	= str_replace('PRO-','',$detail[0]['id_produksi']);
+		$SOTanki 	= substr($detail[0]['product_code'],0,9);
+
+		$so_pipafitting = (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'-';
+
+		$TandaTanki = substr($no_ipp,0,4);
+
+		$so_number 	= ($TandaTanki=='IPPT')?$SOTanki:$so_pipafitting;
 
 		$data = array(
 			'title' 		=> 'Booking Deadstok',
@@ -12479,8 +12490,8 @@ class Produksi extends CI_Controller {
 			'detail' 		=> $detail,
 			'id_booking'	=> $id_booking,
 			'no_ipp' 		=> $no_ipp,
-			'no_so'			=> (!empty($GET_DET_IPP[$no_ipp]['so_number']))?$GET_DET_IPP[$no_ipp]['so_number']:'-',
-			'no_spk'		=> (!empty($GET_NO_SPK[$detail[0]['id_milik']]['no_spk']))?$GET_NO_SPK[$detail[0]['id_milik']]['no_spk']:'-',
+			'no_so'			=> $so_number,
+			'no_spk'		=> $detail[0]['no_spk'],
 		);
 		$this->load->view('Deadstok/print_booking_deadstok', $data);
 	}

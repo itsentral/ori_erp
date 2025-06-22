@@ -879,9 +879,12 @@ class Deadstok extends CI_Controller {
 						a.no_spk,
 						a.id_category AS product,
 						a.kode_booking_deadstok AS booking_code,
+						a.id_product,
+						a.product_code,
 						COUNT( a.id ) AS qty_booking,
 						a.booking_by,
-						a.booking_date 
+						a.booking_date,
+						a.id_product_deadstok
 					FROM
 						production_detail a 
 						LEFT JOIN so_number b ON REPLACE(a.id_produksi,'PRO-','BQ-') = b.id_bq
