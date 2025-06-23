@@ -96,9 +96,12 @@ public function setup_2fa()
 
         $secret = $ga->createSecret();
 
+		$data_session	= $this->session->userdata;
+		$id_user	= $this->session->userdata['ORI_User']['id_user'];
+
         // Simpan secret ke DB user
-        $this->db->update('users', ['ga_secret' => $secret], ['id_user' => $this->auth->user_id()]);
-        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $this->db->update('users', ['ga_secret' => $secret], ['id_user' => $id_user]);
+        $user = $this->db->get_where('users', ['id_user' => $id_user])->row();
         $qrCodeUrl = $ga->getQRCodeGoogleUrl($user->full_name . '@ORI-ERP', $secret);
 
         $data['secret'] = $secret;
@@ -118,8 +121,12 @@ public function setup_2fa()
 
 public function verify_2fa()
     {
-        $identitas = $this->identitas_model->find_by(array('ididentitas' => 1)); // By Muhaemin => Di Form Login
-        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $identitas = $this->master_model->getData('identitas');
+
+		$data_session	= $this->session->userdata;
+		$id_user	= $this->session->userdata['ORI_User']['id_user'];
+
+        $user = $this->db->get_where('users', ['id_user' => $id_user])->row();
         $secret = $user->ga_secret;
 
         if (!$secret) {
@@ -142,8 +149,12 @@ public function check_otp()
     {
         $ga = new PHPGangsta_GoogleAuthenticator();
 
+		$data_session	= $this->session->userdata;
+		$id_user	= $this->session->userdata['ORI_User']['id_user'];
+
+
         $otp = $this->input->post('otp');
-        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $user = $this->db->get_where('users', ['id_user' => $id_user])->row();
         $secret = $user->ga_secret;
 
         if (!$secret) {
