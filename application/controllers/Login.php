@@ -6,6 +6,7 @@ class Login extends CI_Controller {
 		parent::__construct();
 		
 		$this->load->model('master_model');			
+		$this->load->library('GoogleAuthenticator');	
 		
 	}
 
@@ -54,6 +55,8 @@ class Login extends CI_Controller {
 						'status'		=> 1,
 						'pesan'			=> 'Login Process Success. Thank You & Have A Nice Day..'
 					);
+
+
 				}else{
 					$Arr_Return		= array(
 						'status'		=> 2,
@@ -75,8 +78,102 @@ class Login extends CI_Controller {
 			);
 			
 			$this->load->view('login',$data);
-			// $this->load->view('maintenance_page',$data);
+			// $this->load->view('maintenance_page',$data); 
 		}
 	}
+
+	/* 2FA Auth */
+    // ==============
+# Tambahkan library   phpgangsta/googleauthenticator
+//composer require phpgangsta/googleauthenticator:dev-master
+
+
+# Tambahkan di controller users
+
+public function setup_2fa()
+    {
+        $ga = new PHPGangsta_GoogleAuthenticator();
+
+        $secret = $ga->createSecret();
+
+        // Simpan secret ke DB user
+        $this->db->update('users', ['ga_secret' => $secret], ['id_user' => $this->auth->user_id()]);
+        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $qrCodeUrl = $ga->getQRCodeGoogleUrl($user->full_name . '@ORI-ERP', $secret);
+
+        $data['secret'] = $secret;
+        $data['qrCodeUrl'] = $qrCodeUrl;
+
+		$Data_Identitas			= $this->master_model->getData('identitas');
+			$data = array(
+				'title'			=> 'Login',
+				'idt'			=> $Data_Identitas[0]
+			);
+			
+			$this->load->view('setup_2fa',$data);
+
+    }
+
+# halaman verification OTP
+
+public function verify_2fa()
+    {
+        $identitas = $this->identitas_model->find_by(array('ididentitas' => 1)); // By Muhaemin => Di Form Login
+        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $secret = $user->ga_secret;
+
+        if (!$secret) {
+            $this->session->set_flashdata('error', '2FA belum diaktifkan. Silakan aktifkan terlebih dahulu.');
+            redirect('login/setup_2fa');
+        }
+
+		$Data_Identitas			= $this->master_model->getData('identitas');
+			$data = array(
+				'title'			=> 'Login',
+				'idt'			=> $Data_Identitas[0]
+			);
+			
+			$this->load->view('verify_2fa',$data);
+    }
+
+# verification OTP
+
+public function check_otp()
+    {
+        $ga = new PHPGangsta_GoogleAuthenticator();
+
+        $otp = $this->input->post('otp');
+        $user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+        $secret = $user->ga_secret;
+
+        if (!$secret) {
+            $this->session->set_flashdata('error', '2FA belum diaktifkan. Silakan aktifkan terlebih dahulu.');
+            redirect('login/setup_2fa');
+        }
+
+        if (!$otp) {
+            $this->session->set_flashdata('error', 'Kode OTP tidak boleh kosong.');
+            redirect('login/verify_2fa');
+        }
+
+        // Verifikasi kode OTP
+        $checkResult = $ga->verifyCode($secret, $otp, 2); // toleransi waktu 2x30 detik
+    
+        if ($checkResult) {
+            $this->session->set_userdata('2fa_verified', true);
+            redirect('dashboard');
+        } else {
+            // Jika verifikasi gagal, tampilkan pesan error
+            $this->session->set_userdata('2fa_verified', false);
+            $this->session->set_flashdata('error', 'Kode OTP salah');
+            redirect('login/verify_2fa');
+        }
+    }
+
+
+
+
+
+
 	
 }
