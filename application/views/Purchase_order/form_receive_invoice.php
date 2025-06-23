@@ -129,6 +129,30 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		showInputs: true,
 		autoclose:true
 	});
+
+	$(document).on('click', '.detailAjust', function(e){
+		e.preventDefault();
+		loading_spinner();
+		$(".modal-title").html("<b>DETAIL INCOMING</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url  + 'incoming/modal_detail/'+$(this).data('kode_trans'),
+			success:function(data){
+				$("#Mymodal").modal();
+				$("#listCoa").html(data);
+
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
+	
 	$('#simpan-com').click(function(e){
 		//$("#simpan-com").addClass("hidden");
 		d_error='';
