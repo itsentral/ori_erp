@@ -716,6 +716,7 @@ class Purchase extends CI_Controller {
 			'row_group'		=> $data_Group,
 			'results'		=> $info_payterm,
 			'akses_menu'	=> $Arr_Akses,
+			'dt_incoming'	=> $dt_incoming,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);
