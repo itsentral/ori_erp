@@ -41,7 +41,7 @@
 		<form method="post" action="" class="login">
             <p class="title text-center">Setup Google Authenticator</p>
              <p class="title text-center">Scan QR Code</p>
-                   <img src="<?= $qrCodeUrl ?>" alt="QR Code">
+                   <img src="<?= $qrCodeUrl ?>" alt="QR Code" center>
                     <p><strong><?= $secret ?></strong>
         </form>
 		<footer>
