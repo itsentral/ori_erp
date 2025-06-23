@@ -39,8 +39,8 @@
         <p style="color:red"><?= $this->session->flashdata('error') ?></p>
         <?php endif; ?>
 		<form method="post" action="<?= site_url('login/check_otp') ?>" class="login">
-            <label>Masukkan OTP dari Google Authenticator:</label><br>
-            <input type="text" name="otp" required>
+            <p class="title text-center">Masukkan OTP Google Authenticator</p>
+             <input type="text" name="otp" required>
             <br><button type="submit">Verifikasi</button>
         </form>
 		<footer>
