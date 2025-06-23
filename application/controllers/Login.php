@@ -113,7 +113,7 @@ public function setup_2fa()
 				'idt'			=> $Data_Identitas[0]
 			);
 			
-			$this->load->view('setup_2fa',$data);
+			$this->load->view('Users/setup_2fa',$data);
 
     }
 
@@ -140,7 +140,7 @@ public function verify_2fa()
 				'idt'			=> $Data_Identitas[0]
 			);
 			
-			$this->load->view('verify_2fa',$data);
+			$this->load->view('Users/verify_2fa',$data);
     }
 
 # verification OTP
