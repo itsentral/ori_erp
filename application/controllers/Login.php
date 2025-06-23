@@ -104,13 +104,14 @@ public function setup_2fa()
         $user = $this->db->get_where('users', ['id_user' => $id_user])->row();
         $qrCodeUrl = $ga->getQRCodeGoogleUrl($user->nm_lengkap . '@ORI-ERP', $secret);
 
-        $data['secret'] = $secret;
-        $data['qrCodeUrl'] = $qrCodeUrl;
+        
 
 		$Data_Identitas			= $this->master_model->getData('identitas');
 			$data = array(
 				'title'			=> 'Login',
-				'idt'			=> $Data_Identitas[0]
+				'idt'			=> $Data_Identitas[0],
+				'secret'        => $secret,
+				'qrCodeUrl'        => $qrCodeUrl
 			);
 			
 			$this->load->view('Users/setup_2fa',$data);
