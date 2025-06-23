@@ -709,6 +709,9 @@ class Purchase extends CI_Controller {
 		}else{
 			$dt_incoming=$this->db->query("select * from warehouse_adjustment where no_ipp='".$info_payterm->no_po."' and (id_invoice is null or id_invoice = '')")->result();
 		}
+        
+		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
+        $total_price = $nilai_po->total_price;
 
 		$data = array(
 			'title'			=> 'Receive Invoice',
@@ -717,6 +720,7 @@ class Purchase extends CI_Controller {
 			'results'		=> $info_payterm,
 			'akses_menu'	=> $Arr_Akses,
 			'dt_incoming'	=> $dt_incoming,
+			'total_price'	=> $total_price,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);

@@ -69,6 +69,11 @@ $this->load->view('include/side_menu');
 				  <div class="col-md-6">
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
+				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Nilai PO</label>
+					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
+				  </div>
 				</div>
 				<div class="row">
 				  <div class="col-md-12">
