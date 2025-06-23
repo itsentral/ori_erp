@@ -129,7 +129,7 @@ class Purchase extends CI_Controller {
 	}
 	
 	public function modal_detail_approve(){
-		$this->purchase_order_model->modal_detail_approve();
+		$this->purchase_order_model->modal_detail_approve(); 
 	}
 	
 	public function modal_approve(){
@@ -704,6 +704,12 @@ class Purchase extends CI_Controller {
 		}
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$info_payterm 	= $this->db->query("select * from billing_top where id='".$id."'")->row();
+		if($info_payterm->invoice_no!=""){
+			$dt_incoming=$this->db->query("select * from warehouse_adjustment where id_invoice='".$id."' and no_ipp='".$info_payterm->no_po."'")->result();
+		}else{
+			$dt_incoming=$this->db->query("select * from warehouse_adjustment where no_ipp='".$info_payterm->no_po."' and (id_invoice is null or id_invoice = '')")->result();
+		}
+
 		$data = array(
 			'title'			=> 'Receive Invoice',
 			'action'		=> 'index',

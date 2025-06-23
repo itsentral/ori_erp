@@ -8,7 +8,7 @@ $this->load->view('include/side_menu');
 	<div class="tab-pane active">
 		<div class="box box-primary">
 			<div class="box-header">
-				<h3 class="box-title"><?php echo $title;?></h3>
+				<h3 class="box-title"><?php echo $title;?></h3> 
 			</div>
 			<div class="box-body">
 				<div class="row">
@@ -69,6 +69,35 @@ $this->load->view('include/side_menu');
 				  <div class="col-md-6">
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
+				</div>
+				<div class="row">
+				  <div class="col-md-12">
+					<h4>Dokumen Incoming </h4>
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>No Dokumen</th>
+								<th>Incoming Date</th>
+								<th>PIC</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php
+						if(!empty($dt_incoming)){
+							foreach($dt_incoming AS $record){ 
+								echo "<tr>";
+									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
+									echo "<td align='left'>".$record->tanggal."</td>";
+									echo "<td align='left'>".$record->pic."</td>";
+									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
+								echo "</tr>";
+							}
+						}
+						?>
+						</tbody>
+					</table>
+				  </div>
 				</div>
 			</div>
 
