@@ -6,7 +6,7 @@ class Login extends CI_Controller {
 		parent::__construct();
 		
 		$this->load->model('master_model');			
-		$this->load->library('GoogleAuthenticator');	
+		
 		
 	}
 
