@@ -79,6 +79,7 @@ $this->load->view('include/side_menu');
 								<th>No Dokumen</th>
 								<th>Incoming Date</th>
 								<th>PIC</th>
+								<th>Total Harga</th>
 								<th></th>
 							</tr>
 						</thead>
@@ -90,6 +91,7 @@ $this->load->view('include/side_menu');
 									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
 									echo "<td align='left'>".$record->tanggal."</td>";
 									echo "<td align='left'>".$record->pic."</td>";
+									echo "<td align='left'>".$record->total_harga_product."</td>";
 									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
 								echo "</tr>";
 							}
@@ -130,7 +132,7 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		autoclose:true
 	});
 
-	$(document).on('click', '.detailAjust', function(e){
+	$(document).on('click', '.detailAjust', function(e){ 
 		e.preventDefault();
 		loading_spinner();
 		$(".modal-title").html("<b>DETAIL INCOMING</b>");
@@ -152,7 +154,7 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 			}
 		});
 	});
-	
+
 	$('#simpan-com').click(function(e){
 		//$("#simpan-com").addClass("hidden");
 		d_error='';
