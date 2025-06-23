@@ -102,7 +102,7 @@ public function setup_2fa()
         // Simpan secret ke DB user
         $this->db->update('users', ['ga_secret' => $secret], ['id_user' => $id_user]);
         $user = $this->db->get_where('users', ['id_user' => $id_user])->row();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl($user->full_name . '@ORI-ERP', $secret);
+        $qrCodeUrl = $ga->getQRCodeGoogleUrl($user->nm_lengkap . '@ORI-ERP', $secret);
 
         $data['secret'] = $secret;
         $data['qrCodeUrl'] = $qrCodeUrl;
