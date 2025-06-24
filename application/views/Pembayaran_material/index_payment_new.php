@@ -51,7 +51,7 @@ $this->load->view('include/side_menu');
 				$numb=0; foreach($results AS $record){ 
 				$numb++;
                 $payment = $record->no_payment;
-				$req = $this->db_query("SELECT * FROM purchase_order_request_payment WHERE no_payment='$payment'")->row();
+				$req = $this->db->query("SELECT * FROM purchase_order_request_payment WHERE no_payment='$payment'")->row();
                 if(!empty($req)){
 				$noreq =$req->no_request;
 				$nopo  =$req->no_po;
