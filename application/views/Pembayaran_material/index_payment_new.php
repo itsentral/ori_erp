@@ -86,7 +86,6 @@ $this->load->view('include/side_menu');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">No Payment</th>
-						<th class="text-center">No Payment</th>
 						<th class="text-center">No Request</th>
 						<th class="text-center">No PO</th>
 						<th class="text-center">Tgl Bayar</th>
