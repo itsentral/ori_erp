@@ -70,7 +70,7 @@ $this->load->view('include/side_menu');
 					?>
 					<input type="text" class="form-control divide" onblur="calculate_invoice()" id="nilai_pph_invoice" name="nilai_pph_invoice" value="0" >
 					<label class="control-label">PO+PPN-PPH</label>
-					<input type="text" class="form-control divide" id="nilai_invoice" name="nilai_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required  tabindex="-1">
+					<input type="text" class="form-control divide" id="nilai_invoice" name="nilai_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required  tabindex="-1" readonly>
 					<label class="control-label"></label>
 					<input type="hidden" class="form-control divide" id="potongan_dp" name="potongan_dp" placeholder=0 value=0 onblur="calculate_invoice()"onblur="calculate_invoice()">
 					<label class="control-label"></label>
