@@ -11,7 +11,7 @@ class Pembayaran_material_model extends CI_Model {
 	}
 	public function get_data_json_request_payment($sqlwhere=''){ 
 
-		$sql = "SELECT a.*, b.nm_supplier FROM purchase_order_request_paymentx a left join supplier b on a.id_supplier =b.id_supplier WHERE 1=1 ".($sqlwhere==''?'':" and ".$sqlwhere)." ORDER BY a.approved_on DESC ";
+		$sql = "SELECT a.*, b.nm_supplier FROM purchase_order_request_payment a left join supplier b on a.id_supplier =b.id_supplier WHERE 1=1 ".($sqlwhere==''?'':" and ".$sqlwhere)." ORDER BY a.approved_on DESC ";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
