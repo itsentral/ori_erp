@@ -171,6 +171,9 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		var invoice_no=$("#invoice_no").val();
 		var invoice_total=$("#invoice_total").val();
 		var nilai_po=$("#nilai_po").val();
+
+		console.log(invoice_total);
+		console.log(nilai_po)
 		
    		if(invoice_no==""){
    			d_error='No Invoice / Kwitansi Error!';
