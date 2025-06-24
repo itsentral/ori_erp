@@ -170,6 +170,7 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
    		}
 		var invoice_no=$("#invoice_no").val();
 		var invoice_total=$("#invoice_total").val();
+		var nilai_po=$("#nilai_po").val();
 		
    		if(invoice_no==""){
    			d_error='No Invoice / Kwitansi Error!';
@@ -189,6 +190,11 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		  	d_error='Kurs Error!';
    			alert(d_error);
         }
+
+		if(nilai_po > invoice_total){
+   			d_error='Nilai Invoice Lebih Besar Dari Nilai PO ';
+   			alert(d_error);
+   		}	
 		
 		if(d_error==''){
 			swal({
