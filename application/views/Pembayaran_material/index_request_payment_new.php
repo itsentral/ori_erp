@@ -90,9 +90,6 @@ function cekdata(){
 }
 $('#mytabledata').DataTable({
 	"paging": false,
-	"columnDefs": [
-		{ "orderable": false, "targets": [7,8] }
-	],
 });
 function ceksupplier(id,supplier){
 	if($('#request_id_'+id).is(':checked')) {
