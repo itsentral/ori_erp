@@ -36,6 +36,8 @@ $this->load->view('include/side_menu');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">No Payment</th>
+						<th class="text-center">No Request</th>
+						<th class="text-center">No PO</th>
 						<th class="text-center">Tgl Bayar</th>
 						<th class="text-center">Supplier</th>
 						<th class="text-center">Nilai Bayar</th>
@@ -51,6 +53,8 @@ $this->load->view('include/side_menu');
 				?>
 			<tr>
 				<td><?= $record->no_payment ?></td>
+				<td><?= $record->no_request ?></td>
+				<td><?= $record->no_po ?></td>
 				<td><?= $record->payment_date ?></td>
 				<td><?= $record->nm_supplier?></td>
 				<td><?= number_format($record->bank_nilai)?></td>
