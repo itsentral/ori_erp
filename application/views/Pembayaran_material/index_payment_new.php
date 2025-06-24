@@ -56,8 +56,8 @@ $this->load->view('include/side_menu');
 				$noreq =$req->no_request;
 				$nopo  =$req->no_po;
 				}else{
-				$noreq ='-'
-				$nopo  ='-'
+				$noreq ='-';
+				$nopo  ='-';
 				}
 				 
 				?>
