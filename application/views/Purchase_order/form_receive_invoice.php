@@ -194,7 +194,7 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
    			alert(d_error);
         }
 
-		if(nilai_po > invoice_total){
+		if(invoice_total > nilai_po){
    			d_error='Nilai Invoice Lebih Besar Dari Nilai PO ';
    			alert(d_error);
    		}	
