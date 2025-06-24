@@ -41,15 +41,15 @@ $this->load->view('include/side_menu');
 					<input type="hidden" class="form-control divide" id="po_belum_dibayar" name="po_belum_dibayar" value="<?php echo ($data->po_belum_dibayar); ?>" readonly tabindex="-1">
 					<input type="hidden" class="form-control divide" id="sisa_dp" name="sisa_dp" value="<?php echo $data->sisa_dp; ?>" readonly tabindex="-1">
 					<label class="control-label">Bank Account</label>
-					<input type="text" id="bank_transfer" name="bank_transfer" value="<?=$data->bank_transfer?>" class="form-control">
+					<input type="text" id="bank_transfer" name="bank_transfer" value="<?=$data->bank_transfer?>" class="form-control" readonly>
 					<label class="control-label">Payment Date</label>
 					<input type="text" id="req_payment_date" name="req_payment_date" value="<?php echo $data->req_payment_date; ?>" class="form-control tanggal" required>
 					<label class="control-label">Nomor Invoice</label>
-					<input type="text" class="form-control" id="no_invoice" name="no_invoice" value="<?php echo $data->no_invoice; ?>">
+					<input type="text" class="form-control" id="no_invoice" name="no_invoice" value="<?php echo $data->no_invoice; ?>" readonly>
 					<label class="control-label">Keterangan Invoice</label>
-					<input type="text" class="form-control" id="keterangan" name="keterangan" value="<?php echo $data->keterangan; ?>">
+					<input type="text" class="form-control" id="keterangan" name="keterangan" value="<?php echo $data->keterangan; ?>" readonly>
 					<label class="control-label">PO yang akan dibayar</label>
-					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=(isset($data)?$data->nilai_po_invoice:0)?>" placeholder=0 required onblur="calculate_invoice()">
+					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=(isset($data)?$data->nilai_po_invoice:0)?>" placeholder=0 required onblur="calculate_invoice()" readonly>
 					<label class="control-label">PPN</label>
 					<div class="input-group">
 						<div class="input-group-addon"><input type="checkbox" value="1" onclick="calculate_invoice()" name="ch_ppn" id="ch_ppn" <?=($data->invoice_ppn<>0?'checked':'')?>></div>
@@ -60,7 +60,7 @@ $this->load->view('include/side_menu');
 					$coa_pph=(isset($data)?$data->coa_pph:0);
 					echo form_dropdown('coa_pph',$combo_coa_pph,$coa_pph,array('id'=>'coa_pph','class'=>'form-control'));
 					?>
-					<input type="text" class="form-control divide" onblur="calculate_invoice()" id="nilai_pph_invoice" name="nilai_pph_invoice" value="<?=(isset($data)?$data->nilai_pph_invoice:0)?>" >					
+					<input type="text" class="form-control divide" onblur="calculate_invoice()" id="nilai_pph_invoice" name="nilai_pph_invoice" value="<?=(isset($data)?$data->nilai_pph_invoice:0)?>" readonly>					
 
 					<label class="control-label">PO+PPN-PPH</label>
 					<input type="text" class="form-control divide" id="nilai_invoice" name="nilai_invoice" value="<?=(isset($data)?$data->nilai_invoice:0)?>" placeholder=0 required readonly tabindex="-1">
