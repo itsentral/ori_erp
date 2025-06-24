@@ -50,11 +50,21 @@ $this->load->view('include/side_menu');
 			}else{
 				$numb=0; foreach($results AS $record){ 
 				$numb++;
+                $payment = $record->no_payment;
+				$req = $this->db_query("SELECT * FROM purchase_order_request_payment WHERE no_payment='$payment'")->row();
+                if(!empty($req)){
+				$noreq =$req->no_request;
+				$nopo  =$req->no_po;
+				}else{
+				$noreq ='-'
+				$nopo  ='-'
+				}
+				 
 				?>
 			<tr>
 				<td><?= $record->no_payment ?></td>
-				<td><?= $record->no_request ?></td>
-				<td><?= $record->no_po ?></td>
+				<td><?= $noreq ?></td>
+				<td><?= $nopo ?></td>
 				<td><?= $record->payment_date ?></td>
 				<td><?= $record->nm_supplier?></td>
 				<td><?= number_format($record->bank_nilai)?></td>
