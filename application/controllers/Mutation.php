@@ -500,14 +500,14 @@ class Mutation extends CI_Controller {
 				//$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
 				//$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
 
-				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3,'id_material'=>$key),1)->row();
+				$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3,'id_material'=>$key),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE_INCOMING=$harga_jurnal_akhir2->harga;
 				
 				}elseif($gudang2 == 'produksi'){
 				//$get_price_book_produksi = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
 				//$PRICE_INCOMING = (!empty($get_price_book_produksi[0]->price_book))?$get_price_book_pusat[0]->price_book:0;
 
-				$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$key),1)->row();
+				$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 				
 				}
@@ -615,7 +615,7 @@ class Mutation extends CI_Controller {
 					$id_material = 	$rest_pusat[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -634,7 +634,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -643,7 +643,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -651,7 +651,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -674,7 +674,7 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
 					$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
 					$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
-					$ArrJurnalNew[$key]['ket'] 				= 'Retur';
+					$ArrJurnalNew[$key]['ket'] 				= 'pengurangan retur material';
 					$ArrJurnalNew[$key]['harga'] 			= $PRICE;
 					$ArrJurnalNew[$key]['harga_bm'] 		= 0;
 					$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
@@ -733,7 +733,7 @@ class Mutation extends CI_Controller {
 					$id_material = 	$restMat[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -752,7 +752,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -761,7 +761,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -769,7 +769,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -791,7 +791,7 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
 					$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
 					$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
-					$ArrJurnalNew[$key]['ket'] 				= 'Retur';
+					$ArrJurnalNew[$key]['ket'] 				= 'pengurangan retur material';
 					$ArrJurnalNew[$key]['harga'] 			= $PRICE;
 					$ArrJurnalNew[$key]['harga_bm'] 		= 0;
 					$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
@@ -832,7 +832,7 @@ class Mutation extends CI_Controller {
 					$ArrHist2[$key]['qty_rusak_akhir'] 	= $rest_pusat[0]->qty_rusak;
 					$ArrHist2[$key]['no_ipp'] 			= $kode_trans;
 					$ArrHist2[$key]['jumlah_mat'] 		= $value;
-					$ArrHist2[$key]['ket'] 				= 'penambahan gudang';
+					$ArrHist2[$key]['ket'] 				= 'penambahan gudang retur';
 					$ArrHist2[$key]['update_by'] 		= $UserName;
 					$ArrHist2[$key]['update_date'] 		= $dateTime;
 					
@@ -844,7 +844,7 @@ class Mutation extends CI_Controller {
 					$id_material = 	$rest_pusat[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -871,7 +871,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -880,7 +880,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($Gudang2 == 'produksi'){
@@ -888,7 +888,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -902,7 +902,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 
 
@@ -911,7 +911,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -919,7 +919,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 			
 					
@@ -927,7 +927,7 @@ class Mutation extends CI_Controller {
 					
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
-					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
@@ -958,7 +958,7 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
 					$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
 					$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
-					$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
+					$ArrJurnalNew2[$key]['ket'] 				= 'retur material';
 					$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
 					$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
 					$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;
@@ -1016,7 +1016,7 @@ class Mutation extends CI_Controller {
 					$id_material = 	$restMat[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -1044,7 +1044,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -1053,7 +1053,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($Gudang2 == 'produksi'){
@@ -1061,7 +1061,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -1075,7 +1075,7 @@ class Mutation extends CI_Controller {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 
 
@@ -1084,7 +1084,7 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -1092,14 +1092,14 @@ class Mutation extends CI_Controller {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 			
 					
 				}
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
-					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
@@ -1123,7 +1123,7 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
 					$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
 					$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
-					$ArrJurnalNew2[$key]['ket'] 				= 'mutasi adjustmnent';
+					$ArrJurnalNew2[$key]['ket'] 				= 'retur material';
 					$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
 					$ArrJurnalNew2[$key]['harga_bm'] 			= 0;
 					$ArrJurnalNew2[$key]['nilai_awal_rp']		= $nilaijurnalakhir2;

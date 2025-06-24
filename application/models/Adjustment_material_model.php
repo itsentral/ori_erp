@@ -309,7 +309,7 @@ class Adjustment_material_model extends CI_Model {
 				$id_material = 	$rest_gudang_dari[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari_m, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari_m, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -328,7 +328,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -337,7 +337,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -345,7 +345,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -450,7 +450,7 @@ class Adjustment_material_model extends CI_Model {
 				$id_material = 	$rest_gudang_ke[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -475,21 +475,21 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir1 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir1 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir1)) $PRICE=$harga_jurnal_akhir1->harga;
 				}elseif($Gudang2 == 'subgudang'){
 					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$id_material))->result();
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir1 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir1 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir1)) $PRICE=$harga_jurnal_akhir1->harga;
 				}elseif($Gudang2 == 'produksi'){
 					//$get_price_book = $this->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$id_material))->result();
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir1 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir1 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir1)) $PRICE=$harga_jurnal_akhir1->harga;
 					
 				}
@@ -502,7 +502,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 
 
@@ -511,7 +511,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -519,7 +519,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
 			
 					
@@ -527,7 +527,7 @@ class Adjustment_material_model extends CI_Model {
 				
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
@@ -731,7 +731,7 @@ class Adjustment_material_model extends CI_Model {
 				$id_material = $rest_gudang_dari[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -750,7 +750,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -759,7 +759,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -767,7 +767,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke , 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -908,7 +908,7 @@ class Adjustment_material_model extends CI_Model {
 				$id_material = $rest_gudang_ke[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -927,7 +927,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -936,7 +936,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -944,7 +944,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					
@@ -1070,7 +1070,7 @@ class Adjustment_material_model extends CI_Model {
 					$id_material = $rest_mat[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -1089,7 +1089,7 @@ class Adjustment_material_model extends CI_Model {
 					$bmunit = 0;
 					$bm = 0;
 
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>2,'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 
 
@@ -1098,7 +1098,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 		
 				}elseif($GudangFrom == 'produksi'){
@@ -1106,7 +1106,7 @@ class Adjustment_material_model extends CI_Model {
 					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 					$bmunit = 0;
 					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
 			
 					

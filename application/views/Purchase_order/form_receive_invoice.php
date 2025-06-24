@@ -8,7 +8,7 @@ $this->load->view('include/side_menu');
 	<div class="tab-pane active">
 		<div class="box box-primary">
 			<div class="box-header">
-				<h3 class="box-title"><?php echo $title;?></h3>
+				<h3 class="box-title"><?php echo $title;?></h3> 
 			</div>
 			<div class="box-body">
 				<div class="row">
@@ -69,6 +69,42 @@ $this->load->view('include/side_menu');
 				  <div class="col-md-6">
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
+				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Nilai PO</label>
+					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
+				  </div>
+				</div>
+				<div class="row">
+				  <div class="col-md-12">
+					<h4>Dokumen Incoming </h4>
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>No Dokumen</th>
+								<th>Incoming Date</th>
+								<th>PIC</th>
+								<th>Total Harga</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php
+						if(!empty($dt_incoming)){
+							foreach($dt_incoming AS $record){ 
+								echo "<tr>";
+									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
+									echo "<td align='left'>".$record->tanggal."</td>";
+									echo "<td align='left'>".$record->pic."</td>";
+									echo "<td align='left'>".$record->total_harga_product."</td>";
+									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
+								echo "</tr>";
+							}
+						}
+						?>
+						</tbody>
+					</table>
+				  </div>
 				</div>
 			</div>
 
@@ -100,6 +136,30 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		showInputs: true,
 		autoclose:true
 	});
+
+	$(document).on('click', '.detailAjust', function(e){ 
+		e.preventDefault();
+		loading_spinner();
+		$(".modal-title").html("<b>DETAIL INCOMING</b>");
+		$.ajax({
+			type:'POST',
+			url: base_url  + 'incoming/modal_detail/'+$(this).data('kode_trans'),
+			success:function(data){
+				$("#Mymodal").modal();
+				$("#listCoa").html(data);
+
+			},
+			error: function() {
+				swal({
+				  title				: "Error Message !",
+				  text				: 'Connection Timed Out ...',
+				  type				: "warning",
+				  timer				: 5000
+				});
+			}
+		});
+	});
+
 	$('#simpan-com').click(function(e){
 		//$("#simpan-com").addClass("hidden");
 		d_error='';
@@ -110,6 +170,10 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
    		}
 		var invoice_no=$("#invoice_no").val();
 		var invoice_total=$("#invoice_total").val();
+		var nilai_po=$("#nilai_po").val();
+
+		console.log(invoice_total);
+		console.log(nilai_po)
 		
    		if(invoice_no==""){
    			d_error='No Invoice / Kwitansi Error!';
@@ -129,6 +193,11 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		  	d_error='Kurs Error!';
    			alert(d_error);
         }
+
+		if(invoice_total > nilai_po){
+   			d_error='Nilai Invoice Lebih Besar Dari Nilai PO ';
+   			alert(d_error);
+   		}	
 		
 		if(d_error==''){
 			swal({

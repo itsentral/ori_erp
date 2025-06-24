@@ -18,7 +18,7 @@ $this->load->view('include/side_menu');
 						<option value='0'>Select Type</option>
 						<option value='plus'>PLUS</option>
 						<option value='minus'>MINUS</option>
-						<option value='mutasi'>MUTASI</option>
+						
 					</select>
 				</div>
 				<label class='label-control col-sm-2 gudang_mutasi'><b>PIC <span class='text-red'>*</span></b></label>

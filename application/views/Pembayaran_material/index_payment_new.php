@@ -36,6 +36,8 @@ $this->load->view('include/side_menu');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">No Payment</th>
+						<th class="text-center">No Request</th>
+						<th class="text-center">No PO</th>
 						<th class="text-center">Tgl Bayar</th>
 						<th class="text-center">Supplier</th>
 						<th class="text-center">Nilai Bayar</th>
@@ -48,9 +50,21 @@ $this->load->view('include/side_menu');
 			}else{
 				$numb=0; foreach($results AS $record){ 
 				$numb++;
+                $payment = $record->no_payment;
+				$req = $this->db->query("SELECT * FROM purchase_order_request_payment WHERE no_payment='$payment'")->row();
+                if(!empty($req)){
+				$noreq =$req->no_request;
+				$nopo  =$req->no_po;
+				}else{
+				$noreq ='-';
+				$nopo  ='-';
+				}
+				 
 				?>
 			<tr>
 				<td><?= $record->no_payment ?></td>
+				<td><?= $noreq ?></td>
+				<td><?= $nopo ?></td>
 				<td><?= $record->payment_date ?></td>
 				<td><?= $record->nm_supplier?></td>
 				<td><?= number_format($record->bank_nilai)?></td>
@@ -72,6 +86,8 @@ $this->load->view('include/side_menu');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">No Payment</th>
+						<th class="text-center">No Request</th>
+						<th class="text-center">No PO</th>
 						<th class="text-center">Tgl Bayar</th>
 						<th class="text-center">Supplier</th>
 						<th class="text-center">Nilai Bayar</th>
@@ -84,9 +100,21 @@ $this->load->view('include/side_menu');
 			}else{
 				$numb=0; foreach($results2 AS $record){ 
 				$numb++;
+
+				$payment2 = $record->no_payment;
+				$req2 = $this->db->query("SELECT * FROM purchase_order_request_payment_nm WHERE no_payment='$payment2'")->row();
+                if(!empty($req2)){
+				$noreq2 =$req2->no_request;
+				$nopo2  =$req2->no_po;
+				}else{
+				$noreq2 ='-';
+				$nopo2  ='-';
+				}
 				?>
 			<tr>
 				<td><?= $record->no_payment ?></td>
+				<td><?= $noreq2 ?></td>
+				<td><?= $nopo2 ?></td>
 				<td><?= $record->payment_date ?></td>
 				<td><?= $record->nm_supplier?></td>
 				<td><?= number_format($record->bank_nilai)?></td>
