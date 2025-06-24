@@ -15,7 +15,7 @@ $this->load->view('include/side_menu');
 				<div class="row">
 				  <div class="col-md-6">
 					<label class="control-label">Request Date</label>
-					<input type="text" id="request_date" name="request_date" value="<?php echo (isset($data->request_date) ? $data->request_date: date("Y-m-d")); ?>" class="form-control tanggal" required>
+					<input type="text" id="request_date" name="request_date" value="<?php echo (isset($data->request_date) ? $data->request_date: date("Y-m-d")); ?>" class="form-control tanggal" required readonly>
 					<label class="control-label">No Request</label>
 					<input type="text" id="no_request" name="no_request" value="<?php echo (isset($data->no_request) ? $data->no_request: '')?>" class="form-control" placeholder="Auto" readonly>
 					<label class="control-label">PO Number</label>
