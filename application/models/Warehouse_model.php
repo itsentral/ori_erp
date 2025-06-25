@@ -679,12 +679,12 @@ class Warehouse_model extends CI_Model {
 				
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$stok_jurnal_akhir1 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
+				if(!empty($stok_jurnal_akhir1)) $stokjurnalakhir=$stok_jurnal_akhir1->qty_stock_akhir;
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				if(!empty($stok_jurnal_akhir1)) $nilaijurnalakhir=$stok_jurnal_akhir1->nilai_akhir_rp;
 
-				if(!empty($stok_jurnal_akhir)) $PRICE2=$stok_jurnal_akhir->harga;
+				if(!empty($stok_jurnal_akhir1)) $PRICE2=$stok_jurnal_akhir1->harga;
 				
 				
 				
