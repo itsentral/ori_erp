@@ -5289,6 +5289,7 @@
 		$radx = (!empty($get_detail[0]->radius) AND $get_detail[0]->radius > 0)?'x '.floatval($get_detail[0]->radius).' R':'';
 		$nama_acc = "Not found"; 
 		if(!empty($get_detail)){
+			$nama_acc = $get_detail[0]->nama; 
 			if($get_detail[0]->category == '1'){
 				$nama_acc = strtoupper($get_detail[0]->nama).' M '.floatval($get_detail[0]->diameter).' x '.floatval($get_detail[0]->panjang).' L '.$radx;
 			}
