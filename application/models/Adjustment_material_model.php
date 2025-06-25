@@ -790,7 +790,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['tgl_trans'] 		= $DateTime;
 				$ArrJurnalNew['qty_out'] 			= $qty_oke;
 				$ArrJurnalNew['ket'] 				= 'ADJUSTMENT '.strtoupper($adjustment_type);
-				$ArrJurnalNew['harga'] 			= $PRICE * $qty_oke;
+				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
 				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;;
