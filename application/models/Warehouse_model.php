@@ -813,12 +813,12 @@ class Warehouse_model extends CI_Model {
 				
 				$hargaBeli      = ($value['kurs'] * $value['unit_price']);
 				$PRICE      = ($value['kurs'] * $value['unit_price']);
-				$stok_akhir = ($PRICE*$qtyIN)+($PRICE2*$stok_jurnal_akhir);
+				$stok_akhir = ($PRICE*$qtyIN)+($PRICE2*$stokjurnalakhir);
 				
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = $stok_akhir/($qtyIN+$stok_jurnal_akhir);
+				   $PRICENEW = $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 				
 				
