@@ -10,13 +10,7 @@ class Dashboard extends CI_Controller {
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
-		}	
-		
-		# Tambahkan di Admin_controller
-
- 		if (!$this->session->userdata('2fa_verified')) {
-            redirect('login/verify_2fa');
-        }
+		}		
 	}	
 	public function index() {
 		//$this->load->view('include/header', array('title'=>'Dashboard')); ALREADY ESTIMATED PRICE
