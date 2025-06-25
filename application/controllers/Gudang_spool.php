@@ -81,6 +81,7 @@ class Gudang_spool extends CI_Controller {
 				$ArrNo_IPP = [];
 				$ArrNo_Drawing = [];
 				$ArrNo_SPK = [];
+				$ArrNo_SO = [];
 				foreach ($get_split_ipp as $key => $value) { $key++;
 
 					$no_spk 		= $value['no_spk'];
@@ -91,7 +92,7 @@ class Gudang_spool extends CI_Controller {
 					
 					$CUTTING_KE = (!empty($value['cutting_ke']))?'.'.$value['cutting_ke']:'';
 					
-					$IMPLODE = explode('-', $value['kode_spool']);
+					$IMPLODE = explode('-', $value['product_code']);
 
 					$sts = $value['sts'];
 
@@ -104,6 +105,8 @@ class Gudang_spool extends CI_Controller {
 					}
 
 					$no = sprintf('%02s', $key);
+
+					$ArrNo_SO[] = $IMPLODE[0];
 
 					$ArrNo_SPK[] = $no.'. <span class="text-bold text-primary">['.$IMPLODE[0].'/'.$no_spk.']</span> <span class="text-bold text-success">'.strtoupper($sts).'</span><span class="text-bold"> ['.$value['qty'].' pcs]</span> '.$product;
 				}
@@ -120,19 +123,22 @@ class Gudang_spool extends CI_Controller {
 					$no_spk         = (!empty($GET_NO_SPK[$value['id_milik']]['no_spk']))?$GET_NO_SPK[$value['id_milik']]['no_spk']:'not set';
                     $ArrNo_SPK[]    = $key.'. '.$value['kode_spool'].'/'.$value['no_so'].'/'.strtoupper($value['product']).' <b class="text-blue">['.$value['qty'].' PCS]</b>/'.$no_spk.'/'.strtoupper($value['sts']);
                 }
+
+				$ArrNo_SO[] = [];
             }
 			
 			$explode_spo     = implode('<br>',array_unique($ArrNo_Spool));
 			$explode_ipp    = implode('<br>',array_unique($ArrNo_IPP));
 			$explode_spk    = implode('<br>',$ArrNo_SPK);
 			$explode_drawing= implode('<br>',array_unique($ArrNo_Drawing));
+			$explode_so = implode('<br>',array_unique($ArrNo_SO));
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['spool_induk']."</div>";
 			$nestedData[]	= "<div align='center'>".$explode_spo."</div>";
 			$nestedData[]	= "<div align='left'>".$explode_drawing."</div>";
-			$nestedData[]	= "<div align='center'>".$explode_ipp."</div>";
+			$nestedData[]	= "<div align='center'>".$explode_ipp." <b><br>OR<br></b>".$explode_so."</div>";
 			$nestedData[]	= "<div align='left'>".$explode_spk."</div>";
             $DATED = (empty($DATEFILTER))?$row['spool_date']:$row['hist_date'];
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i:s', strtotime($DATED))."</div>";

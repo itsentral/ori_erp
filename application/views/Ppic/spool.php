@@ -26,7 +26,7 @@ $this->load->view('include/side_menu');
                     <th class="text-center">Kode</th>
                     <th class="text-center">Kode Spool</th>
                     <th class="text-center">No Drawing</th>
-                    <th class="text-center">IPP</th>
+                    <th class="text-center">IPP & SO</th>
                     <th class="text-center">Nama Product</th>
                     <th class="text-center">By</th>
                     <th class="text-center">Date</th>
