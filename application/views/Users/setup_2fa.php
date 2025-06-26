@@ -61,7 +61,7 @@
 
   
 </body>
-<p><button type="button" onclick="window.history.back()">Kembali</button></p>
+<button onclick=”history.back()”>Back</button> 
 </html>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog" role="document">
