@@ -43,7 +43,7 @@
              <p class="title text-center">Scan QR Code</p>
                    <img src="<?= $qrCodeUrl ?>" alt="QR Code" center>
                    <!-- <p><strong><?= $secret ?></strong>-->
-                  <button  <a href="ori_dummy/login">Kembali</a> </button> 
+                  <button  <a href="https://sentral.dutastudy.com/ori_dummy/dashboard">Kembali</a> </button> 
         </form>
 		<footer>
 			<font color="white">  
@@ -54,11 +54,11 @@
 		</p>
 	</div>
 	<script  src="<?php echo base_url();?>assets/login/js/index.js"></script>
-  <script> 
+  <!-- <script> 
         setTimeout(function() { 
             window.location.href = 'https://sentral.dutastudy.com/ori_dummy/dashboard';
         }, 10000); // 5000 milliseconds = 5 seconds 
-    </script> 
+    </script>  -->
 
   
 </body>
