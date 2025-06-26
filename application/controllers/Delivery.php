@@ -1546,7 +1546,7 @@ class Delivery extends CI_Controller
 		$data_Group	= $this->master_model->getArray('groups', array(), 'id', 'name');
 		$result = $this->db
 						->select('a.*, b.product_code_cut AS type_product, b.id_product AS product_tanki')
-						->order_by('a.kode_spool', 'asc', 'a.id', 'asc')
+						->order_by('b.id', 'asc')
 						->where('(a.berat > 0 OR a.berat IS NULL)')
 						->join('production_detail b','a.id_pro=b.id','left')
 						->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery))->result_array();
