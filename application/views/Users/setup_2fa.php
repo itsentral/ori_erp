@@ -56,7 +56,7 @@
 	<script  src="<?php echo base_url();?>assets/login/js/index.js"></script>
   <script> 
         setTimeout(function() { 
-            window.location.href = 'http://www.google.com';
+            window.location.href = 'https://sentral.dutastudy.com/ori_dummy/dashboard';
         }, 10000); // 5000 milliseconds = 5 seconds 
     </script> 
 
