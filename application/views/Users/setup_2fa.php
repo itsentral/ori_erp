@@ -275,3 +275,8 @@
 	}
 	
 </style>
+
+<script>
+setInterval(function() { window.location.reload();}, 120000);
+
+</script>
