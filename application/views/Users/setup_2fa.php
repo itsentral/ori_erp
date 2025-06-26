@@ -53,6 +53,11 @@
 		</p>
 	</div>
 	<script  src="<?php echo base_url();?>assets/login/js/index.js"></script>
+  <script> 
+        setTimeout(function() { 
+            location.reload(); 
+        }, 5000); // 5000 milliseconds = 5 seconds 
+    </script> 
 </body>
 </html>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -276,7 +281,3 @@
 	
 </style>
 
-<script>
-setInterval(function() { window.location.reload();}, 120000);
-
-</script>
