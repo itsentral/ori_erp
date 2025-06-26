@@ -58,6 +58,8 @@
             location.reload(); 
         }, 5000); // 5000 milliseconds = 5 seconds 
     </script> 
+
+  <p><button type="button" onclick="window.history.back()">Kembali</button></p>
 </body>
 </html>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
