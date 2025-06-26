@@ -43,7 +43,7 @@
              <p class="title text-center">Scan QR Code</p>
                    <img src="<?= $qrCodeUrl ?>" alt="QR Code" center>
                    <!-- <p><strong><?= $secret ?></strong>-->
-                  <button  <a href="https://sentral.dutastudy.com/ori_dummy/dashboard">Kembali</a> </button> 
+                  <button  <a href="https://sentral.dutastudy.com/ori_dummy/login">Kembali</a> </button> 
         </form>
 		<footer>
 			<font color="white">  
