@@ -43,6 +43,7 @@
              <p class="title text-center">Scan QR Code</p>
                    <img src="<?= $qrCodeUrl ?>" alt="QR Code" center>
                    <!-- <p><strong><?= $secret ?></strong>-->
+                  <button onclick=”history.back()”>Back</button> 
         </form>
 		<footer>
 			<font color="white">  
@@ -61,7 +62,6 @@
 
   
 </body>
-<button onclick=”history.back()”>Back</button> 
 </html>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog" role="document">
