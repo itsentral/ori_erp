@@ -572,7 +572,39 @@ class Penawaran_model extends CI_Model {
 
 		$row		= $this->db->get_where('production', array('no_ipp'=>$ipp))->result();
 		
-		$qMatr 		= SQL_Quo($id_bq);
+		// $qMatr 		= SQL_Quo($id_bq);
+		$qMatr 		= "	SELECT 
+							a.id,
+							a.id_category,
+							a.length,
+							a.id_product,
+							a.diameter_1,
+							a.diameter_2,
+							a.series,
+							a.qty,
+							a.man_power AS man_power,
+							a.id_mesin AS id_mesin,
+							a.total_time AS total_time,
+							a.man_hours AS man_hours,
+							a.pe_direct_labour,
+							a.pe_indirect_labour,
+							a.pe_machine,
+							ifnull( a.pe_mould_mandrill, 0 ) AS pe_mould_mandrill,
+							a.pe_consumable,
+							a.pe_foh_consumable,
+							a.pe_foh_depresiasi,
+							a.pe_biaya_gaji_non_produksi,
+							a.pe_biaya_non_produksi,
+							a.pe_biaya_rutin_bulanan
+
+						FROM 
+							bq_detail_header a 
+						WHERE 
+							a.id_category <> 'pipe slongsong' 
+							AND a.id_category <> 'product kosong' 
+							AND a.id_bq = '$id_bq' 
+						ORDER BY 
+							a.id ASC";
 		$rowDet		= $this->db->query($qMatr)->result_array();
 		
 		$rowengC	= $this->db->order_by('id','ASC')->get('cost_engine')->result_array();
