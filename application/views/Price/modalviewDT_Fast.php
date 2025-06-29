@@ -57,7 +57,7 @@
 					<th class="text-center" style='vertical-align:middle;' width='10%'>Material Est (Kg)</th>
 					<th class="text-center" style='vertical-align:middle;' width='10%'>Material Cost</th>
 					<th class='text-center' style='vertical-align:middle;' width='10%'>Process Cost</th>
-					<th class='text-center' style='vertical-align:middle;' width='10%'>SUM_COGS</th>
+					<th class='text-center' style='vertical-align:middle;' width='10%'>COGS</th>
 					<th class="text-center" style='vertical-align:middle;' width='7%'>Detail</th>
 					<th class="text-center" style='vertical-align:middle;' width='5%'>Man Hours</th>
 				</tr>

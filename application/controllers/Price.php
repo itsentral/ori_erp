@@ -217,7 +217,58 @@ class Price extends CI_Controller {
 	}
 	
 	public function modalAppCost(){
-		$this->load->view('Price/modalAppCost');
+		$id_bq 		= $this->uri->segment(3);
+
+		$sql 		= "	SELECT 
+							a.id,
+							a.id_category,
+							a.length,
+							a.id_product,
+							a.qty,
+							a.man_power AS man_power,
+							a.id_mesin AS id_mesin,
+							a.total_time AS total_time,
+							a.man_hours AS man_hours,
+							a.pe_direct_labour,
+							a.pe_indirect_labour,
+							a.pe_machine,
+							ifnull( a.pe_mould_mandrill, 0 ) AS pe_mould_mandrill,
+							a.pe_consumable,
+							a.pe_foh_consumable,
+							a.pe_foh_depresiasi,
+							a.pe_biaya_gaji_non_produksi,
+							a.pe_biaya_non_produksi,
+							a.pe_biaya_rutin_bulanan
+
+						FROM 
+							bq_detail_header a 
+						WHERE 
+							a.id_category <> 'pipe slongsong' 
+							AND a.id_category <> 'product kosong' 
+							AND a.id_bq = '$id_bq' 
+						ORDER BY 
+							a.id ASC";
+		$result		= $this->db->query($sql)->result_array();
+		
+		// $detail 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'acc'))->result_array();
+		// $detail2 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'mat'))->result_array();
+		// $detail3 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'baut'))->result_array();
+		// $detail4 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'plate'))->result_array();
+		// $detail4g 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'gasket'))->result_array();
+		// $detail5 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'lainnya'))->result_array();
+		
+		$data = array(
+			'id_bq' 		=> $id_bq,
+			'result' 		=> $result,
+			// 'detail' 		=> $detail,
+			// 'detail2'		=> $detail2,
+			// 'detail3'		=> $detail3,
+			// 'detail4'		=> $detail4,
+			// 'detail4g'		=> $detail4g,
+			// 'detail5'		=> $detail5,
+			// 'GET_DET_ACC' => get_detail_accessories()
+		);
+		$this->load->view('Price/modalAppCost',$data);
 	}
 	
 	public function AppCost(){

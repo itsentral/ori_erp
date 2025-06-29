@@ -1,15 +1,6 @@
 <?php
-$id_bq = $this->uri->segment(3); 
 $Imp	= explode('-', $id_bq);
-$qBQ 	= "	SELECT * FROM bq_header WHERE id_bq = '".$id_bq."' ";
-$row	= $this->db->query($qBQ)->result_array();
 
-$qBQdetailHeader 	= "SELECT a.*, b.sum_mat, b.est_harga FROM bq_detail_header a INNER JOIN estimasi_cost_and_mat b ON a.id=b.id_milik WHERE a.id_bq = '".$id_bq."' ORDER BY a.id ASC";
-$qBQdetailRest		= $this->db->query($qBQdetailHeader)->result_array();
-// echo $qBQdetailHeader; 
-// echo "<pre>";
-// print_r($row);
-// echo "</pre>";
 $checkSO 	= "	SELECT * FROM production WHERE no_ipp = '".$Imp[1]."' AND `status`='WAITING EST PRICE PROJECT' ";
 $restChkSO	= $this->db->query($checkSO)->num_rows();
 if($restChkSO < 1){
@@ -61,61 +52,107 @@ else{
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead id='head_table'>
 			<tr class='bg-blue'>
-				<th class="text-center" style='vertical-align:middle;' width='4%'>No</th>
-				<th class="text-center" style='vertical-align:middle;' width='19%'>Component</th>
-				<th class="text-center" style='vertical-align:middle;' width='15%'>Dimensi</th>
+				<th class="text-center" style='vertical-align:middle;' width='3%'>#</th>
+				<th class="text-center" style='vertical-align:middle;' width='12%'>Component</th>
+				<th class="text-center" style='vertical-align:middle;' width='10%'>Dimensi</th>
 				<th class="text-center" style='vertical-align:middle;' width='5%'>Qty</th>
 				<th class="text-center" style='vertical-align:middle;'>Product ID</th>
-				<th class="text-center" style='vertical-align:middle;' width='8%'>Weight /Unit</th>
-				<th class="text-center" style='vertical-align:middle;' width='8%'>Cost /Unit</th>
-				<th class="text-center" style='vertical-align:middle;' width='8%'>Weight Total</th>
-				<th class="text-center" style='vertical-align:middle;' width='8%'>Cost Total</th>
+				<th class="text-center" style='vertical-align:middle;' width='8%'>Weight/Unit</th>
+				<th class="text-center" style='vertical-align:middle;' width='8%'>Cost/Unit</th>
+				<th class="text-center" style='vertical-align:middle;' width='8%'>Material Est (Kg)</th>
+				<th class="text-center" style='vertical-align:middle;' width='8%'>Material Cost</th>
+				<th class='text-center' style='vertical-align:middle;' width='8%'>Process Cost</th>
+				<th class='text-center' style='vertical-align:middle;' width='8%'>COGS</th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
-				$Sum = 0;
-				$SumX = 0;
+				$SUM_BERAT = 0;
+				$SUM_PRICE = 0;
+				$SUM_PROCESS = 0;
+				$SUM_COGS = 0;
 				$No = 0;
-				foreach($qBQdetailRest AS $val => $valx){
-					$No++;
-					$spaces = "";
-					$id_delivery = strtoupper($valx['id_delivery']);
-					$bgwarna	= "bg-blue";
-					$SumQty	= $valx['sum_mat'] * $valx['qty'];
-					$Sum += $SumQty;
-					
-					$SumQtyX	= $valx['est_harga'] * $valx['qty'];
-					$SumX += $SumQtyX;
-					
-					if($valx['sts_delivery'] == 'CHILD'){
-						$spaces = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						$id_delivery = strtoupper($valx['sub_delivery']);
-						$bgwarna	= "bg-green";
+				if(!empty($result)){
+					foreach($result AS $val => $valx){
+						$No++;
+						$spaces = "";
+						$bgwarna = 'bg-blue';
+
+						$ID 						= $valx['id'];
+						$id_category 				= $valx['id_category'];
+						$id_milik 					= $valx['id'];
+						$length 					= $valx['length'];
+						$id_product 				= $valx['id_product'];
+						$qty 						= $valx['qty'];
+						$man_power					= $valx['man_power'];
+						$man_hours					= $valx['man_hours'];
+						$id_mesin					= $valx['id_mesin'];
+						$total_time					= $valx['total_time'];
+
+						$SUMMARY = getEstimasi_Product($id_milik,$id_category);
+						
+						$TotalBerat	= (!empty($SUMMARY['est_mat']))?$SUMMARY['est_mat'] * $qty:0;
+						$SUM_BERAT 	+= $TotalBerat;
+						
+						$TotalPrice	= (!empty($SUMMARY['est_price']))?$SUMMARY['est_price'] * $qty:0;
+						$SUM_PRICE += $TotalPrice;
+
+						$direct_labour 				= $man_hours * $valx['pe_direct_labour'] * $qty;
+						$indirect_labour 			= $man_hours * $valx['pe_indirect_labour'] * $qty;
+						$machine 					= $total_time * $valx['pe_machine'] * $qty;
+						$mould_mandrill 			= $valx['pe_mould_mandrill'] * $qty;
+						$consumable 				= $TotalBerat * $valx['pe_consumable'];
+
+						$cost_process 				= $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable;
+
+						$foh_consumable 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_consumable']/100);
+						$foh_depresiasi 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_depresiasi']/100);
+						$biaya_gaji_non_produksi 	= ($cost_process + $TotalPrice) * ($valx['pe_biaya_gaji_non_produksi']/100);
+						$biaya_non_produksi 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_non_produksi']/100);
+						$biaya_rutin_bulanan 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_rutin_bulanan']/100);
+
+						$TotalCost		= $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable + $foh_consumable + $foh_depresiasi + $biaya_gaji_non_produksi + $biaya_non_produksi + $biaya_rutin_bulanan;
+						$SUM_PROCESS 	+= $TotalCost;
+						
+						$COGS 			= $TotalCost + $TotalPrice;
+						$SUM_COGS 		+= $COGS;
+						
+						if($id_category == 'pipe' OR $id_category == 'pipe slongsong'){
+							$lengthX = (floatval($length));
+						}
+						else{
+							$lengthX = (floatval($length));
+						}
+						
+						echo "<tr>";
+							echo "<td align='center'>".$No."</td>";
+							echo "<td align='left'>".$spaces."".strtoupper($id_category)."</td>";
+							echo "<td align='left'>".$spaces."".spec_bq($id_milik)."</td>";
+							echo "<td align='center'><span class='badge ".$bgwarna."'>".$qty."</span></td>";
+							echo "<td align='left'>".$id_product."</span></td>";
+							echo "<td align='right'>".number_format($TotalBerat/$qty, 3)."</span></td>";
+							echo "<td align='right'>".number_format($TotalPrice/$qty, 2)."</span></td>";
+							echo "<td align='right'>".number_format($TotalBerat, 3)."</span></td>";
+							echo "<td align='right'>".number_format($TotalPrice, 2)."</span></td>";
+							echo "<td align='right'>".number_format($TotalCost, 2)."</td>";
+							echo "<td align='right'>".number_format($COGS, 2)."</span></td>";					
+						echo "</tr>";
 					}
+				}
+				else{
 					echo "<tr>";
-						echo "<td align='center'>".$No."</span></td>";
-						echo "<td align='left' style='padding-left:20px;'>".$spaces."".strtoupper($valx['id_category'])."</td>";
-						echo "<td align='left' style='padding-left:20px;'>".$spaces."".spec_bq($valx['id'])."</td>";
-						echo "<td align='center'><span class='badge ".$bgwarna."'>".$valx['qty']."</span></td>";
-						echo "<td align='left'>".$valx['id_product']."</span></td>";
-						echo "<td align='right' style='padding-right:20px;'>".number_format($valx['sum_mat'], 2)." Kg</span></td>";
-						echo "<td align='right' style='padding-right:20px;'>".number_format($valx['est_harga'], 2)."</span></td>";
-						echo "<td align='right' style='padding-right:20px;'>".number_format($SumQty, 2)." Kg</span></td>";
-						echo "<td align='right' style='padding-right:20px;'>".number_format($SumQtyX, 2)."</span></td>";
+						echo "<td colspan='11'>Tidak ada product yang ditampilkan</td>";
 					echo "</tr>";
 				}
 			?>
 			<tr>
 				<th class="text-center" colspan='7' style='vertical-align:middle;'>Total</th>
-				<th class="text-right" style='padding-right:20px;'>
-					<?= number_format($Sum, 2);?> Kg
-					<input type='hidden' name='total_kg' value='<?= number_format($Sum, 2);?>'>
-				</th>
-				<th class="text-right" style='padding-right:20px;'>
-					<?= number_format($SumX, 2);?>
-					<input type='hidden' name='total_cost' value='<?= number_format($SumX, 2);?>'>
-				</th>
+				<th class="text-right"><?= number_format($SUM_BERAT, 3);?></th>
+				<th class="text-right"><?= number_format($SUM_PRICE, 2);?></th>
+				<?php
+				echo "<th class='text-right'>".number_format($SUM_PROCESS, 2)."</th>";
+				echo "<th class='text-right'>".number_format($SUM_COGS, 2)."</th>";
+				?>
 			</tr>
 		</tbody>
 	</table>
@@ -124,19 +161,6 @@ else{
 <script>
 	$(document).ready(function(){
 		swal.close();
-	});
-	$(document).on('click', '#detailDT', function(e){
-		e.preventDefault();
-		$("#head_title2").html("<b>DETAIL DATA BQ ["+$(this).data('id_product')+"]</b>");
-		$("#view2").load(base_url +'index.php/'+ active_controller+'/modalDetailDT/'+$(this).data('id_product')+'/'+$(this).data('id_milik'));
-		$("#ModalView2").modal();
-	});
-	
-	$(document).on('click', '#MatDetail', function(e){
-		e.preventDefault();
-		$("#head_title2").html("<b>DETAIL ESTIMATION</b>");
-		$("#view2").load(base_url +'index.php/'+ active_controller+'/modalDetailMat/'+$(this).data('id_product')+'/'+$(this).data('id_milik'));
-		$("#ModalView2").modal();
 	});
 	
 	$(document).ready(function(){
