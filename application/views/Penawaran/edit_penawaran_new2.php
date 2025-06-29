@@ -53,14 +53,47 @@ $this->load->view('include/side_menu');
 					<?php
 					$SumTot2x = 0;
 					foreach($getDetail AS $val => $valx){
-						$getProfit = $this->db->query("SELECT profit FROM cost_profit WHERE diameter='".str_replace('.','',$valx['diameter_1'])."' AND diameter2='".str_replace('.','',$valx['diameter_2'])."' AND product_parent='".$valx['id_category']."' ")->result_array();
-						$est_harga = (($valx['est_harga2']+$valx['direct_labour']+$valx['indirect_labour']+$valx['machine']+$valx['mould_mandrill']+$valx['consumable']+$valx['foh_consumable']+$valx['foh_depresiasi']+$valx['biaya_gaji_non_produksi']+$valx['biaya_non_produksi']+$valx['biaya_rutin_bulanan'])) / $valx['qty'];
+
+						$id_milik 	= $valx['id'];
+						$id_category= $valx['id_category'];
+						$qty 		= $valx['qty'];
+						$diameter_1 = $valx['diameter_1'];
+						$diameter_2 = $valx['diameter_2'];
+						$series 	= explode('-',$valx['series']);
+						$liner 		= $series[1];
+						$pressure 	= $series[0];
+						$man_power					= $valx['man_power'];
+						$man_hours					= $valx['man_hours'];
+						$id_mesin					= $valx['id_mesin'];
+						$total_time					= $valx['total_time'];
+
+						$SUMMARY 	= getEstimasi_Product($id_milik,$id_category);
+						$TotalBerat	= (!empty($SUMMARY['est_mat']))?$SUMMARY['est_mat'] * $qty:0;
+						$TotalPrice	= (!empty($SUMMARY['est_price']))?$SUMMARY['est_price'] * $qty:0;
+
+						$direct_labour 				= $man_hours * $valx['pe_direct_labour'] * $qty;
+						$indirect_labour 			= $man_hours * $valx['pe_indirect_labour'] * $qty;
+						$machine 					= $total_time * $valx['pe_machine'] * $qty;
+						$mould_mandrill 			= $valx['pe_mould_mandrill'] * $qty;
+						$consumable 				= $TotalBerat * $valx['pe_consumable'];
+
+						$cost_process 				= $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable;
+
+						$foh_consumable 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_consumable']/100);
+						$foh_depresiasi 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_depresiasi']/100);
+						$biaya_gaji_non_produksi 	= ($cost_process + $TotalPrice) * ($valx['pe_biaya_gaji_non_produksi']/100);
+						$biaya_non_produksi 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_non_produksi']/100);
+						$biaya_rutin_bulanan 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_rutin_bulanan']/100);
+
+						$est_harga		= ($TotalPrice + $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable + $foh_consumable + $foh_depresiasi + $biaya_gaji_non_produksi + $biaya_non_produksi + $biaya_rutin_bulanan) / $qty;
+
+						$getProfit = $this->db->query("SELECT profit FROM cost_profit WHERE diameter='".str_replace('.','',$diameter_1)."' AND diameter2='".str_replace('.','',$diameter_2)."' AND product_parent='".$id_category."' ")->result_array();
 						$profit = (!empty($getProfit[0]['profit']))?floatval($getProfit[0]['profit']):0;
 						$helpProfit = 0;
 						if($profit <> 0){
 							$helpProfit = $est_harga *($profit/100);
 						}
-						$HrgTot   = (($est_harga) + ($helpProfit)) * $valx['qty'];
+						$HrgTot   = (($est_harga) + ($helpProfit)) * $qty;
 						$SumTot2x += $HrgTot;
 					}
 					$SUM = 0;
@@ -71,40 +104,71 @@ $this->load->view('include/side_menu');
 					$SUM_KG = 0;
 					foreach($getDetail AS $val => $valx){ 
 						$no++;
-						$getProfit = $this->db->query("SELECT profit FROM cost_profit WHERE diameter='".str_replace('.','',$valx['diameter_1'])."' AND diameter2='".str_replace('.','',$valx['diameter_2'])."' AND product_parent='".$valx['id_category']."' ")->result_array();
-						$est_harga = (($valx['est_harga2']+$valx['direct_labour']+$valx['indirect_labour']+$valx['machine']+$valx['mould_mandrill']+$valx['consumable']+$valx['foh_consumable']+$valx['foh_depresiasi']+$valx['biaya_gaji_non_produksi']+$valx['biaya_non_produksi']+$valx['biaya_rutin_bulanan'])) / $valx['qty'];
-						
-						$profit = (!empty($valx['persen']))?floatval($valx['persen']):0;
+
+						$id_milik 	= $valx['id'];
+						$id_category= $valx['id_category'];
+						$qty 		= $valx['qty'];
+						$diameter_1 = $valx['diameter_1'];
+						$diameter_2 = $valx['diameter_2'];
+						$series 	= explode('-',$valx['series']);
+						$liner 		= $series[1];
+						$pressure 	= $series[0];
+						$man_power					= $valx['man_power'];
+						$man_hours					= $valx['man_hours'];
+						$id_mesin					= $valx['id_mesin'];
+						$total_time					= $valx['total_time'];
+
+						$SUMMARY 	= getEstimasi_Product($id_milik,$id_category);
+						$TotalBerat	= (!empty($SUMMARY['est_mat']))?$SUMMARY['est_mat'] * $qty:0;
+						$TotalPrice	= (!empty($SUMMARY['est_price']))?$SUMMARY['est_price'] * $qty:0;
+
+						$direct_labour 				= $man_hours * $valx['pe_direct_labour'] * $qty;
+						$indirect_labour 			= $man_hours * $valx['pe_indirect_labour'] * $qty;
+						$machine 					= $total_time * $valx['pe_machine'] * $qty;
+						$mould_mandrill 			= $valx['pe_mould_mandrill'] * $qty;
+						$consumable 				= $TotalBerat * $valx['pe_consumable'];
+
+						$cost_process 				= $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable;
+
+						$foh_consumable 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_consumable']/100);
+						$foh_depresiasi 			= ($cost_process + $TotalPrice) * ($valx['pe_foh_depresiasi']/100);
+						$biaya_gaji_non_produksi 	= ($cost_process + $TotalPrice) * ($valx['pe_biaya_gaji_non_produksi']/100);
+						$biaya_non_produksi 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_non_produksi']/100);
+						$biaya_rutin_bulanan 		= ($cost_process + $TotalPrice) * ($valx['pe_biaya_rutin_bulanan']/100);
+
+						$est_harga		= round(($TotalPrice + $direct_labour + $indirect_labour + $machine + $mould_mandrill + $consumable + $foh_consumable + $foh_depresiasi + $biaya_gaji_non_produksi + $biaya_non_produksi + $biaya_rutin_bulanan) / $qty,2);
+
+						$getProfit 	= $this->db->query("SELECT extra, persen FROM cost_project_detail WHERE caregory_sub='".$id_milik."' AND id_bq='".$id_bq."'")->result_array();
+						$profit 	= (!empty($getProfit[0]['persen']))?floatval($getProfit[0]['persen']):0;
+						$allow 		= (!empty($getProfit[0]['extra']))?floatval($getProfit[0]['extra']):0;
 						
 						$helpProfit = 0;
 						if($profit <> 0){
 							$helpProfit = $est_harga *($profit/100);
 						}
 						
-						$HrgTot   = (($est_harga) + ($helpProfit)) * $valx['qty'];
-						$HPP_Tot += $est_harga * $valx['qty'];
+						$HrgTot   = (($est_harga) + ($helpProfit)) * $qty;
+						$HPP_Tot += $est_harga * $qty;
 						$SumTot2 += $HrgTot;
-						
-						$allow = (!empty($valx['extra']))?floatval($valx['extra']):0;
 						
 						$HrgTot2  = (($HrgTot) + ($HrgTot * ($allow/100)));
 						
 						$SumEstHarga += $est_harga;
 						
 						$SUM	 += (($HrgTot) + ($HrgTot * ($allow/100)));
-						$SUM_KG += $valx['sum_mat2'];
+						$SUM_KG += $TotalBerat;
 						
 						echo "<tr>";
 							echo "<td align='center'>".$no."</td>";
-							echo "<td>".strtoupper($valx['id_category'])."</td>";
-							echo "<td align='right'>".$valx['diameter_1']."</td>";
-							echo "<td align='right'>".$valx['diameter_2']."</td>";
-							echo "<td align='center'>".$valx['liner']."</td>";
-							echo "<td align='center'>".$valx['pressure']."</td>";
-							echo "<td align='left'>".spec_bq($valx['id_milik'])."</td>";
-							echo "<td align='center'>".$valx['qty'];
-								echo "<input type='text' id='qty_$no' style='text-align: right;' name='MatCost[$no][qty]' class='form-control input-sm THide' value='".$valx['qty']."'>";
-								echo "<input type='text' id='id_milik_$no' style='text-align: right;' name='MatCost[$no][id_milik]' class='form-control input-sm THide' value='".$valx['id_milik']."'>";
+							echo "<td>".strtoupper($id_category)."</td>";
+							echo "<td align='right'>".$diameter_1."</td>";
+							echo "<td align='right'>".$diameter_2."</td>";
+							echo "<td align='center'>".$liner."</td>";
+							echo "<td align='center'>".$pressure."</td>";
+							echo "<td align='left'>".spec_bq($id_milik)."</td>";
+							echo "<td align='center'>".$qty;
+								echo "<input type='text' id='qty_$no' style='text-align: right;' name='MatCost[$no][qty]' class='form-control input-sm THide' value='".$qty."'>";
+								echo "<input type='text' id='id_milik_$no' style='text-align: right;' name='MatCost[$no][id_milik]' class='form-control input-sm THide' value='".$id_milik."'>";
 								echo "<input type='text' id='id_category_$no' style='text-align: right;' name='MatCost[$no][category]' class='form-control input-sm THide' value='material'>";
 							echo "</td>";
 							echo "<td align='right'>".number_format($est_harga,2);
