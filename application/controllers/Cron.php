@@ -4103,7 +4103,7 @@ class Cron extends CI_Controller {
 			FROM
 				laporan_wip_per_hari_action a
 				LEFT JOIN production_detail b ON a.id_production_detail=b.id
-		    WHERE a.date='".$tanggal."'
+		    WHERE DATE(a.insert_date)='".$tanggal."'
 			ORDER BY a.id ASC";
 		$restDetail1	= $this->db->query($SQL)->result_array();
         // echo "<pre>";
@@ -4845,7 +4845,7 @@ class Cron extends CI_Controller {
 			FROM
 				laporan_wip_per_hari_action a
 				LEFT JOIN production_detail b ON a.id_production_detail=b.id
-		    WHERE a.date='".$tanggal."' AND (
+		    WHERE DATE(a.insert_date)='".$tanggal."' AND (
 				a.id_produksi LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
