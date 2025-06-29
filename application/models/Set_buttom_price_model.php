@@ -33,7 +33,39 @@ class Set_buttom_price_model extends CI_Model {
 		$qSupplier 	= "SELECT * FROM production WHERE no_ipp = '".$ipp."' ";
 		$getHeader	= $this->db->query($qSupplier)->result();
 
-		$qMatr 		= SQL_Quo_Edit($id_bq);					
+		// $qMatr 		= SQL_Quo_Edit($id_bq);		
+		$qMatr 		= "	SELECT 
+							a.id,
+							a.id_category,
+							a.length,
+							a.id_product,
+							a.diameter_1,
+							a.diameter_2,
+							a.series,
+							a.qty,
+							a.man_power AS man_power,
+							a.id_mesin AS id_mesin,
+							a.total_time AS total_time,
+							a.man_hours AS man_hours,
+							a.pe_direct_labour,
+							a.pe_indirect_labour,
+							a.pe_machine,
+							ifnull( a.pe_mould_mandrill, 0 ) AS pe_mould_mandrill,
+							a.pe_consumable,
+							a.pe_foh_consumable,
+							a.pe_foh_depresiasi,
+							a.pe_biaya_gaji_non_produksi,
+							a.pe_biaya_non_produksi,
+							a.pe_biaya_rutin_bulanan
+
+						FROM 
+							bq_detail_header a 
+						WHERE 
+							a.id_category <> 'pipe slongsong' 
+							AND a.id_category <> 'product kosong' 
+							AND a.id_bq = '$id_bq' 
+						ORDER BY 
+							a.id ASC";			
 		$getDetail	= $this->db->query($qMatr)->result_array();
 
 		$engC 		= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'eng cost' AND b.category = 'engine' AND b.id_bq='".$id_bq."' AND b.option_type='Y' ORDER BY a.id ASC ";
