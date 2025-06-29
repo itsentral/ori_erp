@@ -1073,58 +1073,87 @@ class Price extends CI_Controller {
 		$id_bq 		= $this->uri->segment(3);
 		$tanda_cost = $this->uri->segment(4); 
 
-		$sql 		= "	SELECT
-							a.id_milik,
-							a.id_bq,
-							b.parent_product AS id_category,
-							a.qty,
-							b.diameter AS diameter_1,
-							b.diameter2 AS diameter_2,
-							b.panjang AS length,
-							b.thickness,
-							b.angle AS sudut,
-							b.type,
+		// $sql 		= "	SELECT
+		// 					a.id_milik,
+		// 					a.id_bq,
+		// 					b.parent_product AS id_category,
+		// 					a.qty,
+		// 					b.diameter AS diameter_1,
+		// 					b.diameter2 AS diameter_2,
+		// 					b.panjang AS length,
+		// 					b.thickness,
+		// 					b.angle AS sudut,
+		// 					b.type,
+		// 					a.id_product,
+		// 					b.standart_code,
+		// 					( a.est_harga * a.qty ) AS est_harga2,
+		// 					( a.sum_mat * a.qty ) AS sum_mat2,
+		// 					b.pressure,
+		// 					b.liner,
+		// 					a.man_power,
+		// 					a.man_hours,
+		// 					a.id_mesin,
+		// 					a.total_time,
+		// 					(a.direct_labour * a.qty) AS direct_labour,
+		// 					(a.indirect_labour * a.qty) AS indirect_labour,
+		// 					(a.machine * a.qty) AS machine,
+		// 					(a.mould_mandrill * a.qty) AS mould_mandrill,
+		// 					(a.consumable * a.qty) AS consumable,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) * `a`.`qty` 
+		// 					) AS `cost_process`,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
+		// 					) * ( (b.pe_foh_consumable) / 100 ) * a.qty AS foh_consumable,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
+		// 					) * ( (b.pe_foh_depresiasi) / 100 ) * a.qty AS foh_depresiasi,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
+		// 					) * ( (b.pe_biaya_gaji_non_produksi) / 100 ) * a.qty AS biaya_gaji_non_produksi,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
+		// 					) * ( (b.pe_biaya_non_produksi) / 100 ) * a.qty AS biaya_non_produksi,
+		// 					(
+		// 						((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
+		// 					) * ( (b.pe_biaya_rutin_bulanan) / 100 ) * a.qty AS biaya_rutin_bulanan 
+		// 				FROM
+		// 					estimasi_cost_and_mat a
+		// 					INNER JOIN bq_product b ON a.id_milik = b.id
+		// 				WHERE
+		// 					b.parent_product <> 'pipe slongsong' 
+		// 					AND b.parent_product <> 'product kosong' 
+		// 					AND a.id_bq = '".$id_bq."' 
+		// 				ORDER BY a.id_milik ASC";
+		$sql 		= "	SELECT 
+							a.id,
+							a.id_category,
+							a.length,
 							a.id_product,
-							b.standart_code,
-							( a.est_harga * a.qty ) AS est_harga2,
-							( a.sum_mat * a.qty ) AS sum_mat2,
-							b.pressure,
-							b.liner,
-							a.man_power,
-							a.man_hours,
-							a.id_mesin,
-							a.total_time,
-							(a.direct_labour * a.qty) AS direct_labour,
-							(a.indirect_labour * a.qty) AS indirect_labour,
-							(a.machine * a.qty) AS machine,
-							(a.mould_mandrill * a.qty) AS mould_mandrill,
-							(a.consumable * a.qty) AS consumable,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) * `a`.`qty` 
-							) AS `cost_process`,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
-							) * ( (b.pe_foh_consumable) / 100 ) * a.qty AS foh_consumable,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
-							) * ( (b.pe_foh_depresiasi) / 100 ) * a.qty AS foh_depresiasi,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
-							) * ( (b.pe_biaya_gaji_non_produksi) / 100 ) * a.qty AS biaya_gaji_non_produksi,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
-							) * ( (b.pe_biaya_non_produksi) / 100 ) * a.qty AS biaya_non_produksi,
-							(
-								((a.direct_labour)+(a.indirect_labour)+(a.machine)+(a.mould_mandrill)+(a.consumable)) + `a`.`est_harga` 
-							) * ( (b.pe_biaya_rutin_bulanan) / 100 ) * a.qty AS biaya_rutin_bulanan 
-						FROM
-							estimasi_cost_and_mat a
-							INNER JOIN bq_product b ON a.id_milik = b.id
-						WHERE
-							b.parent_product <> 'pipe slongsong' 
-							AND b.parent_product <> 'product kosong' 
-							AND a.id_bq = '".$id_bq."' 
-						ORDER BY a.id_milik ASC";
+							a.qty,
+							a.man_power AS man_power,
+							a.id_mesin AS id_mesin,
+							a.total_time AS total_time,
+							a.man_hours AS man_hours,
+							a.pe_direct_labour,
+							a.pe_indirect_labour,
+							a.pe_machine,
+							ifnull( a.pe_mould_mandrill, 0 ) AS pe_mould_mandrill,
+							a.pe_consumable,
+							a.pe_foh_consumable,
+							a.pe_foh_depresiasi,
+							a.pe_biaya_gaji_non_produksi,
+							a.pe_biaya_non_produksi,
+							a.pe_biaya_rutin_bulanan
+
+						FROM 
+							bq_detail_header a 
+						WHERE 
+							a.id_category <> 'pipe slongsong' 
+							AND a.id_category <> 'product kosong' 
+							AND a.id_bq = '$id_bq' 
+						ORDER BY 
+							a.id ASC";
 		$result		= $this->db->query($sql)->result_array();
 		
 		// $detail 		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq,'category'=>'acc'))->result_array();
@@ -1147,7 +1176,8 @@ class Price extends CI_Controller {
 			'GET_DET_ACC' => get_detail_accessories()
 		);
 		
-		$this->load->view('Price/modalviewDT', $data);
+		// $this->load->view('Price/modalviewDT', $data);
+		$this->load->view('Price/modalviewDT_Fast', $data);
 	}
 	
 	public function modalTotalCost(){
