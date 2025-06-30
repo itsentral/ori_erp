@@ -12,8 +12,8 @@ class Dashboard extends CI_Controller {
 			redirect('login');
 		}
 		/*if (!$this->session->userdata('2fa_verified')) {
-            redirect('login/verify_2fa');*/
-        }		
+            redirect('login/verify_2fa');
+        }*/		
 	}	
 	public function index() {
 		//$this->load->view('include/header', array('title'=>'Dashboard')); ALREADY ESTIMATED PRICE
