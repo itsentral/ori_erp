@@ -11,8 +11,8 @@ class Dashboard extends CI_Controller {
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}
-		if (!$this->session->userdata('2fa_verified')) {
-            redirect('login/verify_2fa');
+		/*if (!$this->session->userdata('2fa_verified')) {
+            redirect('login/verify_2fa');*/
         }		
 	}	
 	public function index() {
