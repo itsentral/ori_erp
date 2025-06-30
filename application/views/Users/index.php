@@ -18,7 +18,7 @@ $this->load->view('include/side_menu');
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table class="table table-bordered table-striped" id="example1">
+		<table class="table table-bordered table-striped" id="example1"> 
 			<thead>
 				<tr class='bg-blue'>
 					<th class="text-center">Username</th>
@@ -36,7 +36,7 @@ $this->load->view('include/side_menu');
 						$int++;
 						$class	= 'bg-green';
 						$status	= 'Active';
-						if($datas->st_aktif == 'N'){
+						if($datas->st_aktif != '1'){
 							$class	= 'bg-red';
 							$status	= 'Not Active';
 						}
