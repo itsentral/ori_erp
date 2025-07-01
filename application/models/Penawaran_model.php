@@ -666,11 +666,11 @@ class Penawaran_model extends CI_Model {
 		$data_session	= $this->session->userdata;
 		$data	= $this->input->post();
 		
-		$MatCost	= $data['MatCost'];
-		$EngCost	= $data['EngCost'];
-		$PackCost	= $data['PackCost'];
-		$ExportCost	= $data['ExportCost'];
-		$LokalCost	= $data['LokalCost'];
+		$MatCost	= (!empty($data['MatCost']))?$data['MatCost']:[];
+		$EngCost	= (!empty($data['EngCost']))?$data['EngCost']:[];
+		$PackCost	= (!empty($data['PackCost']))?$data['PackCost']:[];
+		$ExportCost	= (!empty($data['ExportCost']))?$data['ExportCost']:[];
+		$LokalCost	= (!empty($data['LokalCost']))?$data['LokalCost']:[];
 		
 		$ArrHeader = array(
 			'id_bq' 		=> $data['id_bq'],
