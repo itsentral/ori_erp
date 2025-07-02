@@ -793,7 +793,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;;
+				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;
 				$ArrJurnalNew['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE * $qty_oke);
 				$ArrJurnalNew['update_by'] 		= $UserName;
 				$ArrJurnalNew['update_date'] 		= $DateTime;
@@ -827,6 +827,10 @@ class Adjustment_material_model extends CI_Model {
 					}
 
 				//jurnal minus
+
+				    $price_book=$PRICE;
+					$nilai_jurnal=$PRICE * $qty_oke;
+
 					$tgl_jurnal= date('Y-m-d');
 					$Bln	= substr($tgl_jurnal,5,2);
 					$Thn	= substr($tgl_jurnal,0,4);
@@ -834,8 +838,7 @@ class Adjustment_material_model extends CI_Model {
 					$coa_gudang=$this->db->query("select * from warehouse where id='".$id_gudang_ke."' ")->row();
 					$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_jurnal);
 					$this->db->query("UPDATE ".DBACC.".pastibisa_tb_cabang SET nomorJC=nomorJC + 1  WHERE nocab='101'");
-					$price_book=get_price_book($id_material);
-					$nilai_jurnal=$price_book*$qty_oke;
+					
 					$keterangan_jurnal='ADJUSTMENT '.$nm_material;
 					$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_jurnal, 'jml' => $nilai_jurnal, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $keterangan_jurnal, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $data_session['ORI_User']['username'], 'memo' => $kode_trans, 'tgl_jvkoreksi' => $tgl_jurnal, 'ho_valid' => '');
 					$this->db->insert(DBACC.'.javh',$dataJVhead);
@@ -1132,7 +1135,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;;
+				$ArrJurnalNew['nilai_trans_rp']	= $PRICE * $qty_oke;
 				$ArrJurnalNew['nilai_akhir_rp']	= $nilaijurnalakhir+($PRICE * $qty_oke);
 				$ArrJurnalNew['update_by'] 		= $UserName;
 				$ArrJurnalNew['update_date'] 		= $DateTime;
@@ -1170,7 +1173,8 @@ class Adjustment_material_model extends CI_Model {
 				
 				}
 				
-				
+				 	$price_book=$PRICE;
+					$nilai_jurnal=$PRICE * $qty_oke;
 				
 				//jurnal plus
 					$tgl_jurnal= date('Y-m-d');
@@ -1180,8 +1184,6 @@ class Adjustment_material_model extends CI_Model {
 					$coa_gudang=$this->db->query("select * from warehouse where id='".$id_gudang_ke."' ")->row();
 					$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_jurnal);
 					$this->db->query("UPDATE ".DBACC.".pastibisa_tb_cabang SET nomorJC=nomorJC + 1  WHERE nocab='101'");
-					$price_book=get_price_book($id_material);
-					$nilai_jurnal=$price_book*$qty_oke;
 					$keterangan_jurnal='ADJUSTMENT '.$nm_material;
 					$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_jurnal, 'jml' => $nilai_jurnal, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $keterangan_jurnal, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $data_session['ORI_User']['username'], 'memo' => $kode_trans, 'tgl_jvkoreksi' => $tgl_jurnal, 'ho_valid' => '');
 					$this->db->insert(DBACC.'.javh',$dataJVhead);
