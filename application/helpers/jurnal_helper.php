@@ -360,18 +360,22 @@
 		$Thn	  = substr($tgl_voucher,0,4);
 // end agus		
 		foreach ($ArrData as $key => $value) {
-// revisi agus
-			if($gudang == 'produksi'){
-				$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
-				$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-				$bmunit = 0;
-				$bm = 0;
-			}elseif($gudang == 'subgudang'){
-				$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-				$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-				$bmunit = 0;
-				$bm = 0;
-			}
+// revisi syamsudin 2/07/2025
+			
+
+				if($gudang == 'subgudang'){
+					$harga_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$GudangFrom, 'id_material'=>$key),1)->row();
+					if(!empty($harga_jurnal_akhir)) $PRICE=$harga_jurnal_akhir->harga;
+					$bmunit = 0;
+					$bm = 0;
+		
+				}elseif($gudang == 'produksi'){
+					$harga_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$GudangFrom, 'id_material'=>$key),1)->row();
+					if(!empty($harga_jurnal_akhir)) $PRICE=$harga_jurnal_akhir->harga;		
+					$bmunit = 0;
+					$bm = 0;	
+					
+				}
 			$SUM_PRICE += $PRICE * $value['qty_good'];
 /*
 			$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
@@ -555,7 +559,13 @@
 				$temp[$key_uniq] += $value['amount'];
 
 				//DETAIL MATERIAL JURNAL NEW
-				$COSTBOOK = get_price_book($value['id_material']);
+				
+					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$GudangTo, 'id_material'=>$value['id_material']),1)->row();
+					if(!empty($harga_jurnal_akhir2)) $COSTBOOK=$harga_jurnal_akhir2->harga;
+					
+		
+				
+			
 				$ArrDetailNew[$nomor]['kode_trans'] 	= $kode_trans;
 				$ArrDetailNew[$nomor]['category'] 		= $category;
 				$ArrDetailNew[$nomor]['gudang_dari'] 	= $GudangFrom;
