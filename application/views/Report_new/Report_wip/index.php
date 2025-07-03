@@ -26,6 +26,7 @@ $this->load->view('include/side_menu');
         </div>
         <div class='form-group row'>
             <div class='col-sm-12'>
+				<div class="table-responsive">
                 <table class="table table-bordered table-striped" id="my-grid2" width='100%'>
                     <thead>
                         <tr class='bg-blue'>
@@ -48,6 +49,7 @@ $this->load->view('include/side_menu');
                     </thead>
                     <tbody></tbody>
                 </table>
+				</div>
             </div>
         </div>
 
@@ -69,6 +71,7 @@ $this->load->view('include/side_menu');
         </div>
         <div class='form-group row'>
             <div class='col-sm-12'>
+				<div class="table-responsive">
                 <table class="table table-bordered table-striped" id="my-grid" width='100%'>
                     <thead>
                         <tr class='bg-blue'>
@@ -87,6 +90,7 @@ $this->load->view('include/side_menu');
                     </thead>
                     <tbody></tbody>
                 </table>
+				</div>
             </div>
         </div>
 
