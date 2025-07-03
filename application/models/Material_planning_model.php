@@ -1297,7 +1297,7 @@ class Material_planning_model extends CI_Model {
 		    WHERE 1=1 
 				AND a.id_material <> 'MTL-1903000' 
 				AND d.flag_active='Y' 
-				AND (a.id_gudang = '1' OR a.id_gudang = '2')
+				AND (a.id_gudang = '2')
 				AND (
 					a.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR a.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
