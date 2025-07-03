@@ -11,7 +11,8 @@ class Dashboard extends CI_Controller {
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}		
-	}	
+	}
+	
 	public function index() {
 		//$this->load->view('include/header', array('title'=>'Dashboard')); ALREADY ESTIMATED PRICE
 		// history('View Dashboard');
