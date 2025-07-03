@@ -6533,7 +6533,7 @@ if($base_cur=='USD'){
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
-					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","","",'".$vals['qty']."','cut','".$vals['cogs']."','".$vals['product']."') ");
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','-','".$vals['qty']."','cut','".$vals['cogs']."','".$vals['product']."') ");
 				}
 			}
 
