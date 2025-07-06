@@ -559,7 +559,7 @@
 				$temp[$key_uniq] += $value['amount'];
 
 				//DETAIL MATERIAL JURNAL NEW
-				
+					$COSTBOOK = 0;
 					$harga_jurnal_akhir2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$GudangTo, 'id_material'=>$value['id_material']),1)->row();
 					if(!empty($harga_jurnal_akhir2)) $COSTBOOK=$harga_jurnal_akhir2->harga;
 					
