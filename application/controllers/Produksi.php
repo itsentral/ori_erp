@@ -10037,8 +10037,9 @@ class Produksi extends CI_Controller {
 				$ARrInsertSPK[$key]['closing_produksi_by'] 		= $username;
 				$ARrInsertSPK[$key]['closing_produksi_date'] 	= $datetime;
 
-
-				$qUpdate 	= $this->db->query("UPDATE 
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
+					$qUpdate 	= $this->db->query("UPDATE 
 											production_detail
 										SET 
 											upload_real='Y',
@@ -10054,6 +10055,19 @@ class Produksi extends CI_Controller {
 										ORDER BY 
 											id ASC 
 										LIMIT $QTY");
+				}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Closing! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
+				
 			}
 		}
 
