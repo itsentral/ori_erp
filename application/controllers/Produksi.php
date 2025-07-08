@@ -12706,8 +12706,12 @@ class Produksi extends CI_Controller {
 			$temp[$UNIQ]['no_spk'] 		= (!empty($getDetailSPK[0]['no_spk']))?$getDetailSPK[0]['no_spk']:'';
 			$temp[$UNIQ]['id_milik']	= (!empty($getDetailSPK[0]['id_milik']))?$getDetailSPK[0]['id_milik']:'';
 
-			$costbook 	= (!empty($GET_COSTBOOK[$value['id_material']]))?$GET_COSTBOOK[$value['id_material']]:0;
-			$berat 		= $temp[$UNIQ]['berat'];
+			//$costbook 	= (!empty($GET_COSTBOOK[$value['id_material']]))?$GET_COSTBOOK[$value['id_material']]:0;
+			$idmaterial2 = $value['id_material'];
+
+			$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$idmaterial2),1)->row();
+			if(!empty($getcostbook)) $costbook=$getcostbook->harga;
+			$berat 		 = $temp[$UNIQ]['berat'];
 			// $SUM_MATERIAL += round($costbook * $berat);
 			
 			$temp[$UNIQ]['costbook'] 		= $costbook;
@@ -12763,7 +12767,7 @@ class Produksi extends CI_Controller {
 					
 					$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
 				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
