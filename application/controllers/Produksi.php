@@ -4286,7 +4286,8 @@ class Produksi extends CI_Controller {
 				// if($hist_produksi == '0'){
 					// $ARrUpdateSPK[$key]['id'] 				= $value['id'];
 					// $ARrUpdateSPK[$key]['qty_input'] 		= get_name('production_spk','qty_input','id',$value['id']) + $QTY;
-
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
 					$qUpdate 	= $this->db->query("UPDATE 
 												production_detail
 											SET 
@@ -4301,6 +4302,18 @@ class Produksi extends CI_Controller {
 											ORDER BY 
 												id ASC 
 											LIMIT $QTY");
+				}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Update! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
 				// }
 			}
 		}
@@ -4881,8 +4894,10 @@ class Produksi extends CI_Controller {
 				$ARrInsertSPK[$key]['updated_by'] 		= $username;
 				$ARrInsertSPK[$key]['updated_date'] 	= $datetime;
 				$ARrInsertSPK[$key]['upload_eng_change']= $file_name;
-
-				$qUpdate 	= $this->db->query("UPDATE 
+				
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
+					$qUpdate 	= $this->db->query("UPDATE 
 											production_detail
 										SET 
 											upload_real='Y',
@@ -4896,6 +4911,18 @@ class Produksi extends CI_Controller {
 										ORDER BY 
 											id ASC 
 										LIMIT $QTY");
+										}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Closing! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
 			}
 		}
 
@@ -5888,7 +5915,8 @@ class Produksi extends CI_Controller {
 				// if($hist_produksi == '0'){
 					// $ARrUpdateSPK[$key]['id'] 				= $value['id'];
 					// $ARrUpdateSPK[$key]['qty_input'] 		= get_name('production_spk','qty_input','id',$value['id']) + $QTY;
-
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
 					$qUpdate 	= $this->db->query("UPDATE 
 												production_detail
 											SET 
@@ -5903,6 +5931,18 @@ class Produksi extends CI_Controller {
 											ORDER BY 
 												id ASC 
 											LIMIT $QTY");
+				}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Update! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
 				// }
 			}
 		}
@@ -6567,7 +6607,9 @@ class Produksi extends CI_Controller {
 				$ARrInsertSPK[$key]['updated_date'] 	= $datetime;
 				$ARrInsertSPK[$key]['upload_eng_change']= $file_name;
 
-				$qUpdate 	= $this->db->query("UPDATE 
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
+					$qUpdate 	= $this->db->query("UPDATE 
 											production_detail
 										SET 
 											upload_real2='Y',
@@ -6581,6 +6623,18 @@ class Produksi extends CI_Controller {
 										ORDER BY 
 											id ASC 
 										LIMIT $QTY");
+										}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Closing! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
 			}
 		}
 
@@ -10737,7 +10791,8 @@ class Produksi extends CI_Controller {
 				$ARrInsertSPK[$key]['closing_produksi_by'] 		= $username;
 				$ARrInsertSPK[$key]['closing_produksi_date'] 	= $datetime;
 
-
+				$CheckDataUpdate = $this->db->get_where('production_detail',['id_milik'=>$value['id_milik'],'kode_spk'=>$kode_spk,'print_merge_date'=>$dateCreated])->result_array();
+				if(!empty($CheckDataUpdate)){
 				$qUpdate 	= $this->db->query("UPDATE 
 											production_detail
 										SET 
@@ -10754,6 +10809,18 @@ class Produksi extends CI_Controller {
 										ORDER BY 
 											id ASC 
 										LIMIT $QTY");
+				}
+				else{
+					$Arr_Kembali	= array(
+						'pesan'		=>'Failed Update! Error Msg: id:'.$value['id_milik'].', idspk:'.$kode_spk.', datespk:'.$dateCreated,
+						'status'	=> 2,
+						'id_milik'	=> $value['id_milik'],
+						'kode_spk'	=> $kode_spk,
+						'print_merge_date'	=> $dateCreated
+					);
+					echo json_encode($Arr_Kembali);
+					return false;
+				}
 			}
 		}
 
