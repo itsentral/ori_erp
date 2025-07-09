@@ -109,22 +109,11 @@
 				$bmunit = ($value['bm']/$value['qty_good']);
 				$bm     =  $value['bm'];
 			//revisi syam 10/07/2024		
-			}elseif($GudangFrom == '2'){
-				$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
-				$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-				$bmunit = 0;
-				$bm = 0;
-			}elseif($GudangFrom == '3'){
-				$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-				$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-				$bmunit = 0;
-				$bm = 0;
-			}elseif($GudangFrom == '30'){
-				$get_price_book = $CI->db->order_by('id','desc')->get_where('price_book_project',array('id_material'=>$key))->result();
-				$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-				$bmunit = 0;
-				$bm = 0;
-				
+			}else{
+				$harga_jurnal_akhir = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$GudangFrom, 'id_material'=>$key),1)->row();
+					if(!empty($harga_jurnal_akhir)) $PRICE=$harga_jurnal_akhir->harga;		
+					$bmunit = 0;
+					$bm = 0;	
 			}
 			$SUM_PRICE += $PRICE * $value['qty_good'];
 			/*
