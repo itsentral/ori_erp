@@ -169,8 +169,8 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
    			alert(d_error);
    		}
 		var invoice_no=$("#invoice_no").val();
-		var invoice_total=$("#invoice_total").val();
-		var nilai_po=$("#nilai_po").val();
+		var invoice_total=parseInt($("#invoice_total").val());
+		var nilai_po=parseInt($("#nilai_po").val());
 
 		console.log(invoice_total);
 		console.log(nilai_po)
