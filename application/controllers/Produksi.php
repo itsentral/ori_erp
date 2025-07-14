@@ -13385,13 +13385,12 @@ class Produksi extends CI_Controller {
 				
 				
 				
-				/*if($nm_material=='WIP Total'){	
-    				if($product=='pipe'){
-						$nokir ='1103-03-02';	
+					if($product=='pipe'){
+						$nokirwip ='1103-03-02';	
 					}else{
-						$nokir ='1103-03-03';	
+						$nokirwip ='1103-03-03';	
 					}					
-				}	*/
+					
 
 			    $debit  = $totalwip;			
 				
@@ -13400,7 +13399,7 @@ class Produksi extends CI_Controller {
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
-					  'no_perkiraan'  => '1103-03-02',
+					  'no_perkiraan'  => $nokirwip,
 					  'keterangan'    => $keterangan,
 					  'no_reff'       => $id,
 					  'debet'         => $wiptotal,
