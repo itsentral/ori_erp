@@ -5,7 +5,7 @@ include $sroot."/application/libraries/MPDF57/mpdf.php";
 $mpdf=new mPDF('utf-8','A4');
 // $mpdf=new mPDF('utf-8','A4-L');
 set_time_limit(0);
-ini_set('memory_limit','1024M');
+ini_set('memory_limit','2048M');
 
 ob_start();
 date_default_timezone_set('Asia/Jakarta');
