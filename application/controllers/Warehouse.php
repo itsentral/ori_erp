@@ -1578,7 +1578,7 @@ class Warehouse extends CI_Controller {
 					$ArrJurnalNew2[$value['id']]['harga_bm'] 			= 0;
 					$ArrJurnalNew2[$value['id']]['nilai_awal_rp']		= $nilaijurnalakhir2;
 					$ArrJurnalNew2[$value['id']]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-					$ArrJurnalNew2[$value['id']]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+					$ArrJurnalNew2[$value['id']]['nilai_akhir_rp']		= $nilaijurnalakhir2+($PRICE*$QTY_OKE);
 					$ArrJurnalNew2[$value['id']]['update_by'] 			= $UserName;
 					$ArrJurnalNew2[$value['id']]['update_date'] 		= $DateTime;
 					$ArrJurnalNew2[$value['id']]['no_jurnal'] 			= '-';
