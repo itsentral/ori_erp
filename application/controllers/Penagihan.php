@@ -3708,6 +3708,8 @@ else
 		$total_retensi2_idr	= $gethd->total_retensi2_idr;
 		$base_cur		= $gethd->base_cur;
 		$no_po			= $gethd->no_po;
+		$created_on      = date('Y-m-d H:i:s');
+		$created_by     = $data_session['ORI_User']['username'];
 
 		$this->db->trans_begin();
 		$db2->trans_begin();
@@ -3856,8 +3858,14 @@ else
 			$nokir1  = $rec->no_perkiraan;
 			
 			if($nokir1=='1102-01-02' OR $nokir1=='2102-01-03' ){
-				$total_invoice = $invoice->total_invoice;
+
+				if ($nilaibayar1 > 1) {
+                $total_invoice = $invoice->total_invoice;
 				$kurs_jual     = $invoice->kurs_jual;
+				}else{
+				$total_invoice = 0;
+				$kurs_jual     = 0;
+				}
 			} 
 			else{
 				$total_invoice = 0;
@@ -3876,7 +3884,9 @@ else
 					'kredit'        => 0,
 					'nilai_valas_debet'  => $total_invoice,
 					'nilai_valas_kredit' => 0,
-					'kurs_transaksi'     => $kurs_jual
+					'kurs_transaksi'     => $kurs_jual,
+					'created_on'         => $created_on,
+					'created_by'         => $created_by
 					//'jenis_jurnal'  => 'invoicing'
 				);
 				$nilaitotaljurnal=($nilaitotaljurnal+$nilaibayar1);
@@ -3893,7 +3903,9 @@ else
 					'kredit'        => $nilaibayar1,
 					'nilai_valas_debet'  => 0,
 					'nilai_valas_kredit' => 0,
-					'kurs_transaksi'     => 0
+					'kurs_transaksi'     => 0,
+					'created_on'         => $created_on,
+					'created_by'         => $created_by
 					//'jenis_jurnal'  => 'invoicing'
 				);
 			}
