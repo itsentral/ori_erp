@@ -1435,7 +1435,7 @@ class Warehouse extends CI_Controller {
 						
 						$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
@@ -1507,7 +1507,7 @@ class Warehouse extends CI_Controller {
 					
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
-					$stok_jurnal_akhir2 = $this->db->order_by('id', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$id_material),1)->row();
+					$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$id_material),1)->row();
 					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 					
 					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
