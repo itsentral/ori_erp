@@ -1,7 +1,7 @@
 <table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
 	<thead>
 		<tr class='bg-blue'>
-			<td class="text-left" colspan='15'><b>PRODUCT</b></td>
+			<td class="text-left" colspan='15'><b>PRODUCT IDR</b></td>
 		</tr>
 		<tr class='bg-blue'>
 			<th class="text-center" width='2%'>#</th>
@@ -653,12 +653,12 @@
 				if($penagihan[0]->total_dpp_rp!=0) {
 					$grand_total = round($penagihan[0]->total_dpp_rp, 2);
 					$grand_total2 = round($penagihan[0]->total_gab_product_idr, 2);
-					$down_payment=($penagihan[0]->total_um_idr);
-					$down_payment2=0;
+					//$down_payment=($penagihan[0]->total_um_idr);
+					//$down_payment2=0;
 				}else{
 					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
-					$down_payment=($uang_muka_persen*$grand_total/100);
-					$down_payment2=0;
+					//$down_payment=($uang_muka_persen*$grand_total/100);
+					//$down_payment2=0;
 				}
 				?>
 				<input type="hidden" class="form-control grand_total_dpp text-right input-sm divide" id="grand_total" name="grand_total" value="<?php echo set_value('grand_total', isset($grand_total) ? $grand_total : '0'); ?>" tabindex="-1">

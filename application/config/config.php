@@ -31,6 +31,12 @@ $root .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME'
 $config['base_url'] = $root;
 
 //$config['index_page'] = '';
+// $root = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https://" : "http://");
+// $root .= $_SERVER['HTTP_HOST'];
+// $root .= str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']);
+// $config['base_url'] = $root;
+
+//$config['index_page'] = '';
 
 
 /*
@@ -233,7 +239,7 @@ $config['allow_get_array'] = TRUE;
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 1;
 
 /*
 |--------------------------------------------------------------------------
