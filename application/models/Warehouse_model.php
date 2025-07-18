@@ -1047,7 +1047,7 @@ class Warehouse_model extends CI_Model {
 				}
 				if ($rec->parameter_no == "3") {
 					$coa_hutang_unbill=$rec->no_perkiraan;
-					if($kurs_ros>1) $coa_hutang_unbill='2101-01-04';					
+					if($kurs_ros>1) $coa_hutang_unbill='2101-01-05';					
 					if ($hutang > 0) {
 						$det_Jurnaltes1[] = array(
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1"
@@ -1094,6 +1094,8 @@ class Warehouse_model extends CI_Model {
 			$this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
 //auto jurnal
 		$session = $this->session->userdata('app_session');
+		$created_on      = date('Y-m-d H:i:s');
+		$created_by     = $data_session['ORI_User']['username'];
 		$jenis_jurnal='JV032';
 		$data_vendor 	= $this->db->query("select * from supplier where id_supplier='".$data_po->id_supplier."'")->row();
 		$nama_vendor 	= $data_vendor->nm_supplier;
@@ -1117,6 +1119,8 @@ class Warehouse_model extends CI_Model {
 					'kredit'		=> $vals['kredit'],
 					'nilai_valas_debet'			=> $vals['nilai_valas_debet'],
 					'nilai_valas_kredit'		=> $vals['nilai_valas_kredit'],
+					'created_on'         => $created_on,
+					'created_by'         => $created_by
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 				$total=($total+$vals['kredit']);
