@@ -419,8 +419,7 @@ $this->load->view('include/side_menu');
 	});
 	 function savemutasi(){
 
-	   
-		
+	    
 	    if ($('#tgl_bayar').val() == "") {
           swal({
             title	: "Tanggal Tidak Boleh Kosong!",
@@ -500,6 +499,7 @@ $this->load->view('include/side_menu');
             allowOutsideClick	: false
           });
         } else {
+		$('#simpanpenerimaan').hide();		
         swal({
           title: "Peringatan !",
           text: "Pastikan data sudah lengkap dan benar",
@@ -513,7 +513,7 @@ $this->load->view('include/side_menu');
         },
         function(isConfirm){
 			if(isConfirm) {
-				$('#simpanpenerimaan').hide();
+				
 				var formdata = $("#form-header-mutasi").serialize();
 				$.ajax({
 					url: base_url+"penerimaan/save_penerimaan",
