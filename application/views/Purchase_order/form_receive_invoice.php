@@ -3,6 +3,7 @@ $this->load->view('include/side_menu');
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
+<input type="hidden" name="group_top" id="group_top" value="<?php echo (isset($results) ? $results->group_top: ''); ?>" />
 <input type="hidden" name="no_po" id="no_po" value="<?php echo (isset($results) ? $results->no_po: ''); ?>" />
 <div class="tab-content">
 	<div class="tab-pane active">
