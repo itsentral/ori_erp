@@ -1040,7 +1040,7 @@ class Pembelian extends CI_Controller {
 		}
 
 
-		$no_po=$data['no_po'];
+		$no_po=$data['no_po']; 
 
 		$datapo = $this->db->query("select * from tran_po_header where no_po='".$no_po."'")->row();
 //		if($data->nilai_terima_barang_kurs>0){
@@ -1107,6 +1107,8 @@ class Pembelian extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'created_on'    => $dateTime,
+					'created_by'    => $Username,
 					);
 				$total=($total+$vals['debet']);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
