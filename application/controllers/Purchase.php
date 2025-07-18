@@ -745,6 +745,7 @@ class Purchase extends CI_Controller {
 //			'invoice_dokumen' => $data['invoice_dokumen'],
 			'created_by_invoice' => $Username,
 		];
+		$total= $data['invoice_total'];
 		$totalunbill=0;
 		$totalap=0;
 		$coaunbill='';
@@ -753,15 +754,19 @@ class Purchase extends CI_Controller {
 		$no_po=$data['no_po'];
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
-		if($datapo->total_terima_barang_idr>0){
-			$jenis_jurnal='JV041';
+       
+		if($data['group_top']=='uang muka'){			
+				$jenis_jurnal='JV053';
+			}else{
+				$jenis_jurnal='JV041';
+			}
+
 			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' order by parameter_no")->result();
 			$nomor_jurnal=$jenis_jurnal.$no_po.rand(100,999);
 			$payment_date=$data['tgl_terima']; // date("Y-m-d")
 			$det_Jurnaltes1=array();
-			$total=($datapo->total_terima_barang_idr);
 			if($total!=0) {
-			  foreach ($datajurnal1 as $rec) {
+			  foreach ($datajurnal1 as $rec) { 
 				if($rec->parameter_no=="1"){
 					$det_Jurnaltes1[] = array(
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => $data['invoice_total']-$data['nilai_ppn'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
@@ -800,6 +805,8 @@ class Purchase extends CI_Controller {
 						'no_reff'		=> $vals['no_reff'],
 						'debet'			=> $vals['debet'],
 						'kredit'		=> $vals['kredit'],
+						'created_on' 	=> $dateTime,
+						'created_by' 	=> $Username,
 						);
 					$total=($total+$vals['debet']);
 					$this->db->insert(DBACC.'.jurnal',$datadetail);
@@ -850,7 +857,7 @@ class Purchase extends CI_Controller {
 				$this->db->insert('tr_kartu_hutang',$datahutang);
 				//end auto jurnal
 			}
-		}
+		
 		
 		$this->db->where('id',$id);
 		$this->db->update('billing_top', $ArrUpdate);
