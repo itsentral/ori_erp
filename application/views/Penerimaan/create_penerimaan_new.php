@@ -418,6 +418,8 @@ $this->load->view('include/side_menu');
 		$(".divide").divide();
 	});
 	 function savemutasi(){
+
+	   
 		
 	    if ($('#tgl_bayar').val() == "") {
           swal({
@@ -511,7 +513,7 @@ $this->load->view('include/side_menu');
         },
         function(isConfirm){
 			if(isConfirm) {
-				//$('#simpanpenerimaan').hide();
+				$('#simpanpenerimaan').hide();
 				var formdata = $("#form-header-mutasi").serialize();
 				$.ajax({
 					url: base_url+"penerimaan/save_penerimaan",
