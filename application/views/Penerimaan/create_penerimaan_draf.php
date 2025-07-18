@@ -561,6 +561,7 @@ $this->load->view('include/side_menu');
             allowOutsideClick	: false
           });
         } else {
+		$('#simpanpenerimaan').hide();		
         swal({
           title: "Peringatan !",
           text: "Pastikan data sudah lengkap dan benar",
