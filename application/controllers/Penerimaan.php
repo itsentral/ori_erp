@@ -491,7 +491,10 @@ class Penerimaan extends CI_Controller {
 	
 	public function save_jurnal_BUM(){
 		
-				
+		$data_session 	= $this->session->userdata;
+		$created_on      = date('Y-m-d H:i:s');
+		$created_by     = $data_session['ORI_User']['username'];
+
 	   	$kodejurnal = 'BUM01';				
 		$nomor      = $this->db->query("SELECT max(id) as id from tr_invoice_payment limit 1")->row();
 		$id			= $nomor->id;
@@ -589,6 +592,8 @@ class Penerimaan extends CI_Controller {
 				  'kredit'        => 0,
 				  'nilai_valas_debet'         => $totalkurs,
 				  'nilai_valas_kredit'        => 0,
+				  'created_on'         => $created_on,
+				  'created_by'         => $created_by,
 				  
 				 );
 			} 
@@ -607,6 +612,8 @@ class Penerimaan extends CI_Controller {
 				  'kredit'        => 0,
 				  'nilai_valas_debet'         => 0,
 				  'nilai_valas_kredit'        => 0,
+				  'created_on'         => $created_on,
+				  'created_by'         => $created_by,
 				  
 				 );
 			} elseif ($selisih > 0){
@@ -621,6 +628,8 @@ class Penerimaan extends CI_Controller {
 				  'kredit'        => $selisih,
 				  'nilai_valas_debet'         => 0,
 				  'nilai_valas_kredit'        => 0,
+				  'created_on'         => $created_on,
+				  'created_by'         => $created_by,
 				  
 				 );
 			}
@@ -637,6 +646,8 @@ class Penerimaan extends CI_Controller {
 				  'kredit'        => 0,
 				  'nilai_valas_debet'         => 0,
 				  'nilai_valas_kredit'        => 0,
+				  'created_on'         => $created_on,
+				   'created_by'         => $created_by,
 
 			);
 			}
@@ -653,6 +664,8 @@ class Penerimaan extends CI_Controller {
 				  'kredit'        => $lebihbayar,
 				  'nilai_valas_debet'         => 0,
 				  'nilai_valas_kredit'        => 0,
+				  'created_on'         => $created_on,
+				  'created_by'         => $created_by,
 				  
 				 );
 			}
@@ -692,6 +705,8 @@ class Penerimaan extends CI_Controller {
       					  'kredit'        => 0,
 						  'nilai_valas_debet'         => 0,
 				          'nilai_valas_kredit'        => 0,
+						  'created_on'         => $created_on,
+					      'created_by'         => $created_by,
       				    );
 						}
 						
@@ -710,7 +725,9 @@ class Penerimaan extends CI_Controller {
 							  'debet'         => 0,
 							  'kredit'        => $jmlbayar+$selisihidr,
 							  'nilai_valas_debet'         => 0,
-							  'nilai_valas_kredit'        => $jmlbayarusd 
+							  'nilai_valas_kredit'        => $jmlbayarusd,
+							  'created_on'         => $created_on,
+					          'created_by'         => $created_by,
 							); 
 							
 							}elseif($tipe=='RETENSI'){
@@ -725,7 +742,9 @@ class Penerimaan extends CI_Controller {
 							  'debet'         => 0,
 							  'kredit'        => $jmlbayar+$selisihidr,
 							  'nilai_valas_debet'         => 0,
-							  'nilai_valas_kredit'        => $jmlbayarusd 
+							  'nilai_valas_kredit'        => $jmlbayarusd,
+							  'created_on'         => $created_on,
+					          'created_by'         => $created_by,
 							); 
 							
 							}
@@ -748,6 +767,8 @@ class Penerimaan extends CI_Controller {
 							  'kredit'        => $jmlbayar,
 							  'nilai_valas_debet'         => 0,
 							  'nilai_valas_kredit'        => 0,
+							  'created_on'         => $created_on,
+					          'created_by'         => $created_by,
 							);
 							
 							}elseif($tipe=='RETENSI'){
@@ -763,6 +784,8 @@ class Penerimaan extends CI_Controller {
 							  'kredit'        => $jmlbayar,
 							  'nilai_valas_debet'         => 0,
 							  'nilai_valas_kredit'        => 0,
+							  'created_on'         => $created_on,
+							  'created_by'         => $created_by,
 							);
 							
 							}
