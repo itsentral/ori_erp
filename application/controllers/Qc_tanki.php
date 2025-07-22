@@ -804,7 +804,7 @@ class Qc_tanki extends CI_Controller
 				$ArrGroup[$value]['id_pro_det'] = $id_pro_det;
 				$ArrGroup[$value]['qty'] = $qty;
 
-				$nilai_wip 		= (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+				// $nilai_wip 		= (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 				$material 		= (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
 				$wip_direct 	= (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
 				$wip_indirect 	= (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
@@ -812,12 +812,13 @@ class Qc_tanki extends CI_Controller
 				$wip_foh 		= (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
 				$id_trans 		= (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
 
-				$ArrGroup[$value]['nilai_wip'] = $nilai_wip;
-				$ArrGroup[$value]['material'] = $material;
-				$ArrGroup[$value]['wip_direct'] =  $wip_direct;
-				$ArrGroup[$value]['wip_indirect'] =  $wip_indirect;
-				$ArrGroup[$value]['wip_consumable'] =  $wip_consumable;
-				$ArrGroup[$value]['wip_foh'] =  $wip_foh;
+				$nilai_wip 		= round($material)+round($wip_direct)+round($wip_indirect)+round($wip_consumable)+round($wip_foh);
+				$ArrGroup[$value]['nilai_wip'] = ($nilai_wip > 0 AND $qty > 0)?round($nilai_wip/$qty):0;
+				$ArrGroup[$value]['material'] = ($material > 0 AND $qty > 0)?round($material/$qty):0;
+				$ArrGroup[$value]['wip_direct'] =  ($wip_direct > 0 AND $qty > 0)?round($wip_direct/$qty):0;
+				$ArrGroup[$value]['wip_indirect'] =  ($wip_indirect > 0 AND $qty > 0)?round($wip_indirect/$qty):0;
+				$ArrGroup[$value]['wip_consumable'] =  ($wip_consumable > 0 AND $qty > 0)?round($wip_consumable/$qty):0;
+				$ArrGroup[$value]['wip_foh'] =  ($wip_foh > 0 AND $qty > 0)?round($wip_foh/$qty):0;
 				$ArrGroup[$value]['created_by'] = $username;
 				$ArrGroup[$value]['created_date'] = $datetime;
 				$ArrGroup[$value]['id_trans'] = $id_trans;
