@@ -221,11 +221,12 @@ class Cron_model extends CI_Model {
                 (SELECT @row:=0) r
 		    WHERE 1=1 AND a.id_category <> '' ".$where_tgl." ".$where_bln." ".$where_thn." ".$where_range." AND (
 				a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
-		// echo $sql; exit; OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
