@@ -6378,9 +6378,9 @@ if($base_cur=='USD'){
 				}*/
 
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = $get_kurs[0]->sisa_um;
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-				$down_payment   = $get_kurs[0]->sisa_um_idr;
+				$sisa_um   = isset($get_kurs[0]->sisa_um);
+				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
+				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
 			}
 			
 			$approval	= $this->uri->segment(4);
