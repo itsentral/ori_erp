@@ -212,13 +212,11 @@ class Cron_model extends CI_Model {
 
 		$sql = "
 			SELECT
-				(@row:=@row+1) AS nomor,
 				a.*,
 				b.no_spk AS no_spk2
 			FROM
 				laporan_per_hari a
-				LEFT JOIN so_detail_header b ON a.id_milik = b.id,
-                (SELECT @row:=0) r
+				LEFT JOIN so_detail_header b ON a.id_milik = b.id
 		    WHERE 1=1 AND a.id_category <> '' ".$where_tgl." ".$where_bln." ".$where_thn." ".$where_range." AND (
 				a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -231,7 +229,7 @@ class Cron_model extends CI_Model {
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
-			0 => 'nomor',
+			0 => 'id',
 			1 => 'id_produksi',
 			2 => 'id_produksi',
 			3 => 'id_produksi',
