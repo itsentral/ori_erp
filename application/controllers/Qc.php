@@ -4367,9 +4367,13 @@ class Qc extends CI_Controller
 			foreach($wip AS $data){
 				
 				$nm_material = $data->product;	
-				$tgl_voucher = $data->tanggal;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD';
+				$wip_txt         ='COGS';	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
                	$no_request  = $data->no_spk;	
 				
@@ -4499,7 +4503,7 @@ class Qc extends CI_Controller
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
-					  'keterangan'    => 'FINISHED GOOD',
+					  'keterangan'    => $keterangan1,
 					  'no_reff'       => $id,
 					  'debet'         => $cogs,
 					  'kredit'        => 0,
@@ -4514,7 +4518,7 @@ class Qc extends CI_Controller
 					  'tanggal'       => $tgl_voucher,
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coacogs,
-					  'keterangan'    => 'COGS',
+					  'keterangan'    => $keterangan2,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
 					  'kredit'        => $cogs,
