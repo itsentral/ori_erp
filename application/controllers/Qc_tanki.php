@@ -117,13 +117,12 @@ class Qc_tanki extends CI_Controller
 				b.qty AS tot_qty,
 				MIN(a.closing_produksi_date) AS min_date_produksi,
 				MAX(a.closing_produksi_date) AS max_date_produksi,
-                z.no_so,
+                SUBSTRING(a.product_code,1,9) as no_so,
                 REPLACE(a.id_produksi, 'PRO-', '') AS no_ipp,
                 COUNT(a.id) AS qty_qc
 			FROM
 				production_detail a
-                LEFT JOIN production_spk b ON a.kode_spk = b.kode_spk AND a.id_milik=b.id_milik
-                LEFT JOIN warehouse_adjustment z ON a.kode_spk = z.kode_spk,
+                LEFT JOIN production_spk b ON a.kode_spk = b.kode_spk AND a.id_milik=b.id_milik,
 				(SELECT @row:=0) r
 		    WHERE 1=1 
                 AND a.upload_real = 'Y' 
@@ -138,7 +137,6 @@ class Qc_tanki extends CI_Controller
 					OR a.no_spk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					OR a.id_category LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					OR a.product_code LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-					OR z.no_so LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 				)
 			" . $group_by . "
 		";
@@ -148,7 +146,7 @@ class Qc_tanki extends CI_Controller
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'z.no_so',
+			1 => 'product_code',
 			2 => 'id_produksi',
 			3 => 'no_spk',
 			4 => 'id_product'
