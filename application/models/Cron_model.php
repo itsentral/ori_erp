@@ -149,7 +149,7 @@ class Cron_model extends CI_Model {
 			$MP = 0;
 			$MH = 0;
 			if(!empty($GET_DETAIL_SO)){
-				$WH = $GET_DETAIL_SO[0]->total_time;
+				$WH = $GET_DETAIL_SO[0]->total_time; 
 				$MP = $GET_DETAIL_SO[0]->man_power;
 				$MH = $GET_DETAIL_SO[0]->man_hours;
 			}
