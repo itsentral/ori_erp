@@ -55,7 +55,7 @@ class Quotation_model extends CI_Model {
 							LEFT JOIN cost_project_detail b ON a.id=b.caregory_sub
 							LEFT JOIN laporan_revised_detail c ON a.id=c.id_milik
 						WHERE
-							a.id_bq = '".$id_bq."' AND c.revised_no = '".$get_max_rev[0]->revised_no."' AND a.id_category != 'product kosong'";					
+							a.id_bq = '".$id_bq."' AND c.revised_no = '".$get_max_rev[0]->revised_no."' AND a.id_category != 'product kosong' ORDER BY a.id ASC";					
 		$getDetail	= $this->db->query($qMatr)->result_array();
 
 		$engC 		= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'eng cost' AND b.category = 'engine' AND b.id_bq='".$id_bq."' AND b.option_type='Y' ORDER BY a.id ASC ";
