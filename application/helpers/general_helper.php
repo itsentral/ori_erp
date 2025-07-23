@@ -201,7 +201,6 @@ function get_input_produksi_detail() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                -- b.nm_material AS nm_material,
                 GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
@@ -231,7 +230,6 @@ function get_input_produksi_plus() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                -- b.nm_material AS nm_material,
                 GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
@@ -261,7 +259,6 @@ function get_input_produksi_plus_exclude() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                -- b.nm_material AS nm_material,
                 GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
@@ -290,7 +287,6 @@ function get_input_produksi_add() {
     $SQL = "SELECT
                 a.id_production_detail AS id,
                 a.actual_type AS material_id,
-                -- b.nm_material AS nm_material,
                 GROUP_CONCAT(DISTINCT b.nm_material ORDER BY b.nm_material ASC SEPARATOR '<br>') AS nm_material,
                 b.id_category AS category_id,
                 SUM( a.material_terpakai ) AS terpakai 
