@@ -4368,7 +4368,7 @@ class Qc extends CI_Controller
 				
 				$nm_material = $data->product;	
 				$tgl_voucher = $data->tanggal;
-				$fg_txt         ='FINISHED GOOD';
+				$fg_txt         ='FINISHED GOOD'; 
 				$wip_txt         ='COGS';	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
