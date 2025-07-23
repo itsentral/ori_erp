@@ -1426,7 +1426,7 @@ class Penawaran_model extends CI_Model {
 							LEFT JOIN cost_project_detail b ON a.id=b.caregory_sub
 							LEFT JOIN laporan_revised_detail c ON a.id=c.id_milik
 						WHERE
-							a.id_bq = '".$id_bq."' AND c.revised_no = '".$get_max_rev[0]->revised_no."' AND a.id_category <> 'product kosong'";		
+							a.id_bq = '".$id_bq."' AND c.revised_no = '".$get_max_rev[0]->revised_no."' AND a.id_category <> 'product kosong' ORDER BY a.id ASC";		
 		$rest_detail	= $this->db->query($sql_detail)->result_array();
 		
 		$ListBQipp		= $this->db->query("SELECT series FROM bq_detail_header WHERE id_bq = '".$id_bq."' GROUP BY series")->result_array();
