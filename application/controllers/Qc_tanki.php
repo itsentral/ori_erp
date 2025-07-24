@@ -130,6 +130,7 @@ class Qc_tanki extends CI_Controller
                 AND a.kode_spk IS NOT NULL
 				AND a.fg_date IS NULL
 				AND a.closing_produksi_date IS NOT NULL
+				AND a.kode_spk != 'deadstok'
                 ".$where."
 				AND (
 					a.kode_spk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
