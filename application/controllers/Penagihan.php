@@ -2198,8 +2198,8 @@ if($base_cur=='USD'){
 
 					
 						
-					// print_r($dtListIDipp);
-			        // exit;
+					print_r($detailInv1);
+			        exit;
 				}
 				
 				
