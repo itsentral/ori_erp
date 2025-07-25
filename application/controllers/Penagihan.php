@@ -2139,7 +2139,7 @@ if($base_cur=='USD'){
 					foreach($getDelivery AS $val => $d1){
 							$nm_material          = $d1['product_so'];
 							$product_cust         = $d1['product_delivery'];
-							$product_desc         = $d1['deskipsi_so'];
+							$product_desc         = $d1['deskripsi_so'];
 							$diameter_1           = $d1['dim1'];
 							$diameter_2      	  = $d1['dim2'];
 							$liner                = $d1['liner'];
@@ -2161,16 +2161,17 @@ if($base_cur=='USD'){
 							$no_sodtl		      = $d1['no_so'];
 							$qty_ori			  = $d1['qty_so'];
 							$qty_belum			  = $d1['qty_inv'];
+							$no_bq                = $d1['id_produksi'];
 
 							$detailInv1[$val]['id_penagihan']		= $id_tagih;
 							$detailInv1[$val]['id_bq'] 		     	= $no_bq;
 							$detailInv1[$val]['no_ipp'] 		    = $no_ippdtl;
 							$detailInv1[$val]['so_number'] 		    = $no_sodtl;
-							$detailInv1[$val]['no_invoice'] 		= $no_invoice;
-							$detailInv1[$val]['tgl_invoice']      	= $Tgl_Invoice;
-							$detailInv1[$val]['id_customer']	 	= $id_customer;
-							$detailInv1[$val]['nm_customer'] 		= $nm_customer;
-							$detailInv1[$val]['jenis_invoice'] 		= $jenis_invoice;
+							$detailInv1[$val]['no_invoice'] 		= '-';
+							$detailInv1[$val]['tgl_invoice']      	= date(Y-m-d H:i:s);
+							$detailInv1[$val]['id_customer']	 	= $data['customer'];
+							$detailInv1[$val]['nm_customer'] 		= get_name('customer','nm_customer','id_customer',$data['customer']);
+							$detailInv1[$val]['jenis_invoice'] 		= 'progress';
 							$detailInv1[$val]['nm_material']	    = $nm_material;
 							$detailInv1[$val]['product_cust']	    = $product_cust;
 							$detailInv1[$val]['desc']	    		= $product_desc;
@@ -2192,7 +2193,7 @@ if($base_cur=='USD'){
 							$detailInv1[$val]['qty_sisa']			= $qty_belum;
 							$detailInv1[$val]['checked']			= $checked;
 							$detailInv1[$val]['id_milik']	    	= $d1['id_milik'];
-							$detailInv1[$val]['cogs']	    		= $d1['cogs'];
+							$detailInv1[$val]['cogs']	    		= 0;
 
 						}
 					}
