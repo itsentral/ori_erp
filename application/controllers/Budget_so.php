@@ -2359,6 +2359,7 @@ class Budget_so extends CI_Controller {
 									')
 								->join('bq_detail_detail b','a.id_header=b.id_header','left')
 								->join('ms_category_part c','b.id_category=c.id','left')
+								->limit(1,1000)
 								->get_where('bq_selling_price a',
 									array(
 										'a.no_ipp'=>$NO_IPP, 
@@ -2379,6 +2380,7 @@ class Budget_so extends CI_Controller {
 												b.unit_price
 												')
 											->join('bq_detail_detail b','a.id_header=b.id_header','left')
+											->limit(1,1000)
 											->get_where('bq_selling_price a',
 												array(
 													'a.no_ipp'=>$NO_IPP, 
@@ -2458,7 +2460,7 @@ class Budget_so extends CI_Controller {
 									) * ( a.pe_biaya_rutin_bulanan / 100 ) AS biaya_rutin_bulanan 
 								FROM
 										bq_detail_detail a
-								WHERE a.id='".$row_Cek['id']."'";
+								WHERE a.id='".$row_Cek['id']."' LIMIT 0,1000";
 				$resultTanki = $this->tanki->query($SQL_COST)->result_array();
 				
 				$EstMatKg 	+= $est_selling;
