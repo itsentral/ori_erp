@@ -2115,6 +2115,7 @@ if($base_cur=='USD'){
 					$updDelivery="update delivery_product_detail set sts_invoice='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$updDeliveryHeader="update delivery_product set st_cogs='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$dtdelivery_no=$dtImplode2;
+					$dtdelivery_no1=$dtImplode;
 					$getipp 	= $this->db->query("SELECT replace(id_produksi,'PRO-','') id_produksi FROM delivery_product_detail WHERE kode_delivery IN ".$dtImplode." group BY id_produksi")->result();
 					$dtListipp = [];
 					foreach($getipp AS $val => $valx ){
@@ -2131,7 +2132,7 @@ if($base_cur=='USD'){
 					$dtImplode	= "('".implode("','", $dtListIDipp)."')"; 
 					$dtImplode2	= implode(",", $dtListIDipp);
 
-                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_delivery IN ".$dtdelivery_no." ORDER BY id ")->result_array();
+                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_deliveryx IN ".$dtdelivery_no1." ORDER BY id ")->result_array();
 					
 					$detailInv1 = [];
                     if(!empty($getDelivery)){						
