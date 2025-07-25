@@ -2166,6 +2166,7 @@ class Produksi extends CI_Controller {
 			'hist_produksi'		=> $detAdjustment[0]['created_date']
 		);
 		$this->load->view('Print/print_req_mixing_new', $data);
+		history("Print spk mixing edit qty ".$IDUNIQ);
 	}
 
 	public function getDataGroupMaterial($data=null,$uniq=null) {
