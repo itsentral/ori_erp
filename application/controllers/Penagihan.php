@@ -2200,8 +2200,8 @@ if($base_cur=='USD'){
 
 					
 						
-					print_r($detailInv1);
-			        exit;
+					//print_r($detailInv1);
+			        //exit;
 				}
 				
 				
