@@ -17,8 +17,8 @@ class Tanki_model extends CI_Model {
         return $SPEC;
 	}
 
-    function get_spec_check(){
-		$result = $this->tanki->limit(0,1000)->get('bq_detail_detail')->result_array();
+    function get_spec_check($no_ipp){
+		$result = $this->tanki->get_where('bq_detail_detail',array('no_ipp'=>$no_ipp))->result_array();
         $ArrSpec = [];
         foreach ($result as $key => $value) {
             $SPEC = number_format($value['dia_lebar']).' x '.number_format($value['panjang']).' x '.number_format($value['t_dsg'],2);
