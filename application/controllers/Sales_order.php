@@ -229,7 +229,7 @@ class Sales_order extends CI_Controller {
 		$dtImplode2	= "('".implode("','", $dtListArray2)."')";
 		
 		//Duplicate Bq Detail Detail
-		$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." ")->result_array();
+		$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." " LIMIT 1000)->result_array();
 		$ArrBqDetailDetail = array();
 		foreach($getBq_DetailDetail AS $val => $valx){
 			$ArrBqDetailDetail[$val]['id_milik'] = $valx['id'];
