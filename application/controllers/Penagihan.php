@@ -2168,7 +2168,7 @@ if($base_cur=='USD'){
 							$detailInv1[$val]['no_ipp'] 		    = $no_ippdtl;
 							$detailInv1[$val]['so_number'] 		    = $no_sodtl;
 							$detailInv1[$val]['no_invoice'] 		= '-';
-							$detailInv1[$val]['tgl_invoice']      	= date(Y-m-d H:i:s);
+							$detailInv1[$val]['tgl_invoice']      	= date('Y-m-d H:i:s');
 							$detailInv1[$val]['id_customer']	 	= $data['customer'];
 							$detailInv1[$val]['nm_customer'] 		= get_name('customer','nm_customer','id_customer',$data['customer']);
 							$detailInv1[$val]['jenis_invoice'] 		= 'progress';
