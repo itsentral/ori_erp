@@ -4,7 +4,7 @@ $sub_delivery	= $this->uri->segment(4);
 $id_bq			= $this->uri->segment(5);
 $sts_delivery	= $this->uri->segment(6);
 
-$sqlDetEst	= "SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_delivery='".$id_delivery."' AND sub_delivery='".$sub_delivery."' AND sts_delivery='".$sts_delivery."' ";
+$sqlDetEst	= "SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_delivery='".$id_delivery."' AND sub_delivery='".$sub_delivery."' AND sts_delivery='".$sts_delivery."' LIMIT 0,1000 ";
 $restDetEst	= $this->db->query($sqlDetEst)->result_array();
 // echo $sqlDetEst; 
 

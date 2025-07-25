@@ -12,13 +12,13 @@ class Tanki_model extends CI_Model {
 		$array = [
             'id'=>$id_milik
         ];
-		$result = $this->tanki->get_where('bq_detail_detail',$array)->result();
+		$result = $this->tanki->limit(0,1000)->get_where('bq_detail_detail',$array)->result();
         $SPEC = (!empty($result))?number_format($result[0]->dia_lebar).' x '.number_format($result[0]->panjang).' x '.number_format($result[0]->t_dsg,2):'';
         return $SPEC;
 	}
 
     function get_spec_check(){
-		$result = $this->tanki->get('bq_detail_detail')->result_array();
+		$result = $this->tanki->limit(0,1000)->get('bq_detail_detail')->result_array();
         $ArrSpec = [];
         foreach ($result as $key => $value) {
             $SPEC = number_format($value['dia_lebar']).' x '.number_format($value['panjang']).' x '.number_format($value['t_dsg'],2);
@@ -189,7 +189,7 @@ class Tanki_model extends CI_Model {
 		$array = [
             'id'=>$id_milik
         ];
-		$result = $this->tanki->get_where('bq_detail_detail',$array)->result();
+		$result = $this->tanki->limit(0,1000)->get_where('bq_detail_detail',$array)->result();
         $Array = [
             'qty' => $result[0]->jml
         ];
