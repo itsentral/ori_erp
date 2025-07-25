@@ -2080,7 +2080,8 @@ if($base_cur=='USD'){
 			// exit;
 			
 			$data_session	= $this->session->userdata;
-
+            $max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
+			$id_tagih 		= $max_num[0]->nomor_max + 1;
 			$check = $data['check'];
 			$idso = $data['id'];
 			$dtdelivery_no='';
@@ -2108,7 +2109,7 @@ if($base_cur=='USD'){
 				$updDeliveryHeader="";
 				if($data['type']!='progress'){
 					$result_data 	= $this->db->query("SELECT * FROM billing_so WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
-
+				
 				}else{
 					
 					$updDelivery="update delivery_product_detail set sts_invoice='1' WHERE kode_delivery IN ".$dtImplode." ";
@@ -2129,7 +2130,74 @@ if($base_cur=='USD'){
 					}
 					$dtImplode	= "('".implode("','", $dtListIDipp)."')"; 
 					$dtImplode2	= implode(",", $dtListIDipp);
+
+                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_delivery IN ".$dtImplode." ORDER BY id ")->result_array();
 					
+					$detailInv1 = [];
+                    if(!empty($getDelivery)){						
+					foreach($getDelivery AS $val => $d1){
+							$nm_material          = $d1['product_so'];
+							$product_cust         = $d1['product_delivery'];
+							$product_desc         = $d1['deskipsi_so'];
+							$diameter_1           = $d1['dim1'];
+							$diameter_2      	  = $d1['dim2'];
+							$liner                = $d1['liner'];
+							$pressure             = $d1['pressure'];
+							$id_milik             = $d1['id_milik'];
+							$spesifikasi		  = $d1['spec'];
+							$harga_sat     		  = $d1['idr_nilai_so'];
+							$qty=0;$checked='';
+							if($d1['qty_berat'] > 0){
+								$qty              = $d1['qty_berat'];
+								$checked='1';
+							}else {
+								$qty              = $d1['qty_delivery'];
+								$checked='1';								
+							}
+							$unit1                = $d1['unit'];
+							$harga_tot     		  = $d1['idr_nilai_delivery'];
+							$no_ippdtl     		  = $d1['kode_delivery'];
+							$no_sodtl		      = $d1['no_so'];
+							$qty_ori			  = $d1['qty_so'];
+							$qty_belum			  = $d1['qty_inv'];
+
+							$detailInv1[$val]['id_penagihan']		= $id_tagih;
+							$detailInv1[$val]['id_bq'] 		     	= $no_bq;
+							$detailInv1[$val]['no_ipp'] 		    = $no_ippdtl;
+							$detailInv1[$val]['so_number'] 		    = $no_sodtl;
+							$detailInv1[$val]['no_invoice'] 		= $no_invoice;
+							$detailInv1[$val]['tgl_invoice']      	= $Tgl_Invoice;
+							$detailInv1[$val]['id_customer']	 	= $id_customer;
+							$detailInv1[$val]['nm_customer'] 		= $nm_customer;
+							$detailInv1[$val]['jenis_invoice'] 		= $jenis_invoice;
+							$detailInv1[$val]['nm_material']	    = $nm_material;
+							$detailInv1[$val]['product_cust']	    = $product_cust;
+							$detailInv1[$val]['desc']	    		= $product_desc;
+							$detailInv1[$val]['dim_1']	            = $diameter_1;
+							$detailInv1[$val]['dim_2']	            = $diameter_2;
+							$detailInv1[$val]['liner']	            = $liner;
+							$detailInv1[$val]['pressure']	        = $pressure;
+							$detailInv1[$val]['spesifikasi']	    = $spesifikasi;
+							$detailInv1[$val]['unit']	            = $unit1;
+							$detailInv1[$val]['harga_satuan']	    = $harga_sat;
+							$detailInv1[$val]['harga_satuan_idr']	= $harga_sat;
+							$detailInv1[$val]['qty']	            = $qty;
+							$detailInv1[$val]['harga_total']	    = $harga_tot;
+							$detailInv1[$val]['harga_total_idr']	= $harga_tot;
+							$detailInv1[$val]['kategori_detail']	= 'PRODUCT';
+							$detailInv1[$val]['created_by'] 	    = $data_session['ORI_User']['username'];
+							$detailInv1[$val]['created_date'] 	    = date('Y-m-d H:i:s');
+							$detailInv1[$val]['qty_total']			= $qty_ori;
+							$detailInv1[$val]['qty_sisa']			= $qty_belum;
+							$detailInv1[$val]['checked']			= $checked;
+							$detailInv1[$val]['id_milik']	    	= $d1['id_milik'];
+							$detailInv1[$val]['cogs']	    		= $d1['cogs'];
+
+						}
+					}
+
+					
+						
 					// print_r($dtListIDipp);
 			        // exit;
 				}
@@ -2145,8 +2213,7 @@ if($base_cur=='USD'){
 				echo json_encode($Arr_Kembali);
 				die();
 			}
-			$max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
-			$id_tagih 		= $max_num[0]->nomor_max + 1;
+		
 
 		
 			$SUM_USD = 0;
@@ -2206,6 +2273,11 @@ if($base_cur=='USD'){
 					$this->db->query($updDelivery);
 					$this->db->query($updDeliveryHeader);
 				}
+
+
+				if(!empty($detailInv1)){
+					$this->db->insert_batch('penagihan_detail',$detailInv1);
+					}
 
 			$this->db->trans_complete();
 
