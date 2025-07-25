@@ -2132,7 +2132,7 @@ if($base_cur=='USD'){
 					$dtImplode	= "('".implode("','", $dtListIDipp)."')"; 
 					$dtImplode2	= implode(",", $dtListIDipp);
 
-                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_deliveryx IN ".$dtdelivery_no1." ORDER BY id ")->result_array();
+                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_delivery IN ".$dtdelivery_no1." ORDER BY id ")->result_array();
 					
 					$detailInv1 = [];
                     if(!empty($getDelivery)){						
