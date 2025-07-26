@@ -443,7 +443,7 @@ class Sales extends CI_Controller {
 				$dtImplode	= "('".implode("','", $dtListArray)."')";
 				// echo $dtImplode;
 				//Duplicate Bq Detail Detail
-				$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." LIMIT 0,1000 ")->result_array();
+				$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." ")->result_array();
 				
 				foreach($getBq_DetailDetail AS $val => $valx){
 					$ArrBqDetailDetail[$val]['id_milik'] = $valx['id'];
@@ -1026,7 +1026,7 @@ class Sales extends CI_Controller {
 			$dtImplode	= "('".implode("','", $dtListArray)."')";
 			// echo $dtImplode;
 			//Duplicate Bq Detail Detail
-			$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." LIMIT 0,1000 ")->result_array();
+			$getBq_DetailDetail = $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' AND id_bq_header IN ".$dtImplode." ")->result_array();
 			$ArrBqDetailDetail = array();
 			foreach($getBq_DetailDetail AS $val => $valx){
 				$ArrBqDetailDetail[$val]['id_milik'] = $valx['id'];

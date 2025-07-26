@@ -12,7 +12,7 @@ class Tanki_model extends CI_Model {
 		$array = [
             'id'=>$id_milik
         ];
-		$result = $this->tanki->limit(0,1000)->get_where('bq_detail_detail',$array)->result();
+		$result = $this->tanki->get_where('bq_detail_detail',$array)->result();
         $SPEC = (!empty($result))?number_format($result[0]->dia_lebar).' x '.number_format($result[0]->panjang).' x '.number_format($result[0]->t_dsg,2):'';
         return $SPEC;
 	}

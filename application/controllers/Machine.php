@@ -4351,7 +4351,7 @@ class Machine extends CI_Controller {
 
 		$ToHistBqHeader		= $this->db->query("SELECT * FROM bq_header WHERE id_bq='".$id_bq."' ")->result_array();
 		$ToHistBqDetHeader	= $this->db->query("SELECT * FROM bq_detail_header WHERE id_bq='".$id_bq."' ")->result_array();
-		$ToHistBqDetDetail	= $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' LIMIT 0,1000")->result_array();
+		$ToHistBqDetDetail	= $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."' ")->result_array();
 
 		// echo "SELECT * FROM bq_detail_detail WHERE id_bq='".$id_bq."'";
 		// print_r($DataBQ);
@@ -6318,7 +6318,7 @@ class Machine extends CI_Controller {
 		// echo  $id_bq;
 		// exit;
 
-		$ToHistBqDetDetail	= $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq_header='".$id_bqdet_et."' LIMIT 0,1000 ")->result_array();
+		$ToHistBqDetDetail	= $this->db->query("SELECT * FROM bq_detail_detail WHERE id_bq_header='".$id_bqdet_et."' ")->result_array();
 		$sqlToHistHead		= "	INSERT INTO hist_bq_detail_header
 									(id_bq, id_bq_header, id_delivery, sub_delivery, series, no_komponen, sts_delivery, id_category, qty, diameter_1, diameter_2, length, thickness, sudut, id_standard, type, id_product, hist_by, hist_date)
 								SELECT
