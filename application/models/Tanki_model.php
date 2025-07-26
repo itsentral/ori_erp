@@ -189,7 +189,7 @@ class Tanki_model extends CI_Model {
 		$array = [
             'id'=>$id_milik
         ];
-		$result = $this->tanki->limit(0,1000)->get_where('bq_detail_detail',$array)->result();
+		$result = $this->tanki->get_where('bq_detail_detail',$array)->result();
         $Array = [
             'qty' => $result[0]->jml
         ];
