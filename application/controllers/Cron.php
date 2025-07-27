@@ -8,6 +8,7 @@ class Cron extends CI_Controller {
 		$this->load->model('cron_model');
 		$this->load->model('tanki_model');
 		$this->load->database();
+		$this->db2 = $this->load->database('tanki', TRUE);
         if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}
@@ -3131,33 +3132,42 @@ class Cron extends CI_Controller {
 	  
 	  $where_tgl = "";
 	  if($tanggal > 0){
-		  $where_tgl = "AND DAY(a.status_date) = '".$tanggal."' ";
+		  $where_tgl = "AND DAY(a.insert_date) = '".$tanggal."' ";
 	  }
 	  
 	  $where_bln = "";
 	  if($bulan > 0){
-		  $where_bln = "AND MONTH(a.status_date) = '".$bulan."' ";
+		  $where_bln = "AND MONTH(a.insert_date) = '".$bulan."' ";
 	  }
 
 	  $where_thn = "";
 	  if($tahun > 0){
-		  $where_thn = "AND YEAR(a.status_date) = '".$tahun."' ";
+		  $where_thn = "AND YEAR(a.insert_date) = '".$tahun."' ";
 	  }
 	  
 	  $where_range = "";
 	  if($tgl_awal > 0){
-		  $where_range = "AND DATE(a.status_date) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' ";
+		  $where_range = "AND DATE(a.insert_date) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' ";
 	  }
 	  
 	  $sql = "
 		  	SELECT
-			  	a.*
+			  	a.*,
+				b.no_spk AS nomor_spk,
+				b.id_product AS nm_tanki,
+				SUBSTRING(b.product_code,1,9) as nomor_so,
+				b.production_date,
+				b.finish_production_date,
+				b.print_merge_date,
+				c.id_gudang
 		  	FROM
-			  	laporan_per_hari a
+			  	laporan_wip_per_hari_action a
+				INNER JOIN production_detail b ON a.id_production_detail = b.id
+				LEFT JOIN production_spk_parsial c ON a.id_milik=c.id_milik AND b.print_merge_date=c.created_date
 		  	WHERE 
 				a.id_category <> '' ".$where_tgl." ".$where_bln." ".$where_thn." ".$where_range." 
 			ORDER BY 
-				a.status_date DESC
+				a.id DESC
 	  ";
 	//   echo $sql;exit;
 	  	$product    = $this->db->query($sql)->result_array();
@@ -3451,17 +3461,15 @@ class Cron extends CI_Controller {
 			  $awal_col	= 0;
 
 			  $NO_IPP = str_replace('PRO-','',$row_Cek['id_produksi']);
-			  $GET_PRODUKSI_DETAIL 	= $this->db->get_where('production_detail',array('id'=>$row_Cek['id_production_detail']))->result();
-			  $kode_hist			= (!empty($GET_PRODUKSI_DETAIL[0]->print_merge_date))?$GET_PRODUKSI_DETAIL[0]->print_merge_date:'-';
-			  $id_milik				= $row_Cek['id_milik'];
-			  $QTY_ORDER			= (!empty($GET_PRODUKSI_DETAIL[0]->qty))?$GET_PRODUKSI_DETAIL[0]->qty:'-';
-			  $START_PRODUKSI		= (!empty($GET_PRODUKSI_DETAIL[0]->production_date))?$GET_PRODUKSI_DETAIL[0]->production_date:'-';
-			  $SELESAI_PRODUKSI		= (!empty($GET_PRODUKSI_DETAIL[0]->finish_production_date))?$GET_PRODUKSI_DETAIL[0]->finish_production_date:'-';
-			  $GET_PRODUKSI_PARSIAL = $this->db->get_where('production_spk_parsial',array('id_milik'=>$id_milik,'created_date'=>$kode_hist))->result();
-			  $id_gudang			= (!empty($GET_PRODUKSI_PARSIAL[0]->id_gudang))?$GET_PRODUKSI_PARSIAL[0]->id_gudang:'-';
-			//   $GET_PRODUKSI_FIN 	= $this->db->get_where('production_detail',array('id_milik'=>$id_milik,'print_merge_date'=>$kode_hist))->result();
-			//   $SELESAI_PRODUKSI		= (!empty($GET_PRODUKSI_FIN[0]->finish_production_date))?$GET_PRODUKSI_FIN[0]->finish_production_date:'-';
-			 
+			  $kode_hist				= $row_Cek['print_merge_date'];
+				$id_milik				= $row_Cek['id_milik'];
+				$QTY_ORDER				= $row_Cek['qty'];
+				$START_PRODUKSI			= $row_Cek['production_date'];
+				$SELESAI_PRODUKSI		= $row_Cek['finish_production_date'];
+				$id_gudang				= $row_Cek['id_gudang'];
+				$so_number				= $row_Cek['nomor_so'];
+				$no_spk					= $row_Cek['nomor_spk'];
+
 			  $awal_col++;
 			  $nomor	= $no;
 			  $Cols		= getColsChar($awal_col);
@@ -3476,31 +3484,29 @@ class Cron extends CI_Controller {
 
 			  $tandaIPP = substr($NO_IPP,0,4);
 			  if($tandaIPP != 'IPPT'){
-				$customer		= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
-				$project		= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
-				$so_number		= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
+				$nm_customer 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
+				$nm_project 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
 				$length			= $SERACH_DETAIL_SPEC[$id_milik]['length'];
 				$thickness		= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
-				$no_spk			= (!empty($GET_PRODUKSI_DETAIL[0]->no_spk))?$GET_PRODUKSI_DETAIL[0]->no_spk:'-';
+				$nm_product		= $row_Cek['id_category'];
 			  }
 			  else{
 				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
-				$customer		= $getDetailTanki['customer'];
-				$project		= $getDetailTanki['nm_project'];
-				$so_number		= $row_Cek['no_so'];
-				$length			= '';
-				$thickness		= '';
-				$no_spk			= $row_Cek['no_spk'];
+				$nm_customer	= $getDetailTanki['customer'];
+				$nm_project		= $getDetailTanki['nm_project'];
+				$length			= 0;
+				$thickness		= 0;
+				$nm_product		= $row_Cek['nm_tanki'];
 			  }
 
 			  $awal_col++;
 			  $Cols			= getColsChar($awal_col);
-			  $sheet->setCellValue($Cols.$awal_row, $customer);
+			  $sheet->setCellValue($Cols.$awal_row, $nm_customer);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
 			  $Cols			= getColsChar($awal_col);
-			  $sheet->setCellValue($Cols.$awal_row, $project);
+			  $sheet->setCellValue($Cols.$awal_row, $nm_project);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
@@ -3533,9 +3539,8 @@ class Cron extends CI_Controller {
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
-			  $id_category	= $row_Cek['id_category'];
 			  $Cols			= getColsChar($awal_col);
-			  $sheet->setCellValue($Cols.$awal_row, $id_category);
+			  $sheet->setCellValue($Cols.$awal_row, $nm_product);
 			  $sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 			  $awal_col++;
@@ -3725,6 +3730,15 @@ class Cron extends CI_Controller {
 					$MP = $GET_DETAIL_SO[0]->man_power;
 					$MH = $GET_DETAIL_SO[0]->man_hours;
 				}
+
+				if($tandaIPP == 'IPPT'){
+				$GET_DETAIL_SO_TANKI = $this->db2->get_where('bq_detail_detail',array('id'=>$id_milik))->result();
+				if(!empty($GET_DETAIL_SO_TANKI)){
+					$WH = $GET_DETAIL_SO_TANKI[0]->t_time;
+					$MP = $GET_DETAIL_SO_TANKI[0]->mp;
+					$MH = $GET_DETAIL_SO_TANKI[0]->man_hours;
+				}
+			}
 
 			  $awal_col++;
 			  $work_hours	= $qty_produksi * $WH;
