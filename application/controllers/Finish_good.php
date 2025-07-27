@@ -959,6 +959,8 @@ $arrContextOptions=array(
 				AND (
 					a.id_category LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					OR a.id_category LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR b.no_so LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR b.no_spk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 				)
 			GROUP BY a.id
 		";
