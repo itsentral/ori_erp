@@ -657,6 +657,7 @@
 					//$down_payment2=0;
 				}else{
 					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
+					$grand_total2 = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
 					//$down_payment=($uang_muka_persen*$grand_total/100);
 					//$down_payment2=0;
 				}
