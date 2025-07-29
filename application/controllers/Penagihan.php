@@ -6563,11 +6563,11 @@ if($base_cur=='USD'){
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
-					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','-','".$vals['qty']."','cut','".$vals['cogs']."','".$vals['product']."') ");
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','-','".$vals['qty']."','cut non produksi','".$vals['cogs']."','".$vals['product']."') ");
 				}
 			}
 
-			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_productx a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	 from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
+			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	 from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
 			x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
 			
 			
