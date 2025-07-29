@@ -6440,7 +6440,7 @@ if($base_cur=='USD'){
 		$nomor_id 	= explode(",",$penagihan[0]->no_so);
 		$approval	= $this->uri->segment(4);
 		// print_r($penagihan);exit;
-		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so')->result_array();
+		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so_gabung')->result_array();
 		
 		// print_r($getBq);
 		// exit;
