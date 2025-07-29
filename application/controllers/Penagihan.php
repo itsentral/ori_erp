@@ -6415,6 +6415,8 @@ if($base_cur=='USD'){
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'down_payment2'	=> 0,
+				'sisa_um'	    => $sisa_um,
+				'sisa_um_idr'	    => $sisa_um_idr,
 				'id'			=> $id,
 				'approval'		=> $approval
 			);
