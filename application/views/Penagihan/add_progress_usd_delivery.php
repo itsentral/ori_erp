@@ -25,7 +25,7 @@
 		<?php
 		$numb=0;
 		$SUM = 0;$total_cogs=0;
-		foreach($getDetail AS $val => $valx){ $numb++;
+		foreach($getDetail AS $val => $valx){ $numb++; 
 			$pr		= 'pr';
 			$numb1	= $pr.$numb;
 			if(isset($valx['harga_total'])){
@@ -64,7 +64,7 @@
 					<input type="hidden" id="data_cogs_<?=$numb?>" name="data1[<?=$numb?>][cogs]" value="<?=$valx['cogs']?>">
 				</td>
 				<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb;?>" name="data1[<?=$numb ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb;?>" name="data1[<?=$numb ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['customer_item'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb;?>" name="data1[<?=$numb ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb;?>" name="data1[<?=$numb ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['desc'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb;?>" name="data1[<?=$numb ?>][diameter_1]" value="<?=$valx['dim1']; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb;?>" name="data1[<?=$numb ?>][diameter_2]" value="<?=$valx['dim2']; ?>" readonly  tabindex="-1"></td>
