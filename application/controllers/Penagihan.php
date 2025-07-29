@@ -6559,7 +6559,7 @@ if($base_cur=='USD'){
 			}
 
 // cutting tidak diproduksi
-			$sql="select a.length/100 as qty, a.nilai_cogs as cogs, a.id_milik, a.product from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' and ISNULL(a.id_produksi)";
+			$sql="select a.length/1000 as qty, a.nilai_cogs as cogs, a.id_milik, a.product from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' and ISNULL(a.id_produksi)";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
