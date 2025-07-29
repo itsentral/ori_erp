@@ -2132,9 +2132,9 @@ if($base_cur=='USD'){
 					$dtImplode	= "('".implode("','", $dtListIDipp)."')"; 
 					$dtImplode2	= implode(",", $dtListIDipp);
 
-                    $getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_delivery IN ".$dtdelivery_no1." ORDER BY id ")->result_array();
+                    //$getDelivery= $this->db->query("SELECT * FROM view_plan_tagih WHERE kode_delivery IN ".$dtdelivery_no1." ORDER BY id ")->result_array();
 					
-					$detailInv1 = [];
+					/*$detailInv1 = [];
                     if(!empty($getDelivery)){						
 					foreach($getDelivery AS $val => $d1){
 							$nm_material          = $d1['product_so'];
@@ -2196,7 +2196,7 @@ if($base_cur=='USD'){
 							$detailInv1[$val]['cogs']	    		= 0;
 
 						}
-					}
+					}*/
 
 					
 						
@@ -2277,9 +2277,9 @@ if($base_cur=='USD'){
 				}
 
 
-				if(!empty($detailInv1)){
+				/*if(!empty($detailInv1)){
 					$this->db->insert_batch('penagihan_detail',$detailInv1);
-					}
+					}*/
 
 			$this->db->trans_complete();
 
