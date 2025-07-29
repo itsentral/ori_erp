@@ -6338,6 +6338,7 @@ if($base_cur=='USD'){
 				$sisa_um   = $get_kurs[0]->sisa_um;
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
 				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
 				
 				$getTankiproduct=array();
 				$getTankipacking=array();
