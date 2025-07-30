@@ -105,10 +105,10 @@
 				<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=$valx['dim1']; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=$valx['dim2']; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=$valx['liner']; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=$valx['pressure']; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=0; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?=spec_bq($valx['id_milik']); ?>" readonly  tabindex="-1"></td>
 				<td>
 					<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
