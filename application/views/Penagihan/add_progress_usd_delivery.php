@@ -86,6 +86,73 @@
 		<?php
 		}
 		?>
+
+		<?php
+		$numb5=300;
+		$SUM2 = 0;$total_cogs2=0;
+		foreach($getDetailcut AS $val => $valx){ $numb5++; 
+			$pr2		= 'pr';
+			$numb6	= $pr2.$numb5;
+			if(isset($valx['harga_total'])){
+				$HrgTot	= $valx['harga_total'];
+				$dataSum = $HrgTot;
+				$unitT = $valx['unit'];
+				$sisa_inv = $valx['qty_delivery'];
+				$harga_sat	= round($valx['harga_satuan'],2);
+				$harga_tot	= round($valx['harga_total'],2);
+				$SUM += ($harga_tot);
+
+			}else{
+				if($valx['qty'] <> 0){
+					$HrgTot  	= $valx['total_deal_usd'];
+					$dataSum	= $HrgTot;
+				}
+				if($valx['product'] == 'pipe' OR $valx['product'] == 'pipe slongsong'){
+					$unitT = "Btg";
+				}
+				else{
+					$unitT = "Pcs";
+				}
+				$sisa_inv = $valx['qty_delivery'];//$valx['qty'] - $valx['qty_inv'];
+				$harga_sat	= round($dataSum / $valx['qty'],2);
+				$harga_tot	= round($harga_sat * $sisa_inv,2);
+				$SUM += ($harga_tot);
+			}
+			$total_cogs2=($total_cogs2+$valx['cogs']);
+			?>
+			<tr id='tr_<?= $numb5;?>' >
+				<td align='center'>
+					<input type="hidden" id="ck_<?= $numb5;?>" name="tr1_<?= $numb5;?>" value="<?= $numb5;?>">
+					<input type="hidden" id="data_ipp_<?=$numb5?>" name="data1[<?=$numb5?>][no_ipp]" value="<?=$valx['no_ipp']?>">
+					<input type="hidden" id="data_so_<?=$numb5?>" name="data1[<?=$numb5?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
+					<input type="hidden" id="data_idmilik_<?=$numb5?>" name="data1[<?=$numb5?>][id_milik]" value="<?=$valx['id_milik']?>">
+					<input type="hidden" id="data_cogs_<?=$numb5?>" name="data1[<?=$numb5?>][cogs]" value="<?=$valx['cogs']?>">
+				</td>
+				<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['desc'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=$valx['dim1']; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=$valx['dim2']; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=$valx['liner']; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=$valx['pressure']; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?=spec_bq($valx['id_milik']); ?>" readonly  tabindex="-1"></td>
+				<td>
+					<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
+					<input type="text" class="form-control input-sm text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=set_value('harga_sat', isset($harga_sat) ? $harga_sat : '0'); ?>" readonly  tabindex="-1">
+				</td>
+				<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_ori]" value="<?=$valx['qty_total']; ?>" readonly tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_belum]" value="<?=$valx['qty_inv']; ?>" readonly tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm qty_product text-center" id="qty_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty]" value="<?=$valx['qty_delivery']; ?>"></td>
+				<td><input type="text" class="form-control input-sm text-center" id="unit1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][unit1]" value="<?=$unitT; ?>" readonly tabindex="-1"></td>
+				<td>
+					<input type="text" class="form-control text-right input-sm divide amount1" id="harga_tot_<?=$numb5 ?>" name="data1[<?=$numb5 ?>][harga_tot]" value="<?=$harga_tot; ?>" readonly tabindex="-1">
+				</td>
+			</tr>
+		<?php
+		}
+		?>
+
+
 		<tr class='FootColor'>
 			<td colspan='14'><b>TOTAL COST  OF PRODUCT</b></td>
 			<td align='center'>
@@ -93,7 +160,7 @@
 				$tot_product2=round($SUM,2);
 				?>
 				<input type="text" class="form-control input-sm result1 text-right divide" id="tot_product" name="tot_product" value="<?=set_value('tot_product', isset($tot_product2) ? $tot_product2 : '0'); ?>" readonly tabindex="-1">
-				<input type="hidden" value="<?=$total_cogs; ?>" name="total_cogs">
+				<input type="hidden" value="<?=$total_cogs+$total_cogs2; ?>" name="total_cogs">
 			</td>
 		</tr>
 	</tbody>
