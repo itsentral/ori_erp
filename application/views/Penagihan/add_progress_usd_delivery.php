@@ -109,7 +109,7 @@
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=0; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=0; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?=spec_bq($valx['id_milik']); ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?=-; ?>" readonly  tabindex="-1"></td>
 				<td>
 					<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
 					<input type="text" class="form-control input-sm harga_product text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=0; ?>"  tabindex="-1">
