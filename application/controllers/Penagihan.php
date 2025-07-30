@@ -563,7 +563,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -1117,7 +1116,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -2108,9 +2106,12 @@ if($base_cur=='USD'){
 				$updDeliveryHeader="";
 				if($data['type']!='progress'){
 					$result_data 	= $this->db->query("SELECT * FROM billing_so WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
+					$totalcogs =0;
 
 				}else{
 					
+					$cogs = $this->db->query("SELECT sum(nilai_unit) as totalcogs FROM data_erp_in_customer WHERE kode_delivery IN ".$dtImplode." ")->row();
+					$totalcogs =$cogs->totalcogs;
 					$updDelivery="update delivery_product_detail set sts_invoice='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$updDeliveryHeader="update delivery_product set st_cogs='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$dtdelivery_no=$dtImplode2;
@@ -2181,6 +2182,7 @@ if($base_cur=='USD'){
 				'etd' => $data['etd'],
 				'eta' => $data['eta'],
 				'consignee' => $data['consignee'],
+				'total_cogs' => $totalcogs,
 				'notify_party' => $data['notify_party'],
 				'port_of_loading' => $data['port_of_loading'],
 				'port_of_discharges' => $data['port_of_discharges'],
@@ -2513,7 +2515,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -3072,7 +3073,6 @@ else
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -3710,6 +3710,7 @@ else
 		$no_po			= $gethd->no_po;
 		$created_on      = date('Y-m-d H:i:s');
 		$created_by     = $data_session['ORI_User']['username'];
+		$no_delivery	= $gethd->delivery_no;
 
 		$this->db->trans_begin();
 		$db2->trans_begin();
@@ -4472,7 +4473,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -4966,7 +4966,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
