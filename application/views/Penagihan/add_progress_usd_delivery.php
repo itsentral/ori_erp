@@ -116,7 +116,7 @@
 				</td>
 				<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_ori]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_belum]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm qty_product text-center" id="qty_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty]" value="<?=$valx['qty']; ?>"></td>
+				<td><input type="text" class="form-control input-sm qty_product2 text-center" id="qty_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty]" value="<?=$valx['qty']; ?>"></td>
 				<td><input type="text" class="form-control input-sm text-center" id="unit1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][unit1]" value="<?=$unitT; ?>" readonly tabindex="-1"></td>
 				<td>
 					<input type="text" class="form-control text-right input-sm divide amount1" id="harga_tot_<?=$numb5 ?>" name="data1[<?=$numb5 ?>][harga_tot]" value="<?=0; ?>" readonly tabindex="-1">

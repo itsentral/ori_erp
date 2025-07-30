@@ -456,14 +456,10 @@ if(isset($approval)){
 			fnAlltotal()
 		});
 
-			$(document).on('keyup change', '.harga_product', function(){
+		$(document).on('keyup change', '.qty_product2', function(){
 			let dataNomor 	= $(this).data('nomor');
 			let sisa 		= getNum($('#qty_belum_'+dataNomor).val().split(",").join(""));
 			let dataIni	  	= getNum($(this).val().split(",").join(""));
-			if(dataIni > sisa){
-				$(this).val(number_format(sisa));
-				dataIni	 = sisa;
-			}
 			let hargaSat  	= $('#harga_sat_'+dataNomor).val();
 			let total     	= getNum(hargaSat*dataIni).toFixed(2);
 			$('#harga_tot_'+dataNomor).val(num2(total));
