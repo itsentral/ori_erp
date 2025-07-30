@@ -112,7 +112,7 @@
 				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?=spec_bq($valx['id_milik']); ?>" readonly  tabindex="-1"></td>
 				<td>
 					<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
-					<input type="text" class="form-control input-sm text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=set_value('harga_sat', isset($harga_sat) ? $harga_sat : '0'); ?>" readonly  tabindex="-1">
+					<input type="text" class="form-control input-sm text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=0; ?>"  tabindex="-1">
 				</td>
 				<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_ori]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_belum]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
