@@ -69,7 +69,7 @@
 				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb;?>" name="data1[<?=$numb ?>][diameter_2]" value="<?=$valx['dim2']; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb;?>" name="data1[<?=$numb ?>][liner]" value="<?=$valx['liner']; ?>" readonly  tabindex="-1"></td>
 				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb;?>" name="data1[<?=$numb ?>][pressure]" value="<?=$valx['pressure']; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb;?>" name="data1[<?=$numb ?>][spesifikasi]" value="<?=-; ?>" readonly  tabindex="-1"></td>
+				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb;?>" name="data1[<?=$numb ?>][spesifikasi]" value="<?='-'; ?>" readonly  tabindex="-1"></td>
 				<td>
 					<input type='hidden' name="data1[<?=$numb ?>][id]" value='<?=$valx['id'];?>'>
 					<input type="text" class="form-control input-sm text-right divide" id="harga_sat_<?= $numb;?>" name="data1[<?=$numb ?>][harga_sat]" value="<?=set_value('harga_sat', isset($harga_sat) ? $harga_sat : '0'); ?>" readonly  tabindex="-1">
