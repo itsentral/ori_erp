@@ -6550,7 +6550,7 @@ if($base_cur=='USD'){
 				}
 			}
 // cutting
-			$sql="select round(c.length_split/c.length,2) as qty, a.nilai_cogs as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut'";
+			$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and b.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik, b.id_product, b.id_produksi ";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
