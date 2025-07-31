@@ -63,8 +63,8 @@ $this->load->view('include/side_menu');
 					<input type='text' name='kurs' id='kurs' class='form-control input-md' value='<?=number_format($kurs,2);?>' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>
 					<?php print_r($getHeader[0]->no_ipp);
 					exit;
-					
-					if(SUBSTR($getHeader[0]->no_ipp,0,4)) !='IPPT' ){ ?>
+
+					if(SUBSTR($getHeader[0]->no_ipp,0,4)) != IPPT ){ ?>
 					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= get_name('so_number','wilayah','id_bq', "BQ-".$getHeader[0]->no_ipp);?>">
 				    <?php } else {?>
 						<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= get_name('so_number','wilayah','id_bq', "BQ-".$getHeader[0]->no_ipp);?>">
