@@ -64,6 +64,8 @@ $this->load->view('include/side_menu');
 					
 					<?php if(!empty($getHeader[0]->no_ipp)){ ?>
 					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= get_name('so_number','wilayah','id_bq', "BQ-".$getHeader[0]->no_ipp);?>">
+				    <?php } else { ?>
+					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="">
 				    <?php } ?>
 						
 				</div>
