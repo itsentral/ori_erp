@@ -6483,6 +6483,7 @@ if($base_cur=='USD'){
 			$non_frp	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 			$material	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
+			$getDetailcut	='';
 			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 			$sisa_um   = $get_kurs[0]->sisa_um;
