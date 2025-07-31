@@ -6632,9 +6632,6 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		 print_r(offset($getHeader[0]->no_ipp));
-		 exit;
-
 		$data2 = array(
 			'title'			=> 'Indeks Of Create Invoice Progress',
 			'action'		=> 'index',
