@@ -90,39 +90,41 @@
 		<?php
 		$numb5=300;
 		$SUM2 = 0;$total_cogs2=0;
-		foreach($getDetailcut AS $val => $valx){ $numb5++; 
-			$pr2		= 'pr';
-			$numb6	= $pr2.$numb5;			
-			?>
-			<tr id='tr_<?= $numb5;?>' >
-				<td align='center'>
-					<input type="hidden" id="ck_<?= $numb5;?>" name="tr1_<?= $numb5;?>" value="<?= $numb5;?>">
-					<input type="hidden" id="data_ipp_<?=$numb5?>" name="data1[<?=$numb5?>][no_ipp]" value="<?=$valx['no_ipp']?>">
-					<input type="hidden" id="data_so_<?=$numb5?>" name="data1[<?=$numb5?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
-					<input type="hidden" id="data_idmilik_<?=$numb5?>" name="data1[<?=$numb5?>][id_milik]" value="<?=$valx['id_milik']?>">
-					<input type="hidden" id="data_cogs_<?=$numb5?>" name="data1[<?=$numb5?>][cogs]" value="<?=$valx['cogs']?>">
-				</td>
-				<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=0; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=0; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=0; ?>" readonly  tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?='-'; ?>" readonly  tabindex="-1"></td>
-				<td>
-					<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
-					<input type="text" class="form-control input-sm harga_product text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=0; ?>"  tabindex="-1">
-				</td>
-				<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_ori]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_belum]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
-				<td><input type="text" class="form-control input-sm qty_product2 text-center" id="qty_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty]" value="<?=$valx['qty']; ?>"></td>
-				<td><input type="text" class="form-control input-sm text-center" id="unit1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][unit1]" value="<?=$unitT; ?>" readonly tabindex="-1"></td>
-				<td>
-					<input type="text" class="form-control text-right input-sm divide amount1" id="harga_tot_<?=$numb5 ?>" name="data1[<?=$numb5 ?>][harga_tot]" value="<?=0; ?>" readonly tabindex="-1">
-				</td>
-			</tr>
-		<?php
+		if (!empty($getDetailcut)){
+			foreach($getDetailcut AS $val => $valx){ $numb5++; 
+				$pr2		= 'pr';
+				$numb6	= $pr2.$numb5;			
+				?>
+				<tr id='tr_<?= $numb5;?>' >
+					<td align='center'>
+						<input type="hidden" id="ck_<?= $numb5;?>" name="tr1_<?= $numb5;?>" value="<?= $numb5;?>">
+						<input type="hidden" id="data_ipp_<?=$numb5?>" name="data1[<?=$numb5?>][no_ipp]" value="<?=$valx['no_ipp']?>">
+						<input type="hidden" id="data_so_<?=$numb5?>" name="data1[<?=$numb5?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
+						<input type="hidden" id="data_idmilik_<?=$numb5?>" name="data1[<?=$numb5?>][id_milik]" value="<?=$valx['id_milik']?>">
+						<input type="hidden" id="data_cogs_<?=$numb5?>" name="data1[<?=$numb5?>][cogs]" value="<?=$valx['cogs']?>">
+					</td>
+					<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb5;?>" name="data1[<?=$numb5 ?>][liner]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb5;?>" name="data1[<?=$numb5 ?>][pressure]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb5;?>" name="data1[<?=$numb5 ?>][spesifikasi]" value="<?='-'; ?>" readonly  tabindex="-1"></td>
+					<td>
+						<input type='hidden' name="data1[<?=$numb5 ?>][id]" value='<?=$valx['id'];?>'>
+						<input type="text" class="form-control input-sm harga_product text-right divide" id="harga_sat_<?= $numb5;?>" name="data1[<?=$numb5 ?>][harga_sat]" value="<?=0; ?>"  tabindex="-1">
+					</td>
+					<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_ori]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty_belum]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm qty_product2 text-center" id="qty_<?= $numb5;?>" data-nomor='<?=$numb5 ?>' name="data1[<?=$numb5 ?>][qty]" value="<?=$valx['qty']; ?>"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="unit1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][unit1]" value="<?=$unitT; ?>" readonly tabindex="-1"></td>
+					<td>
+						<input type="text" class="form-control text-right input-sm divide amount1" id="harga_tot_<?=$numb5 ?>" name="data1[<?=$numb5 ?>][harga_tot]" value="<?=0; ?>" readonly tabindex="-1">
+					</td>
+				</tr>
+			<?php
+			}
 		}
 		?>
 
