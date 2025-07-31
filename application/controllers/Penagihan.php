@@ -6632,7 +6632,7 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		 print_r(strpos($getHeader[0]->no_ipp,"IPPT"));
+		 print_r(SUBSTR($getHeader[0]->no_ipp,0,4));
 		 exit;
 
 		$data2 = array(
