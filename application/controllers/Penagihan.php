@@ -6632,7 +6632,7 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		 print_r(SUBSTR($getHeader[0]->no_ipp,0,4));
+		 print_r($getHeader[0]->no_ipp));
 		 exit;
 
 		$data2 = array(
