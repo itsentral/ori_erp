@@ -1863,7 +1863,7 @@ class Produksi extends CI_Controller {
 					'warehouse' 	=> $getWherehouse,
 					'warehouse2' 	=> $getWherehouse2,
 					'get_detail_spk2' 	=> $get_detail_spk2,
-					'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check(),
+					'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check($get_detail_spk[0]['no_ipp']),
 					'costcenter' 	=> $this->db->order_by('nm_gudang','asc')->get_where('warehouse',array('category'=>'produksi'))->result_array(),
 					'get_liner_utama' 		=> $this->getDataGroupMaterialNew($get_liner_mix, $WHERE_KEY, $WHERE_KEY_QTY, $WHERE_KEY_QTY_ALL),
 					'get_str_n1_utama' 		=> $this->getDataGroupMaterialNew($get_str_n1_mix, $WHERE_KEY, $WHERE_KEY_QTY, $WHERE_KEY_QTY_ALL),
@@ -1905,7 +1905,7 @@ class Produksi extends CI_Controller {
 					'warehouse' 	=> $getWherehouse,
 					'warehouse2' 	=> $getWherehouse2,
 					'get_detail_spk2' 	=> $get_detail_spk2,
-					'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check(),
+					'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check($get_detail_spk[0]['no_ipp']),
 					'costcenter' 	=> $this->db->order_by('nm_gudang','asc')->get_where('warehouse',array('category'=>'produksi'))->result_array(),
 					'get_liner_utama' 		=> array_merge($get_liner_utama_resin,$get_liner_utama_mixing),
 					'get_str_n1_utama' 		=> [],
@@ -1978,7 +1978,7 @@ class Produksi extends CI_Controller {
 				'warehouse' 	=> $getWherehouse,
 				'warehouse2' 	=> $getWherehouse2,
 				'get_detail_spk2' 	=> $get_detail_spk2,
-				'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check(),
+				'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check($get_detail_spk[0]['no_ipp']),
 				'costcenter' 	=> $this->db->order_by('nm_gudang','asc')->get_where('warehouse',array('category'=>'produksi'))->result_array(),
 				'get_liner_utama' 		=> $this->getDataGroupMaterialNewTanki($get_liner_mix, $WHERE_KEY, $WHERE_KEY_QTY, $WHERE_KEY_QTY_ALL),
 				'get_str_n1_utama' 		=> [],
@@ -2157,7 +2157,7 @@ class Produksi extends CI_Controller {
 			'get_external_utama' 	=> $get_external_utama,
 			'get_topcoat_utama' 	=> $get_topcoat_utama,
 			'tgl_planning' 	=> $tgl_planning,
-			'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check(),
+			'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check($get_detail_spk2[0]['no_ipp']),
 			'gudang_from' 		=> $detAdjustment[0]['id_gudang_dari'],
 			'print_ke' 			=> $detAdjustment[0]['print_ke'],
 			'gudang_to' 		=> $PrintHedaer[0]->id_gudang,
@@ -2166,6 +2166,7 @@ class Produksi extends CI_Controller {
 			'hist_produksi'		=> $detAdjustment[0]['created_date']
 		);
 		$this->load->view('Print/print_req_mixing_new', $data);
+		history("Print spk mixing edit qty ".$IDUNIQ);
 	}
 
 	public function getDataGroupMaterial($data=null,$uniq=null) {
@@ -7591,7 +7592,7 @@ class Produksi extends CI_Controller {
 			'warehouse2' 		=> $getWherehouse2,
 			'get_detail_spk' 	=> $get_detail_spk,
 			'hist_produksi' 	=> $hist_produksi,
-			'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check(),
+			'GET_SPEC_TANK' 	=> $this->tanki_model->get_spec_check($get_detail_spk[0]['no_ipp']),
 			'kode_spk' 			=> $kode_spk,
 			'link_submit'		=> $link_submit
 		);

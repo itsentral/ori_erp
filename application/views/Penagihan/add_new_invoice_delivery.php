@@ -61,7 +61,13 @@ $this->load->view('include/side_menu');
 				<label class='label-control col-sm-2'><b>Kurs <span class='text-red'>*</span></b></label>
 				<div class='col-sm-2'>
 					<input type='text' name='kurs' id='kurs' class='form-control input-md' value='<?=number_format($kurs,2);?>' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>
+					
+					<?php if(!empty($getHeader[0]->no_ipp)){ ?>
 					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= get_name('so_number','wilayah','id_bq', "BQ-".$getHeader[0]->no_ipp);?>">
+				    <?php } else { ?>
+					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="">
+				    <?php } ?>
+						
 				</div>
 				<div class='col-sm-2'>
 					<input type='text' name='base_cur' id='base_cur' class='form-control input-md' value='<?=($base_cur);?>' readonly>
@@ -322,7 +328,7 @@ if(isset($approval)){
 					allowOutsideClick	: false
 				});
 			}
-			else if ($('#kurs').val()=="" && $('#wilayah').val() == 'L') {
+			else if ($('#kurs').val()=="") {
 				swal({
 					title	: "KURS HARUS DI UPDATE!",
 					text	: "SILAHKAN UPDATE KURS TERLEBIH DAHULU!",
@@ -449,6 +455,17 @@ if(isset($approval)){
 				$(this).val(number_format(sisa));
 				dataIni	 = sisa;
 			}
+			let hargaSat  	= $('#harga_sat_'+dataNomor).val();
+			let total     	= getNum(hargaSat*dataIni).toFixed(2);
+			$('#harga_tot_'+dataNomor).val(num2(total));
+			$('#harga_tot_hidden'+dataNomor).val(total);
+			fnAlltotal()
+		});
+
+		$(document).on('keyup change', '.qty_product2', function(){
+			let dataNomor 	= $(this).data('nomor');
+			let sisa 		= getNum($('#qty_belum_'+dataNomor).val().split(",").join(""));
+			let dataIni	  	= getNum($(this).val().split(",").join(""));
 			let hargaSat  	= $('#harga_sat_'+dataNomor).val();
 			let total     	= getNum(hargaSat*dataIni).toFixed(2);
 			$('#harga_tot_'+dataNomor).val(num2(total));

@@ -122,7 +122,7 @@
 						<div class="form-group ">
                             <label for="tgldo" class="col-sm-4 control-label">Kurs </label>
                             <div class="col-sm-4" style="padding-top: 8px;">
-                              <input type="text" name="kurs" class="form-control input-sm" id="kurs" value="<?php echo number_format($data_header->kurs_jual) ?>" readonly>
+                              <input type="text" name="kurs" class="form-control input-sm" id="kurs" value="<?php echo number_format($data_header->kurs_jual,2) ?>" readonly>
                             </div>
                             <div class="col-sm-2" style="padding-top: 8px;">
                               <input type="text" name="base_cur" class="form-control input-sm" id="base_cur" value="<?php echo($data_header->base_cur) ?>" readonly>

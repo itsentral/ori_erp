@@ -563,7 +563,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -1117,7 +1116,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -2109,9 +2107,12 @@ if($base_cur=='USD'){
 				$updDeliveryHeader="";
 				if($data['type']!='progress'){
 					$result_data 	= $this->db->query("SELECT * FROM billing_so WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
-				
+					$totalcogs =0;
+
 				}else{
 					
+					$cogs = $this->db->query("SELECT sum(nilai_unit) as totalcogs FROM data_erp_in_customer WHERE kode_delivery IN ".$dtImplode." ")->row();
+					$totalcogs =$cogs->totalcogs;
 					$updDelivery="update delivery_product_detail set sts_invoice='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$updDeliveryHeader="update delivery_product set st_cogs='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$dtdelivery_no=$dtImplode2;
@@ -2250,6 +2251,7 @@ if($base_cur=='USD'){
 				'etd' => $data['etd'],
 				'eta' => $data['eta'],
 				'consignee' => $data['consignee'],
+				'total_cogs' => $totalcogs,
 				'notify_party' => $data['notify_party'],
 				'port_of_loading' => $data['port_of_loading'],
 				'port_of_discharges' => $data['port_of_discharges'],
@@ -2587,7 +2589,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -3146,7 +3147,6 @@ else
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -3784,6 +3784,8 @@ else
 		$no_po			= $gethd->no_po;
 		$created_on      = date('Y-m-d H:i:s');
 		$created_by     = $data_session['ORI_User']['username'];
+		$no_delivery	= $gethd->delivery_no;
+		$kode_delivery  ="('".implode("','", $no_delivery)."')";
 
 		$this->db->trans_begin();
 		$db2->trans_begin();
@@ -4105,6 +4107,8 @@ else
 				'nama_supplier' => $Nama_klien,
 			);
 			$this->db->insert('tr_kartu_piutang',$datapiutang);
+
+			
 		}
 
 		if($jenis_invoice=='retensi'){
@@ -4234,6 +4238,12 @@ else
 		}else{
 			$db2->insert('javh',$dataJVhead);
 			$db2->insert_batch('jurnal',$det_Jurnaltes1);
+			if($kodejurnal1		= 'JV061'){
+            
+			$this->db->query("INSERT INTO data_erp_in_customer (tanggal,keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,jenis,id_material,nm_material,qty_mat,cost_book,gudang,kode_spool)			
+			SELECT ".$tgl.",keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,'out',id_material,nm_material,qty_mat,cost_book,gudang,kode_spool FROM data_erp_in_customer WHERE kode_delivery IN ".$kode_delivery."");
+			}
+			
 
 			$this->db->trans_commit();
 			$db2->trans_commit();
@@ -4546,7 +4556,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment'),
 				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -5040,7 +5049,6 @@ if($base_cur=='USD'){
 				'total_um'	                => $this->input->post('down_payment')/$kurs,
 				'total_um_idr'	            => $this->input->post('down_payment'),
 				'kurs_jual'	                => $kurs,
-				'total_cogs'	            => $this->input->post('total_cogs'),
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
 				'no_pajak'	                => $this->input->post('nomor_pajak'),
@@ -6242,9 +6250,11 @@ if($base_cur=='USD'){
 				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 
-				$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
+				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+				$sisa_um   = $get_kurs[0]->sisa_um;
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
 				if($base_cur=='USD'){
 					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
 				}else{
@@ -6329,8 +6339,10 @@ if($base_cur=='USD'){
 				'kurs'			=> $get_kurs[0]->kurs,
 				'uang_muka_persen'	=> $get_kurs[0]->uang_muka_persen,
 				'uang_muka_persen2'	=> 0,
-				'down_payment'	=> 0,
-				'down_payment2'	=> 0,
+				'down_payment'	=> $down_payment,
+				'sisa_um'	    => $sisa_um,
+				'sisa_um_idr'	    => $sisa_um_idr,
+				'down_payment2'	=> $down_payment2,
 				'id'			=> $id,
 				'approval'		=> $approval
 			);
@@ -6408,6 +6420,7 @@ if($base_cur=='USD'){
 				$sisa_um   = $get_kurs[0]->sisa_um;
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
 				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
 				
 				$getTankiproduct=array();
 				$getTankipacking=array();
@@ -6485,6 +6498,8 @@ if($base_cur=='USD'){
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'down_payment2'	=> 0,
+				'sisa_um'	    => $sisa_um,
+				'sisa_um_idr'	    => $sisa_um_idr,
 				'id'			=> $id,
 				'approval'		=> $approval
 			);
@@ -6510,7 +6525,7 @@ if($base_cur=='USD'){
 		$nomor_id 	= explode(",",$penagihan[0]->no_so);
 		$approval	= $this->uri->segment(4);
 		// print_r($penagihan);exit;
-		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so')->result_array();
+		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so_gabung')->result_array();
 		
 		// print_r($getBq);
 		// exit;
@@ -6542,6 +6557,7 @@ if($base_cur=='USD'){
 			$non_frp	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 			$material	= $this->db->select('*, unit as satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
+			$getDetailcut	='';
 			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 			$sisa_um   = $get_kurs[0]->sisa_um;
@@ -6617,7 +6633,7 @@ if($base_cur=='USD'){
 				}
 			}
 // cutting
-			$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik, b.id_product, b.id_produksi ";
+			$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery join (select id_milik,kode_delivery,id_product,id_produksi,qty as qty_total from production_detail group by id_milik,id_product,id_produksi,qty) b on a.id_milik=b.id_milik where a.kode_delivery in ('".$kode_delivery."') and b.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik, b.id_product, b.id_produksi ";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
@@ -6626,16 +6642,18 @@ if($base_cur=='USD'){
 			}
 
 // cutting tidak diproduksi
-			$sql="select SUM(round(c.length_split/c.length,2)) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' group by a.id_milik";
+			$sql="select round(c.length_split/c.length,2) as qty, a.nilai_cogs as cogs, a.id_milik, a.product from delivery_product_detail a join so_cutting_detail c on a.id_uniq=c.id and a.kode_delivery=c.kode_delivery where a.kode_delivery in ('".$kode_delivery."') and c.kode_delivery in ('".$kode_delivery."') and a.sts='cut' and ISNULL(a.id_produksi)";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
-					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','-','".$vals['qty']."','cut','".$vals['cogs']."','".$vals['product']."') ");
+					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','-','".$vals['qty']."','cut non produksi','".$vals['cogs']."','".$vals['product']."') ");
 				}
 			}
 
 			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	 from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
 			x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
+			
+			$getDetailcut	= $this->db->query("select a.* FROM penagihan_product_temp a WHERE a.sts_do='cut non produksi'")->result_array();
 			
 			
 			if($ada_data_bf!=''){
@@ -6688,9 +6706,6 @@ if($base_cur=='USD'){
 			}
 		}
 		
-		//  print_r($sisa_um);
-		//  exit;
-
 		$data2 = array(
 			'title'			=> 'Indeks Of Create Invoice Progress',
 			'action'		=> 'index',
@@ -6698,6 +6713,7 @@ if($base_cur=='USD'){
 			'akses_menu'	=> $Arr_Akses,
 			'getHeader'		=> $getHeader,
 			'getDetail' 	=> $getDetail,
+			'getDetailcut' 	=> $getDetailcut,
 			'getEngCost' 	=> $getEngCost,
 			'getPackCost' 	=> $getPackCost,
 			'getTruck' 		=> $getTruck,
