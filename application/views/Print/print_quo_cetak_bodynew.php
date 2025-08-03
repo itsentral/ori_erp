@@ -25,7 +25,7 @@
 			<td colspan='3'>:&nbsp;&nbsp;&nbsp;<?=$telephone;?></td>
 		</tr> -->
 		<tr>
-			<td colspan='2'>Subject</td>
+			<td colspan='2'>Perihal</td>
 			<td colspan='3'>:&nbsp;&nbsp;&nbsp;<?=$subject;?></td>
 		</tr>
 		<tr>
@@ -46,10 +46,10 @@
 		</tr>
 		<tr>
 			<td width='5%'></td>
-			<td width='4%'>1. </td>
+			<td width='7%'>1. </td>
 			<td width='27%'>Produk</td>
 			<td width='3%'>:</td>
-			<td width='61%' colspan='2'><?=$product;?></td>
+			<td colspan='2'><?=$product;?></td>
 		</tr>
 		<tr>
 			<td></td>
