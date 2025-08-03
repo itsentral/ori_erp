@@ -123,7 +123,7 @@
 		<tr>
 			<td></td>
 			<td class='valign'>3.</td>
-			<td colspan='4' class='justify'>Seluruh proses pembayaran akan dilakukan melalui transfer ke rekening kami di OBC NISP. - Cabang Mangga Dua Le Grandeur, atas nama PT. ORI POLYTEC COMPOSITES dengan Nomor Rekening: 0278.0001.6993 (USD) atau 0278.0001.6993 (IDR) dan terhitung 30 hari setelah PT. ORI POLYTEC COMPOSITES/ <?=$customer;?> menerima fotokopi/salinan dokumen terkait seperti (Surat Jalan / DO, BA / DCN / MDR, Faktur, PPN.PPH).</td>
+			<td colspan='4' class='justify'>Seluruh proses pembayaran akan dilakukan melalui transfer ke rekening kami di OBC NISP. - Cabang Mangga Dua Le Grandeur, atas nama PT. ORI POLYTEC COMPOSITES dengan Nomor Rekening: 0278.0001.6993 (USD) atau 0278.0001.6993 (IDR) dan terhitung 30 hari setelah PT. ORI POLYTEC COMPOSITES/ <b><?=$customer;?></b> menerima fotokopi/salinan dokumen terkait seperti (Surat Jalan / DO, BA / DCN / MDR, Faktur, PPN.PPH).</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -164,8 +164,8 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>
 				Proses Klaim Garansi dilakukan dengan ketentuan sebagai berikut:<br>
 				<ul>
-					<li>(a) <?=$customer;?> akan mengajukan pemberitahuan dan deskripsi masalah atas barang atau material kepada Perusahaan; dan</li>
-					<li>(b)	Tim dari Perusahaan bersama <?=$customer;?> akan melakukan pemeriksaan terhadap kerusakan, cacat barang, atau kegagalan material untuk menentukan klaim garansi, yang selanjutnya akan dituangkan dalam berita acara dan ditandatangani oleh Perusahaan serta <?=$customer;?></li>
+					<li>(a) <b><?=$customer;?></b> akan mengajukan pemberitahuan dan deskripsi masalah atas barang atau material kepada Perusahaan; dan</li>
+					<li>(b)	Tim dari Perusahaan bersama <b><?=$customer;?></b> akan melakukan pemeriksaan terhadap kerusakan, cacat barang, atau kegagalan material untuk menentukan klaim garansi, yang selanjutnya akan dituangkan dalam berita acara dan ditandatangani oleh Perusahaan serta <b><?=$customer;?></b></li>
 				</ul>
 			</td>
 		</tr>
@@ -200,7 +200,7 @@ echo "<pagebreak />";
 		<tr>
 			<td></td>
 			<td class='valign'>3.</td>
-			<td colspan='3' class='justify'>Biaya Penalty tidak akan dikenakan dalam bentuk apapun apabila dalam keadaan kahar atau Force Majeure.</td>
+			<td colspan='3' class='justify'>Biaya Penalty tidak akan dikenakan dalam bentuk apapun apabila dalam keadaan kahar atau <i>Force Majeure.</i></td>
 		</tr>
 		<tr>
 			<td colspan='5' height='5px;'></td>
@@ -257,6 +257,13 @@ echo "<pagebreak />";
 	echo "<pagebreak />";
 	?>
 	<table class='gridtable3' width='100%' border='0' cellpadding='0' cellspacing='0'>
+        <tr>
+			<td width='5%'></td>
+			<td width='4%'></td>
+			<td width='27%'></td>
+			<td width='3%'></td>
+			<td width='61%' style='vertical-align:top; text-align:right;'><img src='<?=$sroot;?>/assets/images/alamatori.png' style='float:right; padding-top:-42px;' alt="" height='160' width='90'></td>
+		</tr>
 		<tr>
 			<td><b>G.</b></td>
 			<td colspan='4'><b>Penutup</b></td>
