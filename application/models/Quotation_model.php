@@ -556,8 +556,8 @@ class Quotation_model extends CI_Model {
 								$print_cetak	.= "	<li><a href='".base_url('penawaran/print_cetak_usd/'.$row['id_bq'])."' target='_blank'>USD (English)</a></li>";
 								$print_cetak	.= "</ul>";
 								$print_cetak	.= "</div>";
-								$print_cetak_eng= "&nbsp;<a href='".base_url('penawaran/print_cetak_eng/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#d94c4c; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>ENG</b></a>";
-								$print_cetak_usd= "&nbsp;<a href='".base_url('penawaran/print_cetak_usd/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#959719; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>IDN USD</b></a>";
+								// $print_cetak_eng= "&nbsp;<a href='".base_url('penawaran/print_cetak_eng/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#d94c4c; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>ENG</b></a>";
+								// $print_cetak_usd= "&nbsp;<a href='".base_url('penawaran/print_cetak_usd/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#959719; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>IDN USD</b></a>";
 								
 							}
 						}
