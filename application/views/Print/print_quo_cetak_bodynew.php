@@ -46,10 +46,10 @@
 		</tr>
 		<tr>
 			<td width='5%'></td>
-			<td width='7%'>1. </td>
+			<td width='4%'>1. </td>
 			<td width='27%'>Produk</td>
 			<td width='3%'>:</td>
-			<td colspan='2'><?=$product;?></td>
+			<td width='61%' colspan='2'><?=$product;?></td>
 		</tr>
 		<tr>
 			<td></td>
@@ -81,10 +81,10 @@
 		</tr>
 		<tr>
 			<td></td>
-			<th>6.</th>
-			<th>Garansi Produk</th>
-			<th>:</th>
-			<th colspan='2'><?=$garansi_porduct;?></th>
+			<td>6.</td>
+			<td>Garansi Produk</td>
+			<td>:</td>
+			<td colspan='2'><?=$garansi_porduct;?></td>
 		</tr>
 		<tr>
 			<td colspan='6' height='10px;'></td>
