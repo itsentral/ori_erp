@@ -81,10 +81,10 @@
 		</tr>
 		<tr>
 			<td></td>
-			<th class='text-left'>6.</th>
-			<th class='text-left'>Garansi Produk</th>
-			<th class='text-left'>:</th>
-			<th class='justify' colspan='2'><?=$garansi_porduct;?></th>
+			<td >6.</td>
+			<td >Garansi Produk</td>
+			<td >:</td>
+			<td colspan='2'><?=$garansi_porduct;?></td>
 		</tr>
 		<tr>
 			<td colspan='6' height='10px;'></td>
