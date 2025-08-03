@@ -696,7 +696,7 @@ echo "<pagebreak />";
 	
 	table.gridtable3 {
 		font-family: "Garamond", serif;
-		font-size:13px;
+		font-size:12px;
 		color:#333333;
 		margin-left: 60px;
 		margin-right: 60px;
