@@ -657,6 +657,7 @@
 					//$down_payment2=0;
 				}else{
 					$grand_total = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
+					$grand_total2 = round($SUM + $SUM2 + $SUM3 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);
 					//$down_payment=($uang_muka_persen*$grand_total/100);
 					//$down_payment2=0;
 				}
@@ -670,7 +671,7 @@
 			<td align='right' colspan='11'><b>DOWN PAYMENT</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td align='center' colspan='2'></td>
 			<td align='right' colspan='2'>
-				<input type="text" class="form-control down_payment text-right input-sm divide" id="down_payment" name="down_payment" value="<?= $down_payment; ?>" tabindex="-1">
+				<input type="text" class="form-control down_payment text-right input-sm divide" id="down_payment" name="down_payment" value="<?= $sisa_um_idr; ?>" tabindex="-1">
 			</td>
 		</tr>
 		<tr class='HeaderHr hidden'>
