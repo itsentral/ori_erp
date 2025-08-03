@@ -128,7 +128,7 @@
 		<tr>
 			<td></td>
 			<td class='valign'>4.</td>
-			<td colspan='4' class='justify'>4.	Produk akan diproduksi setelah Uang Muka Penjualan diterima PT Ori Polytec Composites.</td>
+			<td colspan='4' class='justify'>Produk akan diproduksi setelah Uang Muka Penjualan diterima PT Ori Polytec Composites.</td>
 		</tr>
 	</tbody>
 </table>
@@ -156,7 +156,7 @@ echo "<pagebreak />";
 		<tr>
 			<td></td>
 			<td class='valign'>2.</td>
-			<td colspan='3' class='justify'>2.	Periode Garansi diberikan 12 Bulan, terhitung sejak tanggal pengiriman yang tercantum dalam surat Jalan PT ORI.</td>
+			<td colspan='3' class='justify'>Periode Garansi diberikan 12 Bulan, terhitung sejak tanggal pengiriman yang tercantum dalam surat Jalan PT ORI.</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -164,7 +164,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>
 				Proses Klaim Garansi dilakukan dengan ketentuan sebagai berikut:<br>
 				<ul>
-					<li><?=$customer;?> akan mengajukan pemberitahuan dan deskripsi masalah atas barang atau material kepada Perusahaan; dan</li>
+					<li>(a) <?=$customer;?> akan mengajukan pemberitahuan dan deskripsi masalah atas barang atau material kepada Perusahaan; dan</li>
 					<li>(b)	Tim dari Perusahaan bersama <?=$customer;?> akan melakukan pemeriksaan terhadap kerusakan, cacat barang, atau kegagalan material untuk menentukan klaim garansi, yang selanjutnya akan dituangkan dalam berita acara dan ditandatangani oleh Perusahaan serta <?=$customer;?></li>
 				</ul>
 			</td>
@@ -184,7 +184,7 @@ echo "<pagebreak />";
 		<tr>
 			<td></td>
 			<td class='valign'>1.</td>
-			<td colspan='3' class='justify'>1.	Setiap terjadi keterlambatan pembayaran akan dikenakan denda 0.1% per hari, maksimum sebesar 10% dari total harga;</td>
+			<td colspan='3' class='justify'>Setiap terjadi keterlambatan pembayaran akan dikenakan denda 0.1% per hari, maksimum sebesar 10% dari total harga;</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -696,7 +696,7 @@ echo "<pagebreak />";
 	
 	table.gridtable3 {
 		font-family: "Garamond", serif;
-		font-size:14px;
+		font-size:13px;
 		color:#333333;
 		margin-left: 60px;
 		margin-right: 60px;
