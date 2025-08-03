@@ -81,10 +81,10 @@
 		</tr>
 		<tr>
 			<td></td>
-			<td>6.</td>
-			<td>Garansi Produk</td>
-			<td>:</td>
-			<td colspan='2'><?=$garansi_porduct;?></td>
+			<th>6.</th>
+			<th>Garansi Produk</th>
+			<th>:</th>
+			<th colspan='2'><?=$garansi_porduct;?></th>
 		</tr>
 		<tr>
 			<td colspan='6' height='10px;'></td>
@@ -175,7 +175,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Segala dokumen, surat, dan korespondensi yang berkaitan dengan ruang lingkup Perjanjian tunduk terhadap ketentuan garansi dalam Perjanjian.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='8px;'></td>
+			<td colspan='5' height='5px;'></td>
 		</tr>
 		<tr>
 			<td><b>D.</b></td>
@@ -203,7 +203,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Biaya Penalty tidak akan dikenakan dalam bentuk apapun apabila dalam keadaan kahar atau Force Majeure.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='8px;'></td>
+			<td colspan='5' height='5px;'></td>
 		</tr>
 		<tr>
 			<td><b>E.</b></td>
@@ -240,14 +240,15 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Apabila penurunan melebihi batas 10% (sepuluh persen), maka <b>seluruh selisih kuantitas yang melebihi batas tersebut akan dikenakan biaya material</b> sesuai harga satuan dalam PO atau berdasarkan perhitungan yang disepakati bersama secara tertulis oleh Para Pihak.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='8px;'></td>
+			<td colspan='5' height='5px;'></td>
 		</tr>
 		<tr>
 			<td><b>F.</b></td>
-			<td colspan='5'><b>Kerahasiaan</b></td>
+			<td colspan='4'><b>Kerahasiaan</b></td>
 		</tr>
 		<tr>
-			<td colspan='5' class='justify'>
+            <td></td>
+			<td colspan='4' class='justify'>
 				Seluruh informasi, data, spesifikasi teknis, harga, gambar, dan dokumen lain yang disampaikan dalam Penawaran Harga ini bersifat <b>rahasia</b> dan hanya ditujukan untuk keperluan evaluasi dan pertimbangan oleh Pihak Penerima Penawaran.
 			</td>
 		</tr>
@@ -258,7 +259,7 @@ echo "<pagebreak />";
 	<table class='gridtable3' width='100%' border='0' cellpadding='0' cellspacing='0'>
 		<tr>
 			<td><b>G.</b></td>
-			<td colspan='5'><b>Penutup</b></td>
+			<td colspan='4'><b>Penutup</b></td>
 		</tr>
 		<tr>
 			<td colspan='5' class='justify'>
