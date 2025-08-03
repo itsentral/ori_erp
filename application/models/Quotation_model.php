@@ -542,7 +542,20 @@ class Quotation_model extends CI_Model {
 							}
 							if($Arr_Akses['download']=='1'){
 								$print_product	= "&nbsp;<a href='".base_url('penawaran/print_penawaran2/'.$row['id_bq'])."' style='margin-bottom:7px;' target='_blank' class='btn btn-sm btn-success'  title='Print Penawaran' ><i class='fa fa-print'></i></a>";
-								$print_cetak	= "&nbsp;<a href='".base_url('penawaran/print_cetak/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#9640b4; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>IDN IDR</b></a>";
+								// $print_cetak	= "&nbsp;<a href='".base_url('penawaran/print_cetak/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#9640b4; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>IDN IDR</b></a>";
+								$print_cetak	= "<div class='btn-group' style='margin-bottom:3px;'>";
+								$print_cetak	.= "<button type='button' class='btn btn-default'><b>Print</b></button>";
+								$print_cetak	.= "<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'>";
+								$print_cetak	.= "	<span class='caret'></span>";
+								$print_cetak	.= "	<span class='sr-only'>Toggle Dropdown</span>";
+								$print_cetak	.= "</button>";
+								$print_cetak	.= "<ul class='dropdown-menu' role='menu'>";
+								$print_cetak	.= "	<li><a href='".base_url('penawaran/print_cetak/'.$row['id_bq'])."' target='_blank'>IDR (Indonesia)</a></li>";
+								$print_cetak	.= "	<li><a href='".base_url('penawaran/print_cetak_new/'.$row['id_bq'])."' target='_blank'>IDR (Indonesia) (New)</a></li>";
+								$print_cetak	.= "	<li><a href='".base_url('penawaran/print_cetak_eng/'.$row['id_bq'])."' target='_blank'>USD (Indonesia)</a></li>";
+								$print_cetak	.= "	<li><a href='".base_url('penawaran/print_cetak_usd/'.$row['id_bq'])."' target='_blank'>USD (English)</a></li>";
+								$print_cetak	.= "</ul>";
+								$print_cetak	.= "</div>";
 								$print_cetak_eng= "&nbsp;<a href='".base_url('penawaran/print_cetak_eng/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#d94c4c; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>ENG</b></a>";
 								$print_cetak_usd= "&nbsp;<a href='".base_url('penawaran/print_cetak_usd/'.$row['id_bq'])."' target='_blank' class='btn btn-sm' style='background-color:#959719; color: white; margin-bottom:7px;'  title='Print Penawaran' ><i class='fa fa-print'></i>&nbsp;&nbsp;&nbsp;<b>IDN USD</b></a>";
 								
