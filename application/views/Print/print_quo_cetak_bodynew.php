@@ -175,7 +175,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Segala dokumen, surat, dan korespondensi yang berkaitan dengan ruang lingkup Perjanjian tunduk terhadap ketentuan garansi dalam Perjanjian.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='10px;'></td>
+			<td colspan='5' height='8px;'></td>
 		</tr>
 		<tr>
 			<td><b>D.</b></td>
@@ -203,7 +203,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Biaya Penalty tidak akan dikenakan dalam bentuk apapun apabila dalam keadaan kahar atau Force Majeure.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='10px;'></td>
+			<td colspan='5' height='8px;'></td>
 		</tr>
 		<tr>
 			<td><b>E.</b></td>
@@ -240,7 +240,7 @@ echo "<pagebreak />";
 			<td colspan='3' class='justify'>Apabila penurunan melebihi batas 10% (sepuluh persen), maka <b>seluruh selisih kuantitas yang melebihi batas tersebut akan dikenakan biaya material</b> sesuai harga satuan dalam PO atau berdasarkan perhitungan yang disepakati bersama secara tertulis oleh Para Pihak.</td>
 		</tr>
 		<tr>
-			<td colspan='5' height='10px;'></td>
+			<td colspan='5' height='8px;'></td>
 		</tr>
 		<tr>
 			<td><b>F.</b></td>
