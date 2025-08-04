@@ -13365,6 +13365,7 @@ class Produksi extends CI_Controller {
 				$tgl_voucher = $data->tanggal;	
 				$keterangan  = $data->nm_material;
 				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
                 $no_request  = $data->no_spk;	
 				$kredit      = $data->total_price;
 				$totalwip       = $data->total_price_debet;	
@@ -13402,7 +13403,7 @@ class Produksi extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $nokirwip,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $wiptotal,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'produksi wip',
