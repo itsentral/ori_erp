@@ -5816,6 +5816,7 @@ class Delivery extends CI_Controller
 		
 		if(!empty($ArrGroupMaterial)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
+			$this->jurnalIntransit($id_trans);
 		}
 
 		if(!empty($ArrGroupOutMaterial)){
@@ -5824,6 +5825,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroupSpool)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
+			$this->jurnalIntransit($id_trans);
 		}
 
 		if(!empty($ArrGroupOutSpool)){
