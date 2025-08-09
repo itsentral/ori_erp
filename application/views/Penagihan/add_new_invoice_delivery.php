@@ -322,7 +322,7 @@ if(isset($approval)){
 					allowOutsideClick	: false
 				});
 			}
-			else if ($('#kurs').val()=="") {
+			else if ($('#kurs').val()=="" && $('#wilayah').val() == 'L') {
 				swal({
 					title	: "KURS HARUS DI UPDATE!",
 					text	: "SILAHKAN UPDATE KURS TERLEBIH DAHULU!",
