@@ -428,9 +428,92 @@ class Ppic extends CI_Controller {
 			'app_date' => $dateTime
 		);
 
+		$get_header 	= $this->db->get_where('so_cutting_header', array('id'=>$id))->result();
+		if(empty($get_header[0]->id_deadstok)){
+			$id_produksi 	= str_replace('BQ-','PRO-',$get_header[0]->id_bq);
+			$id_milik 		= $get_header[0]->id_milik;
+
+			$urut_nomor = $get_header[0]->qty_ke;
+			$nomor_so = get_nomor_so(str_replace('BQ-','',$get_header[0]->id_bq));
+			$kode_urut = substr(get_name('so_detail_header','no_komponen','id',$id_milik),-3);
+
+			$nomor_spk = get_name('so_detail_header','no_spk','id',$id_milik);
+			$product_code = $nomor_so.'-'.$kode_urut.'.'.$urut_nomor;
+
+			$getAmountFG = $this->db
+									->select('finish_good')
+									->get_where('production_detail',array(
+										'id_produksi' => $id_produksi,
+										'id_milik' => $id_milik,
+										'product_ke' => $urut_nomor
+									))
+									->result();
+			$nilaiFGLoose = (!empty($getAmountFG[0]->finish_good))?$getAmountFG[0]->finish_good:0;
+
+			$getCuttingList = $this->db->get_where('so_cutting_detail', array('id_header'=>$id))->result_array();
+			$getCuttingSum 	= $this->db->select('SUM(length_split) AS total_cutting')->get_where('so_cutting_detail', array('id_header'=>$id))->result();
+			$panjangCutting = (!empty($getCuttingSum[0]->total_cutting))?$getCuttingSum[0]->total_cutting:0;
+		}
+		else{
+			$getAmountFG = $this->db
+									->select('finish_good')
+									->get_where('deadstok',array(
+										'id' => $get_header[0]->id_deadstok
+									))
+									->result();
+			$nilaiFGLoose = (!empty($getAmountFG[0]->finish_good))?$getAmountFG[0]->finish_good:0;
+
+			$getCuttingList = $this->db->get_where('so_cutting_detail', array('id_header'=>$id))->result_array();
+			$getCuttingSum 	= $this->db->select('SUM(length_split) AS total_cutting')->get_where('so_cutting_detail', array('id_header'=>$id))->result();
+			$panjangCutting = (!empty($getCuttingSum[0]->total_cutting))?$getCuttingSum[0]->total_cutting:0;
+		}
+		
+		// echo $nilaiFGLoose.'<br>';
+		// echo $panjangCutting.'<br>';
+		// exit;
+
+		$ArrCutting = [];
+		$ArrHistFG = [];
+		foreach ($getCuttingList as $key => $value) {
+			$FinishGood = 0;
+			if($value['length_split'] > 0 AND $value['length'] > 0 AND $nilaiFGLoose > 0 AND $panjangCutting > 0){
+				$FinishGood = $value['length_split'] / $panjangCutting * $nilaiFGLoose;
+			}
+			$ArrCutting[$key]['id'] 			= $value['id'];
+			$ArrCutting[$key]['finish_good'] 	= $FinishGood;
+
+			$ArrHistFG[$key]['tipe_product'] = 'cutting';
+			$ArrHistFG[$key]['id_product'] = $value['id'];
+			$ArrHistFG[$key]['id_milik'] = $value['id_milik'];
+			$ArrHistFG[$key]['tipe'] = 'in';
+			$ArrHistFG[$key]['kode'] = $value['id_header'];
+			$ArrHistFG[$key]['tanggal'] = date('Y-m-d');
+			$ArrHistFG[$key]['keterangan'] = 'lock pipe cutting';
+			$ArrHistFG[$key]['hist_by'] = $data_session['ORI_User']['username'];
+			$ArrHistFG[$key]['hist_date'] = $dateTime;
+		}
+
+
 		$this->db->trans_start();
 			$this->db->where('id', $id);
 			$this->db->update('so_cutting_header', $ArrUpdate);
+
+			if (!empty($ArrHistFG)) {
+				$this->db->insert_batch('history_product_fg', $ArrHistFG);
+			}
+
+			if(empty($get_header[0]->id_deadstok)){
+				$this->db->where('id_produksi', $id_produksi);
+				$this->db->where('id_milik', $id_milik);
+				$this->db->where('product_ke', $urut_nomor);
+				$this->db->update('production_detail', array('no_spk'=>$nomor_spk,'product_code_cut'=>$product_code,'urut_product_cut'=>$urut_nomor));
+			}
+		
+			if(!empty($ArrCutting)){
+				$this->db->update_batch('so_cutting_detail', $ArrCutting, 'id');
+
+				insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting
+			}
 		$this->db->trans_complete();
 
 		if($this->db->trans_status() === FALSE){
@@ -2608,7 +2691,11 @@ class Ppic extends CI_Controller {
 
 				if(!empty($ArrIN_FG_MATERIAL)){
 					$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
+
+					$this->jurnalOuttoWip($kode);
 				}
+
+				
 			$this->db->trans_complete();
 
 			if ($this->db->trans_status() === FALSE) {
@@ -2618,6 +2705,159 @@ class Ppic extends CI_Controller {
 			}
 		}
 	}
+
+	function jurnalOuttoWip($kode){
+		
+		$data_session	= $this->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	        $idtrans = str_replace('-','',$kode);
+
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
+			
+			$totalwip =0;
+			  
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='WIP';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				
+				$wip           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalfg        = $cogs;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_wip,
+					  'keterangan'    => $keterangan2,
+					  'no_reff'       => $id.$noso,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Finishgood Part To WIP',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 			
+				
+			}
+			
+		   
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
+			
+			$totalfg =0;
+			  
+			$det_Jurnaltes = [];
+			  
+			foreach($fg AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='COGS';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				
+				$wip           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalfg        = $cogs;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coafg,
+					  'keterangan'    => $keterangan1,
+					  'no_reff'       => $id.$noso,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Finishgood Part To WIP',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 			
+				
+			}
+
+			
+			        
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'WIP-Finishgood'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
 
 	public function jurnal_spool_manual(){
 		    $data_session	= $this->session->userdata;
