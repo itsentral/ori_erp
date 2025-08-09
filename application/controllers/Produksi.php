@@ -11651,21 +11651,21 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['no_spk'] = $getDataFG[0]['no_spk'];
 							$ArrIN_WIP_MATERIAL[$key_uniq]['kode_trans'] = $kode_spk;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
-							$ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['created_by'] = $username;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['created_date'] = $datetime;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_trans'] =  $getDataFG[0]['id_trans'];
-							$ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
 			
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['qty_mat'] =  $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
 						}
@@ -11684,21 +11684,21 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['no_spk'] = $getDataFG[0]['no_spk'];
 							$ArrIN_WIP_MATERIAL[$key_uniq]['kode_trans'] = $kode_spk;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
-							$ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['created_by'] = $username;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['created_date'] = $datetime;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_trans'] =  $getDataFG[0]['id_trans'];
-							$ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
 			
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['qty_mat'] =  $qtyValue;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
 						}
@@ -11916,7 +11916,7 @@ class Produksi extends CI_Controller {
 				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP);
 			}
 			if(!empty($ArrIN_WIP_MATERIAL)){
-				$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_MATERIAL);
+				$this->db->insert_batch('data_erp_wip',$ArrIN_WIP_MATERIAL);
 			}
 			//update flag produksi input
 			if(!empty($ArrJurnal)){
