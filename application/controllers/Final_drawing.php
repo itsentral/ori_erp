@@ -2133,7 +2133,7 @@ class Final_drawing extends CI_Controller {
 						$ArrCutting[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 						$ArrCutting[$val]['created_date'] 	= date('Y-m-d H:i:s');
 
-						$ArrDetalPro[$val]['sts_cutting'] 	= 'Y';
+						// $ArrDetalPro[$val]['sts_cutting'] 	= 'Y';
 					}
 				}
 				
@@ -2240,9 +2240,9 @@ class Final_drawing extends CI_Controller {
 						$this->db->insert('production_header', $ArrInsertPro);
 					}
 					$this->db->insert_batch('production_detail', $ArrDetalPro);
-					if(!empty($ArrCutting)){
-						$this->db->insert_batch('so_cutting_header', $ArrCutting);
-					}
+					// if(!empty($ArrCutting)){
+					// 	$this->db->insert_batch('so_cutting_header', $ArrCutting);
+					// }
 				}
 				
 				check_approve($id_bq);
@@ -2575,7 +2575,7 @@ class Final_drawing extends CI_Controller {
 						$ArrCutting[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 						$ArrCutting[$val]['created_date'] 	= date('Y-m-d H:i:s');
 
-						$ArrDetalPro[$val]['sts_cutting'] 	= 'Y';
+						// $ArrDetalPro[$val]['sts_cutting'] 	= 'Y';
 					}
 				}
 				
@@ -2728,9 +2728,9 @@ class Final_drawing extends CI_Controller {
 				if(!empty($ArrDetalPro)){
 					$this->db->insert_batch('production_detail', $ArrDetalPro);
 				}
-				if(!empty($ArrCutting)){
-					$this->db->insert_batch('so_cutting_header', $ArrCutting);
-				}
+				// if(!empty($ArrCutting)){
+				// 	$this->db->insert_batch('so_cutting_header', $ArrCutting);
+				// }
 				
 				if(!empty($this->input->post('check'))){
 					foreach($check AS $val => $valx){
