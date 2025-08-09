@@ -2608,8 +2608,6 @@ class Ppic extends CI_Controller {
 
 				if(!empty($ArrIN_FG_MATERIAL)){
 					$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
-
-					$this->jurnalOuttoWip($kode);
 				}
 
 				
@@ -2619,6 +2617,7 @@ class Ppic extends CI_Controller {
 				$this->db->trans_rollback();
 			} else {
 				$this->db->trans_commit();
+				$this->jurnalOuttoWip($kode);
 			}
 		}
 	}
