@@ -1629,8 +1629,11 @@ class Ppic extends CI_Controller {
 
 				$EXPLODE 	= explode('-',$value);
 				$id_pro 	= $EXPLODE[0];
-				$id_hea 	= str_replace('H','',$EXPLODE[1]);
-				$id_cut 	= str_replace('C','',$EXPLODE[2]);
+				$id_cut = null;
+				if(!empty($EXPLODE[1])){
+					$id_hea 	= str_replace('H','',$EXPLODE[1]);
+					$id_cut 	= str_replace('C','',$EXPLODE[2]);
+				}
 				
 				if(empty($id_cut)){
 					$ArrUpdateProduksi[$nomorx]['id'] = $id_pro;
