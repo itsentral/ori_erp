@@ -705,7 +705,7 @@ class Deadstok extends CI_Controller {
 						$ArrInsertToFG[$key]['wip_foh'] =  null;
 						$ArrInsertToFG[$key]['created_by'] = $username;
 						$ArrInsertToFG[$key]['created_date'] = $dateTime;
-						$ArrInsertToFG[$key]['id_trans'] = null;
+						$ArrInsertToFG[$key]['id_trans'] = $deadstokDipakai;
 		
 						//tambahan finish good
 						$ArrInsertToFG[$key]['id_pro'] = $value['id'];
