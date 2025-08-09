@@ -428,92 +428,9 @@ class Ppic extends CI_Controller {
 			'app_date' => $dateTime
 		);
 
-		$get_header 	= $this->db->get_where('so_cutting_header', array('id'=>$id))->result();
-		if(empty($get_header[0]->id_deadstok)){
-			$id_produksi 	= str_replace('BQ-','PRO-',$get_header[0]->id_bq);
-			$id_milik 		= $get_header[0]->id_milik;
-
-			$urut_nomor = $get_header[0]->qty_ke;
-			$nomor_so = get_nomor_so(str_replace('BQ-','',$get_header[0]->id_bq));
-			$kode_urut = substr(get_name('so_detail_header','no_komponen','id',$id_milik),-3);
-
-			$nomor_spk = get_name('so_detail_header','no_spk','id',$id_milik);
-			$product_code = $nomor_so.'-'.$kode_urut.'.'.$urut_nomor;
-
-			$getAmountFG = $this->db
-									->select('finish_good')
-									->get_where('production_detail',array(
-										'id_produksi' => $id_produksi,
-										'id_milik' => $id_milik,
-										'product_ke' => $urut_nomor
-									))
-									->result();
-			$nilaiFGLoose = (!empty($getAmountFG[0]->finish_good))?$getAmountFG[0]->finish_good:0;
-
-			$getCuttingList = $this->db->get_where('so_cutting_detail', array('id_header'=>$id))->result_array();
-			$getCuttingSum 	= $this->db->select('SUM(length_split) AS total_cutting')->get_where('so_cutting_detail', array('id_header'=>$id))->result();
-			$panjangCutting = (!empty($getCuttingSum[0]->total_cutting))?$getCuttingSum[0]->total_cutting:0;
-		}
-		else{
-			$getAmountFG = $this->db
-									->select('finish_good')
-									->get_where('deadstok',array(
-										'id' => $get_header[0]->id_deadstok
-									))
-									->result();
-			$nilaiFGLoose = (!empty($getAmountFG[0]->finish_good))?$getAmountFG[0]->finish_good:0;
-
-			$getCuttingList = $this->db->get_where('so_cutting_detail', array('id_header'=>$id))->result_array();
-			$getCuttingSum 	= $this->db->select('SUM(length_split) AS total_cutting')->get_where('so_cutting_detail', array('id_header'=>$id))->result();
-			$panjangCutting = (!empty($getCuttingSum[0]->total_cutting))?$getCuttingSum[0]->total_cutting:0;
-		}
-		
-		// echo $nilaiFGLoose.'<br>';
-		// echo $panjangCutting.'<br>';
-		// exit;
-
-		$ArrCutting = [];
-		$ArrHistFG = [];
-		foreach ($getCuttingList as $key => $value) {
-			$FinishGood = 0;
-			if($value['length_split'] > 0 AND $value['length'] > 0 AND $nilaiFGLoose > 0 AND $panjangCutting > 0){
-				$FinishGood = $value['length_split'] / $panjangCutting * $nilaiFGLoose;
-			}
-			$ArrCutting[$key]['id'] 			= $value['id'];
-			$ArrCutting[$key]['finish_good'] 	= $FinishGood;
-
-			$ArrHistFG[$key]['tipe_product'] = 'cutting';
-			$ArrHistFG[$key]['id_product'] = $value['id'];
-			$ArrHistFG[$key]['id_milik'] = $value['id_milik'];
-			$ArrHistFG[$key]['tipe'] = 'in';
-			$ArrHistFG[$key]['kode'] = $value['id_header'];
-			$ArrHistFG[$key]['tanggal'] = date('Y-m-d');
-			$ArrHistFG[$key]['keterangan'] = 'lock pipe cutting';
-			$ArrHistFG[$key]['hist_by'] = $data_session['ORI_User']['username'];
-			$ArrHistFG[$key]['hist_date'] = $dateTime;
-		}
-
-
 		$this->db->trans_start();
 			$this->db->where('id', $id);
 			$this->db->update('so_cutting_header', $ArrUpdate);
-
-			if (!empty($ArrHistFG)) {
-				$this->db->insert_batch('history_product_fg', $ArrHistFG);
-			}
-
-			if(empty($get_header[0]->id_deadstok)){
-				$this->db->where('id_produksi', $id_produksi);
-				$this->db->where('id_milik', $id_milik);
-				$this->db->where('product_ke', $urut_nomor);
-				$this->db->update('production_detail', array('no_spk'=>$nomor_spk,'product_code_cut'=>$product_code,'urut_product_cut'=>$urut_nomor));
-			}
-		
-			if(!empty($ArrCutting)){
-				$this->db->update_batch('so_cutting_detail', $ArrCutting, 'id');
-
-				insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting
-			}
 		$this->db->trans_complete();
 
 		if($this->db->trans_status() === FALSE){
