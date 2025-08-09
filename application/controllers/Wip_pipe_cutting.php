@@ -333,7 +333,7 @@ class Wip_pipe_cutting extends CI_Controller {
 					$this->db->update_batch('so_cutting_detail', $ArrCutting, 'id');
 
 					insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting 
-					jurnalOuttoWipcutting($id);
+					$this->jurnalOuttoWipcutting($id);
 
 					
 				}
