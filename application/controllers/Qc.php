@@ -4375,6 +4375,7 @@ class Qc extends CI_Controller
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
                	$no_request  = $data->no_spk;	
 				
 				$wip           	= $data->wip;
@@ -4414,7 +4415,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_material,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $material,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4428,7 +4429,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_direct,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $wip_direct,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4442,7 +4443,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_indirect,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $wip_indirect,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4456,7 +4457,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_foh,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $wip_foh,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4470,7 +4471,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_consumable,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $wip_consumable,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4488,7 +4489,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4504,7 +4505,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $cogs,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4519,7 +4520,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coacogs,
 					  'keterangan'    => $keterangan2,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
