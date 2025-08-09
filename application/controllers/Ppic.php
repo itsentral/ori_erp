@@ -2632,7 +2632,7 @@ class Ppic extends CI_Controller {
 		
 	        $idtrans = str_replace('-','',$kode);
 
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_wip_group WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
 			
 			$totalwip =0;
 			  
