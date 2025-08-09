@@ -2838,7 +2838,7 @@ class Ppic extends CI_Controller {
 			$Bln	= substr($tgl_voucher,5,2);
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
-			$Keterangan_INV = 'WIP-Finishgood'.$keterangan;
+			$Keterangan_INV = 'Finishgood Part To WIP'.$keterangan;
 			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
