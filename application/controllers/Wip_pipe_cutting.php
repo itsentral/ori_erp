@@ -514,7 +514,7 @@ class Wip_pipe_cutting extends CI_Controller {
 				
 			}
 
-			print_r($det_Jurnaltes);
+			print_r($kode);
 			exit;
 
 			
