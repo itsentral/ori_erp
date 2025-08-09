@@ -56,34 +56,31 @@ class Cron_model extends CI_Model {
             }
 
 			$NO_IPP 				= str_replace('PRO-','',$row_Cek['id_produksi']);
-			$GET_PRODUKSI_DETAIL	= $this->db->get_where('production_detail',array('id'=>$row_Cek['id_production_detail']))->result();
-			$kode_hist				= (!empty($GET_PRODUKSI_DETAIL[0]->print_merge_date))?$GET_PRODUKSI_DETAIL[0]->print_merge_date:'-';
+			$kode_hist				= $row_Cek['print_merge_date'];
 			$id_milik				= $row_Cek['id_milik'];
-			$QTY_ORDER				= (!empty($GET_PRODUKSI_DETAIL[0]->qty))?$GET_PRODUKSI_DETAIL[0]->qty:'-';
-			$START_PRODUKSI			= (!empty($GET_PRODUKSI_DETAIL[0]->production_date))?$GET_PRODUKSI_DETAIL[0]->production_date:'-';
-			$SELESAI_PRODUKSI		= (!empty($GET_PRODUKSI_DETAIL[0]->finish_production_date))?$GET_PRODUKSI_DETAIL[0]->finish_production_date:'-';
-			$GET_PRODUKSI_PARSIAL 	= $this->db->get_where('production_spk_parsial',array('id_milik'=>$id_milik,'created_date'=>$kode_hist))->result();
-			$id_gudang				= (!empty($GET_PRODUKSI_PARSIAL[0]->id_gudang))?$GET_PRODUKSI_PARSIAL[0]->id_gudang:'-';
-			
+			$QTY_ORDER				= $row_Cek['qty'];
+			$START_PRODUKSI			= $row_Cek['production_date'];
+			$SELESAI_PRODUKSI		= $row_Cek['finish_production_date'];
+			$id_gudang				= $row_Cek['id_gudang'];
+			$so_number				= $row_Cek['nomor_so'];
+			$no_spk					= $row_Cek['nomor_spk'];
 
 			$tandaIPP = substr($NO_IPP,0,4);
-			// $no_spk = (!empty($GET_PRODUKSI_DETAIL[0]->no_spk))?$GET_PRODUKSI_DETAIL[0]->no_spk:'-';
 			if($tandaIPP == 'IPPT'){
 				$getDetailTanki = $this->tanki_model->get_ipp_detail($NO_IPP);
-				$nm_customer		= $getDetailTanki['customer'];
+				$nm_customer	= $getDetailTanki['customer'];
 				$nm_project		= $getDetailTanki['nm_project'];
-				$so_number		= $row_Cek['no_so'];
 				$length			= 0;
 				$thickness		= 0;
-				$no_spk		= $row_Cek['no_spk'];
+				$nm_product		= $row_Cek['nm_tanki'];
+				
 			}
 			else{
 				$nm_customer 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_customer'];
 				$nm_project 	= $SERACH_DETAIL_IPP[$NO_IPP]['nm_project'];
-				$so_number 		= $SERACH_DETAIL_IPP[$NO_IPP]['so_number'];
 				$length			= $SERACH_DETAIL_SPEC[$id_milik]['length'];
 				$thickness		= $SERACH_DETAIL_SPEC[$id_milik]['thickness'];
-				$no_spk		= $row_Cek['no_spk2'];
+				$nm_product		= $row_Cek['id_category'];
 			}
 
             $nestedData 	= array();
@@ -96,38 +93,39 @@ class Cron_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row_Cek['status_date']))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($START_PRODUKSI))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($SELESAI_PRODUKSI))."</div>";
-			$nestedData[]	= "<div align='left'>".$row_Cek['id_category']."</div>";
-			$nestedData[]	= "<div align='center'>".$row_Cek['diameter']."</div>";
-			$nestedData[]	= "<div align='center'>".$row_Cek['diameter2']."</div>";
-			$nestedData[]	= "<div align='center'>".$length."</div>";
-			$nestedData[]	= "<div align='center'>".$thickness."</div>";
+			$nestedData[]	= "<div align='left'>".$nm_product."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($row_Cek['diameter2'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($length,2)."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($thickness,2)."</div>";
 			$nestedData[]	= "<div align='center'>".$row_Cek['liner']."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($QTY_ORDER)."</div>";
 			$QTY = $row_Cek['qty_akhir'] - $row_Cek['qty_awal'] + 1;
 			$nestedData[]	= "<div align='center'>".number_format($QTY)."</div>";
 			$nestedData[]	= "<div align='center'>".number_format($row_Cek['qty_awal'])."-".number_format($row_Cek['qty_akhir'])."</div>";
 
-			$nm_veil		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0003']['nm_material']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0003']['nm_material']:'';
-			$berat_veil		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0003']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0003']['terpakai']:0;
-			$nm_csm			= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0004']['nm_material']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0004']['nm_material']:'';
-			$berat_cms		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0004']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0004']['terpakai']:0;
-			$nm_rooving		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0005']['nm_material']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0005']['nm_material']:'';
-			$berat_rooving	= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0005']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0005']['terpakai']:0;
-			$nm_wr			= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0006']['nm_material']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0006']['nm_material']:'';
-			$berat_wr		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0006']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0006']['terpakai']:0;
-			$nm_resin		= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['nm_material']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['nm_material']:'';
-			$berat_resin	= (!empty($SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
-			$nm_catalys		= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['nm_material']:'';
-			$berat_catalys	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0002']['terpakai']:0;
-			$berat_resin_tc	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$row_Cek['id_production_detail']]['TYP-0001']['terpakai']:0;
+			$id_production_detail = $row_Cek['id_production_detail'];
+			$nm_veil		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0003']['nm_material']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0003']['nm_material']:'';
+			$berat_veil		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0003']['terpakai']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0003']['terpakai']:0;
+			$nm_csm			= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0004']['nm_material']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0004']['nm_material']:'';
+			$berat_cms		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0004']['terpakai']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0004']['terpakai']:0;
+			$nm_rooving		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0005']['nm_material']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0005']['nm_material']:'';
+			$berat_rooving	= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0005']['terpakai']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0005']['terpakai']:0;
+			$nm_wr			= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0006']['nm_material']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0006']['nm_material']:'';
+			$berat_wr		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0006']['terpakai']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0006']['terpakai']:0;
+			$nm_resin		= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0001']['nm_material']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0001']['nm_material']:'';
+			$berat_resin	= (!empty($SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT[$id_production_detail]['TYP-0001']['terpakai']:0;
+			$nm_catalys		= (!empty($SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0002']['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0002']['nm_material']:'';
+			$berat_catalys	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0002']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0002']['terpakai']:0;
+			$berat_resin_tc	= (!empty($SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0001']['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS[$id_production_detail]['TYP-0001']['terpakai']:0;
 			
-			$berat_lainnya	= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['terpakai']:0;
-			$berat_add		= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['terpakai']:0;
-			$nm_lainnya		= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$row_Cek['id_production_detail']]['nm_material']:'';
-			$nm_add			= (!empty($SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']))?$SEARCH_DETAIL_BERAT_ADD[$row_Cek['id_production_detail']]['nm_material']:'';
+			$berat_lainnya	= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$id_production_detail]['terpakai']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$id_production_detail]['terpakai']:0;
+			$berat_add		= (!empty($SEARCH_DETAIL_BERAT_ADD[$id_production_detail]['terpakai']))?$SEARCH_DETAIL_BERAT_ADD[$id_production_detail]['terpakai']:0;
+			$nm_lainnya		= (!empty($SEARCH_DETAIL_BERAT_PLUS_EX[$id_production_detail]['nm_material']))?$SEARCH_DETAIL_BERAT_PLUS_EX[$id_production_detail]['nm_material']:'';
+			$nm_add			= (!empty($SEARCH_DETAIL_BERAT_ADD[$id_production_detail]['nm_material']))?$SEARCH_DETAIL_BERAT_ADD[$id_production_detail]['nm_material']:'';
 
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_veil)."</div>";
-			$nestedData[]	= "<div align='right' title='".$row_Cek['id_production_detail']."'>".number_format($berat_veil,4)."</div>";
+			$nestedData[]	= "<div align='right' title='".$id_production_detail."'>".number_format($berat_veil,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_csm)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($berat_cms,4)."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($nm_rooving)."</div>";
@@ -186,17 +184,17 @@ class Cron_model extends CI_Model {
 	public function get_query_json_report_product($tanggal, $bulan, $tahun, $range, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
         $where_tgl = "";
         if($tanggal > 0){
-            $where_tgl = "AND DAY(a.status_date) = '".$tanggal."' ";
+            $where_tgl = "AND DAY(a.insert_date) = '".$tanggal."' ";
         }
 		
 		$where_bln = "";
         if($bulan > 0){
-            $where_bln = "AND MONTH(a.status_date) = '".$bulan."' ";
+            $where_bln = "AND MONTH(a.insert_date) = '".$bulan."' ";
         }
 
         $where_thn = "";
         if($tahun > 0){
-            $where_thn = "AND YEAR(a.status_date) = '".$tahun."' ";
+            $where_thn = "AND YEAR(a.insert_date) = '".$tahun."' ";
         }
 		
 		$where_range = "";
@@ -205,7 +203,7 @@ class Cron_model extends CI_Model {
 			$date_awal = date('Y-m-d', strtotime($exP[0]));
 			$date_akhir = date('Y-m-d', strtotime($exP[1]));
 			// echo $exP[0];exit;
-            $where_range = "AND DATE(a.status_date) BETWEEN '".$date_awal."' AND '".$date_akhir."' ";
+            $where_range = "AND DATE(a.insert_date) BETWEEN '".$date_awal."' AND '".$date_akhir."' ";
         }
 		
 		//REPLACE(a.id_produksi,'PRO','BQ') = c.id_bq AND
@@ -214,16 +212,23 @@ class Cron_model extends CI_Model {
 			SELECT
 				(@row:=@row+1) AS nomor,
 				a.*,
-				b.no_spk AS no_spk2
+				b.no_spk AS nomor_spk,
+				b.id_product AS nm_tanki,
+				SUBSTRING(b.product_code,1,9) as nomor_so,
+				b.production_date,
+				b.finish_production_date,
+				b.print_merge_date,
+				c.id_gudang
 			FROM
-				laporan_per_hari a
-				LEFT JOIN so_detail_header b ON a.id_milik = b.id,
+				laporan_wip_per_hari_action a
+				INNER JOIN production_detail b ON a.id_production_detail = b.id
+				LEFT JOIN production_spk_parsial c ON a.id_milik=c.id_milik AND b.print_merge_date=c.created_date,
                 (SELECT @row:=0) r
 		    WHERE 1=1 AND a.id_category <> '' ".$where_tgl." ".$where_bln." ".$where_thn." ".$where_range." AND (
 				a.id_category LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.id_product LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.product_code LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -240,7 +245,7 @@ class Cron_model extends CI_Model {
 			
 		);
 
-		$sql .= " ORDER BY a.status_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.id DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);

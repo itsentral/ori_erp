@@ -487,17 +487,6 @@ $this->load->view('include/side_menu');
             showConfirmButton	: false,
             allowOutsideClick	: false
           });
-        }
-		else if ($('#total_bank').val() != $('#total_terima').val()) {
-          swal({
-            title	: "JUMLAH BAYAR DAN PENERIMAAN BANK TIDAK SAMA!",
-            text	: "SILAHKAN PERBAIKI DATA ANDA!",
-            type	: "warning",
-            timer	: 3000,
-            showCancelButton	: false,
-            showConfirmButton	: false,
-            allowOutsideClick	: false
-          });
         } else {
 		$('#simpanpenerimaan').hide();		
         swal({

@@ -61,6 +61,183 @@ class Penawaran extends CI_Controller {
 	public function print_cetak(){
 		$this->penawaran_model->print_cetak();
 	}
+
+	public function print_cetak_new(){
+		$sroot 		= $_SERVER['DOCUMENT_ROOT'];
+		include $sroot."/application/libraries/MPDF57/mpdf.php";
+	  
+		$data_session	= $this->session->userdata;
+		$id_bq   		= $this->uri->segment(3);
+		$no_ipp   		= str_replace('BQ-','',$id_bq);
+
+		$get_id_cust	= get_name('production','id_customer','no_ipp',$no_ipp);
+		$alamat_cust	= get_name('customer','alamat','id_customer',$get_id_cust);
+		$telephone		= get_name('customer','telpon','id_customer',$get_id_cust);
+		
+		$mpdf= new mPDF('utf-8','A4');
+		$mpdf->SetImportUse();
+		
+		$get_header = $this->db->get_where('cost_project_header_sales', array('id_bq'=>$id_bq))->result();
+		
+		$sqlResin = "(SELECT id_material, nm_material  FROM bq_component_detail WHERE id_category='TYP-0001' AND id_bq = '".$id_bq."' GROUP BY id_material)
+					 UNION
+					(SELECT id_material, nm_material  FROM bq_component_detail_plus WHERE id_category='TYP-0001' AND id_bq = '".$id_bq."' GROUP BY id_material)";
+		$ListBQipp		= $this->db->query($sqlResin)->result_array();
+		$dtListArray = array();
+		foreach($ListBQipp AS $val => $valx){
+			$dtListArray[$val] = $valx['nm_material'];
+		}
+		$dtImplode	= "".implode(",  ", $dtListArray)."";
+			
+		$customer = (!empty($get_header[0]->customer))?strtoupper($get_header[0]->customer):'-';
+		
+		$get_max_rev = $this->db->select('MAX(revised_no) AS revised_no')->get_where('laporan_revised_detail', array('id_bq'=>$id_bq))->result();
+		$sql_detail 	= "	SELECT
+							a.id_bq,
+							a.id AS id_milik,
+							a.id_category,
+							a.qty,
+							a.diameter_1,
+							a.diameter_2,
+							a.series,
+							a.id_product,
+							c.total_price_last AS cost,
+							c.est_material
+						FROM
+							bq_detail_header a 
+							LEFT JOIN cost_project_detail b ON a.id=b.caregory_sub
+							LEFT JOIN laporan_revised_detail c ON a.id=c.id_milik
+						WHERE
+							a.id_bq = '".$id_bq."' AND c.revised_no = '".$get_max_rev[0]->revised_no."' AND a.id_category != 'product kosong' ORDER BY a.id ASC";		
+		$rest_detail	= $this->db->query($sql_detail)->result_array();
+		
+		$sql_non_frp 	= "	SELECT 
+								a.*,
+								b.unit_price
+							FROM 
+								cost_project_detail a
+								LEFT JOIN bq_acc_and_mat b ON a.caregory_sub = b.id_material  AND a.id_milik = b.id
+							WHERE 
+								(b.category='acc' OR b.category='baut' OR b.category='plate' OR b.category='gasket' OR b.category='lainnya')
+								AND b.id_bq='".$id_bq."' AND a.id_bq='".$id_bq."' ";
+		$non_frp		= $this->db->query($sql_non_frp)->result_array();
+		
+		$sql_material 	= "	SELECT 
+								a.*,
+								b.*,
+								b.qty AS qty_berat
+							FROM 
+								cost_project_detail a
+								LEFT JOIN bq_acc_and_mat b ON a.caregory_sub = b.id_material  AND a.id_milik = b.id
+							WHERE 
+								b.category='mat'
+								AND b.id_bq='".$id_bq."' AND a.id_bq='".$id_bq."' ";
+		$material		= $this->db->query($sql_material)->result_array();
+		
+		$engC 		= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'eng cost' AND b.category = 'engine' AND b.id_bq='".$id_bq."' AND b.option_type='Y' ORDER BY a.id ASC ";
+		$enggenering	= $this->db->query($engC)->result_array();
+
+		$engCPC 	= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'pack cost' AND b.category = 'packing' AND b.id_bq='".$id_bq."' AND b.price_total != 0 ORDER BY a.id ASC ";
+		$packing	= $this->db->query($engCPC)->result_array();
+		// echo $engCPC;
+		$gTruck 	= "SELECT a.*, b.* FROM list_shipping a INNER JOIN cost_project_detail b ON CONCAT_WS(' ',a.shipping_name, a.type)=b.caregory_sub WHERE a.flag = 'Y' AND b.category = 'export' AND b.id_bq='".$id_bq."' AND b.option_type='Y' AND b.price_total != 0 ORDER BY a.urut ASC ";
+		$export	= $this->db->query($gTruck)->result_array();
+
+		$engCPCV 	= "SELECT
+							b.*,
+							c.* 
+						FROM
+							cost_project_detail b
+							LEFT JOIN truck c ON b.kendaraan = c.id 
+						WHERE
+							 b.category = 'lokal' 
+							AND b.id_bq = '".$id_bq."' 
+							AND b.price_total <> 0
+						ORDER BY
+							b.id ASC ";
+		$local	= $this->db->query($engCPCV)->result_array();
+
+		$otherArray	= $this->db->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'other'))->result_array();
+		
+		$data = array(
+			'header'				=> $get_header,
+			'sroot'					=> $sroot,
+			'id_bq'					=> $id_bq,
+			'subject'				=> (!empty($get_header[0]->subject))?ucfirst($get_header[0]->subject):'-',
+			'product'				=> (!empty($get_header[0]->product))?strtoupper($get_header[0]->product):'-',
+			'pengiriman'			=> (!empty($get_header[0]->pengiriman))?strtoupper($get_header[0]->pengiriman):'-',
+			'sales'					=> (!empty($get_header[0]->sales))?ucwords($get_header[0]->sales):'-',
+			'jangka_waktu_penawaran'=> (!empty($get_header[0]->jangka_waktu_penawaran))?ucfirst($get_header[0]->jangka_waktu_penawaran):'-',
+			'garansi_porduct'		=> (!empty($get_header[0]->garansi_porduct))?ucfirst($get_header[0]->garansi_porduct):'-',
+			'tahap_pembayaran'		=> (!empty($get_header[0]->tahap_pembayaran))?ucfirst($get_header[0]->tahap_pembayaran):'-',
+			'waktu_pengiriman'		=> (!empty($get_header[0]->waktu_pengiriman))?ucfirst($get_header[0]->waktu_pengiriman):'-',
+			'customer'				=> $customer,
+			'resin'					=> strtoupper($dtImplode),
+			'quo_number'			=> (!empty($get_header[0]->quo_number))?strtoupper($get_header[0]->quo_number):'-',
+			'job_number'			=> (!empty($get_header[0]->job_number))?strtoupper($get_header[0]->job_number):'-',
+			'attn'					=> (!empty($get_header[0]->attn))?ucfirst($get_header[0]->attn):'-',
+			'detail_product'		=> $rest_detail,
+			'otherArray'		=> $otherArray,
+			'non_frp'		=> $non_frp,
+			'material'		=> $material,
+			'enggenering'	=> $enggenering,
+			'packing'		=> $packing,
+			'export'		=> $export,
+			'local'			=> $local,
+			'alamat_cust'	=> $alamat_cust,
+			'telephone'		=> $telephone,
+			'kurs'			=> $get_header[0]->kurs
+		);
+        
+		
+		$header2 	= $this->load->view('Print/print_quo_cetak_header', $data, TRUE);
+        $body 		= $this->load->view('Print/print_quo_cetak_bodynew', $data, TRUE);
+		$footer2 	= "<img src='".$sroot."/assets/images/footer_quo.png' alt='' width='100%'>"; 
+		// echo $body ;
+		// exit;
+		$header = array (
+			'odd' => array (
+				'C' => array (
+					'content' => $header2
+				),
+				'line' => 0,
+			),
+			'even' => array ()
+		);
+		
+		$footer = array (
+			'odd' => array (
+				'C' => array (
+					'content' => $footer2,
+					'width' => '100%'
+				),
+				'line' => 0,
+			),
+			'even' => array ()
+		);
+		
+        $mpdf->SetHeader($header);
+		$mpdf->SetFooter($footer);
+		
+		$mpdf->defaultheaderline = 0;
+		
+        $mpdf->AddPageByArray([
+			'orientation' => 'P',
+			'margin-top' => 40,
+			'margin-bottom' => 15,
+			'margin-left' => 0,
+			'margin-right' => 0,
+			'margin-header' => 0,
+			'margin-footer' => 0,
+			'line' => 0
+		]);
+		
+		history('Print new quotation indonesia version / '.str_replace('BQ-','',$id_bq));
+		
+		$mpdf->SetTitle($id_bq);
+        $mpdf->WriteHTML($body);
+        $mpdf->Output(str_replace('BQ-','',$id_bq)." ".date('dmYHis').".pdf" ,'I');
+	}
 	
 	public function print_cetak_eng(){
 		$this->penawaran_model->print_cetak_eng();

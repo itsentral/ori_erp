@@ -2953,7 +2953,7 @@
 		$id_pro 			= $getCuttingHeader[0]->id_pro_det;
 		$id_deadstock 		= $getCuttingHeader[0]->id_deadstok;
 		
-		$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in cutting'))->result_array();
+		$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
 		$ArrFG_OUT = [];
 		if(!empty($getReportFG)){
 			$ArrFG_OUT[0]['tanggal'] = date('Y-m-d');
@@ -3140,8 +3140,8 @@
 			$ArrJurnal[$kredit.$nomor]['updated_by'] = $UserName;
 			$ArrJurnal[$kredit.$nomor]['updated_date'] = $DateTime;
 		}
-		// print_r($ArrFG_OUT_DEADSTOCK);
-		// print_r($ArrWIP_IN_DEADSTOCK);
+		// print_r($ArrFG_OUT);
+		// print_r($ArrWIP_IN);
 		// exit;
 
 		$CI->db->insert_batch('jurnal_temp',$ArrJurnal);
