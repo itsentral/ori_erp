@@ -11666,7 +11666,7 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
 						}
 					}
@@ -11699,7 +11699,7 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['cost_book'] =  $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
 						}
 					}
