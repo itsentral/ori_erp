@@ -11618,25 +11618,7 @@ class Produksi extends CI_Controller {
 					$ArrOUT_FG[$key]['id_pro'] =  $value['id_deadstok'];
 					$ArrOUT_FG[$key]['jenis'] =  'out deadstok';
 
-					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
-					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
-					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
-					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
-					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
-					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
-					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
-					$ArrIN_WIP[$key]['qty'] = 1;
-					$ArrIN_WIP[$key]['nilai_wip'] = $getDataFG[0]['nilai_wip'];
-					$ArrIN_WIP[$key]['material'] = 0;
-					$ArrIN_WIP[$key]['wip_direct'] =  0;
-					$ArrIN_WIP[$key]['wip_indirect'] =  0;
-					$ArrIN_WIP[$key]['wip_consumable'] =  0;
-					$ArrIN_WIP[$key]['wip_foh'] =  0;
-					$ArrIN_WIP[$key]['created_by'] = $username;
-					$ArrIN_WIP[$key]['created_date'] = $datetime;
-					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
-					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
-
+					$SUM_DEADSTICK = 0;
 					if(!empty($temp)){
 						foreach ($temp as $key2 => $value2) {
 							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
@@ -11668,6 +11650,8 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
 					}
 					if(!empty($tempMixing)){
@@ -11701,8 +11685,30 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+
+							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
 					}
+
+					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
+					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
+					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
+					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
+					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
+					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+					$ArrIN_WIP[$key]['qty'] = 1;
+					$ArrIN_WIP[$key]['nilai_wip'] = $SUM_DEADSTICK;
+					$ArrIN_WIP[$key]['material'] = 0;
+					$ArrIN_WIP[$key]['wip_direct'] =  0;
+					$ArrIN_WIP[$key]['wip_indirect'] =  0;
+					$ArrIN_WIP[$key]['wip_consumable'] =  0;
+					$ArrIN_WIP[$key]['wip_foh'] =  0;
+					$ArrIN_WIP[$key]['created_by'] = $username;
+					$ArrIN_WIP[$key]['created_date'] = $datetime;
+					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
+					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
 				}
 			}
 		}
