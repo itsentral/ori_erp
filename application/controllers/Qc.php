@@ -4709,7 +4709,7 @@ class Qc extends CI_Controller
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => $keterangan1,
 					  'no_reff'       => $id.$noso,
-					  'debet'         => $finishgood;
+					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP to Fg Spool tanki',
 					  'no_request'    => $no_request,
