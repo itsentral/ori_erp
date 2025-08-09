@@ -543,7 +543,7 @@ class Wip_pipe_cutting extends CI_Controller {
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 		  
-		}
+	}
 
 
 }
