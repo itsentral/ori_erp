@@ -332,7 +332,10 @@ class Wip_pipe_cutting extends CI_Controller {
 				if(!empty($ArrCutting)){
 					$this->db->update_batch('so_cutting_detail', $ArrCutting, 'id');
 
-					insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting
+					insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting 
+					jurnalOuttoWipcutting($id);
+
+					
 				}
 			$this->db->trans_complete();
 
@@ -345,6 +348,8 @@ class Wip_pipe_cutting extends CI_Controller {
 			}
 			else{
 				$this->db->trans_commit();
+
+
 				$Arr_Kembali	= array(
 					'pesan'		=>'Process Success. Thanks ...',
 					'status'	=> 1
@@ -387,5 +392,158 @@ class Wip_pipe_cutting extends CI_Controller {
             $this->load->view('Wip_pipe_cutting/confirm',$data);
         }
 	}
+
+
+	function jurnalOuttoWipcutting($kode){
+		
+		$data_session	= $this->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	        
+
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			
+			$totalwip =0;
+			  
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				$idtrans = $data->id_trans;
+
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='WIP';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				
+				$wip           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalwip        = $finishgood;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_wip,
+					  'keterangan'    => $keterangan2,
+					  'no_reff'       => $idtrans,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Finishgood To WIP Cutting',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 			
+				
+			}
+			
+		   
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'out cutting%'")->result();
+			
+			
+			  
+			foreach($fg AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='COGS';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				$idtrans = $data->id_trans;
+				
+				$wip           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalfg        = $finishgood;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coafg,
+					  'keterangan'    => $keterangan1,
+					  'no_reff'       => $idtrans,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Finishgood To WIP Cutting',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 			
+				
+			}
+
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'Finishgood To WIP Cutting'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
+
 
 }
