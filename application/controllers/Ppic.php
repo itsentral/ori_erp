@@ -2676,7 +2676,7 @@ class Ppic extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan2,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $idtrans,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
@@ -2731,7 +2731,7 @@ class Ppic extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $idtrans,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
@@ -2746,7 +2746,7 @@ class Ppic extends CI_Controller {
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
