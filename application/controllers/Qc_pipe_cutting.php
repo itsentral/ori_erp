@@ -383,7 +383,7 @@ class Qc_pipe_cutting extends CI_Controller {
 					$this->db->insert_batch('data_erp_wip_group',$ArrWIP_OUT_DEADSTOCK);
 				}
 
-				jurnalIntoFGcutting($idprodet);
+				$this->jurnalIntoFGcutting($idprodet);
 
 			$this->db->trans_complete();
 
