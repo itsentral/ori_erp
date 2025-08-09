@@ -4665,7 +4665,7 @@ class Qc extends CI_Controller
 	        $idtrans = str_replace('-','',$kode);
 
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
 			
 			$totalfg =0;
 			  
@@ -4694,7 +4694,7 @@ class Qc extends CI_Controller
 				$finishgood    	= $data->finishgood;
 				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
 				
-				$totalfg        = $cogs;
+				$totalfg        = $finishgood;
 				if ($nm_material=='pipe'){			
 				$coa_wip 		='1103-03-02';	
 				}else{
@@ -4738,7 +4738,7 @@ class Qc extends CI_Controller
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			

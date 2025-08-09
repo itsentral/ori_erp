@@ -8,6 +8,7 @@ class Ppic extends CI_Controller {
 		$this->load->model('master_model');
 		$this->load->model('produksi_model');
 		$this->load->model('tanki_model');
+		$this->load->model('Jurnal_model');
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
@@ -2611,8 +2612,6 @@ class Ppic extends CI_Controller {
 
 				if(!empty($ArrIN_FG_MATERIAL)){
 					$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
-
-					$this->jurnalOuttoWip($kode);
 				}
 
 				
@@ -2622,6 +2621,7 @@ class Ppic extends CI_Controller {
 				$this->db->trans_rollback();
 			} else {
 				$this->db->trans_commit();
+				$this->jurnalOuttoWip($kode);
 			}
 		}
 	}
@@ -2636,7 +2636,7 @@ class Ppic extends CI_Controller {
 		
 	        $idtrans = str_replace('-','',$kode);
 
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
 			
 			$totalwip =0;
 			  
@@ -2665,7 +2665,7 @@ class Ppic extends CI_Controller {
 				$finishgood    	= $data->finishgood;
 				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
 				
-				$totalfg        = $cogs;
+				$totalwip        = $finishgood;
 				if ($nm_material=='pipe'){			
 				$coa_wip 		='1103-03-02';	
 				}else{
@@ -2679,7 +2679,7 @@ class Ppic extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan2,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $idtrans,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
@@ -2691,11 +2691,9 @@ class Ppic extends CI_Controller {
 			}
 			
 		   
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
 			
-			$totalfg =0;
-			  
-			$det_Jurnaltes = [];
+			
 			  
 			foreach($fg AS $data){
 				
@@ -2734,7 +2732,7 @@ class Ppic extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $idtrans,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
@@ -2746,10 +2744,7 @@ class Ppic extends CI_Controller {
 			}
 
 			
-			        
-				
-			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
@@ -2759,7 +2754,7 @@ class Ppic extends CI_Controller {
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'Finishgood Part To WIP'.$keterangan;
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
