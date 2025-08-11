@@ -452,18 +452,11 @@ class Qc_pipe_cutting extends CI_Controller {
 			
 			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
 			
-            if(!empty($fg)){
-            $jurnalfg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
-			
-			} else {
-             $jurnalfg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
-			}
-
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
 			  
-			foreach($jurnalfg AS $data){
+			foreach($fg AS $data){
 				
 				$nm_material = $data->product;	
 				$tgl_voucher = $data->tanggal;
