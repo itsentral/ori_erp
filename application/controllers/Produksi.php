@@ -12016,6 +12016,7 @@ class Produksi extends CI_Controller {
 				'kode_spk'	=> $kode_spk
 			);
 			$this->closing_produksi_deadstok($ARR_ID_PRO_UNIQ);
+			$this->closing_produksi_base_jurnal($kode_spk_created,$id_gudang,14);
 			history('Input aktual spk produksi utama '.$kode_spk);
 		}
 		echo json_encode($Arr_Kembali);
