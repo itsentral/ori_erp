@@ -8,6 +8,8 @@ class Qc_pipe_cutting extends CI_Controller {
 		$this->load->model('master_model');
 		$this->load->model('produksi_model');
 		$this->load->model('tanki_model');
+		$this->load->model('Jurnal_model');
+		$this->load->model('Acc_model');
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
