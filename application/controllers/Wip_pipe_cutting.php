@@ -291,6 +291,7 @@ class Wip_pipe_cutting extends CI_Controller {
 				$getCuttingList = $this->db->get_where('so_cutting_detail', array('id_header'=>$id))->result_array();
 				$getCuttingSum 	= $this->db->select('SUM(length_split) AS total_cutting')->get_where('so_cutting_detail', array('id_header'=>$id))->result();
 				$panjangCutting = (!empty($getCuttingSum[0]->total_cutting))?$getCuttingSum[0]->total_cutting:0;
+				$ID_proDet = $id;
 			}
 
 			$ArrCutting = [];
