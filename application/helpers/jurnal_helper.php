@@ -3194,7 +3194,7 @@
 			
 
 			$totalwip =0;
-			  
+			$total = 0;  
 			$det_Jurnaltes = [];
 			  
 			foreach($jurnalwip AS $data){
@@ -3243,7 +3243,10 @@
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					  
-					 ); 			
+					 ); 		
+					 
+					 
+					$total +=$data->finishgood;
 				
 			}
 			
@@ -3302,9 +3305,7 @@
 			}
 
 			 
-			print_r($jurnalfg);
-			exit;
-
+			
 				
 			$CI->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
 			$CI->db->insert_batch('jurnaltras',$det_Jurnaltes); 
@@ -3316,7 +3317,7 @@
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'Finishgood To WIP Cutting'.$keterangan;
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$CI->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
