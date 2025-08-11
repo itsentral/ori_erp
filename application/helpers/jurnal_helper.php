@@ -3178,7 +3178,7 @@
 
 
 	function jurnalOuttoWipcutting($kode){
-		
+		$CI 	=& get_instance();
 		$data_session	= $CI->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
