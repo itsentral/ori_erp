@@ -471,9 +471,14 @@ class Wip_pipe_cutting extends CI_Controller {
 		   
 			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'out cutting%'")->result();
 			
+			if(!empty($fg)){
+            $jurnalfg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'out cutting%'")->result();
 			
+			} else {
+             $jurnalfg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'out cutting%'")->result();
+			}
 			  
-			foreach($fg AS $data){
+			foreach($jurnalfg AS $data){
 				
 				$nm_material = $data->product;	
 				$tgl_voucher = $data->tanggal;
@@ -522,8 +527,8 @@ class Wip_pipe_cutting extends CI_Controller {
 				
 			}
 
-			print_r($kode);
-			exit;
+			// print_r($kode);
+			// exit;
 
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
