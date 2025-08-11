@@ -350,7 +350,7 @@ class Wip_pipe_cutting extends CI_Controller {
 			else{
 				$this->db->trans_commit();
                 
-				$this->jurnalOuttoWipcutting($ID_proDet);
+				//$this->jurnalOuttoWipcutting($ID_proDet);
 
 				$Arr_Kembali	= array(
 					'pesan'		=>'Process Success. Thanks ...',
