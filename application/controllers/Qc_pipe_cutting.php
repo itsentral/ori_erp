@@ -521,7 +521,8 @@ class Qc_pipe_cutting extends CI_Controller {
 
 			
 			        
-				
+			print_r($idtrans);
+			exit;	
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
