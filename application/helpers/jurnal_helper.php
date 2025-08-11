@@ -2953,7 +2953,9 @@
 		$id_pro 			= $getCuttingHeader[0]->id_pro_det;
 		$id_deadstock 		= $getCuttingHeader[0]->id_deadstok;
 		
-		$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+		if(!empty($id_pro)){
+			$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+		}
 		$ArrFG_OUT = [];
 		if(!empty($getReportFG)){
 			$ArrFG_OUT[0]['tanggal'] = date('Y-m-d');
