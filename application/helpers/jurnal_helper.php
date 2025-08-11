@@ -3173,7 +3173,7 @@
 			$CI->db->insert_batch('data_erp_wip_group',$ArrWIP_IN_DEADSTOCK);
 		}
         
-		$CI->jurnalOuttoWipcutting($ID_proDet);
+		jurnalOuttoWipcutting($ID_proDet);
 	}
 
 
