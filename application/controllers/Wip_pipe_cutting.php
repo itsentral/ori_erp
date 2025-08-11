@@ -434,7 +434,7 @@ class Wip_pipe_cutting extends CI_Controller {
 				$noso 		 = ','.$data->no_so;
                	$no_request  = $data->no_spk;	
 				
-				$wip           	= $data->wip;
+				$wip1           	= $data->wip;
 				$material      	= $data->material;
 				$wip_direct    	= $data->wip_direct;
 				$wip_indirect  	= $data->wip_indirect;
@@ -493,7 +493,7 @@ class Wip_pipe_cutting extends CI_Controller {
                	$no_request  = $data->no_spk;	
 				$idtrans = $data->id_trans;
 				
-				$wip           	= $data->wip;
+				$wip2           	= $data->wip;
 				$material      	= $data->material;
 				$wip_direct    	= $data->wip_direct;
 				$wip_indirect  	= $data->wip_indirect;
@@ -527,7 +527,7 @@ class Wip_pipe_cutting extends CI_Controller {
 				
 			}
 
-			print_r($det_Jurnaltes);
+			print_r($jurnalwip);
 			exit;
 
 			
