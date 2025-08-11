@@ -313,7 +313,7 @@ class Qc_pipe_cutting extends CI_Controller {
 				$GetDetCut_Deadstock	= $this->db->get_where('data_erp_wip_group',array('id_trans'=>$value['id'],'jenis'=>'in cutting deadstok'))->result_array();
 				
 				if(!empty($GetDetCut_Deadstock)){
-					$idprodet = $GetDetCut[0]['id_pro_det'];
+					$idprodet = $GetDetCut_Deadstock[0]['id_pro_det'];
 					$ArrFG_IN_DEADSTOCK[$key]['tanggal'] 		= date('Y-m-d');
 					$ArrFG_IN_DEADSTOCK[$key]['keterangan'] 	= 'WIP to Finish Good (Cutting Deadstock)';
 					$ArrFG_IN_DEADSTOCK[$key]['no_so'] 		= $GetDetCut_Deadstock[0]['no_so'];
