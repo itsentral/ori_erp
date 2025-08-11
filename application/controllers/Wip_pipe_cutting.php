@@ -406,11 +406,18 @@ class Wip_pipe_cutting extends CI_Controller {
 
 			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
 			
+            if(!empty($wip)){
+            $jurnalwip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			
+			} else {
+             $jurnalwip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_trans ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			}
+
 			$totalwip =0;
 			  
 			$det_Jurnaltes = [];
 			  
-			foreach($wip AS $data){
+			foreach($jurnalwip AS $data){
 				
 				$idtrans = $data->id_trans;
 
