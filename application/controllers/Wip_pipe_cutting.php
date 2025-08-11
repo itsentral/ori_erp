@@ -527,8 +527,8 @@ class Wip_pipe_cutting extends CI_Controller {
 				
 			}
 
-			// print_r($kode);
-			// exit;
+			print_r($det_Jurnaltes);
+			exit;
 
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
