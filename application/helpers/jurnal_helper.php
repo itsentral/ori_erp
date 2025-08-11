@@ -3301,6 +3301,10 @@
 				
 			}
 
+			 
+			print_r($jurnalfg);
+			exit;
+
 				
 			$CI->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
 			$CI->db->insert_batch('jurnaltras',$det_Jurnaltes); 
