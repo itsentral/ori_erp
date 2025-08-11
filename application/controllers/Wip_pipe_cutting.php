@@ -334,7 +334,7 @@ class Wip_pipe_cutting extends CI_Controller {
 					$this->db->update_batch('so_cutting_detail', $ArrCutting, 'id');
 
 					insert_jurnal_cutting($ArrCutting, $id); // id = id header cutting 
-					$this->jurnalOuttoWipcutting($ID_proDet);
+				
 
 					
 				}
@@ -349,7 +349,8 @@ class Wip_pipe_cutting extends CI_Controller {
 			}
 			else{
 				$this->db->trans_commit();
-
+                
+				$this->jurnalOuttoWipcutting($ID_proDet);
 
 				$Arr_Kembali	= array(
 					'pesan'		=>'Process Success. Thanks ...',
@@ -405,7 +406,7 @@ class Wip_pipe_cutting extends CI_Controller {
 		
 	        
 
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_trans ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
 			
             if(!empty($wip)){
             $jurnalwip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
