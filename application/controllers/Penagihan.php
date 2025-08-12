@@ -6252,9 +6252,9 @@ if($base_cur=='USD'){
 
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = $get_kurs[0]->sisa_um;
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+				$sisa_um   = isset($get_kurs[0]->sisa_um);
+				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
+				$sisa_um_idr   = isset($get_kurs[0]->sisa_um_idr);
 				if($base_cur=='USD'){
 					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
 				}else{
@@ -6336,8 +6336,8 @@ if($base_cur=='USD'){
 				'in_so'			=> implode(',',$in_so),
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
-				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $get_kurs[0]->uang_muka_persen,
+				'kurs'			=> isset($get_kurs[0]->kurs),
+				'uang_muka_persen'	=> isset($get_kurs[0]->uang_muka_persen),
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'sisa_um'	    => $sisa_um,
@@ -6417,7 +6417,7 @@ if($base_cur=='USD'){
 				}*/
 
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = $get_kurs[0]->sisa_um;
+				$sisa_um   = isset($get_kurs[0]->sisa_um);
 				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
 				$sisa_um_idr   = isset($get_kurs[0]->sisa_um_idr);
 				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
@@ -6468,6 +6468,7 @@ if($base_cur=='USD'){
 				$sisa_um   = isset($get_kurs[0]->sisa_um);
 				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
 				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
+				$sisa_um_idr    = isset($get_kurs[0]->sisa_um_idr);
 			}
 			
 			$approval	= $this->uri->segment(4);
