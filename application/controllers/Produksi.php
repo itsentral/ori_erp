@@ -11630,7 +11630,7 @@ class Produksi extends CI_Controller {
 							//$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
 
 							$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key2),1)->row();
-							if(!empty($getcostbook)) $costbook=$getcostbook->harga;
+							if(!empty($getcostbook)) $cost_book=$getcostbook->harga;
 
 							$key_uniq = $key.'-'.$key2.'-Mix2';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
