@@ -11474,7 +11474,10 @@ class Produksi extends CI_Controller {
 									$unit_act 	= $total_act / $QTY_INP;
 
 									//PRICE BOOK
-									$PRICE_BOOK = get_price_book($value2['actual_type']);
+									$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$value2['actual_type']),1)->row();
+									if(!empty($getcostbook)) $PRICE_BOOK=$getcostbook->harga;
+									//$PRICE_BOOK = get_price_book($value2['actual_type']);
+
 									$AMOUNT 	= $total_act * $PRICE_BOOK;
 
 									$ID_PRODUKSI_DETAIL[] = $value3['id_detail'];
@@ -11591,7 +11594,9 @@ class Produksi extends CI_Controller {
 
 		$tanggalNow = date('Y-m-d');
 		$GETDetMaterial = get_detail_material();
-		$GETPriceBookProduksi = getPriceBookByDateproduksi($tanggalNow);
+		//$GETPriceBookProduksi = getPriceBookByDateproduksi($tanggalNow);
+
+			
 
 		if(!empty($getDetDeadStock)){
 			foreach ($getDetDeadStock as $key => $value) {
@@ -11618,29 +11623,15 @@ class Produksi extends CI_Controller {
 					$ArrOUT_FG[$key]['id_pro'] =  $value['id_deadstok'];
 					$ArrOUT_FG[$key]['jenis'] =  'out deadstok';
 
-					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
-					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
-					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
-					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
-					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
-					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
-					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
-					$ArrIN_WIP[$key]['qty'] = 1;
-					$ArrIN_WIP[$key]['nilai_wip'] = $getDataFG[0]['nilai_wip'];
-					$ArrIN_WIP[$key]['material'] = 0;
-					$ArrIN_WIP[$key]['wip_direct'] =  0;
-					$ArrIN_WIP[$key]['wip_indirect'] =  0;
-					$ArrIN_WIP[$key]['wip_consumable'] =  0;
-					$ArrIN_WIP[$key]['wip_foh'] =  0;
-					$ArrIN_WIP[$key]['created_by'] = $username;
-					$ArrIN_WIP[$key]['created_date'] = $datetime;
-					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
-					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
-
+					$SUM_DEADSTICK = 0;
 					if(!empty($temp)){
 						foreach ($temp as $key2 => $value2) {
 							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
-							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							//$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+
+							$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key2),1)->row();
+							if(!empty($getcostbook)) $cost_book=$getcostbook->harga;
+
 							$key_uniq = $key.'-'.$key2.'-Mix2';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
 
@@ -11667,13 +11658,18 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
 					}
 					if(!empty($tempMixing)){
 						foreach ($tempMixing as $key2 => $value2) {
 							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
-							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							//$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key2),1)->row();
+							if(!empty($getcostbook)) $cost_book=$getcostbook->harga;
+
 							$key_uniq = $key.'-'.$key2.'-Mix';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
 
@@ -11700,9 +11696,31 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['nm_material'] =  $nm_material;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+
+							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
 					}
+
+					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
+					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
+					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
+					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
+					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
+					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+					$ArrIN_WIP[$key]['qty'] = 1;
+					$ArrIN_WIP[$key]['nilai_wip'] = $SUM_DEADSTICK;
+					$ArrIN_WIP[$key]['material'] = 0;
+					$ArrIN_WIP[$key]['wip_direct'] =  0;
+					$ArrIN_WIP[$key]['wip_indirect'] =  0;
+					$ArrIN_WIP[$key]['wip_consumable'] =  0;
+					$ArrIN_WIP[$key]['wip_foh'] =  0;
+					$ArrIN_WIP[$key]['created_by'] = $username;
+					$ArrIN_WIP[$key]['created_date'] = $datetime;
+					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
+					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
 				}
 			}
 		}
@@ -12010,6 +12028,7 @@ class Produksi extends CI_Controller {
 				'kode_spk'	=> $kode_spk
 			);
 			$this->closing_produksi_deadstok($ARR_ID_PRO_UNIQ);
+			$this->closing_produksi_base_jurnal($kode_spk_created,$id_gudang,14);
 			history('Input aktual spk produksi utama '.$kode_spk);
 		}
 		echo json_encode($Arr_Kembali);
@@ -12780,7 +12799,7 @@ class Produksi extends CI_Controller {
 		$restDetail		= array_merge($restDetail1,$restDetail2,$restDetail3);
 		$dateKurs = date('Y-m-d');
 		// $dateKurs = '2025-01-02';
-		$GET_COSTBOOK = getPriceBookByDateproduksi($dateKurs);
+		//$GET_COSTBOOK = getPriceBookByDateproduksi($dateKurs);
 		$GET_MAERIALS = get_detail_material();
 		$GET_MATERIAL	= get_detail_material();
 		//KURS

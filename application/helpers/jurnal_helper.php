@@ -2953,7 +2953,9 @@
 		$id_pro 			= $getCuttingHeader[0]->id_pro_det;
 		$id_deadstock 		= $getCuttingHeader[0]->id_deadstok;
 		
-		$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+		if(!empty($id_pro)){
+			$getReportFG 	= $CI->db->order_by('id','DESC')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro,'jenis'=>'in'))->result_array();
+		}
 		$ArrFG_OUT = [];
 		if(!empty($getReportFG)){
 			$ArrFG_OUT[0]['tanggal'] = date('Y-m-d');
@@ -2977,6 +2979,8 @@
 			$ArrFG_OUT[0]['id_pro'] = (!empty($getReportFG[0]['id_pro']))?$getReportFG[0]['id_pro']:0;
 			$ArrFG_OUT[0]['qty_ke'] = (!empty($getReportFG[0]['qty_ke']))?$getReportFG[0]['qty_ke']:0;
 			$ArrFG_OUT[0]['jenis'] = 'out cutting';
+
+			$ID_proDet  = (!empty($getReportFG[0]['id_pro_det']))?$getReportFG[0]['id_pro_det']:NULL;
 		}
 
 		//Deadstock
@@ -3003,6 +3007,8 @@
 			$ArrFG_OUT_DEADSTOCK[0]['id_trans'] = $getReportFG_DEADSTOCK[0]['id_trans'];
 			$ArrFG_OUT_DEADSTOCK[0]['id_pro'] = $getReportFG_DEADSTOCK[0]['id_pro'];
 			$ArrFG_OUT_DEADSTOCK[0]['jenis'] = 'out deadstok';
+
+			$ID_proDet  = $getReportFG_DEADSTOCK[0]['id_pro_det'];
 		}
 
 		$SUM_PRICE = 0;
@@ -3080,6 +3086,8 @@
 				$ArrWIP_IN[$nomor]['created_date'] = $DateTime;
 				$ArrWIP_IN[$nomor]['jenis'] = 'in cutting';
 				$ArrWIP_IN[$nomor]['id_trans'] = $kode_spk;
+
+				$ID_proDet  = $id_pro;
 			}
 
 			//DEADSTOCK Cutting
@@ -3104,6 +3112,8 @@
 				$ArrWIP_IN_DEADSTOCK[$nomor]['created_date'] = $DateTime;
 				$ArrWIP_IN_DEADSTOCK[$nomor]['jenis'] = 'in cutting deadstok';
 				$ArrWIP_IN_DEADSTOCK[$nomor]['id_trans'] = $kode_spk;
+
+				$ID_proDet  = (!empty($getDetailDead[0]['id_pro_det']))?$getDetailDead[0]['id_pro_det']:NULL;
 			}
 
 
@@ -3164,6 +3174,169 @@
 		if(!empty($ArrWIP_IN_DEADSTOCK)){
 			$CI->db->insert_batch('data_erp_wip_group',$ArrWIP_IN_DEADSTOCK);
 		}
+        
+		jurnalOuttoWipcutting($ID_proDet);
+	}
+
+
+	function jurnalOuttoWipcutting($kode){
+		$CI 	=& get_instance();
+		$CI->load->model('Jurnal_model');
+		$CI->load->model('Acc_model');
+		$data_session	= $CI->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	        
+
+            $jurnalwip = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE id_pro_det ='".$kode."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			
+			
+
+			$totalwip =0;
+			$total = 0;  
+			$det_Jurnaltes = [];
+			  
+			foreach($jurnalwip AS $data){
+				
+				$idtrans = $data->id_trans;
+
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='WIP';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				
+				$wip1           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalwip        = $finishgood;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_wip,
+					  'keterangan'    => $keterangan2,
+					  'no_reff'       => $idtrans,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Finishgood To WIP Cutting',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 		
+					 
+					 
+					$total +=$data->finishgood;
+				
+			}
+			
+		   
+			$jurnalfg = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND created_date='".$DateTime."' AND jenis LIKE 'out%'")->result();
+			
+			
+			  
+			foreach($jurnalfg AS $data){
+				
+				$nm_material = $data->product;	
+				$tgl_voucher = $data->tanggal;
+				$fg_txt         ='FINISHED GOOD'; 
+				$wip_txt         ='COGS';	
+				$spasi       = ',';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+               	$no_request  = $data->no_spk;	
+				$idtrans = $data->id_trans;
+				
+				$wip2           	= $data->wip;
+				$material      	= $data->material;
+				$wip_direct    	= $data->wip_direct;
+				$wip_indirect  	= $data->wip_indirect;
+				$wip_foh       	= $data->wip_foh;
+				$wip_consumable = $data->wip_consumable;
+				$finishgood    	= $data->finishgood;
+				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
+				
+				$totalfg        = $finishgood;
+				if ($nm_material=='pipe'){			
+				$coa_wip 		='1103-03-02';	
+				}else{
+				$coa_wip 		='1103-03-03';						
+				}					
+				$coafg   		='1103-04-01';
+                				
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coafg,
+					  'keterangan'    => $keterangan1,
+					  'no_reff'       => $idtrans,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Finishgood To WIP Cutting',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 ); 			
+				
+			}
+
+			 
+			
+				
+			$CI->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$kode' AND tanggal ='".$Date."'"); 
+			$CI->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'Finishgood To WIP Cutting'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $total, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$CI->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$CI->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
 	}
 
 	function insert_jurnal_qc_cutting($ArrData, $kode_pro){
