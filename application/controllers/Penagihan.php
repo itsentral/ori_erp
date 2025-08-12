@@ -6341,7 +6341,7 @@ if($base_cur=='USD'){
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
 				'kurs'			=> isset($get_kurs[0]->kurs),
-				'uang_muka_persen'	=> isset($get_kurs[0]->uang_muka_persen),
+				'uang_muka_persen'	=> $uang_muka_persen,
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'sisa_um'	    => $sisa_um,
