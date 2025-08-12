@@ -90,7 +90,9 @@ $rest_data 			= $this->db->query($sql_header)->result_array();
 					foreach($rest_dt_check AS $val2 => $valx2){echo number_format($valx2['qty_rusak'],2)."<br>";}
 				echo "</td>";
 				echo "<td align='right'>";
-					foreach($rest_dt_check AS $val2 => $valx2){echo date('d M Y', strtotime($valx2['expired_date']))."<br>";}
+					foreach($rest_dt_check AS $val2 => $valx2){
+						$expired_date = (!empty($valx2['expired_date']))?date('d M Y', strtotime($valx2['expired_date'])):'';
+						echo $expired_date."<br>";}
 				echo "</td>";
 				echo "<td align='left'>";
 					foreach($rest_dt_check AS $val2 => $valx2){echo ucfirst($valx2['keterangan'])."<br>";}
