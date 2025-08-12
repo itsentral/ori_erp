@@ -6473,6 +6473,9 @@ if($base_cur=='USD'){
 				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
 				$sisa_um_idr    = isset($get_kurs[0]->sisa_um_idr);
 			}
+			print_r($uang_muka_persen);
+			exit;
+
 			
 			$approval	= $this->uri->segment(4);
 			$data2 = array(
