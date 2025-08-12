@@ -11474,7 +11474,10 @@ class Produksi extends CI_Controller {
 									$unit_act 	= $total_act / $QTY_INP;
 
 									//PRICE BOOK
-									$PRICE_BOOK = get_price_book($value2['actual_type']);
+									$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$value2['actual_type']),1)->row();
+									if(!empty($getcostbook)) $PRICE_BOOK=$getcostbook->harga;
+									//$PRICE_BOOK = get_price_book($value2['actual_type']);
+
 									$AMOUNT 	= $total_act * $PRICE_BOOK;
 
 									$ID_PRODUKSI_DETAIL[] = $value3['id_detail'];
@@ -11591,7 +11594,9 @@ class Produksi extends CI_Controller {
 
 		$tanggalNow = date('Y-m-d');
 		$GETDetMaterial = get_detail_material();
-		$GETPriceBookProduksi = getPriceBookByDateproduksi($tanggalNow);
+		//$GETPriceBookProduksi = getPriceBookByDateproduksi($tanggalNow);
+
+			
 
 		if(!empty($getDetDeadStock)){
 			foreach ($getDetDeadStock as $key => $value) {
@@ -11622,7 +11627,11 @@ class Produksi extends CI_Controller {
 					if(!empty($temp)){
 						foreach ($temp as $key2 => $value2) {
 							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
-							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							//$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+
+							$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key2),1)->row();
+							if(!empty($getcostbook)) $costbook=$getcostbook->harga;
+
 							$key_uniq = $key.'-'.$key2.'-Mix2';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
 
@@ -12787,7 +12796,7 @@ class Produksi extends CI_Controller {
 		$restDetail		= array_merge($restDetail1,$restDetail2,$restDetail3);
 		$dateKurs = date('Y-m-d');
 		// $dateKurs = '2025-01-02';
-		$GET_COSTBOOK = getPriceBookByDateproduksi($dateKurs);
+		//$GET_COSTBOOK = getPriceBookByDateproduksi($dateKurs);
 		$GET_MAERIALS = get_detail_material();
 		$GET_MATERIAL	= get_detail_material();
 		//KURS
