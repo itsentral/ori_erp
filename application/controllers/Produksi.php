@@ -11666,7 +11666,10 @@ class Produksi extends CI_Controller {
 					if(!empty($tempMixing)){
 						foreach ($tempMixing as $key2 => $value2) {
 							$nm_material = (!empty($GETDetMaterial[$key2]['nm_material']))?$GETDetMaterial[$key2]['nm_material']:null;
-							$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							//$cost_book = (!empty($GETPriceBookProduksi[$key2]))?$GETPriceBookProduksi[$key2]:0;
+							$getcostbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key2),1)->row();
+							if(!empty($getcostbook)) $cost_book=$getcostbook->harga;
+
 							$key_uniq = $key.'-'.$key2.'-Mix';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
 

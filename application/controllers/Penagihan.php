@@ -3701,7 +3701,9 @@ else
 				$non_frp	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->from('penagihan_detail')->where("(kategori_detail='BQ')")->where('id_penagihan',$id)->get()->result_array();
 				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
-				$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+				
+				//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+				
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 				$sisa_um   = $get_kurs[0]->sisa_um;
 				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
@@ -6252,9 +6254,10 @@ if($base_cur=='USD'){
 
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = isset($get_kurs[0]->sisa_um);
-				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
-				$sisa_um_idr   = isset($get_kurs[0]->sisa_um_idr);
+				$sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
 				if($base_cur=='USD'){
 					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
 				}else{
@@ -6292,15 +6295,13 @@ if($base_cur=='USD'){
 
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 //				$get_kurs	= $this->db->select(' (kurs_usd_dipakai) AS kurs,  (uang_muka_persen) AS uang_muka_persen,  (uang_muka_persen2) AS uang_muka_persen2')->where_in('no_ipp',$in_ipp)->get('billing_so')->result();
-				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-
-				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
-				$uang_muka_persen = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
-				if($base_cur=='USD'){
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-				}else{
-					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
-				}
+				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+				$sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				
+				
 				$uang_muka_persen2 = 0;
 				$down_payment2 = 0;
 				if(count($get_tagih) > 1){
@@ -6313,6 +6314,9 @@ if($base_cur=='USD'){
 					}
 				}
 			}
+
+			// print_r($get_kurs[0]->uang_muka_persen);
+			// exit;
 			$approval	= $this->uri->segment(4);
 			$data2 = array(
 				'title'			=> 'Indeks Of Create Invoice Progress',
@@ -6337,7 +6341,7 @@ if($base_cur=='USD'){
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
 				'kurs'			=> isset($get_kurs[0]->kurs),
-				'uang_muka_persen'	=> isset($get_kurs[0]->uang_muka_persen),
+				'uang_muka_persen'	=> $uang_muka_persen,
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'sisa_um'	    => $sisa_um,
@@ -6417,10 +6421,10 @@ if($base_cur=='USD'){
 				}*/
 
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = isset($get_kurs[0]->sisa_um);
-				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
-				$sisa_um_idr   = isset($get_kurs[0]->sisa_um_idr);
-				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
+				$sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
 				
 				$getTankiproduct=array();
 				$getTankipacking=array();
@@ -6465,11 +6469,14 @@ if($base_cur=='USD'){
 				}*/
 
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = isset($get_kurs[0]->sisa_um);
-				$uang_muka_persen = isset($get_kurs[0]->uang_muka_persen);
-				$down_payment   = isset($get_kurs[0]->sisa_um_idr);
-				$sisa_um_idr    = isset($get_kurs[0]->sisa_um_idr);
+					$sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
 			}
+			// print_r($uang_muka_persen);
+			// exit;
+
 			
 			$approval	= $this->uri->segment(4);
 			$data2 = array(
@@ -6561,9 +6568,10 @@ if($base_cur=='USD'){
 			$getDetailcut	='';
 			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-			$sisa_um   = $get_kurs[0]->sisa_um;
-			$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-			$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+			    $sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
 
 			$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 			//$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
@@ -6686,9 +6694,10 @@ if($base_cur=='USD'){
 			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um, sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 			$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
 //				$uang_muka_persen = (!empty($get_tagih))?$get_tagih[0]->progress_persen:0;
-			$sisa_um   = $get_kurs[0]->sisa_um;
-			$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
-			$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				$sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
+				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
+				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
+				$down_payment   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
 			if($base_cur=='USD'){
 				$down_payment = (!empty($get_tagih))?$get_tagih[0]->total_invoice:0;
 			}else{
