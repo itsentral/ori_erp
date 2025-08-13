@@ -6529,6 +6529,10 @@ if($base_cur=='USD'){
 		$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 
 		$id    		= $this->uri->segment(3);
+
+		print_r($id);
+		exit;
+
 		$penagihan 	= $this->db->get_where('penagihan', array('id'=>$id))->result();
 		$nomor_id 	= explode(",",$penagihan[0]->no_so);
 		$approval	= $this->uri->segment(4);
