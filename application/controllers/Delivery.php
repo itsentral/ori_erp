@@ -2648,7 +2648,7 @@ class Delivery extends CI_Controller
 		//UPLOAD DOCUMENT
 		if (!empty($_FILES["upload_spk"]["name"])) {
 			$target_dir     = "assets/file/produksi/";
-			$target_dir_u   = $_SERVER['DOCUMENT_ROOT'] . "/assets/file/produksi/";
+			$target_dir_u   = $_SERVER['DOCUMENT_ROOT'] . "assets/file/produksi/";
 			$name_file      = $kode_delivery . '_delivery_' . date('Ymdhis');
 			$target_file    = $target_dir . basename($_FILES["upload_spk"]["name"]);
 			$name_file_ori  = basename($_FILES["upload_spk"]["name"]);
