@@ -5684,6 +5684,8 @@ class Delivery extends CI_Controller
 						$ArrGroupOutMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
 						$ArrGroupOutMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
 						$ArrGroupOutMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+
+						$id_trans = $value2x['id_trans'];
 					}
 				}
 				else{
@@ -5735,6 +5737,8 @@ class Delivery extends CI_Controller
 					$ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
 					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
 					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					$id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
 				}
 			}
 		}
@@ -5803,6 +5807,8 @@ class Delivery extends CI_Controller
 					$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
 					$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
 					$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
+
+					$id_trans = $valx['id_trans'];
 				}
 			}
 		}
