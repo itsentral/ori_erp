@@ -257,13 +257,7 @@ class Penagihan extends CI_Controller {
 			FROM
 				billing_so_gabung b
 					(SELECT @row:=0) r
-		    WHERE (status=1 or status=0) ".$where_customer." ".$where_no_po." AND (
-				b.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.project LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.kode_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.no_po LIKE '%".$this->db->escape_like_str($like_value)."%'
-	        )
+		    WHERE (status=1 or status=0) ".$where_customer." ".$where_no_po." 
 		";
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
