@@ -5912,11 +5912,13 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_customer',$ArrGroup);
-			$this->jurnalIntransitCustomer($id_trans);
+			
 		}
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
 		}
+
+		$this->jurnalIntransitCustomer($id_trans);
 	}
 
 	public function close_jurnal_in_transit_reject_to_fg($kode_delivery){
@@ -6473,9 +6475,6 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-			print_r($idtrans);
-			exit;
-		   
 			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
 			
