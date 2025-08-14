@@ -128,6 +128,7 @@
 		?>
 
 		<?php
+		/*
 		$numb7=400;
 		$SUM3 = 0;$total_cogs3=0;
 		if (!empty($getNonid)){
@@ -165,14 +166,14 @@
 				</tr>
 			<?php
 			}
-		}
+		}*/
 		?>
 
 		<tr class='FootColor'>
 			<td colspan='13'><b>TOTAL COST  OF PRODUCT</b></td>
 			<td align='center'>
 				<?php
-				$tot_product2=round($SUM+$SUM2+$sum3,2);
+				$tot_product2=round($SUM,2);
 				?>
 				<input type="text" class="form-control input-sm result1 text-right divide" id="tot_product" name="tot_product" value="<?=set_value('tot_product', isset($tot_product2) ? $tot_product2 : '0'); ?>" readonly tabindex="-1">
 				<input type="hidden" value="<?=$total_cogs; ?>" name="total_cogs">
