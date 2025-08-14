@@ -6515,7 +6515,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coacustomer,
 					  'keterangan'    => 'INTRANSIT-CUSTOMER',
-					  'no_reff'       => $id,
+					  'no_reff'       => $idtrans,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6530,7 +6530,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coaintransit,
 					  'keterangan'    => 'INTRANSIT-CUSTOMER',
-					  'no_reff'       => $id,
+					  'no_reff'       => $idtrans,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6545,7 +6545,7 @@ class Delivery extends CI_Controller
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
