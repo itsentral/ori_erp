@@ -13547,7 +13547,7 @@ class Produksi extends CI_Controller {
 					  'no_perkiraan'  => $nokirwip,
 					  'keterangan'    => $keterangan,
 					  'no_reff'       => $id.$noso,
-					  'debet'         => $wiptotal,
+					  'debet'         => $totalwip,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'produksi wip deadstock',
 					  'no_request'    => $no_request,
