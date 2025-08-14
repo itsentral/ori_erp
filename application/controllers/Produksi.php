@@ -13495,7 +13495,7 @@ class Produksi extends CI_Controller {
 		    $kodejurnal='JV004';
 		  	
 
-			$wip = $this->db->query("SELECT * FROM data_erp_wip WHERE kode_trans like'".$idtrans."%'")->result();
+			$wip = $this->db->query("SELECT * FROM data_erp_wip WHERE kode_trans like'".$kodespk."%'")->result();
 			$id = $kodespk;
 			$totalwip =0;
 			$wiptotal =0; 
