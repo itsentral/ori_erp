@@ -127,13 +127,53 @@
 			}
 		}
 		?>
-
+        
+		<?php
+		$numb7=400;
+		$SUM3 = 0;$total_cogs3=0;
+		if (!empty($getNonid)){
+			foreach($getNonid AS $val => $valx){ $numb7++; 
+				$pr3		= 'pr';
+				$numb8	= $pr3.$numb7;			
+				?>
+				<tr id='tr_<?= $numb7;?>' >
+					<td align='center'>
+						<input type="hidden" id="ck_<?= $numb7;?>" name="tr1_<?= $numb7;?>" value="<?= $numb7;?>">
+						<input type="hidden" id="data_ipp_<?=$numb7?>" name="data1[<?=$numb7?>][no_ipp]" value="<?=$valx['no_ipp']?>">
+						<input type="hidden" id="data_so_<?=$numb7?>" name="data1[<?=$numb7?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
+						<input type="hidden" id="data_idmilik_<?=$numb7?>" name="data1[<?=$numb7?>][id_milik]" value="<?=$valx['id_milik']?>">
+						<input type="hidden" id="data_cogs_<?=$numb7?>" name="data1[<?=$numb7?>][cogs]" value="<?=$valx['cogs']?>">
+					</td>
+					<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb7;?>" name="data1[<?=$numb7 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb7;?>" name="data1[<?=$numb7 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb7;?>" name="data1[<?=$numb7 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb7;?>" name="data1[<?=$numb7 ?>][diameter_1]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb7;?>" name="data1[<?=$numb7 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-right" id="liner_<?= $numb7;?>" name="data1[<?=$numb7 ?>][liner]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="pressure_<?= $numb7;?>" name="data1[<?=$numb7 ?>][pressure]" value="<?=0; ?>" readonly  tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm" id="id_milik_<?= $numb7;?>" name="data1[<?=$numb7 ?>][spesifikasi]" value="<?=spec_bq($valx['id_milik']); ?>" readonly  tabindex="-1"></td>
+					<td>
+						<input type='hidden' name="data1[<?=$numb7 ?>][id]" value='<?=$valx['id'];?>'>
+						<input type="text" class="form-control input-sm text-right divide" id="harga_sat_<?= $numb7;?>" name="data1[<?=$numb7 ?>][harga_sat]" value="<?=0; ?>"  tabindex="-1">
+					</td>
+					<td><input type="text" class="form-control input-sm text-center" id="qty_ori_<?= $numb7;?>" data-nomor='<?=$numb7 ?>' name="data1[<?=$numb7 ?>][qty_ori]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="qty_belum_<?= $numb7;?>" data-nomor='<?=$numb7 ?>' name="data1[<?=$numb7 ?>][qty_belum]" value="<?=$valx['qty']; ?>" readonly tabindex="-1"></td>
+					<td><input type="text" class="form-control input-sm qty_product3 text-center" id="qty_<?= $numb7;?>" data-nomor='<?=$numb7 ?>' name="data1[<?=$numb7 ?>][qty]" value="<?=$valx['qty']; ?>"></td>
+					<td><input type="text" class="form-control input-sm text-center" id="unit1_<?= $numb7;?>" name="data1[<?=$numb7 ?>][unit1]" value="<?=$unitT; ?>" readonly tabindex="-1"></td>
+					<td>
+						<input type="text" class="form-control text-right input-sm divide amount1" id="harga_tot_<?=$numb7 ?>" name="data1[<?=$numb7 ?>][harga_tot]" value="<?=0; ?>" readonly tabindex="-1">
+					</td>
+				</tr>
+			<?php
+			}
+		}
+		?>
 
 		<tr class='FootColor'>
 			<td colspan='14'><b>TOTAL COST  OF PRODUCT</b></td>
 			<td align='center'>
 				<?php
-				$tot_product2=round($SUM,2);
+				$tot_product2=round($SUM+$SUM2+$SUM3,2);
 				?>
 				<input type="text" class="form-control input-sm result1 text-right divide" id="tot_product" name="tot_product" value="<?=set_value('tot_product', isset($tot_product2) ? $tot_product2 : '0'); ?>" readonly tabindex="-1">
 				<input type="hidden" value="<?=$total_cogs+$total_cogs2; ?>" name="total_cogs">
