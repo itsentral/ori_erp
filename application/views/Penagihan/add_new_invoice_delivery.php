@@ -456,6 +456,16 @@ if(isset($approval)){
 			fnAlltotal()
 		});
 
+		$(document).on('blur', '.harga_tot8', function(){
+			let dataNomor8 = $(this).data('nomor');
+			let hargaSat8  = 1;
+			let dataIni8   = ($(this).val()).split(",").join("");
+			let total8     = getNum(hargaSat8*dataIni8).toFixed(2);
+			$('#harga_tot8'+dataNomor8).val(num2(total8));
+			$('#harga_tot8_hidden'+dataNomor8).val(total8);
+			fnAlltotal8()
+		});
+
 		$(document).on('keyup change', '.qty_product2', function(){
 			let dataNomor 	= $(this).data('nomor');
 			let sisa 		= getNum($('#qty_belum_'+dataNomor).val().split(",").join(""));
@@ -467,14 +477,17 @@ if(isset($approval)){
 			fnAlltotal()
 		});
 
-		$(document).on('blur', '.harga_tot8', function(){
-			let dataNomor8 = $(this).data('nomor');
-			let hargaSat8  = 1;
-			let dataIni8   = ($(this).val()).split(",").join("");
-			let total8     = getNum(hargaSat8*dataIni8).toFixed(2);
-			$('#harga_tot8'+dataNomor8).val(num2(total8));
-			$('#harga_tot8_hidden'+dataNomor8).val(total8);
-			fnAlltotal8()
+		
+
+		$(document).on('keyup change', '.qty_product3', function(){
+			let dataNomor 	= $(this).data('nomor');
+			let sisa 		= getNum($('#qty_belum_'+dataNomor).val().split(",").join(""));
+			let dataIni	  	= getNum($(this).val().split(",").join(""));
+			let hargaSat  	= $('#harga_sat_'+dataNomor).val();
+			let total     	= getNum(hargaSat*dataIni).toFixed(2);
+			$('#harga_tot_'+dataNomor).val(num2(total));
+			$('#harga_tot_hidden'+dataNomor).val(total);
+			fnAlltotal()
 		});
 
 		$(document).on('keyup change', '.qty_bq', function(){

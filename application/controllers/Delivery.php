@@ -2648,7 +2648,7 @@ class Delivery extends CI_Controller
 		//UPLOAD DOCUMENT
 		if (!empty($_FILES["upload_spk"]["name"])) {
 			$target_dir     = "assets/file/produksi/";
-			$target_dir_u   = $_SERVER['DOCUMENT_ROOT'] . "/assets/file/produksi/";
+			$target_dir_u   = $_SERVER['DOCUMENT_ROOT'] . "ori_dummy/assets/file/produksi/";
 			$name_file      = $kode_delivery . '_delivery_' . date('Ymdhis');
 			$target_file    = $target_dir . basename($_FILES["upload_spk"]["name"]);
 			$name_file_ori  = basename($_FILES["upload_spk"]["name"]);
@@ -5684,6 +5684,8 @@ class Delivery extends CI_Controller
 						$ArrGroupOutMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
 						$ArrGroupOutMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
 						$ArrGroupOutMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+
+						$id_trans = $value2x['id_trans'];
 					}
 				}
 				else{
@@ -5735,6 +5737,8 @@ class Delivery extends CI_Controller
 					$ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
 					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
 					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					$id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
 				}
 			}
 		}
@@ -5803,6 +5807,8 @@ class Delivery extends CI_Controller
 					$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
 					$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
 					$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
+
+					$id_trans = $valx['id_trans'];
 				}
 			}
 		}
@@ -5847,6 +5853,7 @@ class Delivery extends CI_Controller
 		$ArrGroup = [];
 		$ArrGroupOut = [];
 		$ArrIdPro = $this->db->get_where('data_erp_in_transit',array('kode_delivery'=>$kode_delivery,'created_date'=>$created_date))->result_array();
+		
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
@@ -5905,11 +5912,13 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_customer',$ArrGroup);
-			$this->jurnalIntransitCustomer($id_trans);
+			
 		}
 		if(!empty($ArrGroupOut)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
 		}
+
+		$this->jurnalIntransitCustomer($id_trans);
 	}
 
 	public function close_jurnal_in_transit_reject_to_fg($kode_delivery){
@@ -6466,9 +6475,8 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-	
-		   
 			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			
 			
 			$totalfg =0;
 			  
@@ -6509,7 +6517,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coacustomer,
 					  'keterangan'    => 'INTRANSIT-CUSTOMER',
-					  'no_reff'       => $id,
+					  'no_reff'       => $idtrans,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6524,7 +6532,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coaintransit,
 					  'keterangan'    => 'INTRANSIT-CUSTOMER',
-					  'no_reff'       => $id,
+					  'no_reff'       => $idtrans,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6539,7 +6547,7 @@ class Delivery extends CI_Controller
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$id' AND tanggal ='".$Date."'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
