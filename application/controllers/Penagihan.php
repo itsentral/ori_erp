@@ -253,13 +253,12 @@ class Penagihan extends CI_Controller {
 				b.kode_customer,
 				b.nm_customer AS customer,
 				b.no_po AS no_pox,
-				IFNULL(c.so_number,b.no_so) so_number
+				b.no_so as so_number
 			FROM
 				billing_so_gabung b
-				LEFT JOIN so_number c ON replace(c.id_bq,'BQ-','') = b.no_ipp,
-				(SELECT @row:=0) r
+					(SELECT @row:=0) r
 		    WHERE (status=1 or status=0) ".$where_customer." ".$where_no_po." AND (
-				IFNULL(c.so_number,b.no_so) LIKE '%".$this->db->escape_like_str($like_value)."%'
+				b.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.project LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.kode_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
