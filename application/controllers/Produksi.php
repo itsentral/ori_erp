@@ -11698,6 +11698,7 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price_debet'] =  $qtyValue * $cost_book;
 
 							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
@@ -12028,7 +12029,7 @@ class Produksi extends CI_Controller {
 				'kode_spk'	=> $kode_spk
 			);
 			$this->closing_produksi_deadstok($ARR_ID_PRO_UNIQ);
-			$this->closing_produksi_base_jurnal($kode_spk_created,$id_gudang,14);
+			$this->jurnalWIPdeadstock($kode_spk);
 			history('Input aktual spk produksi utama '.$kode_spk);
 		}
 		echo json_encode($Arr_Kembali);
@@ -13482,4 +13483,126 @@ class Produksi extends CI_Controller {
 		  
 		}
 		
+	function jurnalWIPdeadstock($kodespk){
+		
+		//$idtrans       = $this->uri->segment(3);
+		$data_session	= $this->session->userdata;
+		$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		
+		
+	
+		    $kodejurnal='JV004';
+		  	
+
+			$wip = $this->db->query("SELECT * FROM data_erp_wip WHERE kode_trans like'".$idtrans."%'")->result();
+			$id = $kodespk;
+			$totalwip =0;
+			$wiptotal =0; 
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				$nm_material = $data->nm_material;	
+				$product 	 = $data->product;	
+				$tgl_voucher = $data->tanggal;	
+				$keterangan  = $data->nm_material;
+				$id          = $data->id_trans;
+				$noso 		 = ','.$data->no_so;
+                $no_request  = $data->no_spk;	
+				$kredit      = $data->total_price;
+				$totalwip       = $data->total_price_debet;	
+				$wiptotal       += $data->total_price;	
+				
+				if($nm_material=='WIP Direct labour'){					
+					$nokir = '2107-01-02' ;
+				}elseif($nm_material=='WIP Indirect labour'){					
+					$nokir = '2107-01-03' ;
+				}elseif($nm_material=='WIP Consumable'){					
+					$nokir = '2107-01-01' ;				
+				}elseif($nm_material=='WIP FOH'){					
+					$nokir = '2107-01-04' ;
+                }
+				else{
+					$nokir = '1103-01-03' ;
+				}
+				
+				
+				
+				
+					if($product=='pipe'){
+						$nokirwip ='1103-03-02';	
+					}else{
+						$nokirwip ='1103-03-03';	
+					}					
+					
+
+			    $debit  = $totalwip;			
+				
+				if($totalwip != 0 ){
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokirwip,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id.$noso,
+					  'debet'         => $wiptotal,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip deadstock',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					   );
+					
+				}else{
+								
+					$det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $kredit,
+					  'jenis_jurnal'  => 'produksi wip deadstock',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+				}
+				
+			}
+			
+			       
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='produksi wip' and no_reff ='$id'");
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'Jurnal Produksi - WIP';
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
 }
