@@ -6666,7 +6666,7 @@ if($base_cur=='USD'){
 			
 			$getDetailcut	= $this->db->query("select a.* FROM penagihan_product_temp a WHERE a.sts_do='cut non produksi' AND a.id_penagihan='".$id."'")->result_array();
 			
-			$getidmilik   = $this->db->query("SELECT sum(x.qty) AS qty,sum(x.cogs) AS cogs, x.no_ipp, x.id_product, CONCAT('BQ-', x.no_ipp) AS id_bq, x.id_penagihan, y.id_milik,  x.sts_do  FROM  penagihan_product_temp x JOIN so_detail_header y ON x.id_milik = y.id WHERE x.id_penagihan='".$id."' GROUP BY x.no_ipp, x.id_product, y.id_milik")->result_array();
+			$getidmilik   = $this->db->query("SELECT sum(x.qty) AS qty,sum(x.cogs) AS cogs, x.no_ipp, x.id_product, CONCAT('BQ-', x.no_ipp) AS id_bq, x.id_penagihan, y.id_milik,  x.sts_do  FROM  penagihan_product_temp x JOIN so_detail_header y ON x.id_milik = y.id WHERE x.id_penagihan='".$id."' AND y.id_milik IS NULL  GROUP BY x.no_ipp, x.id_product, y.id_milik")->result_array();
 			
 
 
@@ -6733,6 +6733,7 @@ if($base_cur=='USD'){
 			'getPackCost' 	=> $getPackCost,
 			'getTruck' 		=> $getTruck,
 			'other' 		=> $getOther,
+			'getNonid'   	=> $getidmilik,
 			'non_frp'		=> $non_frp,
 			'material'		=> $material,
 			'list_top'		=> $list_top,
