@@ -5853,6 +5853,7 @@ class Delivery extends CI_Controller
 		$ArrGroup = [];
 		$ArrGroupOut = [];
 		$ArrIdPro = $this->db->get_where('data_erp_in_transit',array('kode_delivery'=>$kode_delivery,'created_date'=>$created_date))->result_array();
+		
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$ArrGroup[$value]['tanggal'] = date('Y-m-d');
@@ -6472,12 +6473,12 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-	
+			print_r($idtrans);
+			exit;
 		   
 			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
-			print_r($wip);
-			exit;
+			
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
