@@ -11700,7 +11700,7 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;                            
 							
 
 							$SUM_DEADSTICK += $qtyValue * $cost_book;
@@ -11845,6 +11845,54 @@ class Produksi extends CI_Controller {
 				$ArrHistInsert[$key]['update_by'] 		=  $username;
 				$ArrHistInsert[$key]['update_date'] 		= $datetime;
 			}
+
+				$id_material  =
+				$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
+				$coa_gudang = $coa_1->coa_1;
+				$kategori_gudang = $coa_1->category;				 
+					
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				
+				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($stok_jurnal_akhir)) $PRICE=$stok_jurnal_akhir->harga;
+				
+				
+				
+				$QTY_OKE  = $value + $berat_hist; 
+				$ACTUAL_MAT = $key;
+				$kode_trans = $kode_spk;
+				//$PRICE     = $costbook;
+				
+				$ArrJurnalNew[$key]['id_material'] 		= $key;
+				$ArrJurnalNew[$key]['idmaterial'] 		= $GET_MATERIAL[$key]['idmaterial'];
+				$ArrJurnalNew[$key]['nm_material'] 		= $GET_MATERIAL[$key]['nm_material'];
+				$ArrJurnalNew[$key]['id_category'] 		= $GET_MATERIAL[$key]['id_category'];
+				$ArrJurnalNew[$key]['nm_category'] 		= $GET_MATERIAL[$key]['nm_category'];
+				$ArrJurnalNew[$key]['id_gudang'] 		= $id_gudang;
+				$ArrJurnalNew[$key]['kd_gudang'] 		= $kode_gudang;
+				$ArrJurnalNew[$key]['id_gudang_dari'] 	= $id_gudang;
+				$ArrJurnalNew[$key]['kd_gudang_dari'] 	= $kode_gudang;
+				$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_wip;
+				$ArrJurnalNew[$key]['kd_gudang_ke'] 		= $kode_gudang_wip;
+				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
+				$ArrJurnalNew[$key]['qty_stock_akhir'] 	    = $stokjurnalakhir-$QTY_OKE;
+				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
+				$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
+				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
+				$ArrJurnalNew[$key]['ket'] 				= 'pindah gudang produksi - wip deadstock';
+				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
+				$ArrJurnalNew[$key]['harga_bm'] 		= 0;
+				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+				$ArrJurnalNew[$key]['update_by'] 		= $username;
+				$ArrJurnalNew[$key]['update_date'] 		= $datetime;
+				$ArrJurnalNew[$key]['no_jurnal'] 		= ;
+				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 
 			//PENAMBAHAN GUDANG WIP
 			
@@ -11992,6 +12040,9 @@ class Produksi extends CI_Controller {
 			if(!empty($ArrHistInsert2)){
 				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
 			}
+			if(!empty($ArrJurnalNew)){
+			$this->db->insert_batch('tran_warehouse_jurnal_detail',$ArrJurnalNew);
+		}
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
