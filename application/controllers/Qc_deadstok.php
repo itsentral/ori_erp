@@ -653,11 +653,11 @@ class Qc_deadstok extends CI_Controller
 				$fg_txt         ='FINISHED GOOD'; 
 				$wip_txt         ='COGS';	
 				$spasi       = ',';
-				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$data->kode_trans; 
-				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$data->kode_trans; 
-				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$data->kode_trans;
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->kode_trans;
+				$noso 		 = ','.$data->no_so;
                	$no_request  = $data->no_spk;	
 				
 				$wip           	= $data->wip;
