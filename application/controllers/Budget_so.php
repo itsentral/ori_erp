@@ -2427,7 +2427,8 @@ class Budget_so extends CI_Controller {
 									->group_by('a.id_det')
 									->get_where('bq_detail_material_new a',
 											array(
-												'a.id_det' => $row_Cek['id']
+												'a.id_det' => $row_Cek['id'],
+												'a.id_material !=' => 'MTL-1903000'
 											)
 										)
 									->result_array();

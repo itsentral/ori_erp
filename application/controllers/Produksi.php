@@ -13296,8 +13296,8 @@ class Produksi extends CI_Controller {
         $est_material_bef          = (!empty($restEstMat[0]['est_berat']))?$restEstMat[0]['est_berat']:0;
         $est_harga_bef             = (!empty($restEstMat[0]['est_price']))?$restEstMat[0]['est_price']:0;
 
-        $est_material           = $est_material_bef * $jumTot;
-        $est_harga              = $est_harga_bef * $jumTot;
+        $est_material           = $est_material_bef;
+        $est_harga              = $est_harga_bef;
 
 		$sqlBy 		= " SELECT
 							a.dia_lebar AS diameter,
