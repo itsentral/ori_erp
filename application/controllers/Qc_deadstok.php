@@ -8,6 +8,7 @@ class Qc_deadstok extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->model('Jurnal_model');
 		// Your own constructor code
 		if (!$this->session->userdata('isORIlogin')) {
 			redirect('login');
