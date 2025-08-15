@@ -11849,7 +11849,8 @@ class Produksi extends CI_Controller {
 				$id_material  =$key;
 				$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
 				$coa_gudang = $coa_1->coa_1;
-				$kategori_gudang = $coa_1->category;				 
+				$kategori_gudang = $coa_1->category;	
+				$GET_MATERIAL	= get_detail_material();			 
 					
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
@@ -11862,7 +11863,7 @@ class Produksi extends CI_Controller {
 				
 				
 				
-				$QTY_OKE  = $value + $berat_hist; 
+				$QTY_OKE  = $value; 
 				$ACTUAL_MAT = $key;
 				$kode_trans = $kode_spk;
 				//$PRICE     = $costbook;
