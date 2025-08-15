@@ -11891,7 +11891,7 @@ class Produksi extends CI_Controller {
 				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
 				$ArrJurnalNew[$key]['update_by'] 		= $username;
 				$ArrJurnalNew[$key]['update_date'] 		= $datetime;
-				$ArrJurnalNew[$key]['no_jurnal'] 		= ;
+				$ArrJurnalNew[$key]['no_jurnal'] 		= '';
 				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 
 			//PENAMBAHAN GUDANG WIP
