@@ -11882,7 +11882,7 @@ class Produksi extends CI_Controller {
 				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
 				$ArrJurnalNew[$key]['qty_stock_akhir'] 	    = $stokjurnalakhir-$QTY_OKE;
 				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
-				$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
+				$ArrJurnalNew[$key]['tgl_trans'] 			= $datetime;
 				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
 				$ArrJurnalNew[$key]['ket'] 				= 'pindah gudang produksi - wip deadstock';
 				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
