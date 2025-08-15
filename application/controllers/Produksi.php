@@ -11846,7 +11846,7 @@ class Produksi extends CI_Controller {
 				$ArrHistInsert[$key]['update_date'] 		= $datetime;
 			}
 
-				$id_material  =
+				$id_material  =$key;
 				$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
 				$coa_gudang = $coa_1->coa_1;
 				$kategori_gudang = $coa_1->category;				 
