@@ -636,10 +636,10 @@ class Qc_deadstok extends CI_Controller
 	        //$idtrans = str_replace('-','',$kode);
 
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in deadstok modif'")->result();
 			
-			print_r($idtrans);
-			exit;
+			// print_r($idtrans);
+			// exit;
 
 			$totalfg =0;
 			  
