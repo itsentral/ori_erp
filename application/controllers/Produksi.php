@@ -11577,6 +11577,7 @@ class Produksi extends CI_Controller {
 		$ArrOUT_FG = [];
 		$ArrIN_WIP = [];
 		$ArrIN_WIP_MATERIAL = [];
+		$ArrIN_WIP_MATERIAL2 = [];
 
 		$catatanPro = $kode_spk.'/'.$hist_produksi;
 		$TMP_DET = $this->db->select('actual_type as id, material_terpakai as qty')->get_where('tmp_production_real_detail',array('catatan_programmer'=>$catatanPro))->result_array();
@@ -11662,6 +11663,8 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
 							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
+
+
 					}
 					if(!empty($tempMixing)){
 						foreach ($tempMixing as $key2 => $value2) {
@@ -11697,31 +11700,41 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price_debet'] =  $qtyValue * $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;                            
+							
 
 							$SUM_DEADSTICK += $qtyValue * $cost_book;
 						}
 					}
 
-					$ArrIN_WIP[$key]['tanggal'] = date('Y-m-d');
-					$ArrIN_WIP[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
-					$ArrIN_WIP[$key]['no_so'] = $getDataFG[0]['no_so'];
-					$ArrIN_WIP[$key]['product'] = $getDataFG[0]['product'];
-					$ArrIN_WIP[$key]['no_spk'] = $getDataFG[0]['no_spk'];
-					$ArrIN_WIP[$key]['kode_trans'] = $kode_spk;
-					$ArrIN_WIP[$key]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
-					$ArrIN_WIP[$key]['qty'] = 1;
-					$ArrIN_WIP[$key]['nilai_wip'] = $SUM_DEADSTICK;
-					$ArrIN_WIP[$key]['material'] = 0;
-					$ArrIN_WIP[$key]['wip_direct'] =  0;
-					$ArrIN_WIP[$key]['wip_indirect'] =  0;
-					$ArrIN_WIP[$key]['wip_consumable'] =  0;
-					$ArrIN_WIP[$key]['wip_foh'] =  0;
-					$ArrIN_WIP[$key]['created_by'] = $username;
-					$ArrIN_WIP[$key]['created_date'] = $datetime;
-					$ArrIN_WIP[$key]['id_trans'] =  $getDataFG[0]['id_trans'];
-					$ArrIN_WIP[$key]['jenis'] =  'in deadstok';
+					
+
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['tanggal'] = date('Y-m-d');
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['no_so'] = $getDataFG[0]['no_so'];
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['product'] = $getDataFG[0]['product'];
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['no_spk'] = $getDataFG[0]['no_spk'];
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['kode_trans'] = $kode_spk;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['id_pro_det'] = $getDataFG[0]['id_pro_det'];
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['qty'] = 1;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['nilai_wip'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['material'] = $cost_book * $qtyValue;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_direct'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_indirect'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_consumable'] =  0;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['wip_foh'] =  0;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['created_by'] = $username;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['created_date'] = $datetime;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['id_trans'] =  $getDataFG[0]['id_trans'];
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['jenis'] =  'in deadstok';
+			
+							//$ArrIN_WIP_MATERIAL[$key_uniq]['id_material'] =  $key2;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['nm_material'] = $getDataFG[0]['product'];
+							//$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
+							//$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
+							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['total_price'] =  0;
+							$ArrIN_WIP_MATERIAL2[$key_uniq]['total_price_debet'] =  $SUM_DEADSTICK;
 				}
 			}
 		}
@@ -11833,6 +11846,55 @@ class Produksi extends CI_Controller {
 				$ArrHistInsert[$key]['update_date'] 		= $datetime;
 			}
 
+				$id_material  =$key;
+				$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang))->row();
+				$coa_gudang = $coa_1->coa_1;
+				$kategori_gudang = $coa_1->category;	
+				$GET_MATERIAL	= get_detail_material();			 
+					
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$id_material),1)->row();
+				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				
+				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($stok_jurnal_akhir)) $PRICE=$stok_jurnal_akhir->harga;
+				
+				
+				
+				$QTY_OKE  = $value; 
+				$ACTUAL_MAT = $key;
+				$kode_trans = $kode_spk;
+				//$PRICE     = $costbook;
+				
+				$ArrJurnalNew[$key]['id_material'] 		= $key;
+				$ArrJurnalNew[$key]['idmaterial'] 		= $GET_MATERIAL[$key]['idmaterial'];
+				$ArrJurnalNew[$key]['nm_material'] 		= $GET_MATERIAL[$key]['nm_material'];
+				$ArrJurnalNew[$key]['id_category'] 		= $GET_MATERIAL[$key]['id_category'];
+				$ArrJurnalNew[$key]['nm_category'] 		= $GET_MATERIAL[$key]['nm_category'];
+				$ArrJurnalNew[$key]['id_gudang'] 		= $id_gudang;
+				$ArrJurnalNew[$key]['kd_gudang'] 		= $kode_gudang;
+				$ArrJurnalNew[$key]['id_gudang_dari'] 	= $id_gudang;
+				$ArrJurnalNew[$key]['kd_gudang_dari'] 	= $kode_gudang;
+				$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_gudang_wip;
+				$ArrJurnalNew[$key]['kd_gudang_ke'] 		= $kode_gudang_wip;
+				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
+				$ArrJurnalNew[$key]['qty_stock_akhir'] 	    = $stokjurnalakhir-$QTY_OKE;
+				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
+				$ArrJurnalNew[$key]['tgl_trans'] 			= $datetime;
+				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
+				$ArrJurnalNew[$key]['ket'] 				= 'pindah gudang produksi - wip deadstock';
+				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
+				$ArrJurnalNew[$key]['harga_bm'] 		= 0;
+				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+				$ArrJurnalNew[$key]['update_by'] 		= $username;
+				$ArrJurnalNew[$key]['update_date'] 		= $datetime;
+				$ArrJurnalNew[$key]['no_jurnal'] 		= '';
+				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
+
 			//PENAMBAHAN GUDANG WIP
 			
 			$rest_pusat = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key))->result();
@@ -11937,6 +11999,9 @@ class Produksi extends CI_Controller {
 			if(!empty($ArrIN_WIP_MATERIAL)){
 				$this->db->insert_batch('data_erp_wip',$ArrIN_WIP_MATERIAL);
 			}
+			if(!empty($ArrIN_WIP_MATERIAL2)){
+				$this->db->insert_batch('data_erp_wip',$ArrIN_WIP_MATERIAL2);
+			}
 			//update flag produksi input
 			if(!empty($ArrJurnal)){
 				insert_jurnal_wip($ArrJurnal,$id_gudang,14,'laporan produksi','pengurangan gudang produksi','wip',$kode_spk_created);
@@ -11976,6 +12041,9 @@ class Produksi extends CI_Controller {
 			if(!empty($ArrHistInsert2)){
 				$this->db->insert_batch('warehouse_history', $ArrHistInsert2);
 			}
+			if(!empty($ArrJurnalNew)){
+			$this->db->insert_batch('tran_warehouse_jurnal_detail',$ArrJurnalNew);
+		}
 			
 			if($hist_produksi != '0'){
 				$this->db->where_in('id_spk',$ArrWhereIN_);
