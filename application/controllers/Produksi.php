@@ -13279,13 +13279,17 @@ class Produksi extends CI_Controller {
 		$sqlEstMaterial = "SELECT SUM(berat) AS est_berat, SUM(berat*price) AS est_price FROM est_material_tanki WHERE id_det='".$ArrData['id_milik']."' GROUP BY id_det";
         $restEstMat	    = $this->db->query($sqlEstMaterial)->result_array();
 
+		$getQtyPart 	= "SELECT jml FROM bq_detail_detail where id='".$ArrData['id_milik']."' ";
+		$retQtyPart		= $this->tanki->query($getQtyPart)->result_array();
+		$qtyTankiFull	= (!empty($retQtyPart[0]['jml']))?$retQtyPart[0]['jml']:0;
+
 		$jumTot     = ($ArrData['qty_akhir'] - $ArrData['product_ke']) + 1;
 
         $est_material_bef          = (!empty($restEstMat[0]['est_berat']))?$restEstMat[0]['est_berat']:0;
         $est_harga_bef             = (!empty($restEstMat[0]['est_price']))?$restEstMat[0]['est_price']:0;
 
-        $est_material           = $est_material_bef;
-        $est_harga              = $est_harga_bef;
+        $est_material           = ($est_material_bef > 0 AND $qtyTankiFull > 0)?$est_material_bef/$qtyTankiFull:0;
+        $est_harga              = ($est_harga_bef > 0 AND $qtyTankiFull > 0)?$est_harga_bef/$qtyTankiFull:0;
 
 		$sqlBy 		= " SELECT
 							a.dia_lebar AS diameter,
