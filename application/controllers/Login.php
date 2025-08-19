@@ -64,8 +64,8 @@ class Login extends CI_Controller {
 
             } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
                 if($Cek_Data){
-				$Group_ID		= $Cek_Data[0]['group_id'];
-				$Aktif			= $Cek_Data[0]['st_aktif'];
+					$Group_ID		= $Cek_Data[0]['group_id'];
+					$Aktif			= $Cek_Data[0]['st_aktif'];
 						if($Aktif==1){
 							$Arr_Daftar	= array();
 							$Arr_Daftar['isORIlogin']	= 1;
@@ -84,7 +84,7 @@ class Login extends CI_Controller {
 											$Arr_Daftar['ORI_Group']	= $Cek_Group[0];
 											unset($Cek_Group);
 										}						
-									
+									}
 									
 										$this->session->set_userdata($Arr_Daftar);
 										$_SESSION["ses_level3"] = 0;	
@@ -95,30 +95,23 @@ class Login extends CI_Controller {
 											'pesan'			=> 'Login Process Success. Thank You & Have A Nice Day..'
 										);				
 								
-									}else{
-										$Arr_Return		= array(
-											'status'		=> 2,
-											'pesan'			=> 'Inactive Account. Please Contact Your Administrator....'
-										);
-									}else{
-										$Arr_Return		= array(
-											'status'		=> 2,
-											'pesan'			=> 'Incorrect Username Or Password. Please Try Again....'
-										);
-									}
-									echo json_encode($Arr_Return);
+							}else{
+								$Arr_Return		= array(
+									'status'		=> 2,
+									'pesan'			=> 'Inactive Account. Please Contact Your Administrator....'
+								);
+							}
 
-								} else {
-									$Data_Identitas			= $this->master_model->getData('identitas');
-									$data = array(
-										'title'			=> 'Login',
-										'idt'			=> $Data_Identitas[0]
-									);
-									
-									$this->load->view('login',$data);
-									// $this->load->view('maintenance_page',$data); 
-								}
+								
+				
+
+				}else{
+					$Arr_Return		= array(
+						'status'		=> 2,
+						'pesan'			=> 'Incorrect Username Or Password. Please Try Again....'
+					);
 				}
+				echo json_encode($Arr_Return);
 				
             } else {
                 $pesan = 'Gagal login, silahkan coba lagi...!';
@@ -131,7 +124,19 @@ class Login extends CI_Controller {
 				);
 				
 				$this->load->view('login',$data);
-            }		
+            }	
+			
+		} else {
+			$Data_Identitas			= $this->master_model->getData('identitas');
+			$data = array(
+					'title'			=> 'Login',
+					'idt'			=> $Data_Identitas[0],
+					'site_key'      => $this->site_key
+				);
+			
+			$this->load->view('login',$data);
+			// $this->load->view('maintenance_page',$data);
+		}
 			
 		
 	}
