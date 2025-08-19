@@ -19,7 +19,7 @@ class Login extends CI_Controller {
 			$UserName			= $this->input->post('username');
 			$Password			= $this->input->post('password');
 			$PassData			= cryptSHA1($Password);
-			$token              = $this->security->xss_clean($this->input->post('recaptcha_token'));
+			$token              = $this->input->post('recaptcha_token');
 			$WHERE				= array(
 				'deleted'			=> 0,
 				'st_aktif'			=> 1,
