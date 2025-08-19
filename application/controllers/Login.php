@@ -32,12 +32,14 @@ class Login extends CI_Controller {
 
             $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
             $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            print_r($resGoogle);
-            exit;
+            // print_r($resGoogle);
+            // exit;
 
             if (!$resGoogle->success) {
-                $pesan = 'Gagal validasi reCAPTCHA Google...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+             	$Arr_Return		= array(
+									'status'		=> 2,
+									'pesan'			=> 'Gagal validasi reCAPTCHA Google...!'
+								);
 
                 $Data_Identitas			= $this->master_model->getData('identitas');
 				$data = array(
@@ -50,8 +52,11 @@ class Login extends CI_Controller {
 
 
             } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'login') {
-                $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+                
+				$Arr_Return		= array(
+									'status'		=> 2,
+									'pesan'			=> 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!'
+								);
 
                 $Data_Identitas			= $this->master_model->getData('identitas');
 				$data = array(
@@ -111,11 +116,14 @@ class Login extends CI_Controller {
 						'pesan'			=> 'Incorrect Username Or Password. Please Try Again....'
 					);
 				}
-				echo json_encode($Arr_Return);
+			
 				
             } else {
-                $pesan = 'Gagal login, silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+                
+				$Arr_Return		= array(
+						'status'		=> 2,
+						'pesan'			=> 'Gagal login, silahkan coba lagi...!'
+				
 				$Data_Identitas			= $this->master_model->getData('identitas');
 				$data = array(
 					'title'			=> 'Login',
@@ -125,7 +133,7 @@ class Login extends CI_Controller {
 				
 				$this->load->view('login',$data);
             }	
-			
+		 echo json_encode($Arr_Return);
 		} else {
 			$Data_Identitas			= $this->master_model->getData('identitas');
 			$data = array(
