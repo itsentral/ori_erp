@@ -43,7 +43,7 @@ class Login extends CI_Controller {
 				$data = array(
 					'title'			=> 'Login',
 					'idt'			=> $Data_Identitas[0],
-					'site_key'      => $this->site_key
+					'sitekey'      => $this->site_key
 				);
 				
 				$this->load->view('login',$data);
@@ -57,7 +57,7 @@ class Login extends CI_Controller {
 				$data = array(
 					'title'			=> 'Login',
 					'idt'			=> $Data_Identitas[0],
-					'site_key'      => $this->site_key
+					'sitekey'      => $this->site_key
 				);
 				
 				$this->load->view('login',$data);
@@ -120,7 +120,7 @@ class Login extends CI_Controller {
 				$data = array(
 					'title'			=> 'Login',
 					'idt'			=> $Data_Identitas[0],
-					'site_key'      => $this->site_key
+					'sitekey'      => $this->site_key
 				);
 				
 				$this->load->view('login',$data);
@@ -131,7 +131,7 @@ class Login extends CI_Controller {
 			$data = array(
 					'title'			=> 'Login',
 					'idt'			=> $Data_Identitas[0],
-					'site_key'      => $this->site_key
+					'sitekey'      => $this->site_key
 				);
 			
 			$this->load->view('login',$data);
