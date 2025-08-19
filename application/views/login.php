@@ -40,6 +40,7 @@
 			<p class="title text-center">Log in</p>
 			
 			<input type="text" name="username" id="username" placeholder="Username" autocomplete="off"  required autofocus >
+       <input type="hidden" name="recaptcha_token" id="recaptcha_token">
 			<i class="fa fa-user"></i>
 			<input type="password" name="password" id="password" placeholder="Password" autocomplete="off" required>    
 			<i class="fa fa-key"></i>			
@@ -285,7 +286,19 @@
 <link rel="stylesheet" href="<?php echo base_url('sweetalert/dist/sweetalert.css'); ?>">
 <script src="<?php echo base_url('sweetalert/dist/sweetalert.min.js'); ?>"></script>
 
+<script src="https://www.google.com/recaptcha/api.js?render=<?= $sitekey; ?>"></script>
+
 <script>
+  var site_key = "<?= $sitekey ?>";
+  grecaptcha.ready(function() {
+    grecaptcha.execute(site_key, {
+      action: 'login'
+    }).then(function(token) {
+      document.getElementById('recaptcha_token').value = token;
+    });
+  });
+
+
 	var base_url			= '<?php echo base_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	$(function(){
