@@ -13347,39 +13347,43 @@ class Produksi extends CI_Controller {
 		$sqlEstMaterial = "SELECT SUM(berat) AS est_berat, SUM(berat*price) AS est_price FROM est_material_tanki WHERE id_det='".$ArrData['id_milik']."' GROUP BY id_det";
         $restEstMat	    = $this->db->query($sqlEstMaterial)->result_array();
 
+		$getQtyPart 	= "SELECT jml FROM bq_detail_detail where id='".$ArrData['id_milik']."' ";
+		$retQtyPart		= $this->tanki->query($getQtyPart)->result_array();
+		$qtyTankiFull	= (!empty($retQtyPart[0]['jml']))?$retQtyPart[0]['jml']:0;
+
 		$jumTot     = ($ArrData['qty_akhir'] - $ArrData['product_ke']) + 1;
 
         $est_material_bef          = (!empty($restEstMat[0]['est_berat']))?$restEstMat[0]['est_berat']:0;
         $est_harga_bef             = (!empty($restEstMat[0]['est_price']))?$restEstMat[0]['est_price']:0;
 
-        $est_material           = $est_material_bef;
-        $est_harga              = $est_harga_bef;
+        $est_material           = ($est_material_bef > 0 AND $qtyTankiFull > 0)?$est_material_bef/$qtyTankiFull:0;
+        $est_harga              = ($est_harga_bef > 0 AND $qtyTankiFull > 0)?$est_harga_bef/$qtyTankiFull:0;
 
 		$sqlBy 		= " SELECT
 							a.dia_lebar AS diameter,
 							a.panjang AS diameter2,
 							a.t_dsg AS pressure,
 							a.t_est AS liner,
-							a.man_hours AS man_hours,
-							(a.man_hours * a.pe_direct_labour) AS direct_labour,
-							(a.man_hours * a.pe_indirect_labour) AS indirect_labour,
+							(a.man_hours/a.jml) AS man_hours,
+							((a.man_hours/a.jml) * a.pe_direct_labour) AS direct_labour,
+							((a.man_hours/a.jml) * a.pe_indirect_labour) AS indirect_labour,
 							(a.t_time * a.pe_machine) AS machine,
 							0 AS mould_mandrill,
 							($est_material * a.pe_consumable) AS consumable,
 							(
-									((a.man_hours * a.pe_direct_labour)+(a.man_hours * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
+									(((a.man_hours/a.jml) * a.pe_direct_labour)+((a.man_hours/a.jml) * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
 							) * ( a.pe_foh_consumable / 100 ) AS foh_consumable,
 							(
-									((a.man_hours * a.pe_direct_labour)+(a.man_hours * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
+									(((a.man_hours/a.jml) * a.pe_direct_labour)+((a.man_hours/a.jml) * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
 							) * ( a.pe_foh_depresiasi / 100 ) AS foh_depresiasi,
 							(
-									((a.man_hours * a.pe_direct_labour)+(a.man_hours * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
+									(((a.man_hours/a.jml) * a.pe_direct_labour)+((a.man_hours/a.jml) * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
 							) * ( a.pe_biaya_gaji_non_produksi / 100 ) AS biaya_gaji_non_produksi,
 							(
-									((a.man_hours * a.pe_direct_labour)+(a.man_hours * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
+									(((a.man_hours/a.jml) * a.pe_direct_labour)+((a.man_hours/a.jml) * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
 							) * ( a.pe_biaya_non_produksi / 100 ) AS biaya_non_produksi,
 							(
-									(((a.man_hours * a.pe_direct_labour))+(a.man_hours * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
+									((((a.man_hours/a.jml) * a.pe_direct_labour))+((a.man_hours/a.jml) * a.pe_indirect_labour)+(a.t_time * a.pe_machine)+($est_material * a.pe_consumable))+ $est_harga 
 							) * ( a.pe_biaya_rutin_bulanan / 100 ) AS biaya_rutin_bulanan 
 						FROM
 								bq_detail_detail a
@@ -13414,7 +13418,7 @@ class Produksi extends CI_Controller {
 							'".$restBy[0]['diameter']."','".$restBy[0]['diameter2']."','0',
 							'0','".$ArrData['status_date']."','".$ArrData['product_ke']."',
 							'".$ArrData['qty_akhir']."','".$ArrData['qty']."','".date('Y-m-d',strtotime($ArrData['status_date']))."','".$ArrData['id_production_detail']."',
-							'".$ArrData['id_milik']."','".$est_material."','".$est_harga."',
+							'".$ArrData['id_milik']."','".$est_material * $jumTot."','".$est_harga * $jumTot."',
 							'".$real_material."','".$real_harga."','".$restBy[0]['direct_labour'] * $jumTot."',
 							'".$restBy[0]['indirect_labour'] * $jumTot."','".$restBy[0]['machine'] * $jumTot."',
 							'".$restBy[0]['mould_mandrill'] * $jumTot."','".$restBy[0]['consumable'] * $jumTot."',
