@@ -6534,6 +6534,7 @@ if($base_cur=='USD'){
 		$penagihan 	= $this->db->get_where('penagihan', array('id'=>$id))->result();
 		$nomor_id 	= explode(",",$penagihan[0]->no_so);
 		$approval	= $this->uri->segment(4);
+		$base_cur   = $penagihan[0]->base_cur;
 		// print_r($penagihan);exit;
 		$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so_gabung')->result_array();
 		
@@ -6548,8 +6549,9 @@ if($base_cur=='USD'){
 			$in_ipp[$val] 	= $valx['no_po'];
 			$in_bq[$val] 	= 'BQ-'.$valx['no_po'];
 			$in_so[$val] 	= get_nomor_so_po($valx['no_po']);
-			$base_cur		= $valx['base_cur'];
+			//$base_cur		= $valx['base_cur'];
 		}
+		
 		if(empty($in_ipp)) {echo 'Nomor SO kosong';die();}
 		$penagihan_detail 	= $this->db->get_where('penagihan_detail', array('id_penagihan'=>$id))->row();
 		$noipp=implode("','",$in_ipp);
