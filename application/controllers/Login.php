@@ -32,7 +32,7 @@ class Login extends CI_Controller {
 
             $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
             $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            print_r($urlVeryfy);
+            print_r($resGoogle);
             exit;
 
             if (!$resGoogle->success) {
