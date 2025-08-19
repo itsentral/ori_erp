@@ -123,7 +123,7 @@ class Login extends CI_Controller {
 				$Arr_Return		= array(
 						'status'		=> 2,
 						'pesan'			=> 'Gagal login, silahkan coba lagi...!'
-				
+				       );
 				$Data_Identitas			= $this->master_model->getData('identitas');
 				$data = array(
 					'title'			=> 'Login',
