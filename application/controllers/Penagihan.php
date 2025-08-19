@@ -4169,7 +4169,12 @@ else
 			$nox = 0;
 			if($jenis_invoice=='uang muka'){
 				foreach($get_bill_so AS $valx){$nox++;
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+					$perseninv1=($valx->total_deal_usd/$totalinvoice);
+					if($perseninv1 < 1){
+                    $perseninv = 0;
+					}else{
+
+					}
 					$this->db->query("update billing_so set
 					uang_muka_persen=(uang_muka_persen+".$gethd->persentase."),
 					uang_muka=(uang_muka+".($gethd->total_dpp_usd*$perseninv)."),
@@ -6086,7 +6091,12 @@ if($base_cur=='USD'){
 			if($jenis_invoice=='uang muka'){
 				foreach($get_bill_so AS $valx){$nox++;
 				 if($valx->jenis=='pipa'){
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+					if($valx->total_deal_usd < 1 || $totalinvoice < 1){
+						$perseninv=0;
+					}else{
+						$perseninv=($valx->total_deal_usd/$totalinvoice);
+					}
+					
 					$this->db->query("update billing_so set
 					uang_muka_persen=(uang_muka_persen+".$gethd->persentase."),
 					uang_muka=(uang_muka+".($gethd->total_dpp_usd*$perseninv)."),
