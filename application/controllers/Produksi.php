@@ -4069,7 +4069,7 @@ class Produksi extends CI_Controller {
 				}
 			}
 			else{
-				$getQtyTanki = $this->tanki->query("SELECT*FROM bq_detail_detail WHERE a.id_det IN ".$IMPLODE_IN."")->result_array();
+				$getQtyTanki = $this->tanki->query("SELECT*FROM bq_detail_detail WHERE id IN ".$IMPLODE_IN."")->result_array();
 				$jmlQty = (!empty($getQtyTanki[0]['jml']))?(float)$getQtyTanki[0]['jml']:1;
 
 				$get_liner_mix = $this->db->query("	SELECT
