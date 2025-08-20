@@ -4069,13 +4069,16 @@ class Produksi extends CI_Controller {
 				}
 			}
 			else{
+				$getQtyTanki = $this->tanki->query("SELECT*FROM bq_detail_detail WHERE id IN ".$IMPLODE_IN."")->result_array();
+				$jmlQty = (!empty($getQtyTanki[0]['jml']))?(float)$getQtyTanki[0]['jml']:1;
+
 				$get_liner_mix = $this->db->query("	SELECT
 														a.id_det AS id_milik,
 														a.id_material,
 														b.nm_material,
 														b.id_category,
 														b.nm_category,
-														a.berat 
+														(a.berat/$jmlQty) AS berat
 													FROM
 														est_material_tanki a
 														LEFT JOIN raw_materials b ON a.id_material = b.id_material
@@ -4090,7 +4093,7 @@ class Produksi extends CI_Controller {
 													b.nm_material,
 													b.id_category,
 													b.nm_category,
-													a.berat 
+													(a.berat/$jmlQty) AS berat
 												FROM
 													est_material_tanki a
 													LEFT JOIN raw_materials b ON a.id_material = b.id_material
@@ -4105,7 +4108,7 @@ class Produksi extends CI_Controller {
 												b.nm_material,
 												b.id_category,
 												b.nm_category,
-												a.berat 
+												(a.berat/$jmlQty) AS berat
 											FROM
 												est_material_tanki a
 												LEFT JOIN raw_materials b ON a.id_material = b.id_material

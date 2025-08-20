@@ -3671,6 +3671,7 @@ else
 			$id    		= $this->uri->segment(3);
 			$penagihan 	= $this->db->get_where('penagihan', array('id'=>$id))->result();
 			$nomor_id 	= explode(",",$penagihan[0]->no_so);
+			$base_cur		= $penagihan[0]->base_cur;
 			$approval	= $this->uri->segment(4);
 			//print_r($approval);exit;
 			$getBq 		= $this->db->select('no_ipp as no_po, base_cur')->where_in('id',$nomor_id)->get('billing_so')->result_array();
@@ -3682,7 +3683,7 @@ else
 				$in_ipp[$val] 	= $valx['no_po'];
 				$in_bq[$val] 	= 'BQ-'.$valx['no_po'];
 				$in_so[$val] 	= get_nomor_so($valx['no_po']);
-				$base_cur		= $valx['base_cur'];
+				//$base_cur		= $valx['base_cur'];
 			}
 			if(empty($in_ipp)) {echo 'Nomor SO kosong';die();}
 			$penagihan_detail 	= $this->db->get_where('penagihan_detail', array('id_penagihan'=>$id))->row();
@@ -4168,7 +4169,12 @@ else
 			$nox = 0;
 			if($jenis_invoice=='uang muka'){
 				foreach($get_bill_so AS $valx){$nox++;
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+					$perseninv1=($valx->total_deal_usd/$totalinvoice);
+					if($perseninv1 < 1){
+                    $perseninv = 0;
+					}else{
+
+					}
 					$this->db->query("update billing_so set
 					uang_muka_persen=(uang_muka_persen+".$gethd->persentase."),
 					uang_muka=(uang_muka+".($gethd->total_dpp_usd*$perseninv)."),
@@ -6085,7 +6091,12 @@ if($base_cur=='USD'){
 			if($jenis_invoice=='uang muka'){
 				foreach($get_bill_so AS $valx){$nox++;
 				 if($valx->jenis=='pipa'){
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+					if($valx->total_deal_usd < 1 || $totalinvoice < 1){
+						$perseninv=0;
+					}else{
+						$perseninv=($valx->total_deal_usd/$totalinvoice);
+					}
+					
 					$this->db->query("update billing_so set
 					uang_muka_persen=(uang_muka_persen+".$gethd->persentase."),
 					uang_muka=(uang_muka+".($gethd->total_dpp_usd*$perseninv)."),
