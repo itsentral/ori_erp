@@ -6,6 +6,7 @@ class Deadstok extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
+		$this->load->model('Jurnal_model');
 
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
