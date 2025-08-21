@@ -3143,4 +3143,126 @@ class Jurnal_nomor extends CI_Controller {
 		}
 		
 	}
+
+
+	function jurnalCogs(){
+		
+		$data_session	= $this->session->userdata;
+		//$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		$Date		    = date('Y-m-d'); 
+		
+		
+	        $dataspool = $this->db->query("select * from data_jurnal_cogs")->result();
+			foreach($dataspool AS $record){
+		    $idtrans = $record->id;
+		   
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_cogs WHERE id ='".$idtrans."' ")->result();
+			
+			$totalfg =0;
+			  
+			$det_Jurnaltes = [];
+			
+			
+			foreach($wip AS $data){
+				
+				$nm_material = $data->no_so;	
+				$tgl_voucher = $data->tanggal;	
+				$spasi       = ' ';
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi; 
+				$FG = 'FINISHED GOOD';
+				$cog = 'adjust cogs';
+				$finish = $FG.$keterangan;
+				$coges = $cog.$keterangan;
+				
+				$id          = $data->id;
+               	$no_request  = $data->id;
+				
+				$nilaiwip       = $data->nilai_wip;
+				$cogs          	= $nilaiwip;
+				
+				$totalfg        = $cogs;
+				
+				
+				
+				if ($nm_material=='FG'){			
+				$coa_fg 		='1103-03-02';	
+				}else{
+				$coa_fg 		='1103-04-07';						
+				}					
+			    $debit  		= $totalfg;	
+				
+				$coacogs 		='5104-01-01';
+                				
+				
+								
+				     $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coacogs,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $nilaiwip,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'adjust cogs',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $coa_fg,
+					  'keterangan'    => $keterangan,
+					  'no_reff'       => $id,
+					  'debet'         => $nilaiwip,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'adjust cogs',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );			
+					  	
+				
+				
+			}
+			
+			        
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='adjust cogs' and no_reff ='$id'"); 
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'Adjust cogs'.$keterangan;
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => 'Manual System', 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					'created_on'		=> $DateTime,
+					'created_by'		=> 'syam'
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
+		
+	}
 }
