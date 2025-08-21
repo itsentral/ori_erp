@@ -3232,7 +3232,7 @@ class Jurnal_nomor extends CI_Controller {
 			        
 				
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='adjust cogs' and no_reff ='$id'"); 
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='adjust cogs' and no_reff ='$idtrans'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
