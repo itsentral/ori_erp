@@ -3155,7 +3155,7 @@ class Jurnal_nomor extends CI_Controller {
 		
 	        $dataspool = $this->db->query("select * from data_jurnal_cogs")->result();
 			foreach($dataspool AS $record){
-		    $idtrans = $record->id;
+		    $idtrans = $record->kode_trans;
 		   
 			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_cogs WHERE id ='".$idtrans."' ")->result();
 			
@@ -3229,9 +3229,7 @@ class Jurnal_nomor extends CI_Controller {
 				
 			}
 			
-			        
-			print_r($wip);
-			exit;	
+			
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='adjust cogs' and no_reff ='$idtrans'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
