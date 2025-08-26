@@ -6706,10 +6706,13 @@ class Produksi extends CI_Controller {
 									$QTY_INP	= $WHERE_KEY_QTY[$value['id']];
 									$total_est 	= $value3['berat'] * $QTY_INP;
 									$total_act  = str_replace(',','',$value2['terpakai']);
-									if($value2['kebutuhan'] > 0){
-										$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
-									}
+									// if($value2['kebutuhan'] > 0){
+									// 	$total_act 	= ($total_est / str_replace(',','',$value2['kebutuhan'])) * str_replace(',','',$value2['terpakai']);
+									// }
+									$unit_act 	= 0;
+									if($total_act > 0 AND $total_act != ''){
 									$unit_act 	= $total_act / $QTY_INP;
+									}
 									$PERSEN = str_replace(',','',$value2['persen']);
 
 									//PRICE BOOK
