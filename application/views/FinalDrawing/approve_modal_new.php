@@ -220,7 +220,7 @@ else{
 				</tbody>
 				<?php
 				$SUM_NONFRP = 0;
-				if(!empty($non_frp2)){ 
+				if(!empty($non_frp2)){
 					echo "<tbody>";
 						echo "<tr class='bg-blue'>";
 							echo "<td class='text-left headX HeaderHr' colspan='13'><b>AKSESORIS (FINAL DRAWING)</b></td>";
@@ -242,10 +242,6 @@ else{
 					echo "</tbody>";
 					echo "<tbody class='body_x'>";
 					foreach($non_frp2 AS $val => $valx){ $no++;
-
-						print_r($valx);
-						exit;
-
 						$PRICE_DEAL = $valx['deal_price'];
 						$PRICE_DEAL_UNIT = $PRICE_DEAL / $valx['qty_deal'];
 						$SUM_NONFRP += $PRICE_DEAL;
