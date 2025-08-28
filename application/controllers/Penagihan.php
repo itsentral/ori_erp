@@ -116,6 +116,7 @@ class Penagihan extends CI_Controller {
 				'ship_via' => $data['ship_via'],
 				'saliling' => $data['saliling'],
 				'vessel_flight' => $data['vessel_flight'],
+				'delivery_no' => $data['dv'],
 				'term_delivery' => $data['term_delivery'],
 				'created_by' => $this->session->userdata['ORI_User']['username'],
 				'created_date' => date('Y-m-d H:i:s')
