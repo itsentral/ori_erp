@@ -291,14 +291,15 @@ class Penagihan_model extends CI_Model {
 			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 			$customer = $this->db->order_by('nm_customer','asc')->group_by('kode_customer')->get('billing_so')->result();
 			$no_po = $this->db->order_by('no_po','asc')->group_by('no_po')->get_where('billing_so', array('no_po <>'=> NULL, 'no_po <>'=> '0'))->result();
-			
+			$dataDV = $this->db->get('delivery_product')->result();
 			$data = array(
 				'title'			=> 'Indeks Of Add Billing',
 				'action'		=> 'index',
 				'row_group'		=> $data_Group,
 				'akses_menu'	=> $Arr_Akses,
 				'customer'		=> $customer,
-				'no_po'			=> $no_po
+				'no_po'			=> $no_po,
+				'dataDv'		=> $dataDV
 			);
 			
 			$this->load->view('Penagihan/add',$data);
