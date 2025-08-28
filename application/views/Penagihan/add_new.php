@@ -139,7 +139,7 @@ $this->load->view('include/side_menu');
 							<?php
 
 							foreach ($dataDv as $val => $valx) {
-								echo "<option value='" . $valx->id_produksi . "'>" . $valx->so_number . "</option>";
+								echo "<option value='" . $valx->kode_delivery . "'>" . $valx->kode_delivery . "</option>";
 							}
 							?>
 						</select>
