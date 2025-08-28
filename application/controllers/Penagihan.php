@@ -68,7 +68,7 @@ class Penagihan extends CI_Controller {
 				$dtImplode	= "('".implode("','", $dtListArray)."')";
 				$dtImplode2	= implode(",", $dtListArray);
 			}
-
+            $dv    = implode(",", $data['dv']);
 			$result_data 	= $this->db->query("SELECT * FROM billing_so_gabung WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
 
 			$max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
@@ -116,7 +116,7 @@ class Penagihan extends CI_Controller {
 				'ship_via' => $data['ship_via'],
 				'saliling' => $data['saliling'],
 				'vessel_flight' => $data['vessel_flight'],
-				'delivery_no' => $data['dv'],
+				'delivery_no' => $dv,
 				'term_delivery' => $data['term_delivery'],
 				'created_by' => $this->session->userdata['ORI_User']['username'],
 				'created_date' => date('Y-m-d H:i:s')
