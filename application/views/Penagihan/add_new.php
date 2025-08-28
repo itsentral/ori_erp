@@ -135,14 +135,13 @@ $this->load->view('include/side_menu');
 				<label class='label-control col-sm-2'><b>Delivery No </b></label>
 				<div class='col-sm-4'>
 					<select name="dv[]" id="dv" multiple class="form-control chosen-select">
-							<option value='0'>Select Delivery No</option>
-							<?php
-
-							foreach ($dataDv as $valx) {
-								echo "<option value='" . $valx->kode_delivery . "'>" . $valx->kode_delivery . "</option>";
-							}
-							?>
-						</select>
+					<option value='0'>Select An Option</option>
+					 <?php
+						foreach($dataDV AS $valx){
+							echo "<option value='".$valx->kode_delivery."'>".$valx->kode_delivery."</option>";
+						}
+					 ?>
+					 </select>
 				</div>			
 			</div>
 			
