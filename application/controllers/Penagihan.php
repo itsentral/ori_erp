@@ -162,6 +162,10 @@ class Penagihan extends CI_Controller {
 			$customer = $this->db->order_by('nm_customer','asc')->group_by('kode_customer')->get('billing_so_gabung')->result();
 			$no_po = $this->db->order_by('no_po','asc')->group_by('no_po')->get_where('billing_so_gabung', array('no_po <>'=> NULL, 'no_po <>'=> '0'))->result();
 			$dataDV = $this->db->query("SELECT * FROM delivery_product")->result();
+
+			print_r($dataDV);
+			exit;
+
 			$data = array(
 				'title'			=> 'Indeks Of Add Billing',
 				'action'		=> 'index',
