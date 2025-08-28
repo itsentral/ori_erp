@@ -131,7 +131,19 @@ $this->load->view('include/side_menu');
 					<?php
 					echo form_input(array('id'=>'term_delivery','name'=>'term_delivery','class'=>'form-control input-md','placeholder'=>'Term of Delivery'));
 					?>
-				</div>				
+				</div>	
+				<label class='label-control col-sm-2'><b>Delivery No </b></label>
+				<div class='col-sm-4'>
+					<select name="dv[]" id="dv" multiple class="form-control chosen-select">
+							<option value='0'>pilih Delivery No</option>
+							<?php
+
+							foreach ($dataDv as $val => $valx) {
+								echo "<option value='" . $valx->id_produksi . "'>" . $valx->so_number . "</option>";
+							}
+							?>
+						</select>
+				</div>			
 			</div>
 			
 			<br>
