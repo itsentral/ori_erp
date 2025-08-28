@@ -138,7 +138,7 @@ $this->load->view('include/side_menu');
 							<option value='0'>Select Delivery No</option>
 							<?php
 
-							foreach ($dataDv as $val => $valx) {
+							foreach ($dataDv as $valx) {
 								echo "<option value='" . $valx->kode_delivery . "'>" . $valx->kode_delivery . "</option>";
 							}
 							?>
