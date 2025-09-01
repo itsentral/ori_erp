@@ -68,7 +68,7 @@ class Penagihan extends CI_Controller {
 				$dtImplode	= "('".implode("','", $dtListArray)."')";
 				$dtImplode2	= implode(",", $dtListArray);
 			}
-
+            $dv    = implode(",", $data['dv']);
 			$result_data 	= $this->db->query("SELECT * FROM billing_so_gabung WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
 
 			$max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
@@ -116,6 +116,7 @@ class Penagihan extends CI_Controller {
 				'ship_via' => $data['ship_via'],
 				'saliling' => $data['saliling'],
 				'vessel_flight' => $data['vessel_flight'],
+				'delivery_no' => $dv,
 				'term_delivery' => $data['term_delivery'],
 				'created_by' => $this->session->userdata['ORI_User']['username'],
 				'created_date' => date('Y-m-d H:i:s')
@@ -161,14 +162,17 @@ class Penagihan extends CI_Controller {
 			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 			$customer = $this->db->order_by('nm_customer','asc')->group_by('kode_customer')->get('billing_so_gabung')->result();
 			$no_po = $this->db->order_by('no_po','asc')->group_by('no_po')->get_where('billing_so_gabung', array('no_po <>'=> NULL, 'no_po <>'=> '0'))->result();
+			$dataDV = $this->db->query("SELECT * FROM delivery_product")->result();
 
+			
 			$data = array(
 				'title'			=> 'Indeks Of Add Billing',
 				'action'		=> 'index',
 				'row_group'		=> $data_Group,
 				'akses_menu'	=> $Arr_Akses,
 				'customer'		=> $customer,
-				'no_po'			=> $no_po
+				'no_po'			=> $no_po,
+				'dataDV'		=> $dataDV
 			);
 
 			$this->load->view('Penagihan/add_new',$data);
@@ -6084,7 +6088,7 @@ if($base_cur=='USD'){
 			$totalinvoice_idr=0;
 			foreach($get_bill_so AS $valx){
 				$totalinvoice+=$valx->total_deal_usd;
-				$totalinvoice_idr+=$valx->total_deal_idr;
+				$totalinvoice_idr+=$valx->total_deal_idr; 
 			}
 			$ArrBillSO = array();
 			$nox = 0;
