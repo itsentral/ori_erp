@@ -160,11 +160,11 @@
 				</thead>
 				<tbody>
 					<?php
-					$id = 0;
+					$id = 0; 
 					if(!empty($data_top)){
 						foreach($data_top AS $val => $valx){ $id++;
 							$styledisabled="";
-							if($valx['proses_inv']=='1') $styledisabled=" disabled";
+							if($valx['proses_inv']=='1') $styledisabled=" disabled"; 
 							echo "<tr class='header_".$id."'>";
 								echo "<td align='left'>";
 									echo "<select name='detail_po[".$id."][group_top]' class='form-control text-left chosen_select' value='".$id."' ".$styledisabled.">";
@@ -291,6 +291,28 @@
 		change_kurs2();
 		
 	});
+
+	$(document).on('keyup', '.sum_tot_idr', function(){
+		var id 		= $(this).attr('id');
+		var det_id	= id.split('_');
+		var a		= det_id[1];
+		term_value(a);
+		
+		var progress = 0;
+		$(".progress_term" ).each(function() {
+			progress 	+= getNum($(this).val().split(",").join(""));
+		});
+		
+		if(progress > 100.0001){
+			$('#save_term').hide();
+			alert(progress);
+			$('#alert-max').show();
+		}
+		else{
+			$('#save_term').show();
+			$('#alert-max').hide();
+		}
+	});
 	
 	$(document).on('keyup', '.progress_term', function(){
 		var id 		= $(this).attr('id');
@@ -388,6 +410,20 @@
 		
 		
 		
+	}
+
+	function term_value(a){
+		var total		= getNum($('#total').html().split(",").join(""));
+		var values 		= getNum($('#idr_'+a).val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();		
+		if(current == 'USD'){
+			var progress 	= (values*100) / total;
+		}		
+		if(current == 'IDR'){
+			var progress 	= (values*100) / total;
+		}		
+		$('#progress_'+a).val(number_format(progress,4));
 	}
 	
 	function term_process(a){

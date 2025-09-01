@@ -2361,9 +2361,9 @@ class Pembelian_model extends CI_Model {
 				$d_Header .= "</select>";
 				$d_Header .= "<input type='hidden' name='detail_po[".$id."][term]' class='form-control text-center input-md' value='".$id."'>";
 			$d_Header .= "</td>";
-			$d_Header .= "<td align='left'><input type='text' id='progress_".$id."' name='detail_po[".$id."][progress]' class='form-control input-md text-center maskM progress_term' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
+			$d_Header .= "<td align='left'><input type='text' id='progress_".$id."' name='detail_po[".$id."][progress]' class='form-control input-md text-center progress_term' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 			$d_Header .= "<td align='left' class='hidden'><input type='text' id='usd_".$id."' name='detail_po[".$id."][value_usd]' class='form-control input-md text-right maskM sum_tot_usd' tabindex='-1' readonly></td>";
-			$d_Header .= "<td align='left'><input type='text' id='idr_".$id."' name='detail_po[".$id."][value_idr]' class='form-control input-md text-right maskM sum_tot_idr' ></td>";
+			$d_Header .= "<td align='left'><input type='text' id='idr_".$id."' name='detail_po[".$id."][value_idr]' class='form-control input-md text-right sum_tot_idr' ></td>";
 			$d_Header .= "<td align='left'><input type='text' id='total_harga_".$id."' name='detail_po[".$id."][keterangan]' class='form-control input-md text-left'></td>";
 			$d_Header .= "<td align='left'><input type='text' name='detail_po[".$id."][jatuh_tempo]' class='form-control input-md text-center datepicker' readonly></td>";
 			$d_Header .= "<td align='left'><input type='text' name='detail_po[".$id."][syarat]' class='form-control input-md'></td>";
