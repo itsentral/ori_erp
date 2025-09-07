@@ -259,6 +259,7 @@ $this->load->view('include/side_menu');
 				'ship_via' : $('#ship_via').val(),
 				'saliling' : $('#saliling').val(),
 				'base_cur' : $('#base_cur').val(),
+				'dv' : $('#dv').val(),
 				'vessel_flight' : $('#vessel_flight').val()
 			};
 
@@ -282,6 +283,15 @@ $this->load->view('include/side_menu');
 				swal({
 				  title	: "Error Message!",
 				  text	: 'Type is empty, please input first ...',
+				  type	: "warning"
+				});
+				return false;
+			}
+
+			if(validasi.type == 'progress' && validasi.dv == ''){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'No Devery is empty, please input first ...',
 				  type	: "warning"
 				});
 				return false;
