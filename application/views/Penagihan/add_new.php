@@ -263,6 +263,9 @@ $this->load->view('include/side_menu');
 				'vessel_flight' : $('#vessel_flight').val()
 			};
 
+			console.log(validasi.dv);
+		
+
 			if(validasi.customer == '0'){
 				swal({
 				  title	: "Error Message!",
@@ -288,7 +291,7 @@ $this->load->view('include/side_menu');
 				return false;
 			}
 
-			if(validasi.type == 'progress' && validasi.dv == ''){
+			if(validasi.type == 'progress' && validasi.dv == '0'){
 				swal({
 				  title	: "Error Message!",
 				  text	: 'No Devery is empty, please input first ...',
