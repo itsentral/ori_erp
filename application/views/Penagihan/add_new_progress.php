@@ -271,7 +271,7 @@ $this->load->view('include/side_menu');
 				});
 				return false;
 			}
-			if(validasi_cur.base_cur == '0'){
+			if(validasi.base_cur == '0'){
 				swal({
 				  title	: "Error Message!",
 				  text	: 'Currency is empty, please input first ...',
