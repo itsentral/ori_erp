@@ -291,7 +291,7 @@ $this->load->view('include/side_menu');
 				return false;
 			}
 
-			if(validasi.type == 'progress' && validasi.dv == 'null'){
+			if(validasi.type == 'progress' && validasi.dv isnull){
 				swal({
 				  title	: "Error Message!",
 				  text	: 'No Devery is empty, please input first ...',
