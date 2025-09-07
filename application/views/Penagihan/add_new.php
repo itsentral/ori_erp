@@ -144,6 +144,19 @@ $this->load->view('include/side_menu');
 					 </select>
 				</div>			
 			</div>
+
+			<div class='form-group row'>
+				<label class='label-control col-sm-2'><b>Currency <span class='text-red'>*</span></b></label>
+				<div class='col-sm-4'>
+					<select name='base_cur' id='base_cur' class='form-control input-md'>
+						<option value='0'>Select An Currency</option>
+						<option value='IDR'>IDR</option>
+						<option value='USD'>USD</option>
+					 </select>
+				</div>
+				
+				
+			</div>
 			
 			<br>
 			<?php
@@ -245,6 +258,7 @@ $this->load->view('include/side_menu');
 				'flight_airway_no' : $('#flight_airway_no').val(),
 				'ship_via' : $('#ship_via').val(),
 				'saliling' : $('#saliling').val(),
+				'base_cur' : $('#base_cur').val(),
 				'vessel_flight' : $('#vessel_flight').val()
 			};
 
@@ -268,6 +282,15 @@ $this->load->view('include/side_menu');
 				swal({
 				  title	: "Error Message!",
 				  text	: 'Type is empty, please input first ...',
+				  type	: "warning"
+				});
+				return false;
+			}
+
+			if(base_cur.type == '0'){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'Currency is empty, please input first ...',
 				  type	: "warning"
 				});
 				return false;
