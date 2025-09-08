@@ -131,6 +131,14 @@ $this->load->view('include/side_menu');
 					<?php
 					echo form_input(array('id'=>'term_delivery','name'=>'term_delivery','class'=>'form-control input-md','placeholder'=>'Term of Delivery'));
 					?>
+				</div>
+				<label class='label-control col-sm-2'><b>Currency <span class='text-red'>*</span></b></label>
+				<div class='col-sm-4'>
+					<select name='base_cur' id='base_cur' class='form-control input-md'>
+						<option value='0'>Select An Currency</option>
+						<option value='IDR'>IDR</option>
+						<option value='USD'>USD</option>
+					 </select>
 				</div>				
 			</div>
 			
@@ -233,6 +241,7 @@ $this->load->view('include/side_menu');
 				'port_of_discharges' : $('#port_of_discharges').val(),
 				'flight_airway_no' : $('#flight_airway_no').val(),
 				'ship_via' : $('#ship_via').val(),
+				'base_cur' : $('#base_cur').val(),
 				'saliling' : $('#saliling').val(),
 				'vessel_flight' : $('#vessel_flight').val()
 			};
@@ -257,6 +266,14 @@ $this->load->view('include/side_menu');
 				swal({
 				  title	: "Error Message!",
 				  text	: 'Type is empty, please input first ...',
+				  type	: "warning"
+				});
+				return false;
+			}
+			if(validasi.base_cur == '0'){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'Currency is empty, please input first ...',
 				  type	: "warning"
 				});
 				return false;
