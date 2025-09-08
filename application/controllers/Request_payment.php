@@ -556,7 +556,7 @@ class Request_payment extends CI_Controller {
 		}
 		$menu_akses	= $this->master_model->getMenu();
 		$data_coa = $this->All_model->GetCoaCombo('5'," a.no_perkiraan like '1101%'");
-		$results = $this->Request_payment_model->GetListDataPayment('a.status!=2'); 
+		$results = $this->Request_payment_model->GetListDataPayment('a.status!=2');
 
 		$data = array(
 			'title'			=> 'Index Of Payment',
@@ -612,7 +612,7 @@ class Request_payment extends CI_Controller {
 		$accnumber		= $this->input->post("accnumber");
 		$accname		= $this->input->post("accname");
 
-		$tanggal		= $this->input->post("tanggal");	 
+		$tanggal		= $this->input->post("tanggal");	
 				
 		$this->db->trans_begin();
 		$jenis_jurnal = 'BUK030';
