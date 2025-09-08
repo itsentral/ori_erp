@@ -281,7 +281,7 @@ class Penagihan_model extends CI_Model {
 			echo json_encode($Arr_Kembali);
 		}
 		else{
-			$controller			= ucfirst(strtolower($this->uri->segment(1)));
+			$controller			= ucfirst(strtolower($this->uri->segment(1))); 
 			$Arr_Akses			= getAcccesmenu($controller);
 			if($Arr_Akses['read'] !='1'){
 				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
@@ -573,8 +573,8 @@ class Penagihan_model extends CI_Model {
 				'total_dpp_rp'	            => $this->input->post('grand_total_hidden')*$kurs,
 				'total_diskon'	            => $diskon,
 				'total_diskon_idr'	        => $diskon * $kurs,
-				'total_retensi'	            => $this->input->post('potongan_retensi_hidden'),
-				'total_retensi_idr'	        => $this->input->post('potongan_retensi_hidden')*$kurs,
+				'total_retensi'	            => $this->input->post('potongan_retensi_hidden2'),
+				'total_retensi_idr'	        => $this->input->post('potongan_retensi_hidden2')*$kurs,
 				'total_ppn'	                => $this->input->post('ppn_hidden'),
 				'total_ppn_idr'	            => $this->input->post('ppn_hidden')*$kurs,
 				'total_invoice'	            => $this->input->post('total_invoice_hidden'),
