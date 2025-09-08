@@ -419,7 +419,7 @@ $this->load->view('include/side_menu');
 	});
 	 function savemutasi(){
 
-	    
+	    $("#simpanpenerimaan").addClass("hidden");
 	    if ($('#tgl_bayar').val() == "") {
           swal({
             title	: "Tanggal Tidak Boleh Kosong!",
@@ -563,7 +563,7 @@ $this->load->view('include/side_menu');
     }
 	
 	function savedraf(){
-		
+		  $("#simpanpenerimaandraft").addClass("hidden");
 	    if ($('#tgl_bayar').val() == "") {
           swal({
             title	: "Tanggal Tidak Boleh Kosong!",
