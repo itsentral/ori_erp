@@ -493,7 +493,7 @@ $this->load->view('include/side_menu');
 		$(".divide").divide();
 	});
 	 function savemutasi(){
-		
+		$("#simpanpenerimaan").addClass("hidden");
 	    if ($('#tgl_bayar').val() == "") {
           swal({
             title	: "Tanggal Tidak Boleh Kosong!",
