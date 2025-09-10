@@ -1350,7 +1350,7 @@ class Rutin_model extends CI_Model {
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['material_name']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['code_group'].' - '.$row['material_name']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['spec']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['category_type']))."</div>";
 			$STOCK_WRH		= (!empty($GET_WAREHOUSE_STOCK[$row['code_group']]))?$GET_WAREHOUSE_STOCK[$row['code_group']]:0;
@@ -1425,6 +1425,7 @@ class Rutin_model extends CI_Model {
 			AND (
 				a.material_name LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.code_group LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR b.category LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
