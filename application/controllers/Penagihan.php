@@ -104,6 +104,7 @@ class Penagihan extends CI_Controller {
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
+				'base_cur' => $data['base_cur'],
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],
@@ -378,7 +379,7 @@ class Penagihan extends CI_Controller {
 			$in_ipp[$val]	= $valx['no_po'];
 			$in_bq[$val]	= 'BQ-'.$valx['no_po'];
 			$in_so[$val]	= ($valx['no_so']==''?get_nomor_so($valx['no_po']):$valx['no_so']);
-			$base_cur		= ($base_cur==''?$valx['base_cur']:$base_cur);//$valx['base_cur'];
+			$base_cur		= ($base_cur==''?$penagihan[0]->base_cur:$base_cur);//$valx['base_cur'];
 		}
 		$getHeader	= $this->db->where_in('no_ipp',$in_ipp)->get('production')->result();
 		$getDetail	= $this->db->order_by('id_milik','asc')->where_in('no_ipp',$in_ipp)->get('billing_so_product')->result_array();
@@ -2250,6 +2251,7 @@ if($base_cur=='USD'){
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
+				'base_cur' => $data['base_cur'],
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],
@@ -4320,6 +4322,7 @@ else
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
+				'base_cur' => $data['base_cur'],
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],
@@ -6761,7 +6764,7 @@ if($base_cur=='USD'){
 			'arr_in_ipp'	=> $in_ipp,
 			'penagihan'		=> $penagihan,
 			'kurs'			=> $get_kurs[0]->kurs,
-			'uang_muka_persen'	=> $uang_muka_persen,
+			'uang_muka_persen'	=> $uang_muka_persen, 
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,
 			'sisa_um'	    => $sisa_um,
