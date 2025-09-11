@@ -57,11 +57,11 @@ class Sales extends CI_Controller {
 	
 	public function getFluida(){
 		$sqlDel		= "SELECT * FROM list_fluida";
-		$restDel	= $this->db->query($sqlDel)->result_array();
+		$restDel	= $this->db->get_where('list_help',array('group_by'=>'liner'))->result_array();
 		
-		$option	= "<option value='0'>Select An Fluida</option>";
+		$option	= "<option value='0'>Select An Liner</option>";
 		foreach($restDel AS $val => $valx){
-			$option .= "<option value='".$valx['id_fluida']."'>".ucwords(strtolower($valx['fluida_name']))."</option>";
+			$option .= "<option value='".$valx['data1']."'>".$valx['data2']."</option>";
 		}
 
 		$ArrJson	= array(
