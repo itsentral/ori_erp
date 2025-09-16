@@ -167,7 +167,7 @@
 							if($valx['proses_inv']=='1') $styledisabled=" disabled"; 
 							echo "<tr class='header_".$id."'>";
 								echo "<td align='left'>";
-									echo "<select name='detail_po[".$id."][group_top]' class='form-control text-left chosen_select' value='".$id."' ".$styledisabled.">";
+									echo "<select name='detail_po[".$id."][group_top]' class='form-control text-left chosen_select' value='".$id."' ".$styledisabled.">"; 
 										echo "<option value='0'>Select Group TOP</option>";
 										foreach($payment AS $val2 => $valx2){
 											$sel = ($valx2['name'] == $valx['group_top'])?'selected':'';
@@ -190,6 +190,8 @@
 								  
 								  }
 								  if($valx['invoice_no']!=""){
+									
+								     echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('pembelian/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';
 									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('pembelian/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
 								  }
 								}else{
