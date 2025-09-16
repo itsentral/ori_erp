@@ -190,6 +190,8 @@
 								  
 								  }
 								  if($valx['invoice_no']!=""){
+									
+								     echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('pembelian/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';
 									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('pembelian/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
 								  }
 								}else{
