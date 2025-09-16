@@ -22,6 +22,7 @@
             <th class="text-right">WIP TOTAL</th>
             <th class="text-center">QTY<br>FG</th>
             <th class="text-right">FG</th>
+            <!-- <th class="text-right">SPOOL</th> -->
             <th class="text-right">IN<br>TRANSIT</th>
             <th class="text-right">DELIVERY<br>CODE</th>
             <th class="text-right">IN<br>CUSTOMER</th>
@@ -72,6 +73,7 @@
                     echo "<td align='right'>".$wip_total."</td>";
                     echo "<td align='center'>".$qty_fg."</td>";
                     echo "<td align='right'>".$nilai_fg."</td>";
+                    // echo "<td align='right'>".$row_Cek['kode_spool']."</td>";
                     echo "<td align='right'>".$nilai_intransit."</td>";
                     echo "<td align='center'>".$kode_delivery."</td>";
                     echo "<td align='right'>".$nilai_incustomer."</td>";

@@ -11,12 +11,12 @@ $this->load->view('include/side_menu');
 		<div class="box-body">
             <div class='form-group row'>
 				<label class='label-control col-sm-2'><b>IPP Number</b></label>
-				<div class='col-sm-4'>
+				<div class='col-sm-8'>
 					<select name='no_ipp' id='no_ipp' class='form-control input-md'>
 						<option value='0'>SELECT IPP</option>
 					<?php
 						foreach($list_ipp AS $val => $valx){
-							echo "<option value='".$valx['no_ipp']."'>".strtoupper($valx['no_ipp'].' - '.$valx['nm_customer'].' ['.$valx['project'])."]</option>";
+							echo "<option value='".$valx['no_ipp']."'>".strtoupper($valx['no_ipp'].' ['.$valx['so_number'].'] - '.$valx['nm_customer'].' ['.$valx['project'])."]</option>";
 						}
 					 ?>
 					</select>
@@ -31,7 +31,7 @@ $this->load->view('include/side_menu');
                     ?>
 				</div>	
 			</div>
-			<div id='show_history_view'></div>
+			<div id='show_history_view' class="table-responsive"></div>
 		</div>
 		<!-- /.box-body -->
 	 </div>
@@ -89,6 +89,9 @@ $this->load->view('include/side_menu');
 				},
 				cache		: false,
 				dataType	: 'json',
+				beforeSend	: function(){
+					loading_spinner();
+				},
 				success		: function(data){
 					if(data.status == 1){
 					$('#show_history_view').html(data.data_html);

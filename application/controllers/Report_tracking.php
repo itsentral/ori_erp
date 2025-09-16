@@ -23,9 +23,10 @@ class Report_tracking extends CI_Controller {
 			redirect(site_url('dashboard'));
 		}
 		$list_ipp			= $this->db
-									->select('a.no_ipp, b.project, b.nm_customer')
+									->select('a.no_ipp, b.project, b.nm_customer, c.so_number')
 									->order_by('a.no_ipp','desc')
 									->join('production b','a.no_ipp=b.no_ipp','join')
+									->join('so_number c','a.id_bq=c.id_bq','join')
 									->get_where('so_header a',array('a.cancel_date'=>NULL))->result_array();
 		$data = array(
 			'title'			=> 'Report Tracking',
@@ -378,7 +379,8 @@ class Report_tracking extends CI_Controller {
 								j.nilai_unit AS nilai_fg,
 								k.nilai_unit AS nilai_intransit,
 								l.nilai_unit AS nilai_incustomer,
-								k.kode_delivery
+								k.kode_delivery,
+								k.kode_spool
 								')
 							->order_by('a.id','asc')
 							->join('billing_so b','REPLACE(a.id_bq,"BQ-","")=b.no_ipp','left')
@@ -390,8 +392,8 @@ class Report_tracking extends CI_Controller {
 							->join('data_erp_wip_group h','CONCAT(f.kode_spk,"/",g.created_date)=h.kode_trans AND h.jenis="in"','left')
 							->join('laporan_wip_per_hari_action i','CONCAT(f.kode_spk,"/",g.created_date)=i.kode_trans','left')
 							->join('data_erp_fg j','h.id_trans=j.id_trans AND h.jenis="in" AND j.jenis="in"','left')
-							->join('data_erp_in_transit k','j.id_trans=k.id_trans AND j.jenis="in" AND k.jenis="in" AND j.id_pro=k.id_pro_det','left')
-							->join('data_erp_in_customer l','l.id_trans=k.id_trans AND l.jenis="in" AND k.jenis="in" AND l.id_pro=k.id_pro_det','left')
+							->join('data_erp_in_transit k','j.id_trans=k.id_trans AND j.jenis="in" AND k.jenis="in" AND j.id_pro=k.id_pro','left')
+							->join('data_erp_in_customer l','l.id_trans=k.id_trans AND l.jenis="in" AND k.jenis="in" AND l.id_pro=k.id_pro','left')
 							->get_where('so_detail_header a', array('a.id_bq'=>$no_ipp))
 							->result_array();
 
