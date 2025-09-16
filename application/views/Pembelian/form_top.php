@@ -167,7 +167,7 @@
 							if($valx['proses_inv']=='1') $styledisabled=" disabled"; 
 							echo "<tr class='header_".$id."'>";
 								echo "<td align='left'>";
-									echo "<select name='detail_po[".$id."][group_top]' class='form-control text-left chosen_select' value='".$id."' ".$styledisabled.">";
+									echo "<select name='detail_po[".$id."][group_top]' class='form-control text-left chosen_select' value='".$id."' ".$styledisabled.">"; 
 										echo "<option value='0'>Select Group TOP</option>";
 										foreach($payment AS $val2 => $valx2){
 											$sel = ($valx2['name'] == $valx['group_top'])?'selected':'';
