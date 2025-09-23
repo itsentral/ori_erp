@@ -4179,7 +4179,7 @@ else
 					if($perseninv1 < 1){
                     $perseninv = 0;
 					}else{
-
+                    $perseninv = $perseninv1;
 					}
 					$this->db->query("update billing_so set
 					uang_muka_persen=(uang_muka_persen+".$gethd->persentase."),
