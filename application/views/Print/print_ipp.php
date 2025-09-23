@@ -106,11 +106,12 @@
 				<th width='10%'>Aplication</th>
 				<th width='8%'>Vacum_Rate</th>
 				<th width='8%'>Life Time</th>
-				<th width='14%'>Reference Standard</th>
+				<th width='7%'>Reference Standard</th>
 				<th width='7%'>Conductive</th>
 				<th width='7%'>Fire Retardant</th>
 				<th width='7%'>Color</th>
 				<th width='7%'>Abrasive</th>
+				<th width='7%'>Product Supply</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -125,6 +126,9 @@
 					$std_bsi	= ($data['std_bsi']=='Y')?'BSI , ':'';
 					$std_jis	= ($data['std_jis']=='Y')?'JIS , ':'';
 					$std_sni	= ($data['std_sni']=='Y')?'SNI , ':'';
+					$std_din	= ($data['std_din']=='Y')?'DIN , ':'';
+					$std_fff	= ($data['std_fff']=='Y')?'FLAT FACE FLANGE , ':'';
+					$std_rf		= ($data['std_rf']=='Y')?'RAISED FLANGE , ':'';
 					$etc_1		= ($data['std_etc']=='Y' AND $data['etc_1'] != '')?$data['etc_1']."/":'';
 					$etc_2		= ($data['std_etc']=='Y' AND $data['etc_2'] != '')?$data['etc_2']."/":'';
 					$etc_3		= ($data['std_etc']=='Y' AND $data['etc_3'] != '')?$data['etc_3']."/":'';
@@ -196,26 +200,39 @@
 								<tr>
 									<td align='left' width='30%'>Liner</td>
 									<td align='left' width='10%'>:</td>
-									<td align='left' width='60%'><?= ($data['color'] == 'N')?'-':($data['color_liner'] == '')?'-':strtoupper($data['color_liner']);?></td>
+									<?php
+									$colorLiner = ($data['color_liner'] == '')?'-':strtoupper($data['color_liner']);
+									?>
+									<td align='left' width='60%'><?= ($data['color'] == 'N')?'-':$colorLiner;?></td>
 								</tr>
 								<tr>
 									<td align='left'>Str</td>
 									<td align='left'>:</td>
-									<td align='left'><?= ($data['color'] == 'N')?'-':($data['color_structure'] == '')?'-':strtoupper($data['color_structure']);?></td>
+									<?php
+									$colorStructure = ($data['color_structure'] == '')?'-':strtoupper($data['color_structure']);
+									?>
+									<td align='left'><?= ($data['color'] == 'N')?'-':$colorStructure;?></td>
 								</tr>
 								<tr>
 									<td align='left'>Eks</td>
 									<td align='left'>:</td>
-									<td align='left'><?= ($data['color'] == 'N')?'-':($data['color_external'] == '')?'-':strtoupper($data['color_external']);?></td>
+									<?php
+									$colorExt = ($data['color_external'] == '')?'-':strtoupper($data['color_external']);
+									?>
+									<td align='left'><?= ($data['color'] == 'N')?'-':$colorExt;?></td>
 								</tr>
 								<tr>
 									<td align='left'>Tc</td>
 									<td align='left'>:</td>
-									<td align='left'><?= ($data['color'] == 'N')?'-':($data['color_topcoat'] == '')?'-':strtoupper($data['color_topcoat']);?></td>
+									<?php
+									$colorTopcoat = ($data['color_topcoat'] == '')?'-':strtoupper($data['color_topcoat']);
+									?>
+									<td align='left'><?= ($data['color'] == 'N')?'-':$colorTopcoat;?></td>
 								</tr>
 							</table>
 						</td>
 						<td align='center'><?= ($data['abrasi'] == 'Y')?'<b>YES</b>':'NO';?></td>
+						<td align='center'><?= $data['product_supply'];?></td>
 					</tr>
 					<?php
 				}
@@ -253,22 +270,34 @@
 								<tr>
 									<td align='left mid' width='30%'>Document 1</td>
 									<td align='left mid' width='5%'>:</td>
-									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':($data2['document_1'] == '')?'-':strtoupper($data2['document_1']);?></td>
+									<?php
+									$document_1 = ($data2['document_1'] == '')?'-':strtoupper($data2['document_1']);
+									?>
+									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':$document_1;?></td>
 								</tr>
 								<tr>
 									<td align='left mid'>Document 2</td>
 									<td align='left mid'>:</td>
-									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':($data2['document_2'] == '')?'-':strtoupper($data2['document_2']);?></td>
+									<?php
+									$document_2 = ($data2['document_2'] == '')?'-':strtoupper($data2['document_2']);
+									?>
+									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':$document_2;?></td>
 								</tr>
 								<tr>
 									<td align='left mid'>Document 3</td>
 									<td align='left mid'>:</td>
-									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':($data2['document_3'] == '')?'-':strtoupper($data2['document_3']);?></td>
+									<?php
+									$document_3 = ($data2['document_3'] == '')?'-':strtoupper($data2['document_3']);
+									?>
+									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':$document_3;?></td>
 								</tr>
 								<tr>
 									<td align='left mid'>Document 4</td>
 									<td align='left mid'>:</td>
-									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':($data2['document_4'] == '')?'-':strtoupper($data2['document_4']);?></td>
+									<?php
+									$document_4 = ($data2['document_4'] == '')?'-':strtoupper($data2['document_4']);
+									?>
+									<td align='left mid' width='65%'><?= ($data2['document'] == 'N')?'-':$document_4;?></td>
 								</tr>
 							</table>
 						</td>

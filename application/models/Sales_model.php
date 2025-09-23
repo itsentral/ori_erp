@@ -140,12 +140,13 @@ class Sales_model extends CI_Model {
 				$ArrDetailPre[$val]['type_resin'] 	= $valx['type_resin'];
 				$ArrDetailPre[$val]['time_life'] 	= $valx['time_life'];
 				$ArrDetailPre[$val]['id_fluida'] 	= $valx['id_fluida'];
-				$ArrDetailPre[$val]['liner_thick'] 	= $NmLiner[0]['liner_thick'];
+				$ArrDetailPre[$val]['liner_thick'] 	= $valx['id_fluida'];
 				$ArrDetailPre[$val]['stifness'] 	= $valx['stifness'];
 				$ArrDetailPre[$val]['aplikasi'] 	= $valx['aplikasi'];
 				$ArrDetailPre[$val]['pressure'] 	= $valx['pressure'];
 				$ArrDetailPre[$val]['vacum_rate'] 	= $valx['vacum_rate'];
 				$ArrDetailPre[$val]['note'] 		= $valx['note'];
+				$ArrDetailPre[$val]['product_supply'] 		= $valx['product_supply'];
 
 				$ArrDetailPre[$val]['resin_req_cust'] 			= $valx['resin_req_cust'];
 				$ArrDetailPre[$val]['ck_minat_warna_tc'] 		= (!empty($valx['ck_minat_warna_tc']))?'Y':'N';
@@ -161,6 +162,9 @@ class Sales_model extends CI_Model {
 				$ArrDetailPre[$val]['std_jis'] 		= (!empty($valx['std_jis']))?'Y':'N';
 				$ArrDetailPre[$val]['std_sni'] 		= (!empty($valx['std_sni']))?'Y':'N';
 				$ArrDetailPre[$val]['std_etc'] 		= (!empty($valx['std_etc']))?'Y':'N';
+				$ArrDetailPre[$val]['std_din'] 		= (!empty($valx['std_din']))?'Y':'N';
+				$ArrDetailPre[$val]['std_fff'] 		= (!empty($valx['std_fff']))?'Y':'N';
+				$ArrDetailPre[$val]['std_rf'] 		= (!empty($valx['std_rf']))?'Y':'N';
 				$ArrDetailPre[$val]['etc_1'] 		= (!empty($valx['std_etc']))?$valx['etc_1']:'';
 				$ArrDetailPre[$val]['etc_2'] 		= (!empty($valx['std_etc']))?$valx['etc_2']:'';
 				$ArrDetailPre[$val]['etc_3'] 		= (!empty($valx['std_etc']))?$valx['etc_3']:'';
@@ -421,12 +425,13 @@ class Sales_model extends CI_Model {
 				$ArrDetailPre[$val]['type_resin'] 	= $valx['type_resin'];
 				$ArrDetailPre[$val]['time_life'] 	= $valx['time_life'];
 				$ArrDetailPre[$val]['id_fluida'] 	= $valx['id_fluida'];
-				$ArrDetailPre[$val]['liner_thick'] 	= $NmLiner[0]['liner_thick'];
+				$ArrDetailPre[$val]['liner_thick'] 	= $valx['id_fluida'];
 				$ArrDetailPre[$val]['stifness'] 	= $valx['stifness'];
 				$ArrDetailPre[$val]['aplikasi'] 	= $valx['aplikasi'];
 				$ArrDetailPre[$val]['pressure'] 	= $valx['pressure'];
 				$ArrDetailPre[$val]['vacum_rate'] 	= $valx['vacum_rate'];
 				$ArrDetailPre[$val]['note'] 		= $valx['note'];
+				$ArrDetailPre[$val]['product_supply'] 		= $valx['product_supply'];
 
 				$ArrDetailPre[$val]['resin_req_cust'] 			= $valx['resin_req_cust'];
 				$ArrDetailPre[$val]['ck_minat_warna_tc'] 		= (!empty($valx['ck_minat_warna_tc']))?'Y':'N';
@@ -442,6 +447,9 @@ class Sales_model extends CI_Model {
 				$ArrDetailPre[$val]['std_jis'] 		= (!empty($valx['std_jis']))?'Y':'N';
 				$ArrDetailPre[$val]['std_sni'] 		= (!empty($valx['std_sni']))?'Y':'N';
 				$ArrDetailPre[$val]['std_etc'] 		= (!empty($valx['std_etc']))?'Y':'N';
+				$ArrDetailPre[$val]['std_din'] 		= (!empty($valx['std_din']))?'Y':'N';
+				$ArrDetailPre[$val]['std_fff'] 		= (!empty($valx['std_fff']))?'Y':'N';
+				$ArrDetailPre[$val]['std_rf'] 		= (!empty($valx['std_rf']))?'Y':'N';
 				$ArrDetailPre[$val]['etc_1'] 		= (!empty($valx['std_etc']))?$valx['etc_1']:'';
 				$ArrDetailPre[$val]['etc_2'] 		= (!empty($valx['std_etc']))?$valx['etc_2']:'';
 				$ArrDetailPre[$val]['etc_3'] 		= (!empty($valx['std_etc']))?$valx['etc_3']:'';
@@ -571,7 +579,7 @@ class Sales_model extends CI_Model {
 			$restApp	= $this->db->query($qApp)->result_array();
 			//fluida
 			$qFluida	= "SELECT * FROM list_fluida";
-			$restFluida	= $this->db->query($qFluida)->result_array();
+			$restFluida	= $this->db->get_where('list_help',array('group_by'=>'liner'))->result_array();
 			//standard
 			$qStandard		= "SELECT * FROM list_standard ORDER BY urut ASC";
 			$restStandard	= $this->db->query($qStandard)->result_array();

@@ -124,6 +124,12 @@
 															<option value='HALF VACUUM' <?= ($valx['vacum_rate'] == 'HALF VACUUM')?'selected':'';?>>HALF VACUUM</option>
 															<option value='FULL VACUUM' <?= ($valx['vacum_rate'] == 'FULL VACUUM')?'selected':'';?>>FULL VACUUM</option>
 														</select>
+														<div class='labDet'>PRODUCT SUPPLY</div>
+													<select name='ListDetailEdit[<?= $no;?>][product_supply]' id='product_supply<?= $no;?>' class='form-control input-sm chosen-select' required>
+															<option value='0'>Select An Product Supply</option>
+															<option value='Loose Supply' <?= ($valx['product_supply'] == 'Loose Supply')?'selected':'';?>>LOOSE SUPPLY</option>
+															<option value='Spool' <?= ($valx['product_supply'] == 'Spool')?'selected':'';?>>SPOOL</option>
+														</select>
 													<div class='labDet'>DOCUMENT</div>
 														<input class='form-check-input docClass' id='document_<?= $no;?>' name='ListDetailEdit[<?= $no;?>][document]' type='checkbox' data-no='<?= $no;?>' value='Y' <?= ($valx['document'] == 'Y')?'checked':'';?>>
 														<label class='form-check-label'>&nbsp;YES</label>
@@ -136,12 +142,12 @@
 													</div>
 												</td>
 												<td style='text-align: right;' width='13%'>
-													<div class='labDet'>FLUIDA</div>
+													<div class='labDet'>RESIN</div>
 														<select name='ListDetailEdit[<?= $no;?>][id_fluida]' id='id_fluida_<?= $no;?>' class='form-control input-sm chosen-select' required>
 															<?php
 																foreach($restFluida AS $val => $valxF){
-																	$selF	= ($valxF['id_fluida'] == $valx['id_fluida'])?'selected':'';
-																	echo "<option value='".$valxF['id_fluida']."' ".$selF.">".ucwords(strtolower($valxF['fluida_name']))."</option>";
+																	$selF	= ($valxF['data1'] == $valx['id_fluida'])?'selected':'';
+																	echo "<option value='".$valxF['data1']."' ".$selF.">".$valxF['data2']."</option>";
 																}
 															?>
 														</select>
@@ -281,6 +287,12 @@
 														<label class='form-check-label'>&nbsp;JIS</label>
 														&nbsp;&nbsp;&nbsp;&nbsp;<input class='form-check-input' name='ListDetailEdit[<?= $no;?>][std_sni]' type='checkbox' value='Y' <?= ($valx['std_sni'] == 'Y')?'checked':'';?>>
 														<label class='form-check-label'>&nbsp;SNI</label><br>
+														&nbsp;&nbsp;&nbsp;&nbsp;<input class='form-check-input' name='ListDetailEdit[<?= $no;?>][std_din]' type='checkbox' value='Y' <?= ($valx['std_din'] == 'Y')?'checked':'';?>>
+														<label class='form-check-label'>&nbsp;DIN</label>
+														&nbsp;&nbsp;&nbsp;&nbsp;<input class='form-check-input' name='ListDetailEdit[<?= $no;?>][std_fff]' type='checkbox' value='Y' <?= ($valx['std_fff'] == 'Y')?'checked':'';?>>
+														<label class='form-check-label'>&nbsp;FLAT FACE FLANGE</label><br>
+														&nbsp;&nbsp;&nbsp;&nbsp;<input class='form-check-input' name='ListDetailEdit[<?= $no;?>][std_rf]' type='checkbox' value='Y' <?= ($valx['std_rf'] == 'Y')?'checked':'';?>>
+														<label class='form-check-label'>&nbsp;RAISED FLANGE</label>
 														&nbsp;&nbsp;&nbsp;&nbsp;<input class='form-check-input etcClass' name='ListDetailEdit[<?= $no;?>][std_etc]'  data-no='<?= $no;?>' id='std_etc_<?= $no;?>' type='checkbox' value='Y' <?= ($valx['std_etc'] == 'Y')?'checked':'';?>>
 														<label class='form-check-label'>&nbsp;ETC</label><br>
 														<?php $InShow5	= ($valx['std_etc'] == 'Y')?'block':'none';?>
