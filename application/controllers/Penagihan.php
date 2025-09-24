@@ -6741,6 +6741,12 @@ if($base_cur=='USD'){
 			}
 		}
 		
+		if(!empty($getidmilik)){
+			$getidmilik2 = $getidmilik;
+		} else {
+			$getidmilik2 = 0;
+		}
+		
 		$data2 = array(
 			'title'			=> 'Indeks Of Create Invoice Progress',
 			'action'		=> 'index',
@@ -6753,7 +6759,7 @@ if($base_cur=='USD'){
 			'getPackCost' 	=> $getPackCost,
 			'getTruck' 		=> $getTruck,
 			'other' 		=> $getOther,
-			'getNonid'   	=> $getidmilik,
+			'getNonid'   	=> $getidmilik2, 
 			'non_frp'		=> $non_frp,
 			'material'		=> $material,
 			'list_top'		=> $list_top,
