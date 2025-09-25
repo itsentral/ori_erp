@@ -3709,7 +3709,7 @@ else
 				$material	= $this->db->select('*, unit satuan, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item')->where('id_penagihan',$id)->get_where('penagihan_detail',array('kategori_detail'=>'MATERIAL'))->result_array();
 				$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 				
-				//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
+				$get_kurs1	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 				
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
 				$sisa_um   = $get_kurs[0]->sisa_um;
@@ -3757,7 +3757,7 @@ else
 			'in_so'			=> implode(',',$in_so),
 			'arr_in_ipp'	=> $in_ipp,
 			'penagihan'		=> $penagihan,
-			'kurs'			=> $get_kurs[0]->kurs,
+			'kurs'			=> $get_kurs1[0]->kurs,
 			'uang_muka_persen'	=> $uang_muka_persen,
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,
@@ -6774,7 +6774,7 @@ if($base_cur=='USD'){
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,
 			'sisa_um'	    => $sisa_um,
-			'sisa_um_idr'	    => $sisa_um_idr,
+			'sisa_um_idr'	    => $sisa_um_idr, 
 			'down_payment2'	=> $down_payment2,
 			'id'			=> $id,
 			'approval'		=> $approval

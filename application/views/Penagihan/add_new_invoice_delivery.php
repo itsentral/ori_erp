@@ -322,7 +322,7 @@ if(isset($approval)){
 					allowOutsideClick	: false
 				});
 			}
-			else if ($('#kurs').val()=="" && $('#wilayah').val() == 'L') {
+			else if ($('#kurs').val()=="" || $('#kurs').val()==0  { //$('#wilayah').val() == 'L')
 				swal({
 					title	: "KURS HARUS DI UPDATE!",
 					text	: "SILAHKAN UPDATE KURS TERLEBIH DAHULU!",
@@ -360,7 +360,7 @@ if(isset($approval)){
 					cancelButtonText: "Batal",
 					closeOnConfirm: false,
 					closeOnCancel: false,
-					showLoaderOnConfirm: true
+					showLoaderOnConfirm: true 
 				},
 				function(isConfirm) {
 					if (isConfirm) {
