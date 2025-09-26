@@ -322,10 +322,10 @@ if(isset($approval)){
 					allowOutsideClick	: false
 				});
 			}
-			else if ($('#kurs').val()=="" || $('#kurs').val()==0  { //$('#wilayah').val() == 'L')
+			else if ($('#kurs').val()=="" || $('#kurs').val()==0) { //$('#wilayah').val() == 'L')
 				swal({
 					title	: "KURS HARUS DI UPDATE!",
-					text	: "SILAHKAN UPDATE KURS TERLEBIH DAHULU!",
+					text	: "Silahkan isi kurs terlebih dahulu! jika IDR isi angka 1",
 					type	: "warning",
 					timer	: 3000,
 					showCancelButton	: false,
