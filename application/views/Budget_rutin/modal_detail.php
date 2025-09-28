@@ -48,27 +48,38 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 						<th class='text-center' style='width: 30%;'>Nama Barang</th>
 						<th class='text-center'>Spesifikasi</th>
 						<th class='text-center'>Brand</th>
-						<th class='text-center' style='width: 15%;'>Kebutuhan 1 Bulan</th>
-						<th class='text-center' style='width: 15%;'>Satuan</th>
+						<th class='text-center' style='width: 10%;'>Kebutuhan 1 Bulan</th>
+						<th class='text-center' style='width: 10%;'>Price From Supplier</th>
+						<th class='text-center' style='width: 10%;'>Total Budget</th>
+						<th class='text-center' style='width: 10%;'>Satuan</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php
 						$id = 0;
+						$SUM_QTY=0;
+						$SUM_BUDGET=0;
 						if(!empty($detail)){
 							foreach($detail AS $val => $valx){ $id++;
 								$spec 		= get_name('con_nonmat_new', 'spec', 'code_group', $valx['id_barang']);
 								$nm_barang 	= get_name('con_nonmat_new', 'material_name', 'code_group', $valx['id_barang']);
 								$brand 		= get_name('con_nonmat_new', 'brand', 'code_group', $valx['id_barang']);
 								$satuan 	= get_name('raw_pieces', 'kode_satuan', 'id_satuan', $valx['satuan']);
+								$price_from_supplier = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
+								$total_budget = $price_from_supplier * $valx['kebutuhan_month'];
 								echo "<tr class='header_".$valxHeader['id'].$id."'>";
 									echo "<td align='center'>".$id."</td>";
 									echo "<td align='left'>".strtoupper($nm_barang)."</td>";
 									echo "<td align='left'>".strtoupper($spec)."</td>";
 									echo "<td align='left'>".strtoupper($brand)."</td>";
 									echo "<td align='center'>".number_format($valx['kebutuhan_month'])."</td>";
+									echo "<td align='right'>".number_format($price_from_supplier,2)."</td>";
+									echo "<td align='right'>".number_format($total_budget,2)."</td>";
 									echo "<td align='center'>".strtoupper($satuan)."</td>";
 								echo "</tr>";
+
+								$SUM_QTY += $valx['kebutuhan_month'];
+								$SUM_BUDGET += $total_budget;
 							}
 						}
 						else{
@@ -78,6 +89,18 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 					</tr>
 						<?php } ?>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th align='center'></th>
+						<th align='center'>TOTAL BUDGET</th>
+						<th align='center'></th>
+						<th align='center'></th>
+						<th class='text-center'><?=number_format($SUM_QTY);?></th>
+						<th align='center'></th>
+						<th class='text-right'><?=number_format($SUM_BUDGET,2);?></th>
+						<th align='center'></th>
+					</tr>
+				</tfoot>
 			</table>
 			<br>
 			<?php
