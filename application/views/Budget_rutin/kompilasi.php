@@ -21,6 +21,8 @@ $this->load->view('include/side_menu');
 						<th class="text-left th">SPESIFIKASI</th>
 						<th class="text-left th">BRAND</th>
 						<th class="text-left th">TOTAL</th>
+						<th class="text-right th">PRICE FROM SUPPLIER</th>
+						<th class="text-right th">TOTAL</th>
 						<th class="text-left th">UNIT</th>
 						<?php
 						foreach($group_header AS $val => $valx){
@@ -35,6 +37,8 @@ $this->load->view('include/side_menu');
 				</thead>
 				<tbody>
 					<?php
+					$SUM_QTY = 0;
+					$SUM_COST = 0;
 					foreach($group_barang AS $val => $valx){ $val++;
 						echo "<tr>";
 							echo "<td class='text-center'>".$val."</td>";
@@ -47,7 +51,16 @@ $this->load->view('include/side_menu');
 								$get_qty = $this->db->query("SELECT a.kebutuhan_month FROM budget_rutin_detail a LEFT JOIN budget_rutin_header b ON a.code_budget=b.code_budget WHERE a.id_barang='".$valx['id_barang']."' AND b.department='".$valx2['department']."' AND b.costcenter='".$valx2['costcenter']."' ")->result();
 								$total_kebutuhan += (!empty($get_qty))?$get_qty[0]->kebutuhan_month:0;
 							}
+							$SUM_QTY += $total_kebutuhan;
+							
 							echo "<td class='text-right'>".number_format($total_kebutuhan)."</td>";
+							$PriceFromSupplier = getPriceAccessoriesMaster($valx['id_barang']);
+							$price_from_supplier = $PriceFromSupplier['price_from_supplier'];
+							$total_cost = $price_from_supplier*$total_kebutuhan;
+							$SUM_COST += $total_cost;
+							echo "<td class='text-right'>".number_format($price_from_supplier,2)."</td>";
+							echo "<td class='text-right'>".number_format($total_cost,2)."</td>";
+
 							echo "<td class='text-left'>".strtoupper(get_name('raw_pieces','kode_satuan','id_satuan',$valx['satuan']))."</td>";
 							foreach($group_header AS $val2 => $valx2){
 								$get_qty = $this->db->query("SELECT a.kebutuhan_month FROM budget_rutin_detail a LEFT JOIN budget_rutin_header b ON a.code_budget=b.code_budget WHERE a.id_barang='".$valx['id_barang']."' AND b.department='".$valx2['department']."' AND b.costcenter='".$valx2['costcenter']."' ")->result();
@@ -58,6 +71,18 @@ $this->load->view('include/side_menu');
 					}
 					?>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th></th>
+						<th>TOTAL</th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th class='text-right'><?=number_format($SUM_QTY);?></th>
+						<th></th>
+						<th class='text-right'><?=number_format($SUM_COST,2);?></th>
+					</tr>
+				</tfoot>
 			</table>
 		</div>
 		<?php
