@@ -63,7 +63,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 		<?php
 		foreach(get_list_jenis_rutin() AS $valH => $valxHeader){
 			$detail 		= $this->db->query("SELECT * FROM budget_rutin_detail WHERE code_budget='".$code."' AND jenis_barang='".$valxHeader['id']."' ")->result_array();
-			$jenis_barang2	= $this->db->query("SELECT * FROM con_nonmat_new WHERE category_awal='".$valxHeader['id']."' ORDER BY material_name ASC ")->result_array();
+			$jenis_barang2	= $this->db->query("SELECT a.*, b.price_from_supplier FROM con_nonmat_new a LEFT JOIN accessories b ON a.code_group=b.id_material WHERE a.category_awal='".$valxHeader['id']."' ORDER BY a.material_name ASC ")->result_array();
 			echo "<h4><b>".strtoupper($valxHeader['category'])."</b></h4>";
 			?>
 			<table class='table table-striped table-bordered table-hover table-condensed' width='100%'>
@@ -72,14 +72,18 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 						<th class='text-center' style='width: 5%;'>#</th>
 						<th class='text-center' style='width: 30%;'>Nama Barang</th>
 						<th class='text-center'>Spesifikasi</th>
-						<th class='text-center' style='width: 15%;'>Kebutuhan 1 Bulan</th>
-						<th class='text-center' style='width: 15%;'>Satuan</th>
+						<th class='text-center' style='width: 10%;'>Kebutuhan 1 Bulan</th>
+						<th class='text-center' style='width: 10%;'>Price From Supplier</th>
+						<th class='text-center' style='width: 10%;'>Total Budget</th>
+						<th class='text-center' style='width: 10%;'>Satuan</th>
 						<th class='text-center' style='width: 5%;'>#</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php
 						$id = 0;
+						$SUM_QTY=0;
+						$SUM_BUDGET=0;
 						if(!empty($detail)){
 							foreach($detail AS $val => $valx){ $id++;
 								$spec = get_name('con_nonmat_new', 'spec', 'code_group', $valx['id_barang']);
@@ -90,8 +94,10 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 										echo "<select name='detail[".$valxHeader['id'].$id."][id_barang]' data-no='".$valxHeader['id'].$id."' data-id_barang='".$valxHeader['id']."' class='chosen_select form-control input-sm getSpec'>";
 										echo "<option value='0'>Select Barang</option>";
 										foreach($jenis_barang2 AS $val2 => $valx2){
+											$price_sup = (!empty($valx2['price_from_supplier']))?$valx2['price_from_supplier']:0;
+
 											$dex = ($valx['id_barang'] == $valx2['code_group'])?'selected':'';
-										  echo "<option value='".$valx2['code_group']."' ".$dex.">".strtoupper($valx2['material_name'])."</option>";
+										  echo "<option value='".$valx2['code_group']."' data-price_sup='".$price_sup."' ".$dex.">".strtoupper($valx2['code_group'].' - '.$valx2['material_name'])."</option>";
 										}
 										echo "</select>";
 									echo "</td>";
@@ -100,8 +106,14 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 										echo "<input name='detail[".$valxHeader['id'].$id."][spesifikasi]' id='spec_".$valxHeader['id'].$id."' class='form-control input-md' readonly placeholder='Spesifikasi' value='".strtoupper($spec)."'>";
 									echo "</td>";
 									echo "<td align='left'>";
-										echo "<input name='detail[".$valxHeader['id'].$id."][kebutuhan_month]' class='form-control text-center input-md maskM' value='".number_format($valx['kebutuhan_month'])."' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
+										echo "<input name='detail[".$valxHeader['id'].$id."][kebutuhan_month]' class='form-control text-center input-md maskM kebutuhan_month' value='".number_format($valx['kebutuhan_month'])."' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
 									echo "</td>";
+									$price_from_supplier = $valx['price_from_supplier'];
+									$total_budget = $price_from_supplier * $valx['kebutuhan_month'];
+									echo "<td align='left'>";
+										echo "<input name='detail[".$valxHeader['id'].$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='".$price_from_supplier."'>";
+									echo "</td>";
+									echo "<td align='right' class='cal_tot_budget'>".number_format($total_budget,2)."</td>";
 									echo "<td align='left'>";
 										echo "<select name='detail[".$valxHeader['id'].$id."][satuan]' data-no='".$valxHeader['id'].$id."' id='satuan_".$valxHeader['id'].$id."' class='chosen_select form-control input-sm'>";
 										echo "<option value='0'>Select Satuan</option>";
@@ -115,18 +127,29 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 										echo "&nbsp;<button type='button' class='btn btn-sm btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i></button>";
 									echo "</td>";
 								echo "</tr>";
+
+								$SUM_QTY += $valx['kebutuhan_month'];
+								$SUM_BUDGET += $total_budget;
 							}
 						}
 					?>
 					<tr id='add_<?=$valxHeader['id'].$id;?>' class='<?=$id;?>'>
 						<td align='center'></td>
 						<td align='left'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' data-id_barang='<?=$valxHeader['id'];?>' class='btn btn-sm btn-success addPart' title='Add Item'><i class='fa fa-plus'></i>&nbsp;&nbsp;Add Item</button></td>
-						<td align='center'></td>
-						<td align='center'></td> 
-						<td align='center'></td>
-						<td align='center'></td>
+						<td align='center' colspan='6'></td>
 					</tr>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th align='center'></th>
+						<th align='center'>TOTAL BUDGET</th>
+						<th align='center'></th>
+						<th class='text-right'><?=number_format($SUM_QTY);?></th>
+						<th align='center'></th>
+						<th class='text-right'><?=number_format($SUM_BUDGET,2);?></th>
+						<th align='center' colspan='2'></th>
+					</tr>
+				</tfoot>
 			</table>
 			<br>
 			<?php
@@ -154,6 +177,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 	$(document).ready(function(){
 		$('.maskM').maskMoney();
 		$('.chosen_select').chosen();
+		$(".autoNumeric2").autoNumeric('init', {mDec: '4', aPad: false});
 	});
 	$(document).on('click', '#back', function(e){
 		window.location.href = base_url + active_controller+'/index_rutin';
@@ -179,6 +203,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 				$("#add_"+id_bef).remove();
 				$('.chosen_select').chosen({width: '100%'});
 				$('.maskM').maskMoney();
+				$(".autoNumeric2").autoNumeric('init', {mDec: '4', aPad: false});
 				swal.close();
 			},
 			error: function() {
@@ -198,7 +223,13 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 	$(document).on('change', '.getSpec', function(){
 		var no 				= $(this).data('no');
 		var jenis_barang	= $(this).val();
+		var price_sup 		= $(this).find(':selected').data('price_sup');
 		var item_sat 		= $('#satuan_'+no);
+
+		var HTML = $(this).parent().parent()
+		var getPSub = HTML.find('.price_from_supplier')
+		getPSub.val(price_sup)
+
 		if(jenis_barang == '0'){
 			swal({
 				title	: "Error Message!",
@@ -232,10 +263,20 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 			}
 		});
 	});
-	
+
 	$(document).on('click', '.delPart', function(){
 		var get_id 		= $(this).parent().parent().attr('class');
 		$("."+get_id).remove();
+	});
+	
+	$(document).on('keyup', '.kebutuhan_month', function(){
+		var qty			= getNum($(this).val().split(",").join(""))
+		var HTML 		= $(this).parent().parent()
+		var price_sup 	= getNum(HTML.find('.price_from_supplier').val().split(",").join(""))
+		var budget 		= HTML.find('.cal_tot_budget')
+		// console.log(qty)
+		// console.log(price_sup)
+		budget.text(price_sup*qty)
 	});
 	
 	$(document).on('click', '#save', function(e){

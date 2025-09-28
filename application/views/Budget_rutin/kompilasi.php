@@ -22,7 +22,7 @@ $this->load->view('include/side_menu');
 						<th class="text-left th">BRAND</th>
 						<th class="text-left th">TOTAL</th>
 						<th class="text-right th">PRICE FROM SUPPLIER</th>
-						<th class="text-right th">TOTAL</th>
+						<th class="text-right th">TOTAL BUDGET</th>
 						<th class="text-left th">UNIT</th>
 						<?php
 						foreach($group_header AS $val => $valx){
