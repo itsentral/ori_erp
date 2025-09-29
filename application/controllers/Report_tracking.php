@@ -379,6 +379,7 @@ class Report_tracking extends CI_Controller {
 								j.nilai_unit AS nilai_fg,
 								k.nilai_unit AS nilai_intransit,
 								l.nilai_unit AS nilai_incustomer,
+								m.nilai_unit AS nilai_cogs,
 								k.kode_delivery,
 								k.kode_spool
 								')
@@ -394,6 +395,7 @@ class Report_tracking extends CI_Controller {
 							->join('data_erp_fg j','h.id_trans=j.id_trans AND h.jenis="in" AND j.jenis="in"','left')
 							->join('data_erp_in_transit k','j.id_trans=k.id_trans AND j.jenis="in" AND k.jenis="in" AND j.id_pro=k.id_pro','left')
 							->join('data_erp_in_customer l','l.id_trans=k.id_trans AND l.jenis="in" AND k.jenis="in" AND l.id_pro=k.id_pro','left')
+							->join('data_erp_cogs m','m.id_trans=l.id_trans AND m.jenis="in" AND l.jenis="in" AND m.id_pro=l.id_pro','left')
 							->get_where('so_detail_header a', array('a.id_bq'=>$no_ipp))
 							->result_array();
 
