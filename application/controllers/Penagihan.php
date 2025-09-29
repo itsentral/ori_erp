@@ -4256,7 +4256,7 @@ else
             $tgl1       		= $gethd->tgl_invoice;
 
 		   print_r($tgl1);
-		   exit
+		   exit;
 			$this->db->query("INSERT INTO data_erp_in_customer (tanggal,keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,jenis,id_material,nm_material,qty_mat,cost_book,gudang,kode_spool)			
 			SELECT ".$tgl1.",keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,'out',id_material,nm_material,qty_mat,cost_book,gudang,kode_spool FROM data_erp_in_customer WHERE kode_delivery IN (".$kode_delivery.")");
 
