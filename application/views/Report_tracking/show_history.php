@@ -26,6 +26,7 @@
             <th class="text-right">IN<br>TRANSIT</th>
             <th class="text-right">DELIVERY<br>CODE</th>
             <th class="text-right">IN<br>CUSTOMER</th>
+            <th class="text-right">IN<br>COGS</th>
         </tr>
     </thead>
     <tbody>
@@ -44,6 +45,7 @@
                 $nilai_fg = (!empty($row_Cek['nilai_fg']))?number_format($row_Cek['nilai_fg']):'';
                 $nilai_intransit = (!empty($row_Cek['nilai_intransit']))?number_format($row_Cek['nilai_intransit']):'';
                 $nilai_incustomer = (!empty($row_Cek['nilai_incustomer']))?number_format($row_Cek['nilai_incustomer']):'';
+                $nilai_cogs = (!empty($row_Cek['nilai_cogs']))?number_format($row_Cek['nilai_cogs']):'';
                 $kode_delivery = (!empty($row_Cek['kode_delivery']))?$row_Cek['kode_delivery']:'';
 
                 $qty_mix = (!empty($row_Cek['qty_mix']))?number_format($row_Cek['qty_mix']):'';
@@ -77,6 +79,7 @@
                     echo "<td align='right'>".$nilai_intransit."</td>";
                     echo "<td align='center'>".$kode_delivery."</td>";
                     echo "<td align='right'>".$nilai_incustomer."</td>";
+                    echo "<td align='right'>".$nilai_cogs."</td>";
                 echo "</tr>";
             }
         }
