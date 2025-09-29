@@ -900,17 +900,26 @@ function get_DealSONonFRP($id_bq) {
         $QTY_DEAL   = (!empty($value['qty_deal']))?$value['qty_deal']:0;
 
         $TOTAL_SELLING  = (!empty($value['total_so']))?$value['total_so']:0;
-        $UNIT_SELLING   = $TOTAL_SELLING / $QTY_SO;
+        $UNIT_SELLING   = 0;
+        if($TOTAL_SELLING > 0 AND $QTY_SO > 0){
+            $UNIT_SELLING   = $TOTAL_SELLING / $QTY_SO;
+        }
 
         $TOTAL_DEAL     = (!empty($value['total_deal']))?$value['total_deal']:0;
-        $UNIT_DEAL      = $TOTAL_DEAL / $QTY_DEAL;
+        $UNIT_DEAL      = 0;
+        if($TOTAL_DEAL > 0 AND $QTY_DEAL > 0){
+            $UNIT_DEAL      = $TOTAL_DEAL / $QTY_DEAL;
+        }
 
         $COMPARE    = 0;
         if($UNIT_DEAL != 0 AND $UNIT_SELLING != 0){
             $COMPARE    = $UNIT_DEAL / $UNIT_SELLING;
         }
 
-        $PRICE_UNIT = ($value['unit_price']/$QTY_SO) * $COMPARE;
+        $PRICE_UNIT    = 0;
+        if($value['unit_price'] != 0 AND $QTY_SO != 0){
+            $PRICE_UNIT = ($value['unit_price']/$QTY_SO) * $COMPARE;
+        }
         $PRICE_QTY  = $PRICE_UNIT*$QTY_DEAL;
         $PROFIT     = $PRICE_QTY + (($value['profit']/100)*$PRICE_QTY);
         $ALLOWANCE  = $PROFIT + (($value['allowance']/100)*$PROFIT);
