@@ -121,6 +121,7 @@ class Con_nonmat extends CI_Controller {
 			foreach ($data['update_data'] as $key => $value) {
 				$ArrayUpdate[$key]['id'] 		= $key;
 				$ArrayUpdate[$key]['purchase'] 	= str_replace(',','',$value['qty']);
+				$ArrayUpdate[$key]['price_from_supplier'] 	= str_replace(',','',$value['price_from_supplier']);
 			}
 		}
 		$tgl_dibutuhkan = $value['tanggal'];
@@ -142,6 +143,7 @@ class Con_nonmat extends CI_Controller {
 				$ArrayInsert[$key]['tanggal'] 		= (!empty($value['dibutuhkan']))?date('Y-m-d',strtotime($value['dibutuhkan'])):$tgl_dibutuhkan;
 				$ArrayInsert[$key]['spec_pr'] 		= $value['spec'];
 				$ArrayInsert[$key]['info_pr'] 		= $value['info'];
+				$ArrayInsert[$key]['price_from_supplier'] 		= $value['price_from_supplier'];
 
 				$ArrayInsertHeader[$key]['no_Pengajuan_group']= $pengajuangroup;
 				$ArrayInsertHeader[$key]['no_pengajuan'] 		= $kodeP;
@@ -191,23 +193,27 @@ class Con_nonmat extends CI_Controller {
 	public function get_add(){
 		$id = $this->uri->segment(3);
 		$id_category = $this->uri->segment(4);
-		$jenis_barang		= $this->db->select('code_group,material_name,spec')->get_where('con_nonmat_new',array('category_awal'=>$id_category,'deleted'=>'N'))->result_array();
-
+		// $jenis_barang		= $this->db->select('code_group,material_name,spec')->get_where('con_nonmat_new',array('category_awal'=>$id_category,'deleted'=>'N'))->result_array();
+		$jenis_barang		= $this->db
+									->select('a.code_group,a.material_name,a.spec,b.price_from_supplier')
+									->join('accessories b','a.code_group=b.id_material','left')
+									->get_where('con_nonmat_new a',array('a.category_awal'=>$id_category,'a.deleted'=>'N'))->result_array();
 		$d_Header = "";
 		// $d_Header .= "<tr>";
 		$d_Header .= "<tr class='header_".$id."'>";
 			$d_Header .= "<td align='center'>".$id."</td>";
 			$d_Header .= "<td align='left'>";
-				$d_Header .= "<select name='detail[".$id."][id_barang]' data-no='".$id."' class='chosen_select form-control input-sm getSpec'>";
+				$d_Header .= "<select name='detail[".$id."][id_barang]' data-no='".$id."' class='chosen_select form-control input-sm getSpec getSpec2'>";
 				$d_Header .= "<option value='0'>Select Barang</option>";
 				foreach($jenis_barang AS $val => $valx){
-				  $d_Header .= "<option value='".$valx['code_group']."'>".strtoupper($valx['material_name']." - ".$valx['spec'])."</option>";
+					$price_sup = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
+				  $d_Header .= "<option value='".$valx['code_group']."' data-price_sup='".$price_sup."'>".strtoupper($valx['code_group'].' - '.$valx['material_name']." - ".$valx['spec'])."</option>";
 				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left' class='rutin_category'></td>";
 			$d_Header .= "<td align='left'>";
-				$d_Header .= "<input name='detail[".$id."][qty]' class='form-control text-center input-md numberOnly2'>";
+				$d_Header .= "<input name='detail[".$id."][qty]' class='form-control text-center input-md numberOnly2 kebutuhan_month'>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left' class='rutin_unit'></td>";
 			$d_Header .= "<td align='left'>";
@@ -222,6 +228,10 @@ class Con_nonmat extends CI_Controller {
 			$d_Header .= "<td align='center'>";
 			$d_Header .= "&nbsp;<button type='button' class='btn btn-sm btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i></button>";
 			$d_Header .= "</td>";
+			$d_Header .= "<td align='left'>";
+				$d_Header .= "<input name='detail[".$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value=''>";
+			$d_Header .= "</td>";
+			$d_Header .= "<td align='right' class='cal_tot_budget'>0</td>";
 		$d_Header .= "</tr>";
 
 		//add part
