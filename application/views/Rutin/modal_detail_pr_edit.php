@@ -13,11 +13,15 @@
 					<th class="text-center" width='10%'>Spec PR</th>
 					<th class="text-center" width='10%'>Info PR</th>
 					<th class="text-center" width='10%'>Status</th>
+					<th class="text-right" width='8%'>Price From Supplier</th>
+					<th class="text-right" width='8%'>Total Budget</th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php
 				$no  = 0;
+				$SUM_QTY = 0;
+				$SUM_BUDGET = 0;
 				foreach($result AS $val => $valx){ $no++;
 					$SPEC 		= (!empty($GET_COMSUMABLE[$valx['id_material']]['spec']))?' - '.$GET_COMSUMABLE[$valx['id_material']]['spec']:'';
 					$CATEGORY 	= get_name('con_nonmat_category_awal', 'category', 'id', $valx['category_awal']);
@@ -28,7 +32,7 @@
 						echo "<td align='left'>".$CATEGORY."</td>";
                         if($valx['sts_app'] == 'N'){
 						    echo "<td align='center'>";
-                                echo "<input type='text' name='update_data[".$valx['id']."][qty]' class='form-control input-sm numberOnly2 text-center' value='".$valx['purchase']."'>";
+                                echo "<input type='text' name='update_data[".$valx['id']."][qty]' class='form-control input-md numberOnly2 text-center kebutuhan_month' value='".$valx['purchase']."'>";
                                 echo "<input type='hidden' name='update_data[".$valx['id']."][tanggal]' value='".$valx['tanggal']."'>";
                             echo "</td>";
                         }
@@ -54,15 +58,32 @@
 						}
 						
 						echo "<td align='center'><span class='badge bg-".$warna."'>".$sts_name."</span></td>";
+						$price_from_supplier = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
+						$total_budget = $price_from_supplier * $valx['purchase'];
+						echo "<td align='left'>";
+							echo "<input name='update_data[".$valx['id']."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='".$price_from_supplier."'>";
+						echo "</td>";
+						echo "<td align='right' class='cal_tot_budget'>".number_format($total_budget,2)."</td>";
 					echo "</tr>";
+
+					$SUM_QTY += $valx['purchase'];
+					$SUM_BUDGET += $total_budget;
 				}
 				?>
 				<tr id='add_<?=$no;?>'>
 					<td align='center'></td>
 					<td align='left'><button type='button' data-category='<?=$valx['category_awal'];?>' class='btn btn-sm btn-success addPart' title='Add Item'><i class='fa fa-plus'></i>&nbsp;&nbsp;Add Item</button></td>
-					<td align='center' colspan='7'></td>
+					<td align='center' colspan='9'></td>
 				</tr>
 			</tbody>
+			<tfoot>
+				<tr>
+					<th align='center'></th>
+					<th align='center' colspan='8'>TOTAL BUDGET</th>
+					<th class='text-right'><?=number_format($SUM_QTY);?></th>
+					<th class='text-right'><?=number_format($SUM_BUDGET,2);?></th>
+				</tr>
+			</tfoot>
 		</table>
         <br>
         <div class='form-group row'>
@@ -82,4 +103,22 @@
 <script>
     swal.close();
     $(".numberOnly2").autoNumeric('init', {mDec: '2', aPad: false});
+
+	$(document).on('keyup', '.kebutuhan_month', function(){
+		var qty			= getNum($(this).val().split(",").join(""))
+		var HTML 		= $(this).parent().parent()
+		var price_sup 	= getNum(HTML.find('.price_from_supplier').val().split(",").join(""))
+		var budget 		= HTML.find('.cal_tot_budget')
+		console.log(qty)
+		console.log(price_sup)
+		budget.text(price_sup*qty)
+	});
+
+	$(document).on('change', '.getSpec2', function(){
+		var price_sup 		= $(this).find(':selected').data('price_sup');
+		console.log(price_sup)
+		var HTML = $(this).parent().parent()
+		var getPSub = HTML.find('.price_from_supplier')
+		getPSub.val(price_sup)
+	});
 </script>

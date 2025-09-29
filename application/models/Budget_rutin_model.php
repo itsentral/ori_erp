@@ -138,6 +138,7 @@ class Budget_rutin_model extends CI_Model {
 					$ArrDetail[$val]['id_barang'] 		= $valx['id_barang'];
 					$ArrDetail[$val]['kebutuhan_month'] = str_replace(',','',$valx['kebutuhan_month']);
 					$ArrDetail[$val]['satuan'] 			= $valx['satuan'];
+					$ArrDetail[$val]['price_from_supplier'] = str_replace(',','',$valx['price_from_supplier']);
 				}
 			}
 			
@@ -211,7 +212,10 @@ class Budget_rutin_model extends CI_Model {
 
 		// $jenis_barang		= $this->db->query("SELECT * FROM con_nonmat_new WHERE category_awal='".$jenis_barangx."' ORDER BY material_name ASC, spec ASC ")->result_array();
 		$satuan				= $this->db->query("SELECT * FROM raw_pieces WHERE flag_active = 'Y' AND `delete` = 'N' ORDER BY kode_satuan ASC")->result_array();
-		$jenis_barang		= $this->db->select('code_group,material_name,spec')->get_where('con_nonmat_new',array('category_awal'=>$jenis_barangx,'deleted'=>'N'))->result_array();
+		$jenis_barang		= $this->db
+									->select('a.code_group,a.material_name,a.spec,b.price_from_supplier')
+									->join('accessories b','a.code_group=b.id_material','left')
+									->get_where('con_nonmat_new a',array('a.category_awal'=>$jenis_barangx,'a.deleted'=>'N'))->result_array();
 
 		$d_Header = "";
 		// $d_Header .= "<tr>";
@@ -221,7 +225,8 @@ class Budget_rutin_model extends CI_Model {
 				$d_Header .= "<select name='detail[".$id."][id_barang]' data-no='".$id."' class='chosen_select form-control input-sm getSpec'>";
 				$d_Header .= "<option value='0'>Select Barang</option>";
 				foreach($jenis_barang AS $val => $valx){
-				  $d_Header .= "<option value='".$valx['code_group']."'>".strtoupper($valx['material_name']." - ".$valx['spec'])."</option>";
+					$price_sup = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
+				  $d_Header .= "<option value='".$valx['code_group']."' data-price_sup='".$price_sup."'>".strtoupper($valx['code_group'].' - '.$valx['material_name'])."</option>";
 				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
@@ -230,8 +235,12 @@ class Budget_rutin_model extends CI_Model {
 				$d_Header .= "<input name='detail[".$id."][spesifikasi]' id='spec_".$id."' class='form-control input-md' readonly placeholder='Spesifikasi'>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left'>";
-				$d_Header .= "<input name='detail[".$id."][kebutuhan_month]' class='form-control text-center input-md maskM' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
+				$d_Header .= "<input name='detail[".$id."][kebutuhan_month]' class='form-control text-center input-md maskM kebutuhan_month' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
 			$d_Header .= "</td>";
+			$d_Header .= "<td align='left'>";
+				$d_Header .= "<input name='detail[".$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='0'>";
+			$d_Header .= "</td>";
+			$d_Header .= "<td align='right' class='cal_tot_budget'>0</td>";
 			$d_Header .= "<td align='left'>";
 				$d_Header .= "<select name='detail[".$id."][satuan]' data-no='".$id."' id='satuan_".$id."' class='chosen_select form-control input-sm'>";
 				$d_Header .= "<option value='0'>Select Satuan</option>";
