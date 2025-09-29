@@ -195,8 +195,8 @@ class Con_nonmat extends CI_Controller {
 		$id_category = $this->uri->segment(4);
 		// $jenis_barang		= $this->db->select('code_group,material_name,spec')->get_where('con_nonmat_new',array('category_awal'=>$id_category,'deleted'=>'N'))->result_array();
 		$jenis_barang		= $this->db
-									->select('a.code_group,a.material_name,a.spec,b.price_from_supplier')
-									->join('accessories b','a.code_group=b.id_material','left')
+									->select('a.code_group,a.material_name,a.spec,b.price_supplier AS price_from_supplier')
+									->join('price_ref b','a.code_group=b.code_group AND b.deleted_date is null','left')
 									->get_where('con_nonmat_new a',array('a.category_awal'=>$id_category,'a.deleted'=>'N'))->result_array();
 		$d_Header = "";
 		// $d_Header .= "<tr>";
@@ -231,7 +231,7 @@ class Con_nonmat extends CI_Controller {
 			$d_Header .= "<td align='left'>";
 				$d_Header .= "<input name='detail[".$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value=''>";
 			$d_Header .= "</td>";
-			$d_Header .= "<td align='right' class='cal_tot_budget'>0</td>";
+			$d_Header .= "<td align='right' style='vertical-align:middle;' class='cal_tot_budget'>0</td>";
 		$d_Header .= "</tr>";
 
 		//add part

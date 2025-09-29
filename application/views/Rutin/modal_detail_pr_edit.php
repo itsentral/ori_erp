@@ -61,7 +61,7 @@
 						$price_from_supplier = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
 						$total_budget = $price_from_supplier * $valx['purchase'];
 						echo "<td align='left'>";
-							echo "<input name='update_data[".$valx['id']."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='".$price_from_supplier."'>";
+							echo "<input name='update_data[".$valx['id']."][price_from_supplier]' class='form-control text-right input-md numberOnly2 price_from_supplier' readonly value='".$price_from_supplier."'>";
 						echo "</td>";
 						echo "<td align='right' class='cal_tot_budget'>".number_format($total_budget,2)."</td>";
 					echo "</tr>";
@@ -80,8 +80,8 @@
 				<tr>
 					<th align='center'></th>
 					<th align='center' colspan='8'>TOTAL BUDGET</th>
-					<th class='text-right'><?=number_format($SUM_QTY);?></th>
-					<th class='text-right'><?=number_format($SUM_BUDGET,2);?></th>
+					<th class='text-right'></th>
+					<th class='text-right' id='cal_tot_budget'><?=number_format($SUM_BUDGET,2);?></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -111,7 +111,14 @@
 		var budget 		= HTML.find('.cal_tot_budget')
 		console.log(qty)
 		console.log(price_sup)
-		budget.text(price_sup*qty)
+		budget.text(number_format(price_sup*qty,2))
+
+		let SUM = 0
+		$('.cal_tot_budget').each(function(){
+			var budget	= getNum($(this).text().split(",").join(""))
+			SUM += budget
+		})
+		$('#cal_tot_budget').text(number_format(SUM,2))
 	});
 
 	$(document).on('change', '.getSpec2', function(){
@@ -119,6 +126,6 @@
 		console.log(price_sup)
 		var HTML = $(this).parent().parent()
 		var getPSub = HTML.find('.price_from_supplier')
-		getPSub.val(price_sup)
+		getPSub.val(number_format(price_sup))
 	});
 </script>

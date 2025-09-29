@@ -6590,7 +6590,7 @@
 	function getPriceAccessoriesMaster($id_material){
 		$CI 		=& get_instance();
 		$date		= date('Y-m-d');
-		$sqlExp 	= "SELECT price_from_supplier FROM accessories WHERE id_material='".$id_material."' LIMIT 1";
+		$sqlExp 	= "SELECT price_supplier AS price_from_supplier FROM price_ref WHERE code_group='".$id_material."' AND deleted_date is null LIMIT 1";
 		$restExp 	= $CI->db->query($sqlExp)->result();
 		$price_from_supplier	= (!empty($restExp[0]->price_from_supplier))?$restExp[0]->price_from_supplier:0;
 
