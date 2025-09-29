@@ -3794,7 +3794,7 @@ else
 		$created_on      = date('Y-m-d H:i:s');
 		$created_by     = $data_session['ORI_User']['username'];
 		$no_delivery	= $gethd->delivery_no;
-		//$kode_delivery  ="('".implode("','", $no_delivery)."')";
+		$kode_delivery  ="'" . str_replace(",", "','", $no_delivery) . "'"; 
 
 		$this->db->trans_begin();
 		$db2->trans_begin();
@@ -4255,7 +4255,7 @@ else
 			if($kodejurnal1		= 'JV061'){
             
 			$this->db->query("INSERT INTO data_erp_in_customer (tanggal,keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,jenis,id_material,nm_material,qty_mat,cost_book,gudang,kode_spool)			
-			SELECT ".$tgl.",keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,'out',id_material,nm_material,qty_mat,cost_book,gudang,kode_spool FROM data_erp_in_customer WHERE kode_delivery IN ".$no_delivery."");
+			SELECT ".$tgl.",keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,'out',id_material,nm_material,qty_mat,cost_book,gudang,kode_spool FROM data_erp_in_customer WHERE kode_delivery IN ".$kode_delivery."");
 			}
 			
 
