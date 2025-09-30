@@ -629,6 +629,9 @@ class Request_payment extends CI_Controller {
 		$UserName = $data_session['ORI_User']['id_user'];
 		$dat_nomor_jurnal=array();
 
+		print_r($status);
+		exit;
+
 		if (!empty($status)) {
 			foreach ($status as $keys => $val) {
 				if ($bank_nilai[$keys] <> 0) {
@@ -829,6 +832,7 @@ class Request_payment extends CI_Controller {
 					$totalkr=($totalkr+$keys->kredit);
 					$noref=$keys->no_reff;
 				}
+
 				if($totaldb!=$totalkr){
 					$nilaiakhir=($totaldb-$totalkr);
 					$ndb=0;$nkr=0;
