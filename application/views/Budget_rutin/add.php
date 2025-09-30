@@ -113,7 +113,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 									echo "<td align='left'>";
 										echo "<input name='detail[".$valxHeader['id'].$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='".$price_from_supplier."'>";
 									echo "</td>";
-									echo "<td align='right' class='cal_tot_budget'>".number_format($total_budget,2)."</td>";
+									echo "<td align='right' style='vertical-align:middle;' class='cal_tot_budget'>".number_format($total_budget,2)."</td>";
 									echo "<td align='left'>";
 										echo "<select name='detail[".$valxHeader['id'].$id."][satuan]' data-no='".$valxHeader['id'].$id."' id='satuan_".$valxHeader['id'].$id."' class='chosen_select form-control input-sm'>";
 										echo "<option value='0'>Select Satuan</option>";
@@ -177,7 +177,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 	$(document).ready(function(){
 		$('.maskM').maskMoney();
 		$('.chosen_select').chosen();
-		$(".autoNumeric2").autoNumeric('init', {mDec: '4', aPad: false});
+		$(".autoNumeric2").autoNumeric('init', {mDec: '0', aPad: false});
 	});
 	$(document).on('click', '#back', function(e){
 		window.location.href = base_url + active_controller+'/index_rutin';
@@ -203,7 +203,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 				$("#add_"+id_bef).remove();
 				$('.chosen_select').chosen({width: '100%'});
 				$('.maskM').maskMoney();
-				$(".autoNumeric2").autoNumeric('init', {mDec: '4', aPad: false});
+				$(".autoNumeric2").autoNumeric('init', {mDec: '0', aPad: false});
 				swal.close();
 			},
 			error: function() {
@@ -228,7 +228,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 
 		var HTML = $(this).parent().parent()
 		var getPSub = HTML.find('.price_from_supplier')
-		getPSub.val(price_sup)
+		getPSub.val(number_format(price_sup))
 
 		if(jenis_barang == '0'){
 			swal({
@@ -276,7 +276,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 		var budget 		= HTML.find('.cal_tot_budget')
 		// console.log(qty)
 		// console.log(price_sup)
-		budget.text(price_sup*qty)
+		budget.text(number_format(price_sup*qty,2))
 	});
 	
 	$(document).on('click', '#save', function(e){

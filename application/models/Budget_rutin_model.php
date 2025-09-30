@@ -41,7 +41,7 @@ class Budget_rutin_model extends CI_Model {
 		}
 		
 		$group_header = $this->db->query("SELECT department, costcenter FROM budget_rutin_header GROUP BY department, costcenter")->result_array();
-		$group_barang = $this->db->query("SELECT id_barang, jenis_barang, satuan FROM budget_rutin_detail ".$WHERE." GROUP BY id_barang ORDER BY jenis_barang ASC, id_barang")->result_array();
+		$group_barang = $this->db->query("SELECT id_barang, jenis_barang, satuan, price_from_supplier FROM budget_rutin_detail ".$WHERE." GROUP BY id_barang ORDER BY jenis_barang ASC, id_barang")->result_array();
 		
 		$data = array(
 			'title'			=> 'Compile Budget'.$nm_category,
@@ -213,8 +213,8 @@ class Budget_rutin_model extends CI_Model {
 		// $jenis_barang		= $this->db->query("SELECT * FROM con_nonmat_new WHERE category_awal='".$jenis_barangx."' ORDER BY material_name ASC, spec ASC ")->result_array();
 		$satuan				= $this->db->query("SELECT * FROM raw_pieces WHERE flag_active = 'Y' AND `delete` = 'N' ORDER BY kode_satuan ASC")->result_array();
 		$jenis_barang		= $this->db
-									->select('a.code_group,a.material_name,a.spec,b.price_from_supplier')
-									->join('accessories b','a.code_group=b.id_material','left')
+									->select('a.code_group,a.material_name,a.spec,b.price_supplier AS price_from_supplier')
+									->join('price_ref b','a.code_group=b.code_group AND b.deleted_date is null','left')
 									->get_where('con_nonmat_new a',array('a.category_awal'=>$jenis_barangx,'a.deleted'=>'N'))->result_array();
 
 		$d_Header = "";
@@ -240,7 +240,7 @@ class Budget_rutin_model extends CI_Model {
 			$d_Header .= "<td align='left'>";
 				$d_Header .= "<input name='detail[".$id."][price_from_supplier]' class='form-control text-right input-md autoNumeric2 price_from_supplier' readonly value='0'>";
 			$d_Header .= "</td>";
-			$d_Header .= "<td align='right' class='cal_tot_budget'>0</td>";
+			$d_Header .= "<td align='right' style='vertical-align:middle;' class='cal_tot_budget'>0</td>";
 			$d_Header .= "<td align='left'>";
 				$d_Header .= "<select name='detail[".$id."][satuan]' data-no='".$id."' id='satuan_".$id."' class='chosen_select form-control input-sm'>";
 				$d_Header .= "<option value='0'>Select Satuan</option>";
