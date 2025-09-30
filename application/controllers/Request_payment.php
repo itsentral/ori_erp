@@ -629,8 +629,8 @@ class Request_payment extends CI_Controller {
 		$UserName = $data_session['ORI_User']['id_user'];
 		$dat_nomor_jurnal=array();
 
-		print_r($status);
-		exit;
+		// print_r($status);
+		// exit;
 
 		if (!empty($status)) {
 			foreach ($status as $keys => $val) {
