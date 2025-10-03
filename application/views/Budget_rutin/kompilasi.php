@@ -54,8 +54,9 @@ $this->load->view('include/side_menu');
 							$SUM_QTY += $total_kebutuhan;
 							
 							echo "<td class='text-right'>".number_format($total_kebutuhan)."</td>";
-							$PriceFromSupplier = getPriceAccessoriesMaster($valx['id_barang']);
-							$price_from_supplier = $PriceFromSupplier['price_from_supplier'];
+							// $PriceFromSupplier = getPriceAccessoriesMaster($valx['id_barang']);
+							// $price_from_supplier = $PriceFromSupplier['price_from_supplier'];
+							$price_from_supplier = $valx['price_from_supplier'];
 							$total_cost = $price_from_supplier*$total_kebutuhan;
 							$SUM_COST += $total_cost;
 							echo "<td class='text-right'>".number_format($price_from_supplier,2)."</td>";

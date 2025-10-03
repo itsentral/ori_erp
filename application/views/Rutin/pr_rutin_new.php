@@ -246,6 +246,13 @@ $this->load->view('include/side_menu');
 	$(document).on('click', '.delPart', function(){
 		var get_id 		= $(this).parent().parent().attr('class');
 		$("."+get_id).remove();
+
+		let SUM = 0
+		$('.cal_tot_budget').each(function(){
+			var budget	= getNum($(this).text().split(",").join(""))
+			SUM += budget
+		})
+		$('#cal_tot_budget').text(number_format(SUM,2))
 	});
 		
 	function DataTables(tanda = null){
