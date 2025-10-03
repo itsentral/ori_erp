@@ -3304,7 +3304,7 @@ class Jurnal_nomor extends CI_Controller {
 
 			    $debit  = $totalwip;			
 				
-				if($totalwip != 0 ){
+				
 					 $det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -3319,7 +3319,7 @@ class Jurnal_nomor extends CI_Controller {
 					  'stspos'		  =>1
 					   );
 					
-				}else{					 
+								 
 								
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
@@ -3391,7 +3391,7 @@ class Jurnal_nomor extends CI_Controller {
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					 );
-				}
+				
 				
 			}
 			
