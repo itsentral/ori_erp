@@ -3293,11 +3293,11 @@ class Jurnal_nomor extends CI_Controller {
 				$id          		  = $data->id_trans;
 				$no_request           = $data->id_trans;
 				$totalmaterial        = $data->material;	
-				$totaldl              = $data->direct_labour;
-				$totalidl             = $data->indirect_labour;	
-				$totalconsum          = $data->consumable;
-				$totalfoh             = $data->foh;	
-              	$totalwip             = $data->wip;	
+				$totaldl              = $data->wip_direct;
+				$totalidl             = $data->wip_indirect;	
+				$totalconsum          = $data->wip_consumable;
+				$totalfoh             = $data->wip_foh;	
+              	$totalwip             = $data->nilai_wip;	
 				
 				
 				
