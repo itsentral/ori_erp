@@ -43,7 +43,7 @@ $this->load->view('include/side_menu');
 						echo "<tr>";
 							echo "<td class='text-center'>".$val."</td>";
 							echo "<td class='text-left'>".strtoupper(get_name('con_nonmat_category_awal', 'category', 'id', $valx['jenis_barang']))."</td>";
-							echo "<td class='text-left'>".strtoupper(get_name('con_nonmat_new', 'material_name', 'code_group', $valx['id_barang']))."</td>";
+							echo "<td class='text-left'>".$valx['id_barang']." - ".strtoupper(get_name('con_nonmat_new', 'material_name', 'code_group', $valx['id_barang']))."</td>";
 							echo "<td class='text-left'>".strtoupper(get_name('con_nonmat_new', 'spec', 'code_group', $valx['id_barang']))."</td>";
 							echo "<td class='text-left'>".strtoupper(get_name('con_nonmat_new', 'brand', 'code_group', $valx['id_barang']))."</td>";
 							$total_kebutuhan = 0;
