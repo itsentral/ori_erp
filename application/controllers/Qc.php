@@ -4662,109 +4662,339 @@ class Qc extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-	        $idtrans = str_replace('-','',$kode);
+		$idtrans = str_replace('-','',$kode);
 
+		
+		$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+		
+		$totalfg =0;
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+		$det_Jurnaltes = [];
 			
-			$totalfg =0;
-			  
-			$det_Jurnaltes = [];
-			  
-			foreach($fg AS $data){
-				
-				$nm_material = $data->product;	
-				$tgl_voucher = $data->tanggal;
-				$fg_txt         ='FINISHED GOOD'; 
-				$wip_txt         ='COGS';	
-				$spasi       = ',';
-				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
-				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
-               	$no_request  = $data->no_spk;	
-				
-				$wip           	= $data->wip;
-				$material      	= $data->material;
-				$wip_direct    	= $data->wip_direct;
-				$wip_indirect  	= $data->wip_indirect;
-				$wip_foh       	= $data->wip_foh;
-				$wip_consumable = $data->wip_consumable;
-				$finishgood    	= $data->finishgood;
-				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
-				
-				$totalfg        = $finishgood;
-				if ($nm_material=='pipe'){			
-				$coa_wip 		='1103-03-02';	
-				}else{
-				$coa_wip 		='1103-03-03';						
-				}					
-				$coafg   		='1103-04-01';
-                				
-					 $det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coafg,
-					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id.$noso,
-					  'debet'         => $finishgood,
-					  'kredit'        => 0,
-					  'jenis_jurnal'  => 'WIP to Fg Spool tanki',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					  
-					 ); 	
-					 
-					  $det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $coa_wip,
-					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id.$noso,
-					  'debet'         => 0,
-					  'kredit'        => $finishgood,
-					  'jenis_jurnal'  => 'WIP to Fg Spool tanki',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					  
-					 ); 		
-				
-			}
-
+		foreach($fg AS $data){
 			
-			        
-				
+			$nm_material = $data->product;	
+			$tgl_voucher = $data->tanggal;
+			$fg_txt         ='FINISHED GOOD'; 
+			$wip_txt         ='COGS';	
+			$spasi       = ',';
+			$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+			$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+			$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+			$id          = $data->id_trans;
+			$noso 		 = ','.$data->no_so;
+			$no_request  = $data->no_spk;	
 			
-			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
-			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			$wip           	= $data->wip;
+			$material      	= $data->material;
+			$wip_direct    	= $data->wip_direct;
+			$wip_indirect  	= $data->wip_indirect;
+			$wip_foh       	= $data->wip_foh;
+			$wip_consumable = $data->wip_consumable;
+			$finishgood    	= $data->finishgood;
+			$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
 			
+			$totalfg        = $finishgood;
+			if ($nm_material=='pipe'){			
+			$coa_wip 		='1103-03-02';	
+			}else{
+			$coa_wip 		='1103-03-03';						
+			}					
+			$coafg   		='1103-04-01';
+							
+					$det_Jurnaltes[]  = array(
+					'nomor'         => '',
+					'tanggal'       => $tgl_voucher,
+					'tipe'          => 'JV',
+					'no_perkiraan'  => $coafg,
+					'keterangan'    => $keterangan1,
+					'no_reff'       => $id.$noso,
+					'debet'         => $finishgood,
+					'kredit'        => 0,
+					'jenis_jurnal'  => 'WIP to Fg Spool tanki',
+					'no_request'    => $no_request,
+					'stspos'		  =>1
+					
+					); 	
+					
+					$det_Jurnaltes[]  = array(
+					'nomor'         => '',
+					'tanggal'       => $tgl_voucher,
+					'tipe'          => 'JV',
+					'no_perkiraan'  => $coa_wip,
+					'keterangan'    => $keterangan1,
+					'no_reff'       => $id.$noso,
+					'debet'         => 0,
+					'kredit'        => $finishgood,
+					'jenis_jurnal'  => 'WIP to Fg Spool tanki',
+					'no_request'    => $no_request,
+					'stspos'		  =>1
+					
+					); 		
 			
-			
-			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
-			$Bln	= substr($tgl_voucher,5,2);
-			$Thn	= substr($tgl_voucher,0,4);
-			$idlaporan = $id;
-			$Keterangan_INV = 'WIP to Fg Spool tanki'.$keterangan;
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-			$this->db->insert(DBACC.'.javh',$dataJVhead);
-			$datadetail=array();
-			foreach ($det_Jurnaltes as $vals) {
-				$datadetail = array(
-					'tipe'			=> 'JV',
-					'nomor'			=> $Nomor_JV,
-					'tanggal'		=> $tgl_voucher,
-					'no_perkiraan'	=> $vals['no_perkiraan'],
-					'keterangan'	=> $vals['keterangan'],
-					'no_reff'		=> $vals['no_reff'],
-					'debet'			=> $vals['debet'],
-					'kredit'		=> $vals['kredit'],
-					);
-				$this->db->insert(DBACC.'.jurnal',$datadetail);
-			}
-			unset($det_Jurnaltes);unset($datadetail);
-		  
 		}
+
+		
+				
+			
+		
+		$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
+		$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+		
+		
+		
+		$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+		$Bln	= substr($tgl_voucher,5,2);
+		$Thn	= substr($tgl_voucher,0,4);
+		$idlaporan = $id;
+		$Keterangan_INV = 'WIP to Fg Spool tanki'.$keterangan;
+		$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+		$this->db->insert(DBACC.'.javh',$dataJVhead);
+		$datadetail=array();
+		foreach ($det_Jurnaltes as $vals) {
+			$datadetail = array(
+				'tipe'			=> 'JV',
+				'nomor'			=> $Nomor_JV,
+				'tanggal'		=> $tgl_voucher,
+				'no_perkiraan'	=> $vals['no_perkiraan'],
+				'keterangan'	=> $vals['keterangan'],
+				'no_reff'		=> $vals['no_reff'],
+				'debet'			=> $vals['debet'],
+				'kredit'		=> $vals['kredit'],
+				);
+			$this->db->insert(DBACC.'.jurnal',$datadetail);
+		}
+		unset($det_Jurnaltes);unset($datadetail);
+		
+	}
+
+	public function so_material(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))) . '/so_material';
+		$Arr_Akses			= getAcccesmenu($controller);
+
+		if ($Arr_Akses['read'] != '1') {
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+		$data_Group	= $this->master_model->getArray('groups', array(), 'id', 'name');
+		$data = array(
+			'title'			=> 'QC SO Material',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses
+		);
+		history('View data qc so material');
+		$this->load->view('Qc/so_material', $data);
+	}
+
+	public function server_side_so_material(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))) . '/so_material';
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_so_material(
+			$requestData['status'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+		$urut2  = 0;
+
+		$FLAG = $requestData['status'];
+		foreach ($query->result_array() as $row) {
+			$total_data     = $totalData;
+			$start_dari     = $requestData['start'];
+			$asc_desc       = $requestData['order'][0]['dir'];
+			if ($asc_desc == 'asc') {
+				$nomor = $urut1 + $start_dari;
+			}
+			if ($asc_desc == 'desc') {
+				$nomor = ($total_data - $start_dari) - $urut2;
+			}
+
+			$check	= "<button class='btn btn-sm btn-success check_real' title='Release QC' data-kode_trans='" . $row['kode_trans'] . "'><i class='fa fa-check'></i></button>";
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>" . $nomor . "</div>";
+			$nestedData[]	= "<div align='center'>" . $row['so_number'] . "</div>";
+			$nestedData[]	= "<div align='center'>" . $row['no_ipp'] . "</div>";
+			// $nestedData[]	= "<div align='center'>" . $row['no_spk'] . "</div>";
+			$nestedData[]	= "<div align='center'>" . $row['qty'] . "</div>";
+			$nestedData[]	= "<div align='center'>
+									" . $check . "
+								</div>";
+
+			$data[] = $nestedData;
+			$urut1++;
+			$urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval($requestData['draw']),
+			"recordsTotal"    	=> intval($totalData),
+			"recordsFiltered" 	=> intval($totalFiltered),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_so_material($status, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$where = "";
+		$where2 = "";
+
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.*,
+				b.so_number
+			FROM
+				outgoing_so_material a
+				LEFT JOIN so_number b ON CONCAT('BQ-',a.no_ipp)=b.id_bq,
+				(SELECT @row:=0) r
+			WHERE 1=1 " . $where . " " . $where2 . "
+				AND a.qc_date IS NULL
+				AND a.deleted_date IS NULL
+				AND (
+					a.no_ipp LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR a.no_spk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+					OR b.so_number LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+				)
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'b.so_number',
+			2 => 'no_ipp',
+			3 => 'qty'
+		);
+
+		$sql .= " ORDER BY a.created_date DESC, " . $columns_order_by[$column_order] . " " . $column_dir . " ";
+		$sql .= " LIMIT " . $limit_start . " ," . $limit_length . " ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	public function modal_qc_so_material(){
+		$kode_trans 	= $this->uri->segment(3);
+		$header = $this->db->get_where('outgoing_so_material', array('kode_trans' => $kode_trans))->result_array();
+		$result = $this->db->get_where('outgoing_so_material_detail', array('kode_trans' => $kode_trans))->result_array();
+		$data = [
+			'kode_trans' => $kode_trans,
+			'header' => $header,
+			'result' => $result,
+		];
+		$this->load->view('Qc/modal_qc_so_material', $data);
+	}
+
+	public function process_qc_so_material(){
+		$data 			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$kode_trans		= $data['kode_trans'];
+		$dateTime 		= date('Y-m-d H:i:s');
+
+		$ArrFlagRelease = [
+			'qc_by' => $data_session['ORI_User']['username'],
+			'qc_date' => $dateTime
+		];
+
+		$this->db->trans_start();
+		$this->db->where('kode_trans', $kode_trans);
+		$this->db->update('outgoing_so_material', $ArrFlagRelease);
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			$Arr_Kembali	= array(
+				'pesan'		=> 'Failed process data. Please try again later ...',
+				'status'	=> 0
+			);
+		} else {
+			$this->db->trans_commit();
+			$Arr_Kembali	= array(
+				'pesan'		=> 'Success process data. Thanks ...',
+				'status'	=> 1
+			);
+			history('Release QC SO Material = ' . $kode_trans);
+		}
+		echo json_encode($Arr_Kembali);
+	}
+
+	public function process_reject_qc_so_material(){
+		$data 			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$kode_trans		= $data['kode_trans'];
+		$dateTime 		= date('Y-m-d H:i:s');
+
+		//PROSES DETAIL
+		$getDetail = $this->db->get_where('outgoing_so_material_detail', array('kode_trans' => $kode_trans))->result_array();
+		$ArrUpdate = [];
+		$ArrMaterial = [];
+		foreach ($getDetail as $key => $value) {
+			$ArrMaterial[$key]['id_material'] 	= $value['id_material'];
+			$ArrMaterial[$key]['gudang'] 	    = $value['id_gudang'];
+			$ArrMaterial[$key]['qty'] 	        = $value['qty'];
+		}
+
+		//GROUPING UPDATE MATERIAL PER GUDANG
+		$ArrGrouping = [];
+		foreach ($ArrMaterial as $key => $value) {
+			$ArrGrouping[$value['gudang']][$key]['id'] = $value['id_material'];
+			$ArrGrouping[$value['gudang']][$key]['qty'] = $value['qty'];
+		}
+
+		$gudang_dari = 15;
+		foreach ($ArrGrouping as $key => $value) {
+			move_warehouse($value, $gudang_dari, $key, $kode_trans);
+		}
+
+		$ArrFlagRelease = [
+			'deleted_by' => $data_session['ORI_User']['username'],
+			'deleted_date' => $dateTime
+		];
+
+		$ArrFlagReleaseAdjustment = [
+			'deleted_by' => $data_session['ORI_User']['username'],
+			'deleted_date' => $dateTime,
+			'status_id' => '0'
+		];
+
+
+		// exit;
+
+		$this->db->trans_start();
+			$this->db->where('kode_trans', $kode_trans);
+			$this->db->update('outgoing_so_material', $ArrFlagRelease);
+
+			$this->db->where('kode_trans', $kode_trans);
+			$this->db->update('warehouse_adjustment', $ArrFlagReleaseAdjustment);
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			$Arr_Kembali	= array(
+				'pesan'		=> 'Failed process data. Please try again later ...',
+				'status'	=> 0
+			);
+		} else {
+			$this->db->trans_commit();
+			$Arr_Kembali	= array(
+				'pesan'		=> 'Success process data. Thanks ...',
+				'status'	=> 1
+			);
+			history('Reject QC SO Material = ' . $kode_trans);
+		}
+		echo json_encode($Arr_Kembali);
+	}
 }
