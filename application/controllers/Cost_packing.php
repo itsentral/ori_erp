@@ -697,6 +697,8 @@ class Cost_packing extends CI_Controller {
 		$area = $this->db->select('area')->group_by('area')->order_by('area','asc')->get('cost_trucking')->result_array();
 		$dest = $this->db->select('tujuan')->group_by('tujuan')->order_by('tujuan','asc')->get('cost_trucking')->result_array();
 		$truck = $this->db->select('id, nama_truck')->order_by('nama_truck','asc')->get('truck')->result_array();
+		$provinsi 		= $this->db->get('provinsi')->result_array();
+		$kabupaten 		= $this->db->get('kabupaten')->result_array();
 		
 		
 		$data = array(
@@ -706,6 +708,8 @@ class Cost_packing extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses,
 			'category'	=> $category,
 			'area'	=> $area,
+			'provinsi'	=> $provinsi,
+			'kabupaten'	=> $kabupaten,
 			'dest'	=> $dest,
 			'truck'	=> $truck
 		);
@@ -725,6 +729,8 @@ class Cost_packing extends CI_Controller {
 			$id_truck	= $data['id_truck'];
 			$area		= $data['area'];
 			$tujuan		= $data['tujuan'];
+			$prov		= $data['prov'];
+			$kota		= $data['kota'];
 			$price		= str_replace(',','',$data['price']);
 			
 			if(empty($id)){
@@ -741,6 +747,8 @@ class Cost_packing extends CI_Controller {
 				'id_truck' 		=> $id_truck,
 				'area' 			=> $area,
 				'tujuan' 		=> $tujuan,
+				'prov' 			=> $prov,
+				'kota' 			=> $kota,
 				'price' 		=> $price,
 				$by 	=> $data_session['ORI_User']['username'],
 				$cdate 	=> date('Y-m-d H:i:s')
@@ -755,6 +763,8 @@ class Cost_packing extends CI_Controller {
 					'id_truck' 		=> $history[0]->id_truck,
 					'area' 			=> $history[0]->area,
 					'tujuan' 		=> $history[0]->tujuan,
+					'prov' 			=> $history[0]->prov,
+					'kota' 			=> $history[0]->kota,
 					'price' 		=> $history[0]->price,
 					'created_by' 	=> $history[0]->created_by,
 					'created_date' 	=> $history[0]->created_date,
@@ -811,18 +821,35 @@ class Cost_packing extends CI_Controller {
 			$list_truck		= $this->db->get('truck')->result_array();
 			$list_area		= $this->db->group_by('area')->get('cost_trucking')->result_array();
 			$data_detail	= $this->db->get_where('cost_trucking', array('id'=>$id))->result_array();
+			$provinsi 		= $this->db->get('provinsi')->result_array();
 			
 			$data = array(
 				'title'			=> 'Add Trucking Local',
 				'action'		=> 'add_trucking',
 				'tanda'			=> $tanda,
 				'list_truck'	=> $list_truck,
-				'list_area'	=> $list_area,
-				'data'	=> $data_detail
+				'provinsi'		=> $provinsi,
+				'list_area'		=> $list_area,
+				'data'			=> $data_detail
 			);
 
 			$this->load->view('Cost_packing/add_trucking',$data);
 		}
+	}
+
+	public function get_kota(){
+		$id = $this->uri->segment(3);
+		$cs = $this->uri->segment(4);
+		$query	 	= "SELECT * FROM kabupaten WHERE id_prov='".$id."'";
+		$Q_result	= $this->db->query($query)->result();
+		$option 	= "<option value='0'>Select An City</option>";
+		foreach($Q_result as $row)	{
+			$selx = ($row->id_kab == $cs)?'selected':'';
+			$option .= "<option value='".$row->id_kab."' ".$selx.">".strtoupper($row->nama)."</option>";
+		}
+		echo json_encode(array(
+			'option' => $option
+		));
 	}
 
 	public function getDataJSONTrucking(){
@@ -834,6 +861,8 @@ class Cost_packing extends CI_Controller {
 			$requestData['area'],
 			$requestData['dest'],
 			$requestData['truck'],
+			$requestData['prov'],
+			$requestData['kota'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -869,6 +898,8 @@ class Cost_packing extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper($row['category'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['area'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['tujuan'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_provinsi'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_kota'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nama_truck'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['price'])."</div>";
 			// $nestedData[]	= "<div align='center'>".$updated_by."</div>";
@@ -902,7 +933,7 @@ class Cost_packing extends CI_Controller {
 		echo json_encode($json_data);
   	}
   
-	public function queryDataJSONTrucking($category, $area, $dest, $truck, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function queryDataJSONTrucking($category, $area, $dest, $truck, $prov, $kota, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		
 		$where_category = "";
 		if($category <> '0'){
@@ -924,20 +955,36 @@ class Cost_packing extends CI_Controller {
 			$where_truck = " AND a.id_truck = '".$truck."' ";
 		}
 
+		$where_prov = "";
+		if($prov <> '0'){
+			$where_prov = " AND a.prov = '".$prov."' ";
+		}
+
+		$where_kota = "";
+		if($kota <> '0'){
+			$where_kota = " AND a.kota = '".$kota."' ";
+		}
+
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
 				a.*,
-				b.nama_truck
+				b.nama_truck,
+				c.nama AS nm_provinsi,
+				d.nama AS nm_kota
 			FROM
 				cost_trucking a 
-				LEFT JOIN truck b ON a.id_truck=b.id,
+				LEFT JOIN truck b ON a.id_truck=b.id
+				LEFT JOIN provinsi c ON a.prov=c.id_prov
+				LEFT JOIN kabupaten d ON a.kota=d.id_kab,
 				(SELECT @row:=0) r
 			WHERE 1=1
 				".$where_category."
 				".$where_area."
 				".$where_dest."
 				".$where_truck."
+				".$where_prov."
+				".$where_kota."
 				AND (
 				a.area LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.tujuan LIKE '%".$this->db->escape_like_str($like_value)."%'
