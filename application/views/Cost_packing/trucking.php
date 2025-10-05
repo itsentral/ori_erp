@@ -59,21 +59,45 @@ $this->load->view('include/side_menu');
 				</select> 
 			</div>
 		</div>
+		<div class='form-group row'>
+			<div class='col-sm-2'>
+				<select id='prov' name='prov' class='form-control input-sm chosen-select'>
+					<option value='0'>All Provinsi</option>
+					<?php
+						foreach($provinsi AS $val => $valx){
+							echo "<option value='".$valx['id_prov']."'>".strtoupper($valx['nama'])."</option>"; 
+						}
+					?>
+				</select>
+			</div>
+			<div class='col-sm-3'>
+				<select id='kota' name='kota' class='form-control input-sm chosen-select'>
+					<option value='0'>All Kab/Kota</option>
+					<?php
+						foreach($kabupaten AS $val => $valx){
+							echo "<option value='".$valx['id_kab']."'>".strtoupper($valx['nama'])."</option>"; 
+						}
+					?>
+				</select>
+			</div>
+		</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
 		<table id="example1" class="table table-bordered table-striped" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center" width='5%'>#</th>
-					<th class="text-center" width='10%'>Category</th> 
-					<th class="text-center" width='18%'>Area</th>
-					<th class="text-center" width='22%'>Destination</th>
-                    <th class="text-center">Truck</th>
-                    <th class="text-center" width='10%'>Price</th>
+					<th class="text-center">#</th>
+					<th class="text-left">Category</th> 
+					<th class="text-left">Area</th>
+					<th class="text-left">Destination</th>
+					<th class="text-left">Provinsi</th>
+					<th class="text-left">Kab/Kota</th>
+                    <th class="text-left">Truck</th>
+                    <th class="text-center">Price</th>
 					<!-- <th class="text-center" width='8%'>Updated</th>
 					<th class="text-center" width='10%'>Update Time</th> -->
-					<th class="text-center" width='9%'>Option</th>
+					<th class="text-center">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -94,15 +118,19 @@ $this->load->view('include/side_menu');
             var area = $('#area').val();
             var dest = $('#dest').val();
             var truck = $('#truck').val();
-			DataTables(category,area,dest,truck);
+			var prov = $('#prov').val();
+            var kota = $('#kota').val();
+			DataTables(category,area,dest,truck,prov,kota);
 		});
 		
-		$(document).on('change','#category, #area, #dest, #truck', function(){
+		$(document).on('change','#category, #area, #dest, #truck, #prov, #kota', function(){
 			var category = $('#category').val();
             var area = $('#area').val();
             var dest = $('#dest').val();
             var truck = $('#truck').val();
-			DataTables(category,area,dest,truck);
+            var prov = $('#prov').val();
+            var kota = $('#kota').val();
+			DataTables(category,area,dest,truck,prov,kota);
 		});
 		
 		$('#btn-add').click(function(){
@@ -181,7 +209,7 @@ $this->load->view('include/side_menu');
 		
 	});
 	
-	function DataTables(category = null, area = null, dest = null, truck = null){
+	function DataTables(category = null, area = null, dest = null, truck = null, prov = null, kota = null){
 
 		var dataTable = $('#example1').DataTable({
 			"serverSide": true,
@@ -205,7 +233,9 @@ $this->load->view('include/side_menu');
 					d.category 	= category,
                     d.area 	= area,
                     d.dest 	= dest,
-                    d.truck = truck
+                    d.truck = truck,
+                    d.prov = prov,
+                    d.kota = kota
 				},
 				cache: false,
 				error: function(){
