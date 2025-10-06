@@ -63,7 +63,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 		<?php
 		foreach(get_list_jenis_rutin() AS $valH => $valxHeader){
 			$detail 		= $this->db->query("SELECT * FROM budget_rutin_detail WHERE code_budget='".$code."' AND jenis_barang='".$valxHeader['id']."' ")->result_array();
-			$jenis_barang2	= $this->db->query("SELECT a.*, b.price_from_supplier FROM con_nonmat_new a LEFT JOIN accessories b ON a.code_group=b.id_material WHERE a.category_awal='".$valxHeader['id']."' ORDER BY a.material_name ASC ")->result_array();
+			$jenis_barang2	= $this->db->query("SELECT a.*, b.price_supplier AS price_from_supplier FROM con_nonmat_new a LEFT JOIN price_ref b ON a.code_group=b.code_group AND b.deleted_date IS NULL WHERE a.category_awal='".$valxHeader['id']."' ORDER BY a.material_name ASC ")->result_array();
 			echo "<h4><b>".strtoupper($valxHeader['category'])."</b></h4>";
 			?>
 			<table class='table table-striped table-bordered table-hover table-condensed' width='100%'>
@@ -91,13 +91,15 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 								echo "<tr class='header_".$valxHeader['id'].$id."'>";
 									echo "<td align='center'>".$id."</td>";
 									echo "<td align='left'>";
-										echo "<select name='detail[".$valxHeader['id'].$id."][id_barang]' data-no='".$valxHeader['id'].$id."' data-id_barang='".$valxHeader['id']."' class='chosen_select form-control input-sm getSpec'>";
+										echo "<select name='detail[".$valxHeader['id'].$id."][id_barang]' data-no='".$valxHeader['id'].$id."' data-id_barang='".$valxHeader['id']."' class='form-control input-sm getSpec'>";
 										echo "<option value='0'>Select Barang</option>";
 										foreach($jenis_barang2 AS $val2 => $valx2){
+											if($valx['id_barang'] == $valx2['code_group']){
 											$price_sup = (!empty($valx2['price_from_supplier']))?$valx2['price_from_supplier']:0;
 
 											$dex = ($valx['id_barang'] == $valx2['code_group'])?'selected':'';
-										  echo "<option value='".$valx2['code_group']."' data-price_sup='".$price_sup."' ".$dex.">".strtoupper($valx2['code_group'].' - '.$valx2['material_name'])."</option>";
+										  	echo "<option value='".$valx2['code_group']."' data-price_sup='".$price_sup."' ".$dex.">".strtoupper($valx2['code_group'].' - '.$valx2['material_name'])."</option>";
+											}
 										}
 										echo "</select>";
 									echo "</td>";
@@ -178,6 +180,40 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 		$('.maskM').maskMoney();
 		$('.chosen_select').chosen();
 		$(".autoNumeric2").autoNumeric('init', {mDec: '0', aPad: false});
+		// $('.chosen-select').chosen('destroy');
+
+		var url = base_url+'api/getDataAccessories'
+
+        $(".cb_bu_info").select2({
+			minimumInputLength: 3,
+            theme: "classic",
+            width:'100%',
+			tags: true,
+			ajax: {
+				url: url,
+				dataType: 'json',
+				type: "GET",
+				quietMillis: 50,
+				data: function (term) {
+				    return {
+				        term: term
+				    };
+				},
+				processResults: function (data) {
+					console.log(data)
+					return {
+						results: $.map(data, function (item) {
+							return {
+								text: item.title,
+								// slug: item.slug,
+								id: item.id
+							}
+						})
+					};
+				}
+			}
+		});
+
 	});
 	$(document).on('click', '#back', function(e){
 		window.location.href = base_url + active_controller+'/index_rutin';
