@@ -6,6 +6,8 @@ $category	= (!empty($data))?$data[0]['category']:'';
 $id_truck	= (!empty($data))?$data[0]['id_truck']:'';
 $area		= (!empty($data))?$data[0]['area']:'';
 $tujuan		= (!empty($data))?$data[0]['tujuan']:'';
+$prov		= (!empty($data))?$data[0]['prov']:'';
+$kota		= (!empty($data))?$data[0]['kota']:'';
 $price		= (!empty($data))?number_format($data[0]['price']):'';
 
 $category_darat = '';
@@ -50,7 +52,7 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 					<button type='button' id='addCountry' style='font-weight: bold; font-size: 12px; margin-top: 5px; color: #175477;'>Add Truck</button>
 				</div>
 			</div>
-			<div class='form-group row'>		 	 
+			<div class='form-group row' hidden>		 	 
 				<label class='label-control col-sm-2'><b>Shipping Method <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<select name='area' id='area' class='form-control input-md'>
@@ -68,6 +70,26 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 						<?php
 							echo form_input(array('id'=>'tujuan','name'=>'tujuan','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Destination'),$tujuan);											
 						?>		
+				</div>
+			</div>		
+			<div class='form-group row'>		 	 
+				<label class='label-control col-sm-2'><b>Provinsi</b></label>
+				<div class='col-sm-4'>
+					<select name='prov' id='prov' class='form-control input-md'>
+						<option value='0'>Select Provinsi</option>
+						<?php
+						foreach($provinsi AS $val => $valx){
+							$selxc = ($prov == $valx['id_prov'])?'selected':'';
+							echo "<option value='".$valx['id_prov']."' ".$selxc.">".strtoupper($valx['nama'])."</option>";
+						}
+						?>
+					 </select>
+				</div>	 	 
+				<label class='label-control col-sm-2'><b>Kab/Kota</b></label> 
+				<div class='col-sm-4'>             
+					<select name='kota' id='kota' class='form-control input-md'>
+						<option value='0'>List Empty</option>
+					</select>	
 				</div>
 			</div>		
 			<div class='form-group row'>		 	 
@@ -112,6 +134,58 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 <script>
 	$(document).ready(function(){
 		$('.maskMoney').maskMoney();
+
+		var id = $('#id').val();
+        if(id != ''){
+			var prov = "<?php echo $prov;?>";
+			var kota = "<?php echo $kota;?>";
+			
+			$.ajax({
+				url: base_url+active_controller+'/get_kota/'+prov+'/'+kota,
+				cache: false,
+				type: "POST",
+				dataType: "json",
+				beforeSend:function(){
+					loading_spinner();
+				},
+				success: function(data){
+					$("#kota").html(data.option).trigger("chosen:updated");
+					swal.close();
+				},
+				error: function() {
+					swal({
+					title				: "Error Message !",
+					text				: 'Connection Time Out. Please try again..',
+					type				: "warning",
+					timer				: 3000,
+					});
+				}
+			});
+		}
+
+		$(document).on('change', '#prov', function(){
+			var prov = $(this).val();
+			var kota = $("#kota");
+			loading_spinner();
+			$.ajax({
+				url: base_url+active_controller+'/get_kota/'+prov,
+				cache: false,
+				type: "POST",
+				dataType: "json",
+				success: function(data){
+					$(kota).html(data.option).trigger("chosen:updated");
+					swal.close();
+				},
+				error: function() {
+					swal({
+					title				: "Error Message !",
+					text				: 'Connection Time Out. Please try again..',
+					type				: "warning",
+					timer				: 3000,
+					});
+				}
+			});
+		});
 		
 		$(document).on('click', '#addCountry', function(e){
 			e.preventDefault();

@@ -1564,7 +1564,6 @@ class Outgoing extends CI_Controller {
 		$DateTime		= date('Y-m-d H:i:s');
 		$tanda			= $data['tanda'];
 		$tipe_out		= $data['tipe_out'];
-		$tipe_out		= $data['tipe_out'];
 		$gudang			= $data['gudang'];		
 		$tujuan_out		= $data['tujuan_out'];
 		$nm_gudang_ke 	= get_name('warehouse', 'kd_gudang', 'id', $gudang);
@@ -1583,7 +1582,9 @@ class Outgoing extends CI_Controller {
 		if($field_joint == 'yes'){
 			$table_utama = 'request_outgoing';
 		}
-		// echo $no_po;
+
+		$typeSOMaterial = substr($tipe_out,0,2);
+		// echo $typeSOMaterial;
 		// print_r($addInMat);
 		// exit;
         $histHlp = "Material outgoing (subgudang): ".$tipe_out;
@@ -1703,6 +1704,22 @@ class Outgoing extends CI_Controller {
 								$SumPriceBook += $total_value;
 							}
 						}
+						if($typeSOMaterial == 'BQ'){
+							if($qtyIN > 0){
+								$price_book = get_price_book($restWhDetail[0]->id_material);
+								$total_value = $price_book * $qtyIN;
+								$ArrMaterialQc[$val]['kode_trans'] 	    = $kode_trans;
+								$ArrMaterialQc[$val]['id_so'] 			= $restWhDetail[0]->id;
+								$ArrMaterialQc[$val]['id_material'] 	= $restWhDetail[0]->id_material;
+								$ArrMaterialQc[$val]['nm_material'] 	= $restWhDetail[0]->nm_material;
+								$ArrMaterialQc[$val]['id_gudang'] 	    = $valx['sub_gudang'];
+								$ArrMaterialQc[$val]['qty'] 	        = $qtyIN;
+								$ArrMaterialQc[$val]['price_book'] 	    = $price_book;
+								$ArrMaterialQc[$val]['nilai_value'] 	= $total_value;
+
+								$SumPriceBook += $total_value;
+							}
+						}
 					}
 				}
 			}
@@ -1784,8 +1801,28 @@ class Outgoing extends CI_Controller {
 					'created_date' 		=> $dateTime
 				);
 			}
+			if($typeSOMaterial == 'BQ'){
+				$ArrQcHeader = array(
+					'no_ipp' 			=> str_replace('BQ-','',$tipe_out),
+					'id_milik' 			=> null,
+					'date_uniq' 		=> null,
+					'no_spk' 			=> $no_spk,
+					'kode_trans' 		=> $kode_trans,
+					'id_gudang' 		=> $gudang_dari,
+					'qty' 				=> $SumMat,
+					'nilai_value' 		=> $SumPriceBook,
+					'created_by' 		=> $data_session['ORI_User']['username'],
+					'created_date' 		=> $dateTime
+				);
+			}
 
 			//=======END NEW=============
+			// echo $typeSOMaterial;
+			// print_r($ArrQcHeader);
+			// print_r($ArrMaterialQc);
+			// print_r($ArrInsertH);
+			// print_r($ArrDeatilAdj);
+			// print_r($ArrUpdate);
 			// exit;
 			$this->db->trans_start();
 				$UserName=$data_session['ORI_User']['username'];
@@ -1806,6 +1843,14 @@ class Outgoing extends CI_Controller {
 					}
 					if(!empty($ArrMaterialQc)){
 						$this->db->insert_batch('outgoing_field_joint_detail', $ArrMaterialQc);
+					}
+				}
+				if($typeSOMaterial == 'BQ'){
+					if(!empty($ArrQcHeader)){
+						$this->db->insert('outgoing_so_material', $ArrQcHeader);
+					}
+					if(!empty($ArrMaterialQc)){
+						$this->db->insert_batch('outgoing_so_material_detail', $ArrMaterialQc);
 					}
 				}
 
