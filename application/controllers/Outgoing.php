@@ -1704,7 +1704,7 @@ class Outgoing extends CI_Controller {
 								$SumPriceBook += $total_value;
 							}
 						}
-						if($typeSOMaterial == 'BQ'){
+						if($typeSOMaterial == 'BQ' AND $field_joint != 'yes'){
 							if($qtyIN > 0){
 								$price_book = get_price_book($restWhDetail[0]->id_material);
 								$total_value = $price_book * $qtyIN;
@@ -1801,7 +1801,7 @@ class Outgoing extends CI_Controller {
 					'created_date' 		=> $dateTime
 				);
 			}
-			if($typeSOMaterial == 'BQ'){
+			if($typeSOMaterial == 'BQ' AND $field_joint != 'yes'){
 				$ArrQcHeader = array(
 					'no_ipp' 			=> str_replace('BQ-','',$tipe_out),
 					'id_milik' 			=> null,
@@ -1845,7 +1845,7 @@ class Outgoing extends CI_Controller {
 						$this->db->insert_batch('outgoing_field_joint_detail', $ArrMaterialQc);
 					}
 				}
-				if($typeSOMaterial == 'BQ'){
+				if($typeSOMaterial == 'BQ' AND $field_joint != 'yes'){
 					if(!empty($ArrQcHeader)){
 						$this->db->insert('outgoing_so_material', $ArrQcHeader);
 					}
