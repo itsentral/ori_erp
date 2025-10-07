@@ -219,7 +219,11 @@ class Confirm_outgoing_spk extends CI_Controller {
 			$ArrConfirm = [];
 			$ArrUpdate = [];
             $ArrUpdateStock		= array();
+
+			$SUM_MAT = 0;
+
 			foreach ($detail as $key => $value) {
+				$QTY_OKE = 0;
 				$qty_confirm    = str_replace(',','',$value['qty_out']);
 				$konversi       = $value['konversi'];
 				$qty_pax_max        = $value['qty_pax_max'] * $konversi;
@@ -398,7 +402,7 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				
 				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
-				
+
                 if(!empty($grouping_temp)){
                     insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
                 }
