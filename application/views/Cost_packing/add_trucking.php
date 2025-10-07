@@ -73,7 +73,7 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 				</div>
 			</div>		
 			<div class='form-group row'>		 	 
-				<label class='label-control col-sm-2'><b>Provinsi</b></label>
+				<label class='label-control col-sm-2'><b>Provinsi <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<select name='prov' id='prov' class='form-control input-md'>
 						<option value='0'>Select Provinsi</option>
@@ -85,7 +85,7 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 						?>
 					 </select>
 				</div>	 	 
-				<label class='label-control col-sm-2'><b>Kab/Kota</b></label> 
+				<label class='label-control col-sm-2'><b>Kab/Kota <span class='text-red'>*</span></b></label> 
 				<div class='col-sm-4'>             
 					<select name='kota' id='kota' class='form-control input-md'>
 						<option value='0'>List Empty</option>
@@ -204,8 +204,8 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 			$(this).prop('disabled',true);
 			var category	= $('#category').val();
 			var id_truck	= $('#id_truck').val();
-			var area		= $('#area').val();
-			var tujuan		= $('#tujuan').val();
+			var prov		= $('#prov').val();
+			var kota		= $('#kota').val();
 			var price		= $('#price').val();
 			
 			if(category=='0'){
@@ -226,19 +226,19 @@ $category_laut = ($data[0]['category'] == 'laut')?'selected':'';
 				$('#simpan-bro').prop('disabled',false);
 				return false;
 			}
-			if(area=='0' ){
+			if(prov=='0' ){
 				swal({
 				  title	: "Error Message!",
-				  text	: 'Area is Empty, please input first ...',
+				  text	: 'Provinsi is Empty, please input first ...',
 				  type	: "warning"
 				});
 				$('#simpan-bro').prop('disabled',false);
 				return false;
 			}
-			if(tujuan==''){
+			if(kota=='0'){
 				swal({
 				  title	: "Error Message!",
-				  text	: 'Destination is Empty, please input first ...',
+				  text	: 'Kab/Kota is Empty, please input first ...',
 				  type	: "warning"
 				});
 				$('#simpan-bro').prop('disabled',false);
