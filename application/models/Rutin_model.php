@@ -1145,7 +1145,7 @@ class Rutin_model extends CI_Model {
 
 			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
 			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
-			$purchase2 	= ($purchase < 0)?0:ceil($purchase);
+			$purchase2 	= ($purchase > 0)?ceil($purchase):0;
 
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = $purchase2;
