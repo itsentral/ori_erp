@@ -206,7 +206,15 @@ class Confirm_outgoing_spk extends CI_Controller {
             $id_gudang_dari	    = $post['gudang_before'];
 			$kode_gudang_dari 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
 
-			$id_tujuan	    = $post['gudang_after'];
+			$id_tujuan	    = $post['gudang_after'];			
+			$kode_gudang_tujuan 	= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
+
+			$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
+			$coa_gudang = $coa_1->coa_1;
+			
+			
+			$coa_2    = $this->db->get_where('warehouse', array('id'=>$id_tujuan))->row();
+			$coa_gudang2 = $coa_2->coa_1;
 
 			$ArrConfirm = [];
 			$ArrUpdate = [];
@@ -386,6 +394,11 @@ class Confirm_outgoing_spk extends CI_Controller {
                 if(!empty($ArrUpdateStock)){
                     move_warehouse($ArrUpdateStock,$id_gudang_dari,$id_tujuan,$kode_trans);
                 }
+
+				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+				
+				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
+				
                 if(!empty($grouping_temp)){
                     insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
                 }
