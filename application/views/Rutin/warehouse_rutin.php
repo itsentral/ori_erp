@@ -246,6 +246,7 @@ $this->load->view('include/side_menu');
 
 	$(document).on('click','#autoUpdate', function(){
 		var inventory 		= $('#inventory').val();
+		var in_gudang = $('#in_gudang').val()
 	
 		if(inventory=='0'){
 			swal({
@@ -270,7 +271,7 @@ $this->load->view('include/side_menu');
 			if (isConfirm) {
 				loading_spinner();
 				$.ajax({
-					url			: base_url + active_controller+'/auto_update_rutin/'+inventory,
+					url			: base_url + active_controller+'/auto_update_rutin/'+inventory+'/'+in_gudang,
 					type		: "POST",
 					cache		: false,
 					dataType	: 'json',

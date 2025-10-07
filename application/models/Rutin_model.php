@@ -1134,6 +1134,7 @@ class Rutin_model extends CI_Model {
 	public function auto_update_rutin(){
 		$data = $this->input->post();
 		$category_awal = $this->uri->segment(3);
+		$gudang = $this->uri->segment(4);
 		$tgl_now = date('Y-m-d');
 		$tgl_next_month = date('Y-m-'.'20', strtotime('+1 month', strtotime($tgl_now)));
 		$get_rutin 	= $this->db->get_where('con_nonmat_new',array('category_awal'=>$category_awal))->result_array();
@@ -1141,11 +1142,11 @@ class Rutin_model extends CI_Model {
 
 		foreach ($get_rutin as $key => $value) {
 			$get_kebutuhan 	= $this->db->select('SUM(kebutuhan_month) AS sum_keb')->get_where('budget_rutin_detail',array('id_barang'=>$value['code_group']))->result();
-			$get_stock 		= $this->db->select('stock')->get_where('warehouse_rutin_stock',array('code_group'=>$value['code_group']))->result();
+			$get_stock 		= $this->db->select('stock')->get_where('warehouse_rutin_stock',array('code_group'=>$value['code_group'],'gudang'=>$gudang))->result();
 
 			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
 			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
-			$purchase2 	= ($purchase < 0)?0:ceil($purchase);
+			$purchase2 	= ($purchase > 0)?ceil($purchase):0;
 
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = $purchase2;
