@@ -238,9 +238,11 @@ class Confirm_outgoing_spk extends CI_Controller {
                 //MATERIAL YANG AKAN DI UPDATE
                 $ArrUpdateStock[$key]['id'] 	= $value['id_material'];
                 $ArrUpdateStock[$key]['qty'] 	= $qty_confirm_pack;
-
-
-				$key = $value['id_material'];			
+				
+				$ID_MATERIAL_ACT = $value['id_material'];	
+               	$getDetMat 		= $this->db->get_where('raw_materials', array('id_material'=>$ID_MATERIAL_ACT))->result();
+						
+				$key = $getDetMat[0]->id_material;			
 				$QTY_OKE = 	$qty_confirm_pack;
 			    $stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
