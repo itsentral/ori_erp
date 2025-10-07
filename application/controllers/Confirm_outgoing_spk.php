@@ -340,7 +340,7 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$ArrJurnalNew2[$val2]['no_jurnal'] 			= '-';
 				$ArrJurnalNew2[$val2]['coa_gudang'] 		= $coa_gudang2;
 					
-				}
+				
 				$SUM_MAT 	+= $QTY_OKE;
 			}
 
