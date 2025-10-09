@@ -81,7 +81,7 @@ class Penagihan extends CI_Controller {
 		$this->db->trans_start();
 			foreach($result_data AS $val => $valx){
 				$SUM_USD += $valx['total_deal_usd'];
-				$SUM_IDR += $valx['total_deal_idr'];
+				$SUM_IDR += $valx['total_deal_idr']; 
 				$no_ipp = str_replace('BQ-','',$valx['no_ipp']);
 
 				$Update_b[$val]['id'] = $valx['id'];
@@ -91,6 +91,8 @@ class Penagihan extends CI_Controller {
 				}else{
 					$this->db->query("update ".DBTANKI.".ipp_header set status_inv='1' WHERE no_ipp ='".$valx['id']."' and status_inv='0' ");
 				}
+
+				$base_cur = $valx['base_cur'];
 			}
 			$header = [
 				'no_so' => $dtImplode2,
@@ -104,7 +106,7 @@ class Penagihan extends CI_Controller {
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
-				'base_cur' => $data['base_cur'],
+				'base_cur' => $base_cur,
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],
@@ -2234,6 +2236,8 @@ if($base_cur=='USD'){
 
 				$Update_b[$val]['id'] = $valx['id'];
 				$Update_b[$val]['id_penagihan'] = $id_tagih;
+
+				$base_cur = $valx['base_cur'];
 			}
 			
 			
@@ -2251,7 +2255,7 @@ if($base_cur=='USD'){
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
-				'base_cur' => $data['base_cur'],
+				'base_cur' => $base_cur,
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],
@@ -4315,6 +4319,7 @@ else
 
 				$Update_b[$val]['id'] = $valx['id'];
 				$Update_b[$val]['id_penagihan'] = $id_tagih;
+				$base_cur = $valx['base_cur'];
 			}
 			$header = [
 				'delivery_no' => $dtdelivery_no,
@@ -4329,7 +4334,7 @@ else
 				'plan_tagih_usd' => $SUM_USD,
 				'plan_tagih_idr' => $SUM_IDR,
 				'type' => $data['type'],
-				'base_cur' => $data['base_cur'],
+				'base_cur' => $base_cur,
 				'status' => 10,
 				'type_lc' => $data['type_lc'],
 				'etd' => $data['etd'],

@@ -1844,6 +1844,17 @@ function get_warehouseStockProject($id_gudang) {
     return $ArrGetCategory;
 }
 
+function get_warehouseStockProjectExclude($id_gudang) {
+    $CI =& get_instance();
+    $listGetCategory = $CI->db->select('SUM(stock) AS stock, code_group')->group_by('code_group')->get_where('warehouse_rutin_stock',array('gudang !='=>$id_gudang))->result_array();
+    $ArrGetCategory = [];
+    foreach ($listGetCategory as $key => $value) {
+        $KEY = $value['code_group'];
+        $ArrGetCategory[$KEY] = (!empty($value['stock']))?$value['stock']:0;
+    }
+    return $ArrGetCategory;
+}
+
 function move_warehouse_barang_stok($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_trans=null){
     $CI 	=& get_instance();
     $dateTime		= date('Y-m-d H:i:s');
