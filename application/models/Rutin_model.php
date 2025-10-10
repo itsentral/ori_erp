@@ -1142,7 +1142,7 @@ class Rutin_model extends CI_Model {
 
 		foreach ($get_rutin as $key => $value) {
 			$get_kebutuhan 	= $this->db->select('SUM(kebutuhan_month) AS sum_keb')->get_where('budget_rutin_detail',array('id_barang'=>$value['code_group']))->result();
-			$get_stock 		= $this->db->select('stock')->get_where('warehouse_rutin_stock',array('code_group'=>$value['code_group'],'gudang'=>$gudang))->result();
+			$get_stock 		= $this->db->select('stock')->get_where('warehouse_rutin_stock',array('code_group'=>$value['code_group']))->result();
 
 			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
 			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
@@ -1329,7 +1329,7 @@ class Rutin_model extends CI_Model {
 		}
 
 		$GET_KEBUTUHAN_PER_MONTH = get_kebutuhanPerMonthGudang($id_gudang_P);
-		$GET_WAREHOUSE_STOCK = get_warehouseStockProject($id_gudang);
+		$GET_WAREHOUSE_STOCK = get_warehouseStockProjectExclude($id_gudang_P);
 		
 		foreach($query->result_array() as $row){
 			$total_data     = $totalData;

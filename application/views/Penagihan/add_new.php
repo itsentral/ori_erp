@@ -145,7 +145,7 @@ $this->load->view('include/side_menu');
 				</div>			
 			</div>
 
-			<div class='form-group row'>
+			<!--<div class='form-group row'>
 				<label class='label-control col-sm-2'><b>Currency <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<select name='base_cur' id='base_cur' class='form-control input-md'>
@@ -156,7 +156,7 @@ $this->load->view('include/side_menu');
 				</div>
 				
 				
-			</div>
+			</div>-->
 			
 			<br>
 			<?php
@@ -300,15 +300,7 @@ $this->load->view('include/side_menu');
 				return false;
 			}
 
-			if(validasi.base_cur == '0'){
-				swal({
-				  title	: "Error Message!",
-				  text	: 'Currency is empty, please input first ...',
-				  type	: "warning"
-				});
-				return false;
-			}
-			
+						
 			if(validasi.type_lc == '0'){
 				swal({
 				  title	: "Error Message!",
