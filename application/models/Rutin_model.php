@@ -129,9 +129,11 @@ class Rutin_model extends CI_Model {
 				a.*,
 				b.category AS categoryb
 			FROM
-				con_nonmat_new a LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id
+				con_nonmat_new a 
+				LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id
 		    WHERE 1=1 AND 
-				a.code_group LIKE 'CN%' and b.id<>9
+				a.code_group LIKE 'CN%' 
+				AND b.id <> 9
 				AND a.deleted='N' 
 				".$where_inventory."
 				".$where_status."
@@ -1421,7 +1423,11 @@ class Rutin_model extends CI_Model {
 				con_nonmat_new a  
 				LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id,
 				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.status = '1' AND a.deleted = 'N'
+		    WHERE 1=1  
+				AND a.code_group LIKE 'CN%' 
+				AND b.id <> 9
+				AND a.deleted='N'
+				AND a.status='1'
 				".$where_inventory."
 			AND (
 				a.material_name LIKE '%".$this->db->escape_like_str($like_value)."%'
