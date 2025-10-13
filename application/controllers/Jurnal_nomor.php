@@ -3265,6 +3265,208 @@ class Jurnal_nomor extends CI_Controller {
 		
 	}
 
+	function jurnalFG2025(){
+		
+		//$idtrans       = $this->uri->segment(3);
+		//$data_session	= $this->session->userdata;
+		//$UserName		= $data_session['ORI_User']['username'];
+		$DateTime		= date('Y-m-d H:i:s');
+		
+		1103-04-01
+		5103-01-01
+		5101-01-01
+		5101-03-01
+		5101-04-01
+		5101-05-01
+		5101-02-01
+		1103-03-03
+	
+		$kodejurnal='JV004';
+		$dataspool = $this->db->query("select * from data_jurnal_FG2025")->result();
+		foreach($dataspool AS $record){
+		$idtrans = $record->kode_trans;
+
+			$wip = $this->db->query("SELECT * FROM data_erp_wip2025 WHERE id_trans ='".$idtrans."'")->result();
+			
+			$totalwip =0;
+			$wiptotal =0; 
+			$det_Jurnaltes = [];
+			  
+			foreach($wip AS $data){
+				
+				
+				$tgl_voucher 		  = $data->tanggal;					
+				$ket         		  = 'WIP ke FG';
+				$id          		  = $data->id_trans;
+				$no_request           = $data->id_trans;
+				$totalmaterial        = $data->material;	
+				$totaldl              = $data->wip_direct;
+				$totalidl             = $data->wip_indirect;	
+				$totalconsum          = $data->wip_consumable;
+				$totalfoh             = $data->wip_foh;	
+              	$totalwip             = $data->nilai_wip;	
+				
+				
+				
+
+			    $debit  = $totalwip;			
+				
+				      $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '1103-04-01',
+					  'keterangan'    => 'FG',
+					  'no_reff'       => $id,
+					  'debet'         => $totalwip,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'wip - fg',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					   );
+
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '1103-03-03',
+					  'keterangan'    => 'WIP',
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $totalwip,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					   );
+					
+								 
+								
+					$det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5101-01-01',
+					  'keterangan'    => 'Material',
+					  'no_reff'       => $id,
+					  'debet'         => $totalmaterial,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5101-02-01',
+					  'keterangan'    => 'Consumable PC',
+					  'no_reff'       => $id,
+					  'debet'         => $totalconsum,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5101-03-01',
+					  'keterangan'    => 'Direct labour PC',
+					  'no_reff'       => $id,
+					  'debet'         => $totaldl,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5101-04-01',
+					  'keterangan'    => 'Indirect labour PC',
+					  'no_reff'       => $id,
+					  'debet'         => $totalidl,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+
+					
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5101-05-01',
+					  'keterangan'    => 'FOH PC',
+					  'no_reff'       => $id,
+					  'debet'         => $totalfoh,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+
+
+					  $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '5103-01-01',
+					  'keterangan'    => 'COGM',
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $totalwip,
+					  'jenis_jurnal'  => 'produksi wip',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+				
+				
+			}
+			
+			       
+				
+			
+			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='produksi wip' and no_reff ='$id'");
+			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
+			
+			
+			
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln	= substr($tgl_voucher,5,2);
+			$Thn	= substr($tgl_voucher,0,4);
+			$idlaporan = $id;
+			$Keterangan_INV = 'Jurnal WIP - FG';
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => '11', 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert(DBACC.'.javh',$dataJVhead);
+			$datadetail=array();
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'			=> 'JV',
+					'nomor'			=> $Nomor_JV,
+					'tanggal'		=> $tgl_voucher,
+					'no_perkiraan'	=> $vals['no_perkiraan'],
+					'keterangan'	=> $vals['keterangan'],
+					'no_reff'		=> $vals['no_reff'],
+					'debet'			=> $vals['debet'],
+					'kredit'		=> $vals['kredit'],
+					'created_by'	=> 'upload',
+					'created_on'    => $DateTime,
+					);
+				$this->db->insert(DBACC.'.jurnal',$datadetail);
+			}
+			unset($det_Jurnaltes);unset($datadetail);
+		  
+		}
+		
+	}
+
 	function jurnalWIP2025(){
 		
 		//$idtrans       = $this->uri->segment(3);
@@ -3421,7 +3623,7 @@ class Jurnal_nomor extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
-					'created_by'	=> 'upload',
+					'created_by'	=> 'upload fg',
 					'created_on'    => $DateTime,
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
