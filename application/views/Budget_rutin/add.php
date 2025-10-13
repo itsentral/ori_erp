@@ -70,12 +70,13 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 				<thead>
 					<tr class='bg-blue'>
 						<th class='text-center' style='width: 5%;'>#</th>
-						<th class='text-center' style='width: 30%;'>Nama Barang</th>
+						<th class='text-center' style='width: 27%;'>Nama Barang</th>
 						<th class='text-center'>Spesifikasi</th>
-						<th class='text-center' style='width: 10%;'>Kebutuhan 1 Bulan</th>
-						<th class='text-center' style='width: 10%;'>Price From Supplier</th>
-						<th class='text-center' style='width: 10%;'>Total Budget</th>
-						<th class='text-center' style='width: 10%;'>Satuan</th>
+						<th class='text-center'>Brand</th>
+						<th class='text-center' style='width: 9%;'>Kebutuhan 1 Bulan</th>
+						<th class='text-center' style='width: 9%;'>Price From Supplier</th>
+						<th class='text-center' style='width: 9%;'>Total Budget</th>
+						<th class='text-center' style='width: 9%;'>Satuan</th>
 						<th class='text-center' style='width: 5%;'>#</th>
 					</tr>
 				</thead>
@@ -87,6 +88,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 						if(!empty($detail)){
 							foreach($detail AS $val => $valx){ $id++;
 								$spec = get_name('con_nonmat_new', 'spec', 'code_group', $valx['id_barang']);
+								$brand = get_name('con_nonmat_new', 'brand', 'code_group', $valx['id_barang']);
 			
 								echo "<tr class='header_".$valxHeader['id'].$id."'>";
 									echo "<td align='center'>".$id."</td>";
@@ -106,6 +108,9 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 									echo "<td align='left'>";
 										echo "<input type='hidden' name='detail[".$valxHeader['id'].$id."][jenis_barang]' class='form-control input-md' value='".$valxHeader['id']."'>";
 										echo "<input name='detail[".$valxHeader['id'].$id."][spesifikasi]' id='spec_".$valxHeader['id'].$id."' class='form-control input-md' readonly placeholder='Spesifikasi' value='".strtoupper($spec)."'>";
+									echo "</td>";
+									echo "<td align='left'>";
+										echo "<input name='detail[".$valxHeader['id'].$id."][brand]' id='brand_".$valxHeader['id'].$id."' class='form-control input-md' readonly placeholder='Brand' value='".strtoupper($brand)."'>";
 									echo "</td>";
 									echo "<td align='left'>";
 										echo "<input name='detail[".$valxHeader['id'].$id."][kebutuhan_month]' class='form-control text-center input-md maskM kebutuhan_month' value='".number_format($valx['kebutuhan_month'])."' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
@@ -138,13 +143,14 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 					<tr id='add_<?=$valxHeader['id'].$id;?>' class='<?=$id;?>'>
 						<td align='center'></td>
 						<td align='left'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type='button' data-id_barang='<?=$valxHeader['id'];?>' class='btn btn-sm btn-success addPart' title='Add Item'><i class='fa fa-plus'></i>&nbsp;&nbsp;Add Item</button></td>
-						<td align='center' colspan='6'></td>
+						<td align='center' colspan='7'></td>
 					</tr>
 				</tbody>
 				<tfoot>
 					<tr>
 						<th align='center'></th>
 						<th align='center'>TOTAL BUDGET</th>
+						<th align='center'></th>
 						<th align='center'></th>
 						<th class='text-right'><?=number_format($SUM_QTY);?></th>
 						<th align='center'></th>
@@ -283,6 +289,7 @@ $tanda 			= (!empty($code))?'Update':'Insert';
 			dataType: "json",
 			success: function(data){
 				$("#spec_"+no).val(data.spec);
+				$("#brand_"+no).val(data.brand);
 				$(item_sat).html(data.option).trigger("chosen:updated");
 				swal.close();
 			},

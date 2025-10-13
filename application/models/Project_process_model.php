@@ -186,7 +186,7 @@ class Project_process_model extends CI_Model {
 				(SELECT @row:=0) r
 		    WHERE 
 				1=1
-				AND (sts_ipp='PROCESS PRODUCTION' OR sts_ipp = 'PARTIAL PROCESS')
+				
 				".$where_wait_est."
 				AND (
 				a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -194,6 +194,8 @@ class Project_process_model extends CI_Model {
 				OR c.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
+
+		// AND (sts_ipp='PROCESS PRODUCTION' OR sts_ipp = 'PARTIAL PROCESS')
 		// $sql = "
 		// 	SELECT
 		// 		a.*
@@ -217,7 +219,7 @@ class Project_process_model extends CI_Model {
 			2 => 'nm_customer'
 		);
 
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY  a.no_ipp DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
