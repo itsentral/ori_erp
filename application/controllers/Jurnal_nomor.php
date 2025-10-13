@@ -3272,15 +3272,6 @@ class Jurnal_nomor extends CI_Controller {
 		//$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		
-		1103-04-01
-		5103-01-01
-		5101-01-01
-		5101-03-01
-		5101-04-01
-		5101-05-01
-		5101-02-01
-		1103-03-03
-	
 		$kodejurnal='JV004';
 		$dataspool = $this->db->query("select * from data_jurnal_FG2025")->result();
 		foreach($dataspool AS $record){
