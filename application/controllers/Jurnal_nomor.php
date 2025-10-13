@@ -3447,7 +3447,7 @@ class Jurnal_nomor extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
-					'created_by'	=> 'upload',
+					'created_by'	=> 'upload fg',
 					'created_on'    => $DateTime,
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
