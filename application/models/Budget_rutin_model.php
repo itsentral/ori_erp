@@ -235,6 +235,9 @@ class Budget_rutin_model extends CI_Model {
 				$d_Header .= "<input name='detail[".$id."][spesifikasi]' id='spec_".$id."' class='form-control input-md' readonly placeholder='Spesifikasi'>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left'>";
+				$d_Header .= "<input name='detail[".$id."][brand]' id='brand_".$id."' class='form-control input-md' readonly placeholder='Brand'>";
+			$d_Header .= "</td>";
+			$d_Header .= "<td align='left'>";
 				$d_Header .= "<input name='detail[".$id."][kebutuhan_month]' class='form-control text-center input-md maskM kebutuhan_month' placeholder='0' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left'>";
@@ -262,6 +265,7 @@ class Budget_rutin_model extends CI_Model {
 			$d_Header .= "<td align='center'></td>";
 			$d_Header .= "<td align='center'></td>";
 			$d_Header .= "<td align='center'></td>";
+			$d_Header .= "<td align='center'></td>";
 		$d_Header .= "</tr>";
 
 		 echo json_encode(array(
@@ -271,7 +275,7 @@ class Budget_rutin_model extends CI_Model {
 	
 	public function get_spec(){
 		$id 		= $this->uri->segment(3);
-		$spec		= $this->db->query("SELECT spec, satuan FROM con_nonmat_new WHERE code_group='".$id."' LIMIT 1")->result();
+		$spec		= $this->db->query("SELECT spec, satuan, brand FROM con_nonmat_new WHERE code_group='".$id."' LIMIT 1")->result();
 		$satuan		= $this->db->query("SELECT * FROM raw_pieces WHERE flag_active = 'Y' AND `delete` = 'N' ORDER BY kode_satuan ASC")->result_array();
 		
 		$option = '';
@@ -281,6 +285,7 @@ class Budget_rutin_model extends CI_Model {
 		}
 		echo json_encode(array(
 			'spec'	=> strtoupper($spec[0]->spec),
+			'brand'	=> strtoupper($spec[0]->brand),
 			'option' => $option
 		));
 	}
