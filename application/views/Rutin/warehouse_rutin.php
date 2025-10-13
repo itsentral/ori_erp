@@ -313,14 +313,14 @@ $this->load->view('include/side_menu');
 	$(document).on('click','#autoDelete', function(){
 		var inventory 		= $('#inventory').val();
 	
-		if(inventory=='0'){
-			swal({
-			  title	: "Error Message!",
-			  text	: 'Filter category terlebih dahulu ...',
-			  type	: "warning"
-			});
-			return false;
-		}
+		// if(inventory=='0'){
+		// 	swal({
+		// 	  title	: "Error Message!",
+		// 	  text	: 'Filter category terlebih dahulu ...',
+		// 	  type	: "warning"
+		// 	});
+		// 	return false;
+		// }
 		swal({
 			title: "Are you sure?",
 			text: "Clear All Propose Request !!!",
