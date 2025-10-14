@@ -901,7 +901,7 @@ class Invoicing_model extends CI_Model {
 				tr_invoice_header a,
 				(SELECT @row:=0) r
 
-			LEFT JOIN penagihan b ON a.id_penagihan=b.id_penagihan
+			INNER JOIN penagihan b ON b.id=a.id_penagihan
 		    WHERE 1=1 ".$where_no_so." ".$where_cust."
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
