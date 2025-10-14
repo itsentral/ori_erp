@@ -385,7 +385,8 @@ class Cron_job extends CI_Controller {
 		$TAHUN		= date('Y',strtotime($TANGGAL));
 		$BULAN		= date('m',strtotime($TANGGAL));
         $username   = 'system';
-	    $datetime   = date('Y-m-d H:i:s');		
+	    $datetime   = date('Y-m-d H:i:s');	
+		//(a.bulan = '$BULAN' AND a.tahun = '$TAHUN' and a.flag='N') AND b.deleted_date IS NULL	
         //INSERT JURNAL TEMP
         $SQL = "SELECT
                     a.category AS category,
@@ -401,7 +402,8 @@ class Cron_job extends CI_Controller {
 					LEFT JOIN asset b ON a.kd_asset=b.kd_asset
 					LEFT JOIN asset_coa c ON b.id_coa=c.id
                 WHERE
-                    (a.bulan = '$BULAN' AND a.tahun = '$TAHUN' and a.flag='N') AND b.deleted_date IS NULL
+                    
+					(a.bulan = '09' AND a.tahun = '2025' and a.flag='N') AND b.deleted_date IS NULL
                 GROUP BY 
                     a.category, 
                     a.kdcab,
@@ -459,7 +461,8 @@ class Cron_job extends CI_Controller {
 				$this->db->trans_commit();
 				$this->saved_jurnal_erp();
 				$this->saved_jurnal_depresiasi();
-				$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='".$BULAN."' AND tahun='".$TAHUN."' ");
+				//$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='".$BULAN."' AND tahun='".$TAHUN."' ");
+				$this->db->query("UPDATE asset_generate SET flag='Y' WHERE bulan='09' AND tahun='2025' ");
 		
 			}
 			echo "Update";
@@ -507,11 +510,16 @@ class Cron_job extends CI_Controller {
 		$this->db->trans_start();
 
 		
-		$bulan=date("m");
-		$tahun=date("Y");
+		//$bulan=date("m");
+		//$tahun=date("Y");
+
+		$bulan='09';
+		$tahun='2025';
 		
 		$DATE_NOW	= date('Y-m-d');
-		$date    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
+		//$date    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
+
+		$date     = '2025-09-30'
 
 		$sqlHeader	= "select * from asset_jurnal_temp WHERE tanggal='".$date."'";
 		$Q_Awal	= $this->db->query($sqlHeader)->result();
