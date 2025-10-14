@@ -6428,12 +6428,10 @@ class Delivery extends CI_Controller
 				
 			}
 			
-			        
-				
-			
+			if(!empty($id)){
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='Finishgood-Intransit' and no_reff ='$id' AND tanggal ='".$Date."'"); 
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
-			
+			}
 			
 			
 			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
