@@ -381,7 +381,8 @@ class Cron_job extends CI_Controller {
     
     public function depresiasi_assets(){
  		$DATE_NOW	= date('Y-m-d');
-        $TANGGAL    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
+       // $TANGGAL    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
+	    $TANGGAL    ='2025-09-30'
 		$TAHUN		= date('Y',strtotime($TANGGAL));
 		$BULAN		= date('m',strtotime($TANGGAL));
         $username   = 'system';
