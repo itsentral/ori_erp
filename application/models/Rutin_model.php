@@ -1184,7 +1184,7 @@ class Rutin_model extends CI_Model {
 		$category_awal = $this->uri->segment(3);
 		$tgl_now = date('Y-m-d');
 		$tgl_next_month = date('Y-m-'.'20', strtotime('+1 month', strtotime($tgl_now)));
-		$get_rutin 	= $this->db->get_where('con_nonmat_new',array('category_awal'=>$category_awal))->result_array();
+		$get_rutin 	= $this->db->get('con_nonmat_new')->result_array();
 		$ArrUpdate = [];
 
 		foreach ($get_rutin as $key => $value) {
