@@ -43,6 +43,7 @@ foreach($ListIPP AS $val => $valx){
 						<th class="text-center" width='12%'>Total Invoice (USD)</th>
 						<th class="text-center" width='12%'>Total Invoice (IDR)</th>
 						<th class="text-center" width='10%'>Jenis Inv</th>
+						<th class="text-center" width='10%'>No Delivery</th>
 						<th class="text-center no-sort" width='16%'>Option</th>
 					</tr>
 				</thead>
