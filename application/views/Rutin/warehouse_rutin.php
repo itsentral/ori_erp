@@ -313,6 +313,7 @@ $this->load->view('include/side_menu');
 	$(document).on('click','#autoDelete', function(){
 		var inventory 		= $('#inventory').val();
 	
+<<<<<<< HEAD
 		//if(inventory=='0'){
 			//swal({
 			  //title	: "Error Message!",
@@ -321,6 +322,16 @@ $this->load->view('include/side_menu');
 			//});
 			//return false;
 		//}
+=======
+		// if(inventory=='0'){
+		// 	swal({
+		// 	  title	: "Error Message!",
+		// 	  text	: 'Filter category terlebih dahulu ...',
+		// 	  type	: "warning"
+		// 	});
+		// 	return false;
+		// }
+>>>>>>> 0438c64baf4936ec690d50535031587ca5688ce7
 		swal({
 			title: "Are you sure?",
 			text: "Clear All Propose Request !!!",
