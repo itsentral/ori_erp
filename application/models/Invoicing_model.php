@@ -898,10 +898,8 @@ class Invoicing_model extends CI_Model {
 				(@row:=@row+1) AS nomor,
 				a.*, b.delivery_no
 			FROM
-				tr_invoice_header a,
+				tr_invoice_header a INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
-
-			INNER JOIN penagihan b ON b.id=a.id_penagihan
 		    WHERE 1=1 ".$where_no_so." ".$where_cust."
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
