@@ -519,7 +519,7 @@ class Cron_job extends CI_Controller {
 		$DATE_NOW	= date('Y-m-d');
 		//$date    = date('Y-m-d', strtotime('-1 days', strtotime($DATE_NOW)));
 
-		$date     = '2025-09-30'
+		$date     = '2025-09-30';
 
 		$sqlHeader	= "select * from asset_jurnal_temp WHERE tanggal='".$date."'";
 		$Q_Awal	= $this->db->query($sqlHeader)->result();
