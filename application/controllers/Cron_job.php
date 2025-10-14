@@ -385,7 +385,7 @@ class Cron_job extends CI_Controller {
 		$TAHUN		= date('Y',strtotime($TANGGAL));
 		$BULAN		= date('m',strtotime($TANGGAL));
         $username   = 'system';
-	    $datetime   = date('Y-m-d H:i:s');	
+	    $datetime   = date('Y-m-d H:i:s'); 	
 		//(a.bulan = '$BULAN' AND a.tahun = '$TAHUN' and a.flag='N') AND b.deleted_date IS NULL	
         //INSERT JURNAL TEMP
         $SQL = "SELECT
