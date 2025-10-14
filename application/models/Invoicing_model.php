@@ -812,6 +812,10 @@ class Invoicing_model extends CI_Model {
         $urut2  = 0;
 		foreach($query->result_array() as $row)
 		{
+
+			print_r($row);
+			exit;
+
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
