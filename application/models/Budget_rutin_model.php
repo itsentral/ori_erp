@@ -524,7 +524,7 @@ class Budget_rutin_model extends CI_Model {
 			}
 
 			$group_header = $this->db->query("SELECT department, costcenter FROM budget_rutin_header GROUP BY department, costcenter")->result_array();
-			$group_barang = $this->db->query("SELECT id_barang, jenis_barang, satuan FROM budget_rutin_detail ".$WHERE." GROUP BY id_barang ORDER BY jenis_barang ASC, id_barang")->result_array();
+			$group_barang = $this->db->query("SELECT id_barang, jenis_barang, satuan, price_from_supplier FROM budget_rutin_detail ".$WHERE." GROUP BY id_barang ORDER BY jenis_barang ASC, id_barang")->result_array();
 			
 
     		$Row		= 1;
@@ -567,12 +567,22 @@ class Budget_rutin_model extends CI_Model {
     		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
     		$sheet->getColumnDimension('F')->setAutoSize(true);
 			
-			$sheet->setCellValue('G'.$NewRow, 'Total');
+			$sheet->setCellValue('G'.$NewRow, 'Price From Supplier');
     		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($style_header);
     		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
     		$sheet->getColumnDimension('G')->setAutoSize(true);
+
+			$sheet->setCellValue('H'.$NewRow, 'Total Budget');
+    		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($style_header);
+    		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
+    		$sheet->getColumnDimension('H')->setAutoSize(true);
+
+			$sheet->setCellValue('I'.$NewRow, 'Unit');
+    		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($style_header);
+    		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+    		$sheet->getColumnDimension('I')->setAutoSize(true);
 			
-			$noexcel = 7;
+			$noexcel = 9;
 			foreach($group_header AS $val => $valx){ $noexcel++;
 				$cc = '';
 				if($valx['costcenter'] <> '0'){
@@ -634,7 +644,20 @@ class Budget_rutin_model extends CI_Model {
   				$status_date	= $total_kebutuhan;
   				$Cols			= getColsChar($awal_col);
   				$sheet->setCellValue($Cols.$awal_row, $status_date);
-  				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+  				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+
+				$price_from_supplier = $valx['price_from_supplier'];
+				$total_cost = $price_from_supplier*$total_kebutuhan;
+
+				$awal_col++;
+  				$Cols			= getColsChar($awal_col);
+  				$sheet->setCellValue($Cols.$awal_row, $price_from_supplier);
+  				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+
+				$awal_col++;
+  				$Cols			= getColsChar($awal_col);
+  				$sheet->setCellValue($Cols.$awal_row, $total_cost);
+  				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 				
 				$awal_col++;
   				$status_date	= strtoupper(get_name('raw_pieces','kode_satuan','id_satuan',$valx['satuan']));
@@ -650,7 +673,7 @@ class Budget_rutin_model extends CI_Model {
 					$status_date	= $qty;
 					$Cols			= getColsChar($awal_col);
 					$sheet->setCellValue($Cols.$awal_row, $status_date);
-					$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+					$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
 				}
 
   			}
