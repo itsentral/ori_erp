@@ -10,7 +10,7 @@ class Invoicing_model extends CI_Model {
 	//=========================================================================================================================
 
 	public function create_new(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$controller			= ucfirst(strtolower($this->uri->segment(1))); 
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
@@ -833,7 +833,7 @@ class Invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['persentase'])."%)</div>";
-
+            $nestedData[]	= "<div align='left'>".$row['delivery_no']."</div>";
 				$print_jurnal	= "";
 				$print_idr		= "";
 				$create 		= "";
@@ -896,15 +896,16 @@ class Invoicing_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*
+				a.*, b.delivery_no
 			FROM
-				tr_invoice_header a,
+				tr_invoice_header a INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where_no_so." ".$where_cust."
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.delivery_no LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
