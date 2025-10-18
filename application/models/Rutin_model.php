@@ -1423,11 +1423,11 @@ class Rutin_model extends CI_Model {
 			$STOCK_WRH		= (!empty($GET_WAREHOUSE_STOCK[$row['code_group']]))?$GET_WAREHOUSE_STOCK[$row['code_group']]:0;
 			$stock_oke 		= (!empty($STOCK_WRH))?number_format($STOCK_WRH):'-';
 			$stock_oke2 	= (!empty($STOCK_WRH))?$STOCK_WRH:0;
-			$nestedData[]	= "<div align='right'>".$stock_oke."</div>";
+			$nestedData[]	= "<div align='right'><span id='stockNow_".$nomor."'>".$stock_oke."</span></div>";
 			
 			$kebutuhnMonth 	= (!empty($GET_KEBUTUHAN_PER_MONTH[$row['code_group']]['kebutuhan']))?$GET_KEBUTUHAN_PER_MONTH[$row['code_group']]['kebutuhan']:0;
 			$nestedData[]	= "<div align='right'>".number_format($kebutuhnMonth)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format(($kebutuhnMonth * 1.5))."</div>";
+			$nestedData[]	= "<div align='right'><span id='maxstockNow_".$nomor."'>".number_format(($kebutuhnMonth * 1.5))."</span></div>";
 			$purchase = ($kebutuhnMonth * 1.5) - $stock_oke2;
 			$purchase2x = ($purchase < 0)?0:$purchase;
 			$purchase2 = (!empty($row['request']))?$row['request']:$purchase2x;
@@ -1437,6 +1437,7 @@ class Rutin_model extends CI_Model {
 			
 			$nestedData[]	= "<div align='right'>
 									<input type='text' name='purchase_".$nomor."' id='purchase_".$nomor."' value='".number_format($purchase2,2)."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md text-right maskM changeSave' style='width:100%;'>
+									<b><span class='text-danger' id='noted_".$nomor."'></span></b>
 								</div><script type='text/javascript'>$('.maskM').autoNumeric('init', {mDec: '2', aPad: false});</script>";
 			$nestedData[]	= "<div align='left'>
 									<select id='satuan_".$nomor."' class='chosen_select form-control input-md'><option value='".$row['satuan']."'>".get_name('raw_pieces','kode_satuan','id_satuan',$row['satuan'])."</option></select>	

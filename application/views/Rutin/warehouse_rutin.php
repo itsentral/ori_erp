@@ -53,15 +53,15 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center" width='4%'>#</th>
+					<th class="text-center" width='3%'>#</th>
 					<th class="text-center">Nama Barang</th>
 					<th class="text-center">Spesifikasi</th>
-					<th class="text-center" width='10%'>Inventory Type</th> 
-					<th class="text-center no-sort" width='7%'>Stock</th>
-					<th class="text-center no-sort" width='7%'>Kebutuhan 1 Bulan</th>
-					<th class="text-center no-sort" width='7%'>Max Stock</th>
-					<th class="text-center no-sort" width='8%'>Propose Purchase</th>
-					<th class="text-center no-sort" width='8%'>Unit</th>
+					<th class="text-center">Inventory Type</th> 
+					<th class="text-center no-sort">Stock</th>
+					<th class="text-center no-sort">Keb.1 Bln</th>
+					<th class="text-center no-sort">Max Stock</th>
+					<th class="text-center no-sort" width='7%'>Propose Purchase</th>
+					<th class="text-center no-sort">Unit</th>
 					<th class="text-center no-sort" width='8%'>Spec</th>
 					<th class="text-center no-sort" width='8%'>Info</th>
 					<th class="text-center no-sort" width='8%'>Price Ref.</th>
@@ -245,6 +245,29 @@ $this->load->view('include/side_menu');
 		var spec 		= $('#spec_'+nomor).val();
 		var info 		= $('#info_'+nomor).val();
 		var price 		= getNum($('#price_'+nomor).val().split(",").join(""));
+
+		var stockNow 	= getNum($('#stockNow_'+nomor).text().split(",").join(""));
+		var maxstockNow = getNum($('#maxstockNow_'+nomor).text().split(",").join(""));
+		var maxpropose 	= maxstockNow - stockNow
+
+		if(maxpropose > 0){
+			if(purchase > maxpropose){
+				$('#purchase_'+nomor).val(number_format(maxpropose))
+				$('#noted_'+nomor).text('Max Propose: '+maxpropose)
+			}
+			else{
+				$('#noted_'+nomor).text('')
+			}
+		}
+		else{
+			if(info == ''){
+				$('#noted_'+nomor).text('Info diisi dulu!')
+				$('#purchase_'+nomor).val(0)
+			}
+			else{
+				$('#noted_'+nomor).text('')
+			}
+		}
 
 		$('#tprice_'+nomor).val(number_format(purchase*price));
 		
