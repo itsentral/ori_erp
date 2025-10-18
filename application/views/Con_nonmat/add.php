@@ -121,13 +121,13 @@ $this->load->view('include/side_menu');
 				</div>
 			</div>
 			<div class='form-group row'>
-				<label class='label-control col-sm-2'><b>Spesification</b></label>
+				<label class='label-control col-sm-2'><b>Spesification <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<?php
 					 echo form_input(array('id'=>'spec','name'=>'spec','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Spesification'),$spec);
 					?>
 				</div>
-				<label class='label-control col-sm-2'><b>Brand</b></label>
+				<label class='label-control col-sm-2'><b>Brand <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<?php
 					 echo form_input(array('id'=>'brand','name'=>'brand','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Brand'),$brand);
@@ -234,6 +234,8 @@ $this->load->view('include/side_menu');
 
 			var material_name	= $('#material_name').val();
 			var trade_name	= $('#trade_name').val();
+			var spec	= $('#spec').val();
+			var brand	= $('#brand').val();
 
 			if(category_awal=='0'){
 				swal({
@@ -261,6 +263,26 @@ $this->load->view('include/side_menu');
 				swal({
 				  title	: "Error Message!",
 				  text	: 'Empty Material Name, please input first ...',
+				  type	: "warning"
+				});
+				$('#save_rutin').prop('disabled',false);
+				return false;
+			}
+
+			if(spec==''){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'Empty Spesifikasi, please input first ...',
+				  type	: "warning"
+				});
+				$('#save_rutin').prop('disabled',false);
+				return false;
+			}
+
+			if(brand==''){
+				swal({
+				  title	: "Error Message!",
+				  text	: 'Empty Brand, please input first ...',
 				  type	: "warning"
 				});
 				$('#save_rutin').prop('disabled',false);
