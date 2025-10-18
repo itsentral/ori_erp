@@ -753,10 +753,18 @@ class Rutin_model extends CI_Model {
 		}
 
 		$inventory 			= $this->db->query("SELECT * FROM con_nonmat_category_awal WHERE `delete`='N' ORDER BY category ASC")->result_array();
+
+		$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get('con_nonmat_new')->result_array();
+		$GetBudget = $this->db->select('SUM(kebutuhan_month*price_from_supplier) AS total_price')->get('budget_rutin_detail')->result_array();
+
+		$TotalPR 		= (!empty($GetTotal[0]['total_price']))?$GetTotal[0]['total_price']:0;
+		$TotalBudget 	= (!empty($GetBudget[0]['total_price']))?$GetBudget[0]['total_price']:0;
 		$data = array(
 			'title'			=> 'Indeks Of Add PR Stock',
 			'action'		=> 'index',
 			'inventory'		=> $inventory,
+			'TotalPR'		=> $TotalPR,
+			'TotalBudget'		=> $TotalBudget,
 			'akses_menu'	=> $Arr_Akses
 		);
 		// $tgl_now = date('Y-m-d');
@@ -1068,9 +1076,14 @@ class Rutin_model extends CI_Model {
 		$satuan 		= $data['satuan'];
 		$spec 			= $data['spec'];
 		$info 			= $data['info'];
+		$inventory 		= $data['inventory'];
+		$price 			= str_replace(',','',$data['price']);
+		$total_price_pr = $price*$purchase;
 		
 		
 		$ArrHeader = array(
+			'price_pr' 	=> $price,
+			'total_price_pr' 	=> $total_price_pr,
 			'spec_pr' 	=> $spec,
 			'info_pr' 	=> $info,
 			'request' 	=> $purchase,
@@ -1086,15 +1099,27 @@ class Rutin_model extends CI_Model {
   			$this->db->trans_rollback();
   			$Arr_Data	= array(
   				'pesan'		=>'Save process failed. Please try again later ...',
-  				'status'	=> 0
+  				'status'	=> 0,
+				'totalpr' 	=> 0
   			);
   		}
   		else{
   			$this->db->trans_commit();
-  			$Arr_Data	= array(
+			if($inventory != '0'){
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get_where('con_nonmat_new',['category_awal'=>$inventory])->result_array();
+			}
+			else{
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get('con_nonmat_new')->result_array();
+			}
+
+			$TotalPR = (!empty($GetTotal[0]['total_price']))?$GetTotal[0]['total_price']:0;
+
+			$Arr_Data	= array(
   				'pesan'		=>'Save process success. Thanks ...',
-  				'status'	=> 1
+  				'status'	=> 1,
+				'totalpr' 	=> number_format($TotalPR)
   			);
+
   			history('Change request rutin '.$id_material.' / '.$purchase.' / '.$tanggal);
   		}
   		echo json_encode($Arr_Data);
@@ -1145,14 +1170,18 @@ class Rutin_model extends CI_Model {
 		foreach ($get_rutin as $key => $value) {
 			$get_kebutuhan 	= $this->db->select('SUM(kebutuhan_month) AS sum_keb')->get_where('budget_rutin_detail',array('id_barang'=>$value['code_group']))->result();
 			$get_stock 		= $this->db->select('stock')->get_where('warehouse_rutin_stock',array('code_group'=>$value['code_group']))->result();
+			$get_price 		= $this->db->select('price_supplier')->get_where('price_ref',array('code_group'=>$value['code_group'],'deleted_date'=>NULL))->result();
 
 			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
 			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
 			$purchase2 	= ($purchase > 0)?ceil($purchase):0;
+			$price_ref 	= (!empty($get_price[0]->price_supplier))?$get_price[0]->price_supplier:0;
 
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = $purchase2;
 			$ArrUpdate[$key]['tgl_dibutuhkan'] = $tgl_next_month;
+			$ArrUpdate[$key]['price_pr'] = $price_ref;
+			$ArrUpdate[$key]['total_price_pr'] = $price_ref * $purchase2;
 		}
 		
 		$this->db->trans_start();
@@ -1165,14 +1194,28 @@ class Rutin_model extends CI_Model {
   			$this->db->trans_rollback();
   			$Arr_Data	= array(
   				'pesan'		=>'Save process failed. Please try again later ...',
-  				'status'	=> 0
+  				'status'	=> 0,
+				'inventory' => $category_awal,
+				'gudang' => $gudang,
+				'totalpr' 	=> 0
   			);
   		}
   		else{
   			$this->db->trans_commit();
+			if($category_awal != '0'){
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get_where('con_nonmat_new',['category_awal'=>$category_awal])->result_array();
+			}
+			else{
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get('con_nonmat_new')->result_array();
+			}
+
+			$TotalPR = (!empty($GetTotal[0]['total_price']))?$GetTotal[0]['total_price']:0;
   			$Arr_Data	= array(
   				'pesan'		=>'Save process success. Thanks ...',
-  				'status'	=> 1
+  				'status'	=> 1,
+				'inventory' => $category_awal,
+				'gudang' => $gudang,
+				'totalpr' 	=> number_format($TotalPR)
   			);
   			history('Update auto rutin pr');
   		}
@@ -1182,6 +1225,7 @@ class Rutin_model extends CI_Model {
 	public function clear_update_rutin(){
 		$data = $this->input->post();
 		$category_awal = $this->uri->segment(3);
+		$gudang = $this->uri->segment(4);
 		$tgl_now = date('Y-m-d');
 		$tgl_next_month = date('Y-m-'.'20', strtotime('+1 month', strtotime($tgl_now)));
 		// $get_rutin 	= $this->db->get_where('con_nonmat_new',array('category_awal'=>$category_awal))->result_array();
@@ -1204,14 +1248,28 @@ class Rutin_model extends CI_Model {
   			$this->db->trans_rollback();
   			$Arr_Data	= array(
   				'pesan'		=>'Save process failed. Please try again later ...',
-  				'status'	=> 0
+  				'status'	=> 0,
+				'inventory' => $category_awal,
+				'gudang' => $gudang,
+				'totalpr' 	=> 0
   			);
   		}
   		else{
   			$this->db->trans_commit();
+			if($category_awal != '0'){
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get_where('con_nonmat_new',['category_awal'=>$category_awal])->result_array();
+			}
+			else{
+				$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get('con_nonmat_new')->result_array();
+			}
+
+			$TotalPR = (!empty($GetTotal[0]['total_price']))?$GetTotal[0]['total_price']:0;
   			$Arr_Data	= array(
   				'pesan'		=>'Save process success. Thanks ...',
-  				'status'	=> 1
+  				'status'	=> 1,
+				'inventory' => $category_awal,
+				'gudang' => $gudang,
+				'totalpr' 	=> number_format($TotalPR)
   			);
   			history('Clear all rutin pr');
   		}
@@ -1368,6 +1426,9 @@ class Rutin_model extends CI_Model {
 			$purchase = ($kebutuhnMonth * 1.5) - $stock_oke2;
 			$purchase2x = ($purchase < 0)?0:$purchase;
 			$purchase2 = (!empty($row['request']))?$row['request']:$purchase2x;
+
+			$price_ref = (!empty($row['price_pr']))?$row['price_pr']:$row['price_supplier'];
+			$total_price = $price_ref * $purchase2;
 			
 			$nestedData[]	= "<div align='right'>
 									<input type='text' name='purchase_".$nomor."' id='purchase_".$nomor."' value='".number_format($purchase2,2)."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md text-right maskM changeSave' style='width:100%;'>
@@ -1375,10 +1436,12 @@ class Rutin_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>
 									<select id='satuan_".$nomor."' class='chosen_select form-control input-md'><option value='".$row['satuan']."'>".get_name('raw_pieces','kode_satuan','id_satuan',$row['satuan'])."</option></select>	
 									<input type='hidden' name='tanggal_".$nomor."' id='tanggal_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md tgl changeSave' style='width:100%;' readonly value='".$tgl_next_month."'></div>";	
-			$nestedData[]	= "<div align='left'>
-									<input type='text' name='spec_".$nomor."' id='spec_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md changeSave' style='width:100%;' placeholder='Spec' value='".$spec_pr."'></div>";	
+			$nestedData[]	= "<div align='left'><input type='text' name='spec_".$nomor."' id='spec_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md changeSave' style='width:100%;' placeholder='Spec' value='".$spec_pr."'></div>";	
 			$nestedData[]	= "<div align='left'>
 									<input type='text' name='info_".$nomor."' id='info_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' class='form-control input-md changeSave' style='width:100%;' placeholder='Info' value='".$info_pr."'></div>
+									";	
+			$nestedData[]	= "<div align='left'><input type='text' name='price_".$nomor."' id='price_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' readonly class='form-control input-md text-right' style='width:100%;' placeholder='Price Ref.' value='".number_format($price_ref)."'></div>";	
+			$nestedData[]	= "<div align='left'><input type='text' name='tprice_".$nomor."' id='tprice_".$nomor."' data-code_group='".$row['code_group']."' data-no='".$nomor."' readonly class='form-control input-md text-right' style='width:100%;' placeholder='Total Price' value='".number_format($total_price)."'></div>
 									<style>.tgl{cursor:pointer;}</style>
 									<script type='text/javascript'>
 									$('.chosen_select').chosen({width: '100%'});
@@ -1389,6 +1452,7 @@ class Rutin_model extends CI_Model {
 										minDate : 0
 									});
 									</script>";	
+			
 			// $approve 		= "&nbsp;<button type='button' class='btn btn-sm btn-success save_pr' title='Save PR'  data-code_group='".$row['code_group']."' data-no='".$nomor."'><i class='fa fa-check'></i></button>";
 			// $nestedData[]	= 	"<div align='center'>
 			// 					".$approve."
@@ -1419,10 +1483,12 @@ class Rutin_model extends CI_Model {
 			SELECT
 				(@row:=@row+1) AS nomor,
 				a.*,
-				b.category AS category_type
+				b.category AS category_type,
+				z.price_supplier
 			FROM
 				con_nonmat_new a  
-				LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id,
+				LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id
+				LEFT JOIN price_ref z ON a.code_group=z.code_group AND z.deleted_date IS NULL,
 				(SELECT @row:=0) r
 		    WHERE 1=1  
 				AND a.code_group LIKE 'CN%' 

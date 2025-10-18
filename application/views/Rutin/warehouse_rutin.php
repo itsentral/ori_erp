@@ -36,6 +36,20 @@ $this->load->view('include/side_menu');
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
+		<div class='form-group row'>		 	 
+			<label class='label-control col-sm-1'><b>Budget</b></label>
+			<div class='col-sm-2'>             
+					<?php
+						echo form_input(array('id'=>'budget','name'=>'budget','class'=>'form-control input-md text-right','autocomplete'=>'off','readonly'=>'readonly'), number_format($TotalBudget));											
+					?>		
+			</div>
+			<label class='label-control col-sm-1'><b>Total Pengajuan</b></label>
+			<div class='col-sm-2'>             
+					<?php
+						echo form_input(array('id'=>'totalpr','name'=>'totalpr','class'=>'form-control input-md text-right','autocomplete'=>'off','readonly'=>'readonly'),number_format($TotalPR));											
+					?>		
+			</div>
+		</div>
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
@@ -50,6 +64,8 @@ $this->load->view('include/side_menu');
 					<th class="text-center no-sort" width='8%'>Unit</th>
 					<th class="text-center no-sort" width='8%'>Spec</th>
 					<th class="text-center no-sort" width='8%'>Info</th>
+					<th class="text-center no-sort" width='8%'>Price Ref.</th>
+					<th class="text-center no-sort" width='8%'>Total Price</th>
 					<!-- <th class="text-center no-sort" width='8%'>Tanggal Dibutuhkan</th> -->
 					<!-- <th class="text-center no-sort" width='3%'>Option</th> -->
 				</tr>
@@ -77,6 +93,32 @@ $this->load->view('include/side_menu');
 			e.preventDefault();
 			var inventory 		= $('#inventory').val();
 			var in_gudang 		= $('#in_gudang').val();
+
+			$.ajax({
+				url			: base_url + active_controller+'/changeBudget/'+inventory+'/'+in_gudang,
+				type		: "POST",
+				cache		: false,
+				dataType	: 'json',
+				success		: function(data){
+					if(data.status == 1){
+						$('#budget').val(data.totalbudget);
+						$('#totalpr').val(data.totalpr);
+						DataTables(data.inventory,data.in_gudang);
+					}
+					else{
+						console.log('Update Failed!')
+					}
+				},
+				error: function() {
+					swal({
+						title				: "Error Message !",
+						text				: 'An Error Occured During Process. Please try again..',
+						type				: "warning",
+						timer				: 7000
+					});
+				}
+			});
+			
 			DataTables(inventory,in_gudang);
 		});
 		$('.datepicker').datepicker({
@@ -195,28 +237,35 @@ $this->load->view('include/side_menu');
 	$(document).on('change','.changeSave', function(){
 		var nomor 		= $(this).data('no');
 		var id_material = $(this).data('code_group');
-		var purchase 	= $('#purchase_'+nomor).val().split(",").join("");
+		var purchase 	= getNum($('#purchase_'+nomor).val().split(",").join(""));
 		// var tanggal 	= $('#tanggal_'+nomor).val();
 		var tanggal 	= $('#tgl_butuh').val();
+		var inventory 	= $('#inventory').val();
 		var satuan 		= $('#satuan_'+nomor).val();
 		var spec 		= $('#spec_'+nomor).val();
 		var info 		= $('#info_'+nomor).val();
+		var price 		= getNum($('#price_'+nomor).val().split(",").join(""));
+
+		$('#tprice_'+nomor).val(number_format(purchase*price));
 		
 		$.ajax({
 			url			: base_url + active_controller+'/save_rutin_change',
 			type		: "POST",
 			data: {
+				"inventory" 	: inventory,
 				"id_material" 	: id_material,
 				"purchase" 		: purchase,
 				"tanggal" 		: tanggal,
 				"spec" 			: spec,
 				"info" 			: info,
-				"satuan" 		: satuan
+				"satuan" 		: satuan,
+				"price" 		: price
 			},
 			cache		: false,
 			dataType	: 'json',
 			success		: function(data){
 				console.log(data.pesan)
+				$('#totalpr').val(data.totalpr);
 			},
 			error: function() {
 				console.log('error connection serve !')
@@ -245,7 +294,7 @@ $this->load->view('include/side_menu');
 	});
 
 	$(document).on('click','#autoUpdate', function(){
-		var inventory 		= $('#inventory').val();
+		var inventory = $('#inventory').val();
 		var in_gudang = $('#in_gudang').val()
 	
 		if(inventory=='0'){
@@ -283,7 +332,9 @@ $this->load->view('include/side_menu');
 									type	: "success",
 									timer	: 7000
 								});
-							window.location.href = base_url + active_controller+'/warehouse_rutin';
+							$('#totalpr').val(data.totalpr);
+							// window.location.href = base_url + active_controller+'/warehouse_rutin';
+							DataTables(data.inventory,data.in_gudang);
 						}
 						else if(data.status == 0){
 							swal({
@@ -312,7 +363,7 @@ $this->load->view('include/side_menu');
 
 	$(document).on('click','#autoDelete', function(){
 		var inventory 		= $('#inventory').val();
-	
+		var in_gudang = $('#in_gudang').val()
 		// if(inventory=='0'){
 		// 	swal({
 		// 	  title	: "Error Message!",
@@ -336,7 +387,7 @@ $this->load->view('include/side_menu');
 			if (isConfirm) {
 				loading_spinner();
 				$.ajax({
-					url			: base_url + active_controller+'/clear_update_rutin/'+inventory,
+					url			: base_url + active_controller+'/clear_update_rutin/'+inventory+'/'+in_gudang,
 					type		: "POST",
 					cache		: false,
 					dataType	: 'json',
@@ -348,7 +399,9 @@ $this->load->view('include/side_menu');
 									type	: "success",
 									timer	: 7000
 								});
-							window.location.href = base_url + active_controller+'/warehouse_rutin';
+								$('#totalpr').val(data.totalpr);
+							// window.location.href = base_url + active_controller+'/warehouse_rutin';
+							DataTables(data.inventory,data.in_gudang);
 						}
 						else if(data.status == 0){
 							swal({

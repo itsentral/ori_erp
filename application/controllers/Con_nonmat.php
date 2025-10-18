@@ -1248,4 +1248,47 @@ class Con_nonmat extends CI_Controller {
 		}
 		echo json_encode($Arr_Data);
 	}
+
+	public function changeBudget(){
+		$data = $this->input->post();
+		$category_awal = $this->uri->segment(3);
+		$gudang = $this->uri->segment(4);
+		
+		if($category_awal != '0'){
+			$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get_where('con_nonmat_new',['category_awal'=>$category_awal])->result_array();
+			$GetBudget = $this->db->select('SUM(kebutuhan_month*price_from_supplier) AS total_price')->get_where('budget_rutin_detail',['jenis_barang'=>$category_awal])->result_array();
+		}
+		else{
+			$GetTotal = $this->db->select('SUM(total_price_pr) AS total_price')->get('con_nonmat_new')->result_array();
+			$GetBudget = $this->db->select('SUM(kebutuhan_month*price_from_supplier) AS total_price')->get('budget_rutin_detail')->result_array();
+
+		}
+
+		$TotalPR = (!empty($GetTotal[0]['total_price']))?$GetTotal[0]['total_price']:0;
+		$TotalBudget = (!empty($GetBudget[0]['total_price']))?$GetBudget[0]['total_price']:0;
+		
+  		if($this->db->trans_status() === FALSE){
+  			$this->db->trans_rollback();
+  			$Arr_Data	= array(
+  				'pesan'		=>'Save process failed. Please try again later ...',
+  				'status'	=> 0,
+				'inventory' => $category_awal,
+				'gudang' 	=> $gudang,
+				'totalpr' 	=> 0,
+				'totalbudget' 	=> 0
+  			);
+  		}
+  		else{
+  			$this->db->trans_commit();
+  			$Arr_Data	= array(
+  				'pesan'		=>'Save process success. Thanks ...',
+  				'status'	=> 1,
+				'inventory' => $category_awal,
+				'gudang' => $gudang,
+				'totalpr' 	=> number_format($TotalPR),
+				'totalbudget' 	=> number_format($TotalBudget)
+  			);
+  		}
+  		echo json_encode($Arr_Data);
+	}
 }
