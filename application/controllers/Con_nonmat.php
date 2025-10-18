@@ -94,6 +94,7 @@ class Con_nonmat extends CI_Controller {
 
 		$data = array(
 		  'GET_COMSUMABLE'	=> get_detail_consumable(),
+		  'GET_KEBUTUHAN_PER_MONTH' => get_kebutuhanPerMonthGudang(null),
 		  'no_ipp'			=> $no_ipp,
 		  'pengajuangroup'	=> $pengajuangroup,
 		  'result'			=> $result
@@ -143,7 +144,7 @@ class Con_nonmat extends CI_Controller {
 				$ArrayInsert[$key]['tanggal'] 		= (!empty($value['dibutuhkan']))?date('Y-m-d',strtotime($value['dibutuhkan'])):$tgl_dibutuhkan;
 				$ArrayInsert[$key]['spec_pr'] 		= $value['spec'];
 				$ArrayInsert[$key]['info_pr'] 		= $value['info'];
-				$ArrayInsert[$key]['price_from_supplier'] 		= $value['price_from_supplier'];
+				$ArrayInsert[$key]['price_from_supplier'] 		= str_replace(',','',$value['price_from_supplier']);
 
 				$ArrayInsertHeader[$key]['no_Pengajuan_group']= $pengajuangroup;
 				$ArrayInsertHeader[$key]['no_pengajuan'] 		= $kodeP;
@@ -193,9 +194,10 @@ class Con_nonmat extends CI_Controller {
 	public function get_add(){
 		$id = $this->uri->segment(3);
 		$id_category = $this->uri->segment(4);
+		$GET_KEBUTUHAN_PER_MONTH = get_kebutuhanPerMonthGudang(null);
 		// $jenis_barang		= $this->db->select('code_group,material_name,spec')->get_where('con_nonmat_new',array('category_awal'=>$id_category,'deleted'=>'N'))->result_array();
 		$jenis_barang		= $this->db
-									->select('a.code_group,a.material_name,a.spec,b.price_supplier AS price_from_supplier')
+									->select('a.code_group,a.material_name,a.spec,b.price_supplier AS price_from_supplier, a.brand')
 									->join('price_ref b','a.code_group=b.code_group AND b.deleted_date is null','left')
 									->get_where('con_nonmat_new a',array('a.category_awal'=>$id_category,'a.deleted'=>'N'))->result_array();
 		$d_Header = "";
@@ -207,11 +209,21 @@ class Con_nonmat extends CI_Controller {
 				$d_Header .= "<option value='0'>Select Barang</option>";
 				foreach($jenis_barang AS $val => $valx){
 					$price_sup = (!empty($valx['price_from_supplier']))?$valx['price_from_supplier']:0;
-				  $d_Header .= "<option value='".$valx['code_group']."' data-price_sup='".$price_sup."'>".strtoupper($valx['code_group'].' - '.$valx['material_name']." - ".$valx['spec'])."</option>";
+					$kebutuhnMonth 	= (!empty($GET_KEBUTUHAN_PER_MONTH[$valx['code_group']]['kebutuhan']))?$GET_KEBUTUHAN_PER_MONTH[$valx['code_group']]['kebutuhan']:0;
+					$maxStock 		= $kebutuhnMonth * 1.5;
+				  	$d_Header .= "<option value='".$valx['code_group']."' 
+				  	data-price_sup='".$price_sup."'
+				  	data-brand='".strtoupper($valx['brand'])."'
+				  	data-kebutuhnmonth='".$kebutuhnMonth."'
+				  	data-maxstock='".$maxStock."'
+					>".strtoupper($valx['code_group'].' - '.$valx['material_name']." - ".$valx['spec'])."</option>";
 				}
 				$d_Header .= "</select>";
 			$d_Header .= "</td>";
 			$d_Header .= "<td align='left' class='rutin_category'></td>";
+			$d_Header .= "<td align='left' class='brand_category'></td>";
+			$d_Header .= "<td align='center' class='keb1bln_category'></td>";
+			$d_Header .= "<td align='center' class='maxstock_category'></td>";
 			$d_Header .= "<td align='left'>";
 				$d_Header .= "<input name='detail[".$id."][qty]' class='form-control text-center input-md numberOnly2 kebutuhan_month'>";
 			$d_Header .= "</td>";

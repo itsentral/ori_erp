@@ -222,6 +222,7 @@ class Rutin_model extends CI_Model {
 
 		$data = array(
 		  'GET_COMSUMABLE'	=> get_detail_consumable(),
+		  'GET_KEBUTUHAN_PER_MONTH' => get_kebutuhanPerMonthGudang(null),
 		  'no_ipp'			=> $no_ipp,
 		  'result'			=> $result
 		);
@@ -353,6 +354,8 @@ class Rutin_model extends CI_Model {
 		$result = $this->db->query($sql)->result_array();
 
 		$data = array(
+			'GET_COMSUMABLE'	=> get_detail_consumable(),
+		  'GET_KEBUTUHAN_PER_MONTH' => get_kebutuhanPerMonthGudang(null),
 		  'no_ipp'		=> $no_ipp,
 		  'tanda'		=> $tanda,
 		  'id_user'		=> $id_user,
@@ -1236,6 +1239,7 @@ class Rutin_model extends CI_Model {
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = 0;
 			$ArrUpdate[$key]['tgl_dibutuhkan'] = $tgl_next_month;
+			$ArrUpdate[$key]['total_price_pr'] = 0;
 		}
 		
 		$this->db->trans_start();
@@ -1328,6 +1332,7 @@ class Rutin_model extends CI_Model {
 				'tanggal' 		=> $value['tgl_dibutuhkan'],
 				'spec_pr' 		=> $value['spec_pr'],
 				'info_pr' 		=> $value['info_pr'],
+				'price_from_supplier' 		=> $value['price_pr'],
 				'in_gudang' 		=> $in_gudang,
 			);
 		}
