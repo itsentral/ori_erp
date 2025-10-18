@@ -593,6 +593,7 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['tgl_pr']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_barang'])."</div>";
 			$nestedData[]	= "<div align='left'>".$row['spec']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['brand']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['info']."</div>";
 			if($row['category'] == 'asset'){
 				$warna = '#a9179e';
@@ -617,9 +618,10 @@ class Pembelian_model extends CI_Model {
 			$SATUAN 		= (!empty($GET_UNIT[$row['satuan']]['kode']))?' ('.strtolower($GET_UNIT[$row['satuan']]['kode']).')':'';
 
 			$nestedData[]	= "<div align='center'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
-			$nestedData[]	= "<div align='center'>".number_format($row['qty'],2).$SATUAN."</div>";
+			$nestedData[]	= "<div align='center'>".number_format($row['qty'],2)."</div>";
+			$nestedData[]	= "<div align='center'>".strtoupper($SATUAN)."</div>";
 			$nestedData[]	= "<div align='center'>".$tgl_dibutuhkan."</div>";
-			$nestedData[]	= "<div align='center'>".strtoupper($USERNAME)."</div>";
+			$nestedData[]	= "<div align='center'>".strtolower($USERNAME)."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i:s', strtotime($row['created_date']))."</div>";
 			$data[] = $nestedData;
             $urut1++;
@@ -646,9 +648,11 @@ class Pembelian_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*
+				a.*,
+				b.brand
 			FROM
-				tran_pr_detail a,
+				tran_pr_detail a
+				LEFT JOIN con_nonmat_new b ON a.id_barang=b.code_group,
 				(SELECT @row:=0) r
 		    WHERE 1=1 AND a.app_status = 'Y' AND no_rfq IS NULL ".$where."
 				AND (
@@ -659,6 +663,7 @@ class Pembelian_model extends CI_Model {
 				OR a.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.info LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.brand LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;

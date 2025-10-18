@@ -69,17 +69,19 @@ $this->load->view('include/side_menu');
 				<table class="table table-bordered table-striped" id="my-grid3" width='100%'>
 					<thead>
 						<tr class='bg-blue'>
-							<th class="text-center" width='4%'>#</th>
-							<th class="text-center" width='7%'>No PR</th> 
-							<th class="text-center" width='10%'>Tanggal PR</th>
-							<th class="text-center">Item</th>
+							<th class="text-center" width='3%'>#</th>
+							<th class="text-center">No PR</th> 
+							<th class="text-center">Tgl. PR</th>
+							<th class="text-center" width='30%'>Item</th>
 							<th class="text-center">Spec</th>
+							<th class="text-center">Brand</th>
 							<th class="text-center">Note</th>
-							<th class="text-center no-sort" width='10%'>Category</th>
-							<th class="text-center no-sort" width='7%'>Qty</th>
-							<th class="text-center no-sort" width='10%'>Dibutuhkan</th>
-							<th class="text-center no-sort" width='9%'>Request By</th>
-							<th class="text-center no-sort" width='10%'>Request Date</th>
+							<th class="text-center no-sort">Category</th>
+							<th class="text-center no-sort">Qty</th>
+							<th class="text-center no-sort">Unit</th>
+							<th class="text-center no-sort">Dibutuhkan</th>
+							<th class="text-center no-sort">Request By</th>
+							<th class="text-center no-sort">Request Date</th>
 						</tr>
 					</thead>
 					<tbody></tbody>
