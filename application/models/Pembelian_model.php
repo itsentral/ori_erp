@@ -1729,7 +1729,7 @@ class Pembelian_model extends CI_Model {
 			2 => 'nm_supplier'
 		);
 
-		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.sts_ajuan ASC, a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
@@ -1946,7 +1946,7 @@ class Pembelian_model extends CI_Model {
 			2 => 'nm_supplier'
 		);
 
-		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.sts_ajuan ASC, a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);

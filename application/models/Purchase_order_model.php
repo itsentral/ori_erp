@@ -850,7 +850,29 @@ class Purchase_order_model extends CI_Model {
 							))
 							->result_array();
 			
+			$resultNew		= 	$this->db->select('a.*')->group_by('a.id_material')->get_where('tran_material_rfq_detail a',array(
+								'a.no_rfq' => $no_rfq,
+								'a.deleted' => 'N',
+							))
+							->result_array();
+			$resultSup		= 	$this->db->select('a.*')->group_by('a.hub_rfq')->get_where('tran_material_rfq_header a',array(
+									'a.no_rfq' => $no_rfq
+								))
+								->result_array();
+			$ArraySerach = [];
+			foreach ($result as $key => $value) {
+				$UNIQ = $value['id_material'].'-'.$value['hub_rfq'];
+				$ArraySerach[$UNIQ]['moq'] = $value['moq'];
+				$ArraySerach[$UNIQ]['lead_time'] = $value['lead_time'];
+				$ArraySerach[$UNIQ]['harga_idr'] = $value['harga_idr'];
+				$ArraySerach[$UNIQ]['total_harga'] = $value['harga_idr']*$value['qty'];
+				$ArraySerach[$UNIQ]['id'] = $value['id'];
+			}
+			
 			$data = array(
+				'resultNew' 	=> $resultNew,
+				'resultSup' 	=> $resultSup,
+				'ArraySerach' 	=> $ArraySerach,
 				'result' 	=> $result,
 				'no_rfq' 	=> $no_rfq
 			);
@@ -998,8 +1020,30 @@ class Purchase_order_model extends CI_Model {
 								// 'a.status' => 'SETUJU'
 							))
 							->result_array();
+
+			$resultNew		= 	$this->db->select('a.*')->group_by('a.id_material')->get_where('tran_material_rfq_detail a',array(
+								'a.no_rfq' => $no_rfq,
+								'a.deleted' => 'N',
+							))
+							->result_array();
+			$resultSup		= 	$this->db->select('a.*')->group_by('a.hub_rfq')->get_where('tran_material_rfq_header a',array(
+									'a.no_rfq' => $no_rfq
+								))
+								->result_array();
+			$ArraySerach = [];
+			foreach ($result as $key => $value) {
+				$UNIQ = $value['id_material'].'-'.$value['hub_rfq'];
+				$ArraySerach[$UNIQ]['moq'] = $value['moq'];
+				$ArraySerach[$UNIQ]['lead_time'] = $value['lead_time'];
+				$ArraySerach[$UNIQ]['harga_idr'] = $value['harga_idr'];
+				$ArraySerach[$UNIQ]['total_harga'] = $value['harga_idr']*$value['qty'];
+				$ArraySerach[$UNIQ]['id'] = $value['id'];
+			}
 			
 			$data = array(
+				'resultNew' 	=> $resultNew,
+				'resultSup' 	=> $resultSup,
+				'ArraySerach' 	=> $ArraySerach,
 				'result' 	=> $result,
 				'no_rfq' 	=> $no_rfq
 			);
