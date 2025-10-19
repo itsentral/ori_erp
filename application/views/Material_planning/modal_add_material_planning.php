@@ -143,7 +143,7 @@
 	<table class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead id='head_table'>
 			<tr>
-				<td class='bg-blue' colspan='9'><b>ACCESSORIES </b></td>
+				<td class='bg-blue' colspan='6'><b>ACCESSORIES </b></td>
 			</tr>
 		</thead>
 		<thead id='head_table'>
@@ -153,9 +153,9 @@
 				<th class="text-center" style='vertical-align:middle;'>Material Name</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Est Material</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Unit</th>
-				<th class="text-center" style='vertical-align:middle;' width='9%'>Free Stock</th>
+				<!-- <th class="text-center" style='vertical-align:middle;' width='9%'>Free Stock</th>
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Kebutuhan 1 Bulan</th>
-				<th class="text-center" style='vertical-align:middle;' width='9%'>Max Stock</th>
+				<th class="text-center" style='vertical-align:middle;' width='9%'>Max Stock</th> -->
 				<th class="text-center" style='vertical-align:middle;' width='9%'>Purchase</th>
 				<!-- <th class="text-center" style='vertical-align:middle;' width='9%'>Tgl Dibutuhkan</th> -->
 			</tr>
@@ -165,8 +165,8 @@
 			if(!empty($non_frp) OR !empty($pack_truck)){
 				$Total1 = 0;
 				$No=0;
-				$id_gudang_project = getGudangProject();
-				$GET_STOCK_PROJECT = get_warehouseStockProject($id_gudang_project);
+				// $id_gudang_project = getGudangProject();
+				// $GET_STOCK_PROJECT = get_warehouseStockProject($id_gudang_project);
 
 				foreach($non_frp AS $val => $valx){
 					$No++;
@@ -178,10 +178,10 @@
 						$satuan = '1';
 					}
 
-					$book_per_month = $this->db->select('SUM(kebutuhan_month) AS kebutuhan')->get_where('budget_rutin_detail', array('id_barang'=>$valx['code_group']))->result();
-					$b_permont = (!empty($book_per_month))?$book_per_month[0]->kebutuhan:0;
-					$max_stock = $b_permont * 1.5;
-					$stock = (!empty($GET_STOCK_PROJECT[$valx['code_group']]))?$GET_STOCK_PROJECT[$valx['code_group']]:0;
+					// $book_per_month = $this->db->select('SUM(kebutuhan_month) AS kebutuhan')->get_where('budget_rutin_detail', array('id_barang'=>$valx['code_group']))->result();
+					// $b_permont = (!empty($book_per_month))?$book_per_month[0]->kebutuhan:0;
+					// $max_stock = $b_permont * 1.5;
+					// $stock = (!empty($GET_STOCK_PROJECT[$valx['code_group']]))?$GET_STOCK_PROJECT[$valx['code_group']]:0;
 					
 					$reorder 		= 0;
 					$qty_booking 	= 0;
@@ -202,9 +202,9 @@
 						echo "<td>".strtoupper(get_name('accessories','material','id',$valx['id_material']))."</td>";
 						echo "<td align='right'>".number_format($qty,2)."</td>";
 						echo "<td align='center'>".strtoupper(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan))."</td>";
-						echo "<td align='right'>".number_format($stock,2)."</td>";
-						echo "<td align='right'>".number_format($b_permont,2)."</td>";
-						echo "<td align='right'>".number_format($max_stock,2)."</td>";
+						// echo "<td align='right'>".number_format($stock,2)."</td>";
+						// echo "<td align='right'>".number_format($b_permont,2)."</td>";
+						// echo "<td align='right'>".number_format($max_stock,2)."</td>";
 						echo "<td align='right'><input type='text' name='add_acc_planning[".$No."][purchase]' class='form-control input-sm text-right maskM' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 						// echo "<td align='left'><input type='text' name='add_acc_planning[".$No."][tanggal]' class='form-control input-sm tgl' readonly placeholder='Tgl DIbutuhkan'></td>";
 					echo "</tr>";
@@ -239,9 +239,9 @@
 						echo "<td></td>";
 						echo "<td align='right'>".number_format($qty,2)."</td>";
 						echo "<td align='center'>".strtoupper('-')."</td>";
-						echo "<td align='center'>-</td>";
-						echo "<td align='center'>-</td>";
-						echo "<td align='center'>-</td>";
+						// echo "<td align='center'>-</td>";
+						// echo "<td align='center'>-</td>";
+						// echo "<td align='center'>-</td>";
 						echo "<td align='right'><input type='text' name='add_acc_planning[".$No."][purchase]' class='form-control input-sm text-right maskM' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 						// echo "<td align='left'><input type='text' name='add_acc_planning[".$No."][tanggal]' class='form-control input-sm tgl' readonly placeholder='Tgl DIbutuhkan'></td>";
 					echo "</tr>";

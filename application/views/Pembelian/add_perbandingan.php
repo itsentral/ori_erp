@@ -31,13 +31,11 @@ $this->load->view('include/side_menu');
 			$query 	= "	SELECT 
 							a.*,
 							z.price_supplier,
-							y.price_from_supplier AS price_supplier_master,
 							c.tgl_dibutuhkan
 						FROM 
 							tran_rfq_detail a 
 							LEFT JOIN tran_pr_detail c ON a.no_rfq = c.no_rfq AND a.id_barang = c.id_barang
 							LEFT JOIN price_ref z ON a.id_barang = z.code_group AND z.sts_price = 'N' AND z.deleted = 'N'
-							LEFT JOIN accessories y ON a.id_barang = y.id_material
 						WHERE 
 							a.hub_rfq='".$valx['hub_rfq']."'
 						GROUP BY a.id_barang
@@ -82,6 +80,7 @@ $this->load->view('include/side_menu');
 					<table class="table table-bordered table-striped" width='100%'>
 						<thead>
 							<tr class='bg-blue'>
+								<th class="text-center mid" width='8%'>Code</th>
 								<th class="text-center mid">Material Name</th>
 								<th class="text-center mid" width='8%'>Price Reference</th>
 								<th class="text-center mid" width='8%'>Price From Supplier</th>
@@ -98,8 +97,9 @@ $this->load->view('include/side_menu');
 						$no2 = 0;
 						$SUM_HARGA = 0;
 						foreach($res AS $val2 => $valx2){ $no2++;
-							$price_supplier = (!empty($valx2['price_supplier_master']))?$valx2['price_supplier_master']:$valx2['price_supplier'];
+							$price_supplier = $valx2['price_supplier'];
 							echo "<tr>";
+								echo "<td align='center'>".strtoupper($valx2['id_barang'])."</td>";
 								echo "<td>".strtoupper($valx2['nm_barang'].' '.$valx2['spec'].' '.$valx2['info'])."</td>";
 								echo "<td align='right'>".number_format($price_supplier,2)."</td>";
 								echo "<td class='mid' align='right'><input type='text' name='Detail[".$no."][detail][".$no2."][price_ref_sup]' class='form-control text-right input-md autoNumeric2 price_sub_".$no." changeKurs' value='".$valx2['price_ref_sup']."' data-no='".$no."'></td>";
@@ -121,7 +121,7 @@ $this->load->view('include/side_menu');
 							$SUM_HARGA += $valx2['total_harga'];
 						}
 						echo "<tr>";
-							echo "<td colspan='6'><textarea id='keterangan_".$no."' class='form-control input-md' name='Header[".$no."][keterangan]' rows='2' placeholder='Deskripsi singkat tentang product/jasa dari supplier.'>".strtoupper($keterangan)."</textarea></td>";
+							echo "<td colspan='7'><textarea id='keterangan_".$no."' class='form-control input-md' name='Header[".$no."][keterangan]' rows='2' placeholder='Deskripsi singkat tentang product/jasa dari supplier.'>".strtoupper($keterangan)."</textarea></td>";
 							echo "<td class='text-right text-bold mid'>TOTAL PRICE</td>";
 							echo "<td class='mid' align='right'><input type='text' class='form-control text-right input-md autoNumeric2 sum_harga_idr_".$no."' value='".$SUM_HARGA."' readonly></td>";
 						echo "</tr>";

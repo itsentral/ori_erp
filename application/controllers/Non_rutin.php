@@ -208,7 +208,7 @@ class Non_rutin extends CI_Controller {
 						$SUM_HARGA 	+= $harga * $qty;
 						
 						$ArrDetail[$val]['id'] 			= $valx['id'];
-						$ArrDetail[$val]['no_pr'] 		= $no_pr;
+						// $ArrDetail[$val]['no_pr'] 		= $no_pr;
 						$ArrDetail[$val]['qty_rev'] 	= $qty;
 						$ArrDetail[$val]['harga_rev'] 	= $harga;
 						$ArrDetail[$val]['sts_app'] 	= $sts_app;
@@ -240,7 +240,7 @@ class Non_rutin extends CI_Controller {
 				$ArrHeader		= array(
 					'qty_rev' 		=> $SUM_QTY,
 					'harga_rev' 	=> $SUM_HARGA,
-					'no_pr' 		=> $no_pr,
+					// 'no_pr' 		=> $no_pr,
 					'sts_app' 		=> $sts_app,
 					'reason' 		=> $reason,
 					'sts_app_by'	=> $data_session['ORI_User']['username'],
@@ -278,8 +278,8 @@ class Non_rutin extends CI_Controller {
 					
 					$this->db->update_batch('rutin_non_planning_detail', $ArrDetail, 'id');
 					
-					$this->db->insert('tran_pr_header', $ArrHeaderPR);
-					$this->db->insert_batch('tran_pr_detail', $ArrDetailPR);
+					// $this->db->insert('tran_pr_header', $ArrHeaderPR);
+					// $this->db->insert_batch('tran_pr_detail', $ArrDetailPR);
 				}
 			$this->db->trans_complete();
 
