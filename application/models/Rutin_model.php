@@ -1179,6 +1179,10 @@ class Rutin_model extends CI_Model {
 			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
 			$purchase2 	= ($purchase > 0)?ceil($purchase):0;
 			$price_ref 	= (!empty($get_price[0]->price_supplier))?$get_price[0]->price_supplier:0;
+			$MOQ 		= $value['min_order'];
+			if($purchase2 < $MOQ){
+				$purchase2 = $MOQ;
+			}
 
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = $purchase2;
@@ -1428,6 +1432,7 @@ class Rutin_model extends CI_Model {
 			$kebutuhnMonth 	= (!empty($GET_KEBUTUHAN_PER_MONTH[$row['code_group']]['kebutuhan']))?$GET_KEBUTUHAN_PER_MONTH[$row['code_group']]['kebutuhan']:0;
 			$nestedData[]	= "<div align='right'>".number_format($kebutuhnMonth)."</div>";
 			$nestedData[]	= "<div align='right'><span id='maxstockNow_".$nomor."'>".number_format(($kebutuhnMonth * 1.5))."</span></div>";
+			$nestedData[]	= "<div align='right'><span id='moqNow_".$nomor."'>".number_format($row['min_order'])."</span></div>";
 			$purchase = ($kebutuhnMonth * 1.5) - $stock_oke2;
 			$purchase2x = ($purchase < 0)?0:$purchase;
 			$purchase2 = (!empty($row['request']))?$row['request']:$purchase2x;

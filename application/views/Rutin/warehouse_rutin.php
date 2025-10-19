@@ -60,6 +60,7 @@ $this->load->view('include/side_menu');
 					<th class="text-center no-sort">Stock</th>
 					<th class="text-center no-sort">Keb.1 Bln</th>
 					<th class="text-center no-sort">Max Stock</th>
+					<th class="text-center no-sort">MOQ</th>
 					<th class="text-center no-sort" width='7%'>Propose Purchase</th>
 					<th class="text-center no-sort">Unit</th>
 					<th class="text-center no-sort" width='8%'>Spec</th>
@@ -248,12 +249,14 @@ $this->load->view('include/side_menu');
 
 		var stockNow 	= getNum($('#stockNow_'+nomor).text().split(",").join(""));
 		var maxstockNow = getNum($('#maxstockNow_'+nomor).text().split(",").join(""));
+		var moqNow 		= getNum($('#moqNow_'+nomor).text().split(",").join(""));
 		var maxpropose 	= maxstockNow - stockNow
 
 		if(maxpropose > 0){
 			if(purchase > maxpropose){
 				$('#purchase_'+nomor).val(number_format(maxpropose))
 				$('#noted_'+nomor).text('Max Propose: '+maxpropose)
+				return false
 			}
 			else{
 				$('#noted_'+nomor).text('')
@@ -263,10 +266,15 @@ $this->load->view('include/side_menu');
 			if(info == ''){
 				$('#noted_'+nomor).text('Info diisi dulu!')
 				$('#purchase_'+nomor).val(0)
+				return false
 			}
 			else{
 				$('#noted_'+nomor).text('')
 			}
+		}
+
+		if(maxpropose < moqNow || purchase < moqNow){
+			$('#purchase_'+nomor).val(number_format(moqNow))
 		}
 
 		$('#tprice_'+nomor).val(number_format(purchase*price));
