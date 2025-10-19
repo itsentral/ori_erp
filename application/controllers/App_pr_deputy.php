@@ -476,5 +476,349 @@ class App_pr_deputy extends CI_Controller {
 		echo json_encode($Arr_Kembali);
 	}
 
+	//Approval Department
+	public function approval_pr_department(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$tanda				= $this->uri->segment(2);
+		$data = array(
+			'title'			=> 'Approval Deputy PR Departemen',
+			'action'		=> 'index',
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'tanda'			=> $tanda
+		);
+		history('View approval deputy pr department (non-rutin)');
+		$this->load->view('App_pr_deputy/approval_pr_department',$data);
+	}
+
+	public function server_side_non_rutin(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_json_non_rutin(
+			$requestData['tanda'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+			
+			$tanda = $requestData['tanda'];
+			
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$no_pr = (!empty($row['no_pr']))?$row['no_pr']:"<span class='text-red' title='No Pengajuan'>".$row['no_pengajuan']."</span>";
+			$nestedData[]	= "<div align='center'>".$no_pr."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_dept'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_barang_group'])."</div>";
+			$last_by 	= (!empty($row['updated_by']))?$row['updated_by']:$row['created_by'];
+			$last_date = (!empty($row['updated_date']))?$row['updated_date']:$row['created_date'];
+			
+			if($row['sts_app2'] == 'N'){
+				$warna 	= 'blue';
+				$sts 	= 'WAITING APPROVAL';
+			}
+			elseif($row['sts_app2'] == 'Y'){
+				$warna 	= 'green';
+				$sts 	= 'APPROVED';
+			}
+			else{
+				$warna 	= 'red';
+				$sts 	= 'REJECTED';
+			}
+			
+			$nestedData[]	= "<div align='center'><span class='badge' style='background-color: ".$warna.";'>".$sts."</span></div>";
+				$view		= "<a href='".base_url($this->uri->segment(1).'/add_approval_pr_department/'.$row['no_pengajuan'].'/view')."' class='btn btn-sm btn-warning' title='View' data-role='qtip'><i class='fa fa-eye'></i></a>";
+				$edit		= "";
+				$approve	= "";
+				$cancel		= "";
+				$print	= "&nbsp;<a href='".base_url('non_rutin/print_pengajuan_non_rutin/'.$row['no_pengajuan'])."' target='_blank' class='btn btn-sm btn-success' title='Print'><i class='fa fa-print'></i></a>";
+
+				if($tanda == 'approval'){
+					$view		= "";
+					if($Arr_Akses['approve']=='1'){
+						if($row['sts_app2'] == 'N'){
+							$approve	= "&nbsp;<a href='".base_url($this->uri->segment(1).'/add_approval_pr_department/'.$row['no_pengajuan'])."' class='btn btn-sm btn-info' title='Approve' data-role='qtip'><i class='fa fa-check'></i></a>";
+						}
+					}
+				}
+			$nestedData[]	= "<div align='left'>
+									".$view."
+                                    ".$edit."
+									".$approve."
+									".$cancel."
+									".$print."
+									</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_json_non_rutin($tanda, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		
+		$where = "";
+		if($tanda == 'approval'){
+			$where = "AND a.sts_app = 'Y' AND a.sts_app2 = 'N' AND (z.no_pr IS NULL AND a.no_pr IS NULL)";
+		}
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.*,
+				b.nm_dept,
+				GROUP_CONCAT(CONCAT(z.nm_barang,', ',z.spec,' <b>(',z.qty,' ',LOWER(y.kode_satuan),')</b>, ',z.tanggal,', ',LOWER(z.keterangan)) ORDER BY z.id ASC SEPARATOR '<br>') AS nm_barang_group
+			FROM
+				rutin_non_planning_detail z
+				LEFT JOIN rutin_non_planning_header a ON z.no_pengajuan=a.no_pengajuan
+				LEFT JOIN department b ON a.id_dept=b.id
+				LEFT JOIN raw_pieces y ON z.satuan=y.id_satuan,
+				(SELECT @row:=0) r
+		    WHERE 1=1 ".$where." AND a.status_id = 1 AND (
+				a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.tanggal LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_dept LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR z.nm_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR z.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR z.keterangan LIKE '%".$this->db->escape_like_str($like_value)."%'
+	        )
+			GROUP BY z.no_pengajuan
+		";
+		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_pr',
+			2 => 'b.nm_dept'
+		);
+
+		$sql .= " ORDER BY id DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	public function add_approval_pr_department(){
+		if($this->input->post()){
+			$Arr_Kembali	= array();
+			$data			= $this->input->post();
+			$data_session	= $this->session->userdata;
+			$dateTime		= date('Y-m-d H:i:s');
+            // print_r($data); exit;
+			$code_plan  	= $data['id'];
+			$code_planx  	= $data['id'];
+			$tanda        	= $data['tanda'];
+			$approve        = $data['approve'];
+			$no_so        	= (!empty($data['no_so']))?$data['no_so']:NULL; 
+			$project_name   = (!empty($data['project_name']))?$data['project_name']:NULL; 
+			$id_dept 		= (!empty($data['id_dept']))?$data['id_dept']:NULL;
+			$id_costcenter 	= (!empty($data['id_costcenter']))?$data['id_costcenter']:NULL;
+			$coa 			= (!empty($data['coa']))?$data['coa']:NULL;
+			$budget 		= str_replace(',','',$data['budget']);
+			$sisa_budget 	= str_replace(',','',$data['sisa_budget']);
+			
+			$detail 		= $data['detail'];
+			
+			//approve
+			$sts_app        = (!empty($data['sts_app']))?$data['sts_app']:'';
+			$reason        	= (!empty($data['reason']))?$data['reason']:'';
+			
+			$ym = date('ym');
+			
+			
+			$SUM_QTY = 0;
+			$SUM_HARGA = 0;
+			
+			//header approve
+			$ArrDetail = array();
+			$ArrDetailPR = array();
+			
+			$Ym = date('ym');
+			$qIPP			= "SELECT MAX(no_pr) as maxP FROM tran_pr_header WHERE no_pr LIKE 'PRN".$Ym."%' ";
+			$numrowIPP		= $this->db->query($qIPP)->num_rows();
+			$resultIPP		= $this->db->query($qIPP)->result_array();
+			$angkaUrut2		= $resultIPP[0]['maxP'];
+			$urutan2		= (int)substr($angkaUrut2, 7, 4);
+			$urutan2++;
+			$urut2			= sprintf('%04s',$urutan2);
+			$no_pr			= "PRN".$Ym.$urut2;
+			
+			
+
+			$Ym = date('ym');
+			$qIPPX			= "SELECT MAX(no_pr_group) as maxP FROM tran_pr_header WHERE no_pr_group LIKE 'PR".$Ym."%' ";
+			$numrowIPPX		= $this->db->query($qIPPX)->num_rows();
+			$resultIPPX		= $this->db->query($qIPPX)->result_array();
+			$angkaUrut2X	= $resultIPPX[0]['maxP'];
+			$urutan2X		= (int)substr($angkaUrut2X, 6, 4);
+			$urutan2X++;
+			$urut2X			= sprintf('%04s',$urutan2X); 
+			$no_pr_group	= "PR".$Ym.$urut2X;
+			
+			$ArrHeaderPR = array(
+				'no_pr' => $no_pr,
+				'no_pr_group' => $no_pr_group,
+				'category' => 'non rutin',
+				'tgl_pr'	=> date('Y-m-d'),
+				'created_by' => $this->session->userdata['ORI_User']['username'],
+				'created_date' => date('Y-m-d H:i:s')
+			);
+			
+			$SUM_QTY = 0;
+			$SUM_HARGA = 0;
+			if(!empty($detail)){
+				foreach($detail AS $val => $valx){
+					$qty 	= str_replace(',','',$valx['qty']);
+					$harga 	= str_replace(',','',$valx['harga']);
+					
+					$SUM_QTY 	+= $qty;
+					$SUM_HARGA 	+= $harga * $qty;
+					
+					$ArrDetail[$val]['id'] 			= $valx['id'];
+					$ArrDetail[$val]['no_pr'] 		= $no_pr;
+					$ArrDetail[$val]['qty_rev'] 	= $qty;
+					$ArrDetail[$val]['harga_rev'] 	= $harga;
+					$ArrDetail[$val]['sts_app2'] 	= $sts_app;
+					$ArrDetail[$val]['sts_app_by2'] 	= $data_session['ORI_User']['username'];
+					$ArrDetail[$val]['sts_app_date2']= $dateTime;
+					
+					
+					$ArrDetailPR[$val]['no_pr'] 		= $no_pr;
+					$ArrDetailPR[$val]['no_pr_group'] 	= $no_pr_group;
+					$ArrDetailPR[$val]['category'] 		= 'non rutin';
+					$ArrDetailPR[$val]['tgl_pr'] 		= date('Y-m-d');
+					$ArrDetailPR[$val]['id_barang'] 	= $valx['id'];
+					$ArrDetailPR[$val]['nm_barang'] 	= strtolower($valx['nm_barang'].' - '.$valx['spec']);
+					$ArrDetailPR[$val]['qty'] 			= $qty;
+					$ArrDetailPR[$val]['nilai_pr'] 		= $harga;
+					$ArrDetailPR[$val]['tgl_dibutuhkan']= $valx['tanggal'];
+					$ArrDetailPR[$val]['satuan']		= $valx['satuan'];
+					$ArrDetailPR[$val]['spec']		= $valx['spec'];
+					$ArrDetailPR[$val]['info']		= $valx['keterangan'];
+					$ArrDetailPR[$val]['app_status'] 	= 'Y';
+					$ArrDetailPR[$val]['app_reason']	= strtolower($valx['keterangan']);
+					$ArrDetailPR[$val]['app_by'] = $data_session['ORI_User']['username'];
+					$ArrDetailPR[$val]['app_date']= $dateTime;
+					$ArrDetailPR[$val]['created_by'] 	= $data_session['ORI_User']['username'];
+					$ArrDetailPR[$val]['created_date'] 	= $dateTime;
+				}
+			}
+		
+			$ArrHeader		= array(
+				'qty_rev' 		=> $SUM_QTY,
+				'harga_rev' 	=> $SUM_HARGA,
+				'no_pr' 		=> $no_pr,
+				'sts_app2' 		=> $sts_app,
+				'reason' 		=> $reason,
+				'sts_app_by2'	=> $data_session['ORI_User']['username'],
+				'sts_app_date2'	=> $dateTime
+			);
+			// print_r($ArrHeaderPR);
+			// print_r($ArrDetailPR);
+			// exit;
+			
+			$this->db->trans_start();
+				$this->db->where(array('no_pengajuan' => $code_planx));
+				$this->db->update('rutin_non_planning_header', $ArrHeader);
+				
+				$this->db->update_batch('rutin_non_planning_detail', $ArrDetail, 'id');
+				
+				$this->db->insert('tran_pr_header', $ArrHeaderPR);
+				$this->db->insert_batch('tran_pr_detail', $ArrDetailPR);
+			$this->db->trans_complete();
+
+
+			if($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				$Arr_Kembali	= array(
+					'pesan'		=> 'Process data failed. Please try again later ...',
+					'status'	=> 0
+				);
+			}
+			else{
+				$this->db->trans_commit();
+				$Arr_Kembali	= array(
+					'pesan'		=> 'Process data success. Thanks ...',
+					'status'	=> 1
+				);
+				history('Approval deputy pengajuan budget non rutin '.$code_plan);
+			}
+			echo json_encode($Arr_Kembali);
+		}
+		else{
+			$controller			= ucfirst(strtolower($this->uri->segment(1)));
+			$Arr_Akses			= getAcccesmenu($controller);
+			if($Arr_Akses['read'] !='1'){
+				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+				redirect(site_url('dashboard'));
+			}
+			
+			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
+			$id 		= $this->uri->segment(3);
+			$approve 	= 'approval';
+			$header 	= $this->db->query("SELECT * FROM rutin_non_planning_header WHERE no_pengajuan='".$id."' ")->result();
+			$detail 	= $this->db->query("SELECT * FROM rutin_non_planning_detail WHERE no_pengajuan='".$id."' ")->result_array();
+			$datacoa 	= $this->db->query("SELECT a.coa,b.nama FROM coa_category a join ".DBACC.".coa_master b on a.coa=b.no_perkiraan WHERE a.tipe='NONRUTIN' order by a.coa")->result_array();
+			$satuan		= $this->db->get_where('raw_pieces',array('delete'=>'N'))->result_array();
+			$tanda 		= (!empty($header))?'Edit':'Add';
+			if(!empty($approve)){
+				$tanda 		= ($approve == 'view')?'View':'Approve';
+			}
+			$data = array(
+				'title'				=> $tanda.' Deputy PR Departemen',
+					'action'		=> strtolower($tanda),
+					'akses_menu'	=> $Arr_Akses,
+					'header'		=> $header,
+					'detail'		=> $detail,
+					'datacoa'		=> $datacoa,
+					'satuan'		=> $satuan,
+					'approve'		=> $approve,
+					'id'			=> $id 
+			);
+			
+			$this->load->view('App_pr_deputy/add_approval_pr_department',$data);
+		}
+	}
 	
 }
