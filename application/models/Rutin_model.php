@@ -506,8 +506,8 @@ class Rutin_model extends CI_Model {
 			
 			
 			$ArrHeader[$val]['no_pengajuan'] 	= $valx['no_pengajuan'];
-			$ArrHeader[$val]['no_pr'] 			= $kodeP.$urut2;
-			$ArrHeader[$val]['no_pr_group'] 	= $no_pr_group;
+			// $ArrHeader[$val]['no_pr'] 			= $kodeP.$urut2;
+			// $ArrHeader[$val]['no_pr_group'] 	= $no_pr_group;
 			$ArrHeader[$val]['sts_app'] 		= 'Y';
 			$ArrHeader[$val]['sts_pr'] 			= 'Y';
 			$ArrHeader[$val]['purchase_rev'] 	= str_replace(',','',$valx['qty_revisi']);
@@ -516,8 +516,8 @@ class Rutin_model extends CI_Model {
 			
 			
 			$ArrDetail[$val]['no_pengajuan'] 	= $valx['no_pengajuan'];
-			$ArrDetail[$val]['no_pr'] 			= $kodeP.$urut2;
-			$ArrDetail[$val]['no_pr_group'] 	= $no_pr_group;
+			// $ArrDetail[$val]['no_pr'] 			= $kodeP.$urut2;
+			// $ArrDetail[$val]['no_pr_group'] 	= $no_pr_group;
 			$ArrDetail[$val]['sts_app'] 		= 'Y';
 			$ArrDetail[$val]['purchase_rev'] 	= str_replace(',','',$valx['qty_revisi']);
 			$ArrDetail[$val]['sts_app_by'] 		= $UserName;
@@ -576,10 +576,10 @@ class Rutin_model extends CI_Model {
 			if(!empty($ArrDetail)){
 				$this->db->update_batch('rutin_planning_detail', $ArrDetail, 'no_pengajuan');
 			}
-			if(!empty($ArrPR)){
-				$this->db->insert_batch('tran_pr_header', $ArrPR2);
-				$this->db->insert_batch('tran_pr_detail', $ArrPR);
-			}
+			// if(!empty($ArrPR)){
+			// 	$this->db->insert_batch('tran_pr_header', $ArrPR2);
+			// 	$this->db->insert_batch('tran_pr_detail', $ArrPR);
+			// }
 		$this->db->trans_complete();
 
 

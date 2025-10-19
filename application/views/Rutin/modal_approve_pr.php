@@ -86,8 +86,8 @@
 			</tfoot>
 		</table>
 		<?php
-			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 15px 0px 5px 0px;','content'=>'Approve','id'=>'app_pr'));
-			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-danger','style'=>'min-width:100px; float:right; margin: 15px 5px 5px 0px;','content'=>'Reject','id'=>'rejectPR_check'));
+			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 15px 0px 5px 0px;','content'=>'Approve All','id'=>'app_pr'));
+			echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-danger','style'=>'min-width:100px; float:right; margin: 15px 5px 5px 0px;','content'=>'Reject Checked','id'=>'rejectPR_check'));
 		?>
 	</div>
 </div>
