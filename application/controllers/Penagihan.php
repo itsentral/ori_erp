@@ -6174,7 +6174,7 @@ if($base_cur=='USD'){
 							$perseninv=($valx->total_deal_usd/$totalinvoice);
 						}
 
-					} elseif($base_cur=='USD'||$base_cur==''){
+					} elseif($base_cur=='IDR'||$base_cur==''){
 
 						if($valx->total_deal_idr < 1 || $totalinvoice < 1){
 							$perseninv=0;
@@ -6206,7 +6206,7 @@ if($base_cur=='USD'){
 							$perseninv=($valx->total_deal_usd/$totalinvoice);
 						}
 
-					} elseif($base_cur=='USD'||$base_cur==''){
+					} elseif($base_cur=='IDR'||$base_cur==''){
 
 						if($valx->total_deal_idr < 1 || $totalinvoice < 1){
 							$perseninv=0;
@@ -6215,9 +6215,6 @@ if($base_cur=='USD'){
 						}
 
 					}
-
-					print_r($base_cur);
-					exit;
 
 					$this->db->query("update ".DBTANKI.".ipp_header set
 					uang_muka_invoice=(uang_muka_invoice+".($gethd->total_um*$perseninv)."),
