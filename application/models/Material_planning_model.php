@@ -572,7 +572,8 @@ class Material_planning_model extends CI_Model {
 									a.satuan,
 									a.berat,
 									b.stock,
-									y.id_material as code_group
+									y.id_material as code_group,
+									0 AS sudah_request
 								FROM
 									so_acc_and_mat a
 									LEFT JOIN accessories y ON a.id_material = y.id

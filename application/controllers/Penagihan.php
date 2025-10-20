@@ -6165,7 +6165,27 @@ if($base_cur=='USD'){
 			if($jenis_invoice=='progress'){
 				foreach($get_bill_so AS $valx){$nox++;
 				 if($valx->jenis=='pipa'){
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+
+					if($base_cur=='USD'){
+
+						if($valx->total_deal_usd < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_usd/$totalinvoice);
+						}
+
+					} elseif($base_cur=='USD'||$base_cur==''){
+
+						if($valx->total_deal_idr < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_idr/$totalinvoice);
+						}
+
+					}
+
+					
+
 					$this->db->query("update billing_so set
 					uang_muka_invoice=(uang_muka_invoice+".($gethd->total_um*$perseninv)."),
 					uang_muka_invoice_idr=(uang_muka_invoice_idr+".$gethd->total_um_idr*$perseninv."),
@@ -6177,7 +6197,25 @@ if($base_cur=='USD'){
 					status_total=(status_total+'".$gethd->total_invoice*$perseninv."')
 					WHERE id='".$valx->id."'");
 				 }else{
-					$perseninv=($valx->total_deal_usd/$totalinvoice);
+					
+					if($base_cur=='USD'){
+
+						if($valx->total_deal_usd < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_usd/$totalinvoice);
+						}
+
+					} elseif($base_cur=='USD'||$base_cur==''){
+
+						if($valx->total_deal_idr < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_idr/$totalinvoice);
+						}
+
+					}
+
 					$this->db->query("update ".DBTANKI.".ipp_header set
 					uang_muka_invoice=(uang_muka_invoice+".($gethd->total_um*$perseninv)."),
 					uang_muka_invoice_idr=(uang_muka_invoice_idr+".$gethd->total_um_idr*$perseninv."),
