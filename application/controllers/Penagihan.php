@@ -6197,7 +6197,7 @@ if($base_cur=='USD'){
 					status_total=(status_total+'".$gethd->total_invoice*$perseninv."')
 					WHERE id='".$valx->id."'");
 				 }else{
-					
+
 					if($base_cur=='USD'){
 
 						if($valx->total_deal_usd < 1 || $totalinvoice < 1){
@@ -6215,6 +6215,9 @@ if($base_cur=='USD'){
 						}
 
 					}
+
+					print_r($base_cur);
+					exit;
 
 					$this->db->query("update ".DBTANKI.".ipp_header set
 					uang_muka_invoice=(uang_muka_invoice+".($gethd->total_um*$perseninv)."),
