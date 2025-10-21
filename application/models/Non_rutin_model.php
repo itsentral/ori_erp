@@ -146,7 +146,7 @@ class Non_rutin_model extends CI_Model {
 		
 		$where = "";
 		if($tanda == 'approval'){
-			$where = "AND a.sts_app2 = 'N' ";
+			$where = "AND a.sts_app = 'N' ";
 		}
 		$sql = "
 			SELECT
