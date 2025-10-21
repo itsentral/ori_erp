@@ -2,7 +2,7 @@
 
 class Non_rutin_model extends CI_Model {
 
-	public function __construct() {
+	public function __construct() { 
 		parent::__construct();
 		// Your own constructor code
 	}
@@ -146,7 +146,7 @@ class Non_rutin_model extends CI_Model {
 		
 		$where = "";
 		if($tanda == 'approval'){
-			$where = "AND a.sts_app = 'N' ";
+			$where = "AND a.sts_app2 = 'N' ";
 		}
 		$sql = "
 			SELECT
