@@ -478,7 +478,7 @@ class App_pr_deputy extends CI_Controller {
 
 	//Approval Department
 	public function approval_pr_department(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)));
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
