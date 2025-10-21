@@ -2,7 +2,7 @@
 
 class Non_rutin_model extends CI_Model {
 
-	public function __construct() {
+	public function __construct() { 
 		parent::__construct();
 		// Your own constructor code
 	}
