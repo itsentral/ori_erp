@@ -499,8 +499,8 @@ class App_pr_deputy extends CI_Controller {
 	}
 
 	public function server_side_non_rutin(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
-		$Arr_Akses			= getAcccesmenu($controller);
+		// $controller			= ucfirst(strtolower($this->uri->segment(1)));
+		// $Arr_Akses			= getAcccesmenu($controller);
 
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_non_rutin(
