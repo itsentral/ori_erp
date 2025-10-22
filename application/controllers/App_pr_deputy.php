@@ -499,8 +499,8 @@ class App_pr_deputy extends CI_Controller {
 	}
 
 	public function server_side_non_rutin(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
-		$Arr_Akses			= getAcccesmenu($controller);
+		// $controller			= ucfirst(strtolower($this->uri->segment(1)));
+		// $Arr_Akses			= getAcccesmenu($controller);
 
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_non_rutin(
@@ -565,11 +565,11 @@ class App_pr_deputy extends CI_Controller {
 
 				if($tanda == 'approval'){
 					$view		= "";
-					if($Arr_Akses['approve']=='1'){
+					// if($Arr_Akses['approve']=='1'){
 						if($row['sts_app2'] == 'N'){
 							$approve	= "&nbsp;<a href='".base_url($this->uri->segment(1).'/add_approval_pr_department/'.$row['no_pengajuan'])."' class='btn btn-sm btn-info' title='Approve' data-role='qtip'><i class='fa fa-check'></i></a>";
 						}
-					}
+					// }
 				}
 			$nestedData[]	= "<div align='left'>
 									".$view."
