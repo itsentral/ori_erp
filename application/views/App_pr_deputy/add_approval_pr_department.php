@@ -353,7 +353,7 @@ $dataso= $this->db->query("select a.project, b.so_number from table_sales_order 
 			if (isConfirm) {
 				loading_spinner();
 				var formData 	= new FormData($('#form_ct')[0]);
-				var baseurl		= base_url + active_controller +'/add';
+				var baseurl		= base_url + active_controller +'/add_approval_pr_department';
 				$.ajax({
 					url			: baseurl,
 					type		: "POST",
