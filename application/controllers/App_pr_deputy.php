@@ -787,12 +787,12 @@ class App_pr_deputy extends CI_Controller {
 			echo json_encode($Arr_Kembali);
 		}
 		else{
-			$controller			= ucfirst(strtolower($this->uri->segment(1)));
-			$Arr_Akses			= getAcccesmenu($controller);
-			if($Arr_Akses['read'] !='1'){
-				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
-				redirect(site_url('dashboard'));
-			}
+			// $controller			= ucfirst(strtolower($this->uri->segment(1)));
+			// $Arr_Akses			= getAcccesmenu($controller);
+			// if($Arr_Akses['read'] !='1'){
+			// 	$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			// 	redirect(site_url('dashboard'));
+			// }
 			
 			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 			$id 		= $this->uri->segment(3);
@@ -808,7 +808,7 @@ class App_pr_deputy extends CI_Controller {
 			$data = array(
 				'title'				=> $tanda.' Deputy PR Departemen',
 					'action'		=> strtolower($tanda),
-					'akses_menu'	=> $Arr_Akses,
+					// 'akses_menu'	=> $Arr_Akses,
 					'header'		=> $header,
 					'detail'		=> $detail,
 					'datacoa'		=> $datacoa,
