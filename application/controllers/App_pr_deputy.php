@@ -478,7 +478,7 @@ class App_pr_deputy extends CI_Controller {
 
 	//Approval Department
 	public function approval_pr_department(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)));
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
@@ -499,8 +499,8 @@ class App_pr_deputy extends CI_Controller {
 	}
 
 	public function server_side_non_rutin(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1)));
-		$Arr_Akses			= getAcccesmenu($controller);
+		// $controller			= ucfirst(strtolower($this->uri->segment(1)));
+		// $Arr_Akses			= getAcccesmenu($controller);
 
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_non_rutin(
@@ -565,11 +565,11 @@ class App_pr_deputy extends CI_Controller {
 
 				if($tanda == 'approval'){
 					$view		= "";
-					if($Arr_Akses['approve']=='1'){
+					// if($Arr_Akses['approve']=='1'){
 						if($row['sts_app2'] == 'N'){
 							$approve	= "&nbsp;<a href='".base_url($this->uri->segment(1).'/add_approval_pr_department/'.$row['no_pengajuan'])."' class='btn btn-sm btn-info' title='Approve' data-role='qtip'><i class='fa fa-check'></i></a>";
 						}
-					}
+					// }
 				}
 			$nestedData[]	= "<div align='left'>
 									".$view."
@@ -787,12 +787,12 @@ class App_pr_deputy extends CI_Controller {
 			echo json_encode($Arr_Kembali);
 		}
 		else{
-			$controller			= ucfirst(strtolower($this->uri->segment(1)));
-			$Arr_Akses			= getAcccesmenu($controller);
-			if($Arr_Akses['read'] !='1'){
-				$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
-				redirect(site_url('dashboard'));
-			}
+			// $controller			= ucfirst(strtolower($this->uri->segment(1)));
+			// $Arr_Akses			= getAcccesmenu($controller);
+			// if($Arr_Akses['read'] !='1'){
+			// 	$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			// 	redirect(site_url('dashboard'));
+			// }
 			
 			$data_Group	= $this->master_model->getArray('groups',array(),'id','name');
 			$id 		= $this->uri->segment(3);
@@ -808,7 +808,7 @@ class App_pr_deputy extends CI_Controller {
 			$data = array(
 				'title'				=> $tanda.' Deputy PR Departemen',
 					'action'		=> strtolower($tanda),
-					'akses_menu'	=> $Arr_Akses,
+					// 'akses_menu'	=> $Arr_Akses,
 					'header'		=> $header,
 					'detail'		=> $detail,
 					'datacoa'		=> $datacoa,
