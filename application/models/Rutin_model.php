@@ -1650,7 +1650,7 @@ class Rutin_model extends CI_Model {
 				b.spec,
 				b.id_material
 			FROM
-			    (SELECT @row:=0) r , 
+			    (SELECT @row:=0) r, 
 				rutin_planning_header a
 				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan
 				
