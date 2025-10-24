@@ -3316,7 +3316,7 @@ class Rutin_model extends CI_Model {
 				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
-		// echo $sql; exit;
+		 echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
