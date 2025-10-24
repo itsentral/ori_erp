@@ -3305,8 +3305,9 @@ class Rutin_model extends CI_Model {
 				b.id_material
 			FROM
 				rutin_planning_header a
-				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan = b.no_pengajuan
-		    WHERE 1=1 ".$where_range."
+				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan = b.no_pengajuan,
+				(SELECT @row:=0) r
+		    WHERE 1=1 ".$where_range." 
 				AND (
 				a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
