@@ -6,8 +6,6 @@ class App_pr_deputy extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
-		$this->load->model('serverside_model');
-		$this->load->model('rutin_model');
 
 		// Your own constructor code
 		if(!$this->session->userdata('isORIlogin')){
