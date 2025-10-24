@@ -1651,7 +1651,7 @@ class Rutin_model extends CI_Model {
 				b.id_material
 			FROM
 				rutin_planning_header a
-				INNER JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan,
+				INNER JOIN rutin_planning_detail b ON a.no_pengajuan = b.no_pengajuan,
 				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where_range."
 				AND (
