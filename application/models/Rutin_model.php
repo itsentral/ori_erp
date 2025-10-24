@@ -1675,7 +1675,51 @@ class Rutin_model extends CI_Model {
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
+		return $data;public function query_data_json_pr_rutin($range, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		
+		$where_range = "";
+        if($range > 0){
+			$exP = explode(' - ', $range);
+			$date_awal = date('Y-m-d', strtotime($exP[0]));
+			$date_akhir = date('Y-m-d', strtotime($exP[1]));
+			// echo $exP[0];exit;
+            $where_range = "AND ((DATE(a.updated_date) BETWEEN '".$date_awal."' AND '".$date_akhir."') OR (DATE(a.created_date) BETWEEN '".$date_awal."' AND '".$date_akhir."')) ";
+        }
+		
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.*,
+				b.nm_material,
+				b.spec,
+				b.id_material
+			FROM
+			    rutin_planning_header a
+				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan
+				
+		    WHERE 1=1 ".$where_range."
+				AND (
+				a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
+	        )
+		";
+		 echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_pengajuan'
+		);
+
+		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
 		return $data;
+	}
 	}
 	
 	public function pdf_report(){
