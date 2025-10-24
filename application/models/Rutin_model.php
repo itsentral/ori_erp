@@ -1650,9 +1650,9 @@ class Rutin_model extends CI_Model {
 				b.spec,
 				b.id_material
 			FROM
-			  	rutin_planning_header a
-				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan
-				
+				rutin_planning_header a
+				INNER JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan,
+				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where_range."
 				AND (
 				a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1661,7 +1661,7 @@ class Rutin_model extends CI_Model {
 				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
-		 echo $sql; exit;
+		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
