@@ -1895,8 +1895,8 @@ class Purchase_order_model extends CI_Model {
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
-		
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$edit_rfq	= "";
@@ -2158,8 +2158,8 @@ class Purchase_order_model extends CI_Model {
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
-		
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$booking	= "";
