@@ -1895,8 +1895,8 @@ class Purchase_order_model extends CI_Model {
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
-		
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$edit_rfq	= "";
@@ -2158,8 +2158,8 @@ class Purchase_order_model extends CI_Model {
 			// $nestedData[]	= "<div align='right'>".$dt_qty."</div>";
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y H:i', strtotime($row['created_date']))."</div>";
-		
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$booking	= "";
@@ -2241,6 +2241,7 @@ class Purchase_order_model extends CI_Model {
 
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_pengajuan(
+			$requestData['status'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -2348,7 +2349,12 @@ class Purchase_order_model extends CI_Model {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_json_pengajuan($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_json_pengajuan($status, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+
+		$where_status = " (a.sts_ajuan='AJU' OR a.sts_ajuan='CLS' OR a.sts_ajuan='APV') ";
+		if($status != '0'){
+			$where_status = " a.sts_ajuan='".$status."' ";
+		}
 
 		$sql = "
 			SELECT
@@ -2356,7 +2362,7 @@ class Purchase_order_model extends CI_Model {
 			FROM
 				tran_material_rfq_header a
 		    WHERE  
-				(a.sts_ajuan='AJU' OR a.sts_ajuan='CLS' OR a.sts_ajuan='APV') 
+				".$where_status." AND a.deleted_date IS NULL
 			AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -2386,6 +2392,7 @@ class Purchase_order_model extends CI_Model {
 
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_approval(
+			$requestData['status'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -2488,7 +2495,12 @@ class Purchase_order_model extends CI_Model {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_json_approval($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_json_approval($status,$like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+
+		$where_status = " (a.sts_ajuan='CLS' OR a.sts_ajuan='APV') ";
+		if($status != '0'){
+			$where_status = " a.sts_ajuan='".$status."' ";
+		}
 
 		$sql = "
 			SELECT
@@ -2496,7 +2508,7 @@ class Purchase_order_model extends CI_Model {
 			FROM
 				tran_material_rfq_header a
 		    WHERE  
-				(a.sts_ajuan='CLS' OR a.sts_ajuan='APV') 
+				".$where_status." AND a.deleted_date IS NULL
 			AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'

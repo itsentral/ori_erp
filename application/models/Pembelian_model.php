@@ -443,8 +443,8 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
 			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['updated_date']))."</div>";
-			
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$edit_rfq	= "";
@@ -1355,8 +1355,8 @@ class Pembelian_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['dibutuhkan']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['updated_by'])."</div>";
 			$nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($row['updated_date']))."</div>";
-		
-			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span></div>";
+			$alasan_reject 	= (!empty($row['alasan_reject']))?"<br><span class='badge bg-danger'>".$row['alasan_reject']."</span>":"";
+			$nestedData[]	= "<div align='left'><span class='badge' style='background-color: ".color_status_purchase($row['sts_ajuan'])['color']."'>".color_status_purchase($row['sts_ajuan'])['status']."</span>".$alasan_reject."</div>";
 				$create	= "";
 				$edit	= "";
 				$booking	= "";
@@ -1582,6 +1582,7 @@ class Pembelian_model extends CI_Model {
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_pengajuan(
 			$requestData['category'],
+			$requestData['status'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -1699,11 +1700,16 @@ class Pembelian_model extends CI_Model {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_json_pengajuan($category, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_json_pengajuan($category, $status, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		
 		$where = "";
 		if($category <> '0'){
 			$where = " AND a.category='".$category."' ";
+		}
+
+		$where_status = " AND (a.sts_ajuan='AJU' OR a.sts_ajuan='CLS' OR a.sts_ajuan='APV')";
+		if($status != '0'){
+			$where_status = " AND a.sts_ajuan='".$status."' ";
 		}
 		
 		$sql = "
@@ -1711,8 +1717,7 @@ class Pembelian_model extends CI_Model {
 				a.*
 			FROM
 				tran_rfq_header a
-		    WHERE  1=1 ".$where." AND
-				(a.sts_ajuan='AJU' OR a.sts_ajuan='CLS' OR a.sts_ajuan='APV') 
+		    WHERE  1=1 ".$where." ".$where_status."  AND a.deleted_date IS NULL
 			AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -1803,6 +1808,7 @@ class Pembelian_model extends CI_Model {
 		$requestData	= $_REQUEST;
 		$fetch			= $this->query_data_json_approval(
 			$requestData['category'],
+			$requestData['status'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -1916,11 +1922,16 @@ class Pembelian_model extends CI_Model {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_json_approval($category, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_json_approval($category, $status, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		
 		$where = "";
 		if($category <> '0'){
 			$where = " AND a.category='".$category."' ";
+		}
+
+		$where_status = " AND (a.sts_ajuan='CLS' OR a.sts_ajuan='APV')";
+		if($status != '0'){
+			$where_status = " AND a.sts_ajuan='".$status."' ";
 		}
 		
 		$sql = "
@@ -1928,8 +1939,7 @@ class Pembelian_model extends CI_Model {
 				a.*
 			FROM
 				tran_rfq_header a
-		    WHERE  1=1 ".$where." AND  
-				(a.sts_ajuan='CLS' OR a.sts_ajuan='APV') 
+		    WHERE  1=1 ".$where." ".$where_status." AND a.deleted_date IS NULL
 			AND (
 				a.no_rfq LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_supplier LIKE '%".$this->db->escape_like_str($like_value)."%'

@@ -6,11 +6,15 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-		
+		<select id='status' name='status' class='form-control input-sm' style='min-width:200px;'>
+				<option value='0'>ALL STATUS</option>
+				<option value='AJU' selected>WAITING APPROVAL</option>
+				<option value='CLS'>CLOSE</option>
+			</select>
 		</div>
 	</div>
 	<!-- /.box-header -->
-	<div class="box-body">
+	<div class="box-body table-responsive">
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
@@ -57,7 +61,14 @@ $this->load->view('include/side_menu');
 <script>
 	$(document).ready(function(){
 		$('.maskM').maskMoney(); 
-		DataTables();
+		var status = $('#status').val();
+        DataTables(status);
+		
+		$(document).on('change','#status', function(e){
+			e.preventDefault();
+			var status = $('#status').val();
+        	DataTables(status);
+		});
 	});
 
     $(document).on('click', '.detailMat', function(e){
@@ -178,10 +189,7 @@ $this->load->view('include/side_menu');
 									title	: "Save Success!",
 									text	: data.pesan,
 									type	: "success",
-									timer	: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									timer	: 7000
 								});
 							window.location.href = base_url + active_controller+'/pengajuan';
 						}
@@ -190,10 +198,7 @@ $this->load->view('include/side_menu');
 								title	: "Save Failed!",
 								text	: data.pesan,
 								type	: "warning",
-								timer	: 7000,
-								showCancelButton	: false,
-								showConfirmButton	: false,
-								allowOutsideClick	: false
+								timer	: 7000
 							});
 						}
 					},
@@ -202,10 +207,7 @@ $this->load->view('include/side_menu');
 							title				: "Error Message !",
 							text				: 'An Error Occured During Process. Please try again..',						
 							type				: "warning",								  
-							timer				: 7000,
-							showCancelButton	: false,
-							showConfirmButton	: false,
-							allowOutsideClick	: false
+							timer				: 7000
 						});
 					}
 				});
@@ -216,10 +218,78 @@ $this->load->view('include/side_menu');
 		});
 	});
 
-	
+	$(document).on('click', '#saveReject', function(){
+		let alasan_reject = $('#alasan_reject').val()
+
+		if(alasan_reject == ''){
+			swal({
+			  title	: "Error Message!",
+			  text	: 'Alasan reject wajib diisi !',
+			  type	: "warning"
+			});
+			return false;
+		}
+
+		swal({ 
+			title: "Are you sure?",
+			text: "You will be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_proses_bro')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/modal_pemilihan_reject',
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000
+								});
+							window.location.href = base_url + active_controller+'/pengajuan';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title				: "Error Message !",
+							text				: 'An Error Occured During Process. Please try again..',						
+							type				: "warning",								  
+							timer				: 7000
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
+		});
+	});
 
 
-	function DataTables(){
+	function DataTables(status=null){
 		var dataTable = $('#my-grid').DataTable({
 			"processing": true,
 			"serverSide": true,
@@ -239,7 +309,7 @@ $this->load->view('include/side_menu');
 				url : base_url + active_controller+'/server_side_pengajuan',
 				type: "post",
 				data: function(d){
-					// d.kode_partner = $('#kode_partner').val()
+					d.status = status
 				},
 				cache: false,
 				error: function(){
