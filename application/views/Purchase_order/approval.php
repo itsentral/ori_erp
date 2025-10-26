@@ -10,6 +10,7 @@ $this->load->view('include/side_menu');
 		</div>
 	</div>
 	<!-- /.box-header -->
+	<div class="box-body  table-responsive">
 	<div class="box-body">
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
@@ -28,6 +29,7 @@ $this->load->view('include/side_menu');
 			</thead>
 			<tbody></tbody>
 		</table>
+	</div>
 	</div>
 	<!-- /.box-body -->
  </div>

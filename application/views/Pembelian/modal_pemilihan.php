@@ -38,6 +38,7 @@
 	<?php
 	$ColsPan = COUNT($resultSup) * 5;
 	?>
+	<div class="table-responsive">
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed">
 		<thead id='head_table'>
 			<tr class='bg-blue'>
@@ -95,6 +96,7 @@
 			?>
 		</tbody>
 	</table>
+	</div>
     <br>
     <div class='form-group row'>              
         <div class='col-sm-2'><label>Alasan Pemilihan</label></div>

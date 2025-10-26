@@ -48,6 +48,7 @@
 		<?php
 		$ColsPan = COUNT($resultSup) * 5;
 		?>
+		<div class="table-responsive">
 		<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed">
 			<thead id='head_table'>
 				<tr class='bg-blue'>
@@ -113,6 +114,7 @@
 				?>
 			</tbody>
 		</table>
+		</div>
 	
 	<?php
 		echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Create Pengajuan','content'=>'Save','id'=>'saveAju')).' ';
