@@ -82,8 +82,8 @@
 </div>
 <div class="box-footer"> 
 	<?php
+		echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-danger','style'=>'float:right; margin: 5px 0px 5px 5px;','content'=>'Reject','id'=>'saveReject'));
 		echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'float:right; margin: 5px 0px 5px 0px;','value'=>'Create Pengajuan','content'=>'Approve','id'=>'saveAju'));
-		echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-danger','style'=>'float:right; margin: 5px 0px 5px 0px;','content'=>'Reject','id'=>'saveReject'));
 	?>
 </div>
 <style>

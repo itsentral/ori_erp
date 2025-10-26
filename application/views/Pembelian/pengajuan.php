@@ -5,19 +5,23 @@ $this->load->view('include/side_menu');
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
-		<div class="box-tool pull-right">
-			<select id='category' name='category' class='form-control input-sm' style='min-width:200px;'>
-				<option value='0'>ALL CATEGORY</option>
-				<option value='asset'>ASSET</option>
-				<option value='rutin'>STOK</option>
-				<option value='non rutin'>DEPARTEMEN</option>
-			</select>
-
-			<select id='status' name='status' class='form-control input-sm' style='min-width:200px;'>
-				<option value='0'>ALL STATUS</option>
-				<option value='AJU' selected>WAITING APPROVAL</option>
-				<option value='CLS'>CLOSE</option>
-			</select>
+		<div class='form-group row'>
+			<div class='col-sm-6'></div>
+			<div class='col-sm-3'>
+				<select id='category' name='category' class='form-control input-sm' style='min-width:200px;'>
+					<option value='0'>ALL CATEGORY</option>
+					<option value='asset'>ASSET</option>
+					<option value='rutin'>STOK</option>
+					<option value='non rutin'>DEPARTEMEN</option>
+				</select>
+			</div>
+			<div class='col-sm-3'>
+				<select id='status' name='status' class='form-control input-sm' style='min-width:200px;'>
+					<option value='0'>ALL STATUS</option>
+					<option value='AJU' selected>WAITING APPROVAL</option>
+					<option value='CLS'>CLOSE</option>
+				</select>
+			</div>
 		</div>
 	</div>
 	<!-- /.box-header -->
