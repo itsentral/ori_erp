@@ -12,6 +12,12 @@ $this->load->view('include/side_menu');
 				<option value='rutin'>RUTIN</option>
 				<option value='non rutin'>NON RUTIN</option>
 			</select>
+
+			<select id='status' name='status' class='form-control input-sm' style='min-width:200px;'>
+				<option value='0'>ALL STATUS</option>
+				<option value='APV' selected>WAITING APPROVAL</option>
+				<option value='CLS'>CLOSE</option>
+			</select>
 		</div>
 	</div>
 	<!-- /.box-header -->
@@ -63,12 +69,14 @@ $this->load->view('include/side_menu');
 	$(document).ready(function(){
 		$('.maskM').maskMoney(); 
 		var category = $('#category').val();
-        DataTables(category);
+		var status = $('#status').val();
+        DataTables(category, status);
 		
-		$(document).on('change','#category', function(e){
+		$(document).on('change','#category, #status', function(e){
 			e.preventDefault();
 			var category = $('#category').val();
-			DataTables(category);
+			var status = $('#status').val();
+        	DataTables(category, status);
 		});
 	});
 
@@ -287,8 +295,7 @@ $this->load->view('include/side_menu');
 		});
 	});	
 
-
-	function DataTables(category = null){
+	function DataTables(category=null, status=null){
 		var dataTable = $('#my-grid').DataTable({
 			"serverSide": true,
 			"stateSave" : true,
@@ -312,7 +319,8 @@ $this->load->view('include/side_menu');
 				url : base_url + active_controller+'/server_side_approval',
 				type: "post",
 				data: function(d){
-					d.category = category
+					d.category = category,
+					d.status = status
 				},
 				cache: false,
 				error: function(){

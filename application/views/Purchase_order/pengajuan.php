@@ -6,7 +6,11 @@ $this->load->view('include/side_menu');
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3>
 		<div class="box-tool pull-right">
-		
+		<select id='status' name='status' class='form-control input-sm' style='min-width:200px;'>
+				<option value='0'>ALL STATUS</option>
+				<option value='AJU' selected>WAITING APPROVAL</option>
+				<option value='CLS'>CLOSE</option>
+			</select>
 		</div>
 	</div>
 	<!-- /.box-header -->
@@ -57,7 +61,14 @@ $this->load->view('include/side_menu');
 <script>
 	$(document).ready(function(){
 		$('.maskM').maskMoney(); 
-		DataTables();
+		var status = $('#status').val();
+        DataTables(status);
+		
+		$(document).on('change','#status', function(e){
+			e.preventDefault();
+			var status = $('#status').val();
+        	DataTables(status);
+		});
 	});
 
     $(document).on('click', '.detailMat', function(e){
@@ -278,7 +289,7 @@ $this->load->view('include/side_menu');
 	});
 
 
-	function DataTables(){
+	function DataTables(status=null){
 		var dataTable = $('#my-grid').DataTable({
 			"processing": true,
 			"serverSide": true,
@@ -298,7 +309,7 @@ $this->load->view('include/side_menu');
 				url : base_url + active_controller+'/server_side_pengajuan',
 				type: "post",
 				data: function(d){
-					// d.kode_partner = $('#kode_partner').val()
+					d.status = status
 				},
 				cache: false,
 				error: function(){
