@@ -209,6 +209,76 @@ $this->load->view('include/side_menu');
 		});
 	});
 
+	$(document).on('click', '#saveReject', function(){
+		let alasan_reject = $('#alasan_reject').val()
+
+		if(alasan_reject == ''){
+			swal({
+			  title	: "Error Message!",
+			  text	: 'Alasan reject wajib diisi !',
+			  type	: "warning"
+			});
+			return false;
+		}
+
+		swal({ 
+			title: "Are you sure?",
+			text: "You will be able to process again this data!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonClass: "btn-danger",
+			confirmButtonText: "Yes, Process it!",
+			cancelButtonText: "No, cancel process!",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function(isConfirm) {
+			if (isConfirm) {
+				loading_spinner();
+				var formData  	= new FormData($('#form_proses_bro')[0]);
+				$.ajax({
+					url			: base_url + active_controller+'/modal_pemilihan_reject',
+					type		: "POST",
+					data		: formData,
+					cache		: false,
+					dataType	: 'json',
+					processData	: false, 
+					contentType	: false,				
+					success		: function(data){								
+						if(data.status == 1){											
+							swal({
+									title	: "Save Success!",
+									text	: data.pesan,
+									type	: "success",
+									timer	: 7000
+								});
+							window.location.href = base_url + active_controller+'/pengajuan';
+						}
+						else if(data.status == 0){
+							swal({
+								title	: "Save Failed!",
+								text	: data.pesan,
+								type	: "warning",
+								timer	: 7000
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title				: "Error Message !",
+							text				: 'An Error Occured During Process. Please try again..',						
+							type				: "warning",								  
+							timer				: 7000
+						});
+					}
+				});
+			} else {
+			swal("Cancelled", "Data can be process again :)", "error");
+			return false;
+			}
+		});
+	});
+
 	
 
 
