@@ -3063,7 +3063,7 @@ class Rutin_model extends CI_Model {
 				$nomor = $urut1 + $start_dari;
 			}
 			if($asc_desc == 'desc'){
-				$nomor = ($total_data - $start_dari) - $urut2;
+				$nomor = ($total_data - $start_dari) - $urut2; 
 			}
 			
 			$tgl_now = date('Y-m-d');
