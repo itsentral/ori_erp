@@ -110,6 +110,59 @@ class Purchase extends CI_Controller {
 	public function modal_pemilihan(){
 		$this->purchase_order_model->modal_pemilihan();
 	}
+
+	public function modal_pemilihan_reject(){
+		$Arr_Kembali	= array();
+		$data			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$no_rfq 		= $data['no_rfq'];
+		$alasan_reject 		= $data['alasan_reject'];
+		// print_r($data);
+		
+		$ArrHeader = array(
+			'sts_ajuan' => 'OPN',
+			'sts_process' => 'N',
+			'alasan_reject' => $alasan_reject
+		);
+
+		$ArrDetail = array(
+			'status' => 'BELUM SETUJU',
+			'status_apv' => 'BELUM SETUJU',
+			'setuju_by' => NULL,
+			'setuju_date' => NULL,
+			'close_by' => NULL,
+			'close_date' => NULL
+		);
+		
+		// print_r($ArrDetail);
+		// exit;
+		
+		$this->db->trans_start();
+			$this->db->where(array('no_rfq'=>$no_rfq));
+			$this->db->update('tran_material_rfq_header', $ArrHeader);
+
+			$this->db->where(array('no_rfq'=>$no_rfq));
+			$this->db->update('tran_material_rfq_detail', $ArrDetail);
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Insert purchase order data failed. Please try again later ...',
+				'status'	=> 2
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Insert purchase order data success. Thanks ...',
+				'status'	=> 1
+			);
+			history('Reject Pemilihan Supplier '.$no_rfq);
+		}
+		echo json_encode($Arr_Kembali);
+		
+	}
 	
 	public function modal_hasil_pengajuan(){
 		$this->purchase_order_model->modal_hasil_pengajuan();
@@ -134,6 +187,59 @@ class Purchase extends CI_Controller {
 	
 	public function modal_approve(){
 		$this->purchase_order_model->modal_approve();
+	}
+
+	public function modal_approve_reject(){
+		$Arr_Kembali	= array();
+		$data			= $this->input->post();
+		$data_session	= $this->session->userdata;
+		$no_rfq 		= $data['no_rfq'];
+		$alasan_reject 		= $data['alasan_reject'];
+		// print_r($data);
+		
+		$ArrHeader = array(
+			'sts_ajuan' => 'OPN',
+			'sts_process' => 'N',
+			'alasan_reject' => $alasan_reject
+		);
+
+		$ArrDetail = array(
+			'status' => 'BELUM SETUJU',
+			'status_apv' => 'BELUM SETUJU',
+			'setuju_by' => NULL,
+			'setuju_date' => NULL,
+			'close_by' => NULL,
+			'close_date' => NULL
+		);
+		
+		// print_r($ArrDetail);
+		// exit;
+		
+		$this->db->trans_start();
+			$this->db->where(array('no_rfq'=>$no_rfq));
+			$this->db->update('tran_material_rfq_header', $ArrHeader);
+
+			$this->db->where(array('no_rfq'=>$no_rfq));
+			$this->db->update('tran_material_rfq_detail', $ArrDetail);
+		$this->db->trans_complete();
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Insert purchase order data failed. Please try again later ...',
+				'status'	=> 2
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Kembali	= array(
+				'pesan'		=>'Insert purchase order data success. Thanks ...',
+				'status'	=> 1
+			);
+			history('Reject Approval Supplier '.$no_rfq);
+		}
+		echo json_encode($Arr_Kembali);
+		
 	}
 	
 	
@@ -742,7 +848,7 @@ class Purchase extends CI_Controller {
 			'lainnya' => $data['lainnya'],
 			'tgl_terima' => $data['tgl_terima'],
 			'kurs_receive_invoice' => $data['kurs'],
-			'mata_uang_receive_invoice' => $data['matauang2'],
+			'matauang_receive_invoice' => $data['matauang2'],
 			'created_date_invoice' => $dateTime,
 //			'invoice_dokumen' => $data['invoice_dokumen'],
 			'created_by_invoice' => $Username,
