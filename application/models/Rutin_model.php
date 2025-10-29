@@ -1651,7 +1651,7 @@ class Rutin_model extends CI_Model {
 	}
 
 }
-=======
+
 <?php
 
 class Rutin_model extends CI_Model {
