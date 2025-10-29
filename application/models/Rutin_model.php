@@ -1642,26 +1642,46 @@ class Rutin_model extends CI_Model {
             $where_range = "AND ((DATE(a.updated_date) BETWEEN '".$date_awal."' AND '".$date_akhir."') OR (DATE(a.created_date) BETWEEN '".$date_awal."' AND '".$date_akhir."')) ";
         }
 		
-		$sql = "
-			SELECT
-				(@row:=@row+1) AS nomor,
-				a.*,
-				b.nm_material,
-				b.spec,
-				b.id_material
-			FROM
-				rutin_planning_header a
-				LEFT JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan,
-				(SELECT @row:=0) r
-		    WHERE 1=1 ".$where_range." 
-				AND (
-				a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
-	        )
-		";
+		// $sql = "
+		// 	SELECT
+		// 		(@row:=@row+1) AS nomor,
+		// 		a.*,
+		// 		b.nm_material,
+		// 		b.spec,
+		// 		b.id_material
+		// 	FROM
+		// 		rutin_planning_header a
+		// 		LEFT JOIN rutin_planning_detail b ON a.no_pengajuan=b.no_pengajuan,
+		// 		(SELECT @row:=0) r
+		//     WHERE 1=1 ".$where_range." 
+		// 		AND (
+		// 		a.no_pengajuan LIKE '%".$this->db->escape_like_str($like_value)."%'
+		// 		OR a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%'
+		// 		OR b.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
+		// 		OR b.spec LIKE '%".$this->db->escape_like_str($like_value)."%'
+	    //     )
+		// ";
 		// echo $sql; exit;
+
+		$this->db->query('SET @row := 0');
+		$this->db->select('(@row := @row + 1) AS nomor, a.*, b.nm_material, b.spec, b.id_material', false);
+		$this->db->from('rutin_planning_header a');
+		$this->db->join('rutin_planning_detail b', 'a.no_pengajuan = b.no_pengajuan', 'left');
+
+		if (!empty($where_range)) {
+			$this->db->where($where_range);
+		}
+
+		if (!empty($like_value)) {
+			$this->db->group_start();
+			$this->db->like('a.no_pengajuan', $like_value);
+			$this->db->or_like('a.created_date', $like_value);
+			$this->db->or_like('b.nm_material', $like_value);
+			$this->db->or_like('b.spec', $like_value);
+			$this->db->group_end();
+		}
+
+		$sql = $this->db->get();
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
