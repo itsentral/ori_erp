@@ -1124,7 +1124,7 @@ class Pembelian extends CI_Controller {
 	public function save_po_top() {
 		$this->pembelian_model->save_po_top();
 	}
-	public function invoice_receive($id) {
+	public function invoice_receive($id) { 
 		$controller			= 'purchase/purchase_order';
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
@@ -1172,8 +1172,8 @@ class Pembelian extends CI_Controller {
 			'surat_jalan' => $data['surat_jalan'],
 			'lainnya' => $data['lainnya'],
 			'tgl_terima' => $data['tgl_terima'],
-			'created_date_invoice' => $dateTime,
-//			'invoice_dokumen' => $data['invoice_dokumen'],
+			'created_date_invoice' => $dateTime,			
+			'matauang_receive_invoice' => $data['matauang2'],
 			'created_by_invoice' => $Username,
 		];
 
