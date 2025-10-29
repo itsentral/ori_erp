@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 
 class Rutin_model extends CI_Model {
