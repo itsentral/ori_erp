@@ -14,13 +14,37 @@ $this->load->view('include/side_menu');
 			<div class="box-body">
 				<div class="row">
 				  <div class="col-md-6">
-					<label class="control-label">Receive Date</label>
+					<label class="control-label">Receive Date</label> 
 					<input type="text" id="tgl_terima" name="tgl_terima" value="<?= (isset($results)?$results->tgl_terima:date("Y-m-d")); ?>" class="form-control tanggal" required>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">No Invoice / Kwitansi</label>
 					<input type="text" id="invoice_no" name="invoice_no" value="<?= (isset($results)?$results->invoice_no:""); ?>" class="form-control" required>
 				  </div>
+				   <div class="col-sm-6">
+				         <label for="matauang" class="control-label">Mata Uang</font></label>
+                            <select id="matauang2" name="matauang2" class="form-control"> 
+							
+							<?							
+							$matauang = $results->matauang_receive_invoice;		
+							if($matauang =='IDR'){?>
+							<option value=''>Pilih Matauang</option>
+							<option value ='IDR' selected >IDR</option>
+							<option value ='USD' >USD</option>	
+							<? }elseif($matauang =='USD'){ ?>
+							<option value=''>Pilih Matauang</option>
+							<option value ='IDR' >IDR</option>
+							<option value ='USD' selected >USD</option>	
+							<? }else{ ?>
+							<option value=''>Pilih Matauang</option>
+							<option value ='IDR' >IDR</option>
+							<option value ='USD' >USD</option>	
+							<?}?>		
+							
+							
+							
+							</select>
+                   </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai Potongan DP</label>
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:"0"); ?>" required>

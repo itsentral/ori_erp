@@ -848,7 +848,7 @@ class Purchase extends CI_Controller {
 			'lainnya' => $data['lainnya'],
 			'tgl_terima' => $data['tgl_terima'],
 			'kurs_receive_invoice' => $data['kurs'],
-			'mata_uang_receive_invoice' => $data['matauang2'],
+			'matauang_receive_invoice' => $data['matauang2'],
 			'created_date_invoice' => $dateTime,
 //			'invoice_dokumen' => $data['invoice_dokumen'],
 			'created_by_invoice' => $Username,
