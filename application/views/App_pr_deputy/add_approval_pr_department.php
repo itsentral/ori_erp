@@ -132,7 +132,7 @@ $dataso= $this->db->query("select a.project, b.so_number from table_sales_order 
                 ?>
             </div>
         </div>
-
+		<div class="table-responsive">
         <table class='table table-striped table-bordered table-hover table-condensed' width='100%'>
             <thead>
                 <tr class='bg-blue'>
@@ -191,6 +191,7 @@ $dataso= $this->db->query("select a.project, b.so_number from table_sales_order 
 				<?php } ?>
             </tbody>
         </table>
+		</div>
         <div class='box-footer'>
         <a href="<?=base_url('app_pr_deputy/approval_pr_department');?>" class='btn btn-md btn-danger' style='float:right; margin-left:5px;'>Back</a>
         <?php
