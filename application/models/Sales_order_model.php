@@ -49,7 +49,7 @@ class Sales_order_model extends CI_Model {
 								LEFT JOIN cost_project_detail b ON a.id_milik=b.caregory_sub
 								LEFT JOIN bq_detail_header c ON a.id_milik=c.id
 						WHERE
-							a.id_bq = '".$id_bq."' AND a.id_category <> 'product kosong'";					
+							a.id_bq = '".$id_bq."' AND a.id_category <> 'product kosong' ORDER BY a.id ASC";					
 		$getDetail	= $this->db->query($qMatr)->result_array();
 
 		$engC 		= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'eng cost' AND b.category = 'engine' AND b.id_bq='".$id_bq."' AND b.option_type='Y' AND b.sts_so = 'Y' ORDER BY a.id ASC ";
@@ -141,7 +141,7 @@ class Sales_order_model extends CI_Model {
 										LEFT JOIN cost_project_detail b ON a.id_milik=b.caregory_sub
 										LEFT JOIN bq_detail_header c ON a.id_milik=c.id
 								WHERE
-									a.id_bq = '".$id_bq."'";
+									a.id_bq = '".$id_bq."' ORDER BY a.id ASC";
 		$qBQdetailRest		= $this->db->query($qBQdetailHeader)->result_array();
 		$NumBaris			= $this->db->query($qBQdetailHeader)->num_rows();
 
@@ -2153,7 +2153,7 @@ class Sales_order_model extends CI_Model {
 									LEFT JOIN bq_detail_header c ON a.id_milik=c.id
 									LEFT JOIN billing_so_product d ON a.id_milik=d.id_milik
 							WHERE
-								a.id_bq = '".$id_bq."'";			
+								a.id_bq = '".$id_bq."' ORDER BY a.id ASC";			
 			$rest_product	= $this->db->query($product)->result_array();
 			// echo $product;
 			$eng 		= "SELECT SUM(b.price_total) AS total_price FROM cost_project_detail b WHERE b.category = 'engine' AND b.id_bq='".$id_bq."' AND b.option_type='Y'";

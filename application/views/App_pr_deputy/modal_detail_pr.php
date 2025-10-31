@@ -2,6 +2,7 @@
 
 <div class="box box-primary">
     <div class="box-body">
+		<div class="table-responsive">
 		<table class="table table-bordered table-striped" id="my-grid3" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
@@ -79,6 +80,7 @@
 				</tr>
 			</tfoot>
 		</table>
+		</div>
 	</div>
 </div>
 

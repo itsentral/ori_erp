@@ -88,7 +88,7 @@ class Budget_rutin_model extends CI_Model {
 			$code_budget  	= $data['code_budget'];
 			$tanda        	= $data['tanda'];
 			$department 	= $data['department'];
-			$id_gudang 		= $data['id_gudang_project'];
+			$id_gudang 		= ($data['id_gudang_project'] == '0')?NULL:$data['id_gudang_project'];
 			$costcenter 	= $data['costcenter'];
 			$detail 		= $data['detail'];
 			$ym = date('ym');
