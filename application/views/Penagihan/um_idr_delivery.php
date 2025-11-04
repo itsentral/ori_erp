@@ -29,7 +29,7 @@ if(isset($penagihan[0]->total_invoice)){
 	$grand_total = round($penagihan[0]->total_invoice, 2);
 }
 ?>
-<input type="hidden" id="total_so" name="total_so" value="<?=$total_so;?>" >
+<input type="text" id="total_so" name="total_so" value="<?=$total_so;?>" readonly>
 			<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
 	<tfoot>
 		<tr class='HeaderHr'>
