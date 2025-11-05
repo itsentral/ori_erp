@@ -63,7 +63,7 @@
                                 <th>Tanggal</th>
                                 <th>No Perkiraan</th>
                                 <th>Keterangan</th>
-                                <th>Jenis Trans</th>
+                                <th>No Reff</th>
                                 <th>Debet</th>
                                 <th>Kredit</th>
                                 <th>Supplier</th>
@@ -82,7 +82,7 @@
                                     <td><?php echo date('d-m-Y', strtotime($row->tanggal)); ?></td>
                                     <td><?php echo $row->no_perkiraan; ?></td>
                                     <td><?php echo $row->keterangan; ?></td>
-                                    <td><?php echo $row->jenis_trans; ?></td>
+                                    <td><?php echo $row->no_reff; ?></td>
                                     <td class="text-right"><?php echo number_format($row->debet, 2, ',', '.'); ?></td>
                                     <td class="text-right"><?php echo number_format($row->kredit, 2, ',', '.'); ?></td>
                                     <td><?php echo $row->nama_supplier; ?></td>
