@@ -27,4 +27,4 @@ application/logs/*
 /hris/application/config/database.php
 /tanki/application/config/database.php
 /application/helpers/jurnal_helper.php
-
+/dbs/*
