@@ -120,6 +120,13 @@ class Kartu_hutang extends CI_Controller {
 
     // Update record
     public function update($id) {
+        // Get current data
+        $current_data = $this->Kartu_hutang_model->get_by_id($id);
+        if (!$current_data) {
+            $this->session->set_flashdata('error', 'Data tidak ditemukan');
+            redirect('kartu_hutang');
+        }
+
         $this->form_validation->set_rules('nomor', 'Nomor', 'required|max_length[50]');
         $this->form_validation->set_rules('tanggal', 'Tanggal', 'required');
         $this->form_validation->set_rules('no_perkiraan', 'No Perkiraan', 'required|max_length[10]');
@@ -130,10 +137,13 @@ class Kartu_hutang extends CI_Controller {
             redirect('kartu_hutang/edit/' . $id);
         }
 
-        // Check if nomor already exists (exclude current record)
-        if ($this->Kartu_hutang_model->check_nomor_exists($this->input->post('nomor'), $id)) {
-            $this->session->set_flashdata('error', 'Nomor sudah digunakan');
-            redirect('kartu_hutang/edit/' . $id);
+        // Check if nomor changed and already exists
+        $new_nomor = $this->input->post('nomor');
+        if ($new_nomor != $current_data->nomor) {
+            if ($this->Kartu_hutang_model->check_nomor_exists($new_nomor)) {
+                $this->session->set_flashdata('error', 'Nomor sudah digunakan oleh data lain');
+                redirect('kartu_hutang/edit/' . $id);
+            }
         }
 
         $data = array(
