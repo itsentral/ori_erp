@@ -76,7 +76,7 @@ $rest_data 			= $this->db->query($sql_header)->result_array();
 		$GET_NM_BARANG = get_detail_consumable(); 
         
 		echo"<pre>";
-		print_r(GET_NM_BARANG);
+		print_r($GET_NM_BARANG);
 		exit;
 	
 		foreach($rest_d AS $val => $valx){
