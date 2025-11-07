@@ -101,7 +101,7 @@ class Purchase_report extends CI_Controller {
 			$nestedData[]	= "<div align='center'><span class='badge' style='background-color: ".$warna.";'>".strtoupper($category)."</span></div>";
 			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['app_by']))."</div>";
 			$nestedData[]	= "<div align='center'>".strtoupper(strtolower($row['app_date']))."</div>";
-			$nestedData[]	= "<div align='center'><div class='col-md-4 badge'>".($row['status']!=""?$row['status']:"-")."</div><div class='col-md-8'><span data-no_pr='".$row['no_pr_group']."' data-category='".$row['category']."' class='text-bold detail_pr' style='color: ".$warna."' title='Detail PR' data-role='qtip'><u>DETAIL PR</u></span></div></div>";
+			$nestedData[]	= "<div align='center'><div class='col-md-4 badge'>".($row['status']!=""?$row['status']:"-")."</div><div class='col-md-8'><span data-no_pr='".$row['no_pr_group']."' data-category='".str_replace(" ","_",$row['category'])."' class='text-bold detail_pr' style='color: ".$warna."' title='Detail PR' data-role='qtip'><u>DETAIL PR</u></span></div></div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
