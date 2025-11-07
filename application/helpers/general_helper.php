@@ -48,8 +48,8 @@ function get_detail_consumable() {
     $listGetCategory = $CI->db->order_by('material_name','asc')->get_where('con_nonmat_new',array('deleted_date'=>NULL))->result_array();
     $ArrGetCategory = [];
     foreach ($listGetCategory as $key => $value) {
-        $ArrGetCategory[$value['code_group']]['material_name']  = $value['nm_material'];
-        $ArrGetCategory[$value['code_group']]['nm_barang']      = $value['nm_material'].' '.$value['spec'].' '.$value['brand'];
+        $ArrGetCategory[$value['code_group']]['material_name']  = $value['material_name'];
+        $ArrGetCategory[$value['code_group']]['nm_barang']      = $value['material_name'].' '.$value['spec'].' '.$value['brand'];
         $ArrGetCategory[$value['code_group']]['spec']           = $value['spec'];
         $ArrGetCategory[$value['code_group']]['brand']          = $value['brand'];
         $ArrGetCategory[$value['code_group']]['kode_excel']     = $value['kode_excel'];
