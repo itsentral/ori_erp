@@ -73,7 +73,12 @@ $rest_data 			= $this->db->query($sql_header)->result_array();
 	<tbody>
 		<?php
 		$No=0;
-		$GET_NM_BARANG = get_detail_consumable();
+		$GET_NM_BARANG = get_detail_consumable(); 
+        
+		echo"<pre>";
+		print_r(GET_NM_BARANG);
+		exit;
+	
 		foreach($rest_d AS $val => $valx){
 			if($valx['qty_oke'] > 0){
 				$No++;
