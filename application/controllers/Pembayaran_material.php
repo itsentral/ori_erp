@@ -1767,7 +1767,7 @@ class Pembayaran_material extends CI_Controller {
 				if($rec->parameter_no=="7"){
 					if($data->nilai_pph_invoice<>0){
 						$det_Jurnaltes1[] = array(
-							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => ($data->nilai_pph_invoice*$curs), 'debet' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
+							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $data->coa_pph, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => ($data->nilai_pph_invoice*$curs), 'debet' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
 						);
 					}
 				}
