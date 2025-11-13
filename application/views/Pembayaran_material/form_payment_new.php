@@ -14,7 +14,7 @@
 				</div>
 		  </div>
 		  <div class="box-body">
-			<table class="table table-bordered table-striped" id="mytabledata" width='100%'>
+			<table class="table table-bordered table-striped" id="mytabledata" width='100%'> 
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">No Request</th>
@@ -90,7 +90,7 @@
 		  <div class="box-footer">
 			<input type="hidden" name="total" id="total" value="<?=round($total); ?>" />
 			<input type="hidden" name="id_supplier" id="id_supplier" value="<?=(isset($data)?$data->id_supplier:$id_supplier); ?>" />
-			<input type="hidden" name="curs_header" id="curs_header" value="<?=(isset($data)?$data->curs_header:$curs_header); ?>" />
+			<input type="text" name="curs_header" id="curs_header" value="<?=(isset($data)?$data->curs_header:$curs_header); ?>" />
 			<input type="hidden" name="modul" id="modul" value="<?=(isset($data)?$data->modul:'PO'); ?>" />
 				<div class="row">
 				  <div class="col-md-6">
