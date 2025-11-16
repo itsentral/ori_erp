@@ -38,19 +38,23 @@ class Produksi_model extends CI_Model {
 		$id_produksi= $this->uri->segment(3);
 		$menu_baru	= $this->uri->segment(4);
 		$id_bq 		= "BQ-".str_replace('PRO-','',$id_produksi);
-		
+		$no_ipp = str_replace('PRO-','',$id_produksi);
 		$row		= $this->db->get_where('production_header', array('id_produksi'=>$id_produksi))->result_array();
-
+		$JALUR = (!empty($row[0]['jalur']))?$row[0]['jalur']:'';
 		$HelpDet 	= "bq_detail_header";
 		$help2 = "";
-		if($row[0]['jalur'] == 'FD'){
-			$HelpDet = "so_detail_header";
-			$help2 = " b.id_milik AS id_milik2,";
+		if(!empty($JALUR)){
+			if($JALUR == 'FD'){
+				$HelpDet = "so_detail_header";
+				$help2 = " b.id_milik AS id_milik2,";
+			}
 		}
 
 		$Disb 	= "";
-		if($row[0]['sts_produksi'] == 'FINISH'){
-			$Disb = "disabled";
+		if(!empty($row[0]['sts_produksi'])){
+			if($row[0]['sts_produksi'] == 'FINISH'){
+				$Disb = "disabled";
+			}
 		}
 
 		$qDetail	= "	SELECT
@@ -77,6 +81,8 @@ class Produksi_model extends CI_Model {
 		$rest_acc 	= $this->db->get_where('production_acc_and_mat', array('id_bq'=>$id_bq, 'category <>'=>'mat'))->result_array(); 
 		
 		$data = array(
+			'no_ipp' 		=> $no_ipp,
+			'tandaT' 		=> substr($no_ipp,0,4),
 			'id_produksi' 	=> $id_produksi,
 			'id_bq' 		=> $id_bq,
 			'rest_mat' 		=> $rest_mat,
@@ -86,7 +92,7 @@ class Produksi_model extends CI_Model {
 			'rowD' 			=> $rowD,
 			'HelpDet'		=> $HelpDet,
 			'Disb'			=> $Disb,
-			'jalur'			=> $row[0]['jalur']
+			'jalur'			=> $JALUR
 		);
 		
 		$this->load->view('Production/modalDetail', $data);
@@ -130,6 +136,8 @@ class Produksi_model extends CI_Model {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
+			$tandaT = substr($row['no_ipp'],0,4);
+
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
@@ -155,7 +163,7 @@ class Produksi_model extends CI_Model {
 						$update_spk1	= "&nbsp;<a href='".base_url('production/updateRealNew2/'.$row['id_produksi'])."' class='btn btn-sm' style='background-color: #ce005f; border-color: #ce005f; color: white;' title='Update SPK 1 (NEW)' data-role='qtip'><i class='fa fa-edit'></i></a>";
 						$update_spk2	= "&nbsp;<a href='".base_url('production/updateRealNew3/'.$row['id_produksi'])."' class='btn btn-sm' style='background-color: #d25e0c; border-color: #d25e0c; color: white;' title='Update SPK Mixing (NEW)' data-role='qtip'><i class='fa fa-edit'></i></a>";
 					}
-					if($Arr_Akses['update']=='1' AND $row['sts_produksi'] == 'PROCESS PRODUCTION' AND $menu_baru == 1){
+					if($Arr_Akses['update']=='1' AND $row['sts_produksi'] == 'PROCESS PRODUCTION' AND $menu_baru == 1 AND $tandaT != 'IPPT'){
 						$finish			= "&nbsp;<button class='btn btn-sm btn-success close_produksi' title='Close Produksi' data-id_produksi='".$row['id_produksi']."'><i class='fa fa-check'></i> Close</button>";
 					}
 					if($Arr_Akses['update']=='1' AND $row['sts_produksi'] == 'WAITING PRODUCTION'){
@@ -200,25 +208,25 @@ class Produksi_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*,
-				b.project,
-				c.so_number AS so_number2,
+				a.no_ipp,
+				a.sts_produksi,
+				a.created_date,
+				a.id_produksi,
+				a.project,
+				a.so_number2,
 				d.sts_booking,
 				d.sts_booking_close,
 				e.canceled_so
 			FROM
-				production_header a 
-				INNER JOIN production b ON a.no_ipp = b.no_ipp
-				LEFT JOIN so_number c ON a.no_ipp = REPLACE(c.id_bq, 'BQ-', '')
+				production_view a
 				left join table_sales_order e on a.no_ipp = e.no_ipp 
 				LEFT JOIN warehouse_planning_header d ON a.no_ipp = d.no_ipp,
                 (SELECT @row:=0) r
-		    WHERE a.deleted = 'N' 
+		    WHERE 1=1
 				AND (
 					a.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR b.project LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR b.status LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR c.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.project LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR a.so_number2 LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
 		";
 		// echo $sql; exit;
@@ -228,8 +236,8 @@ class Produksi_model extends CI_Model {
 		$columns_order_by = array(
 			0 => 'nomor',
 			1 => 'no_ipp',
-			2 => 'so_number',
-			3 => 'nm_project',
+			2 => 'so_number2',
+			3 => 'project',
 			4 => 'created_date'
 		);
 

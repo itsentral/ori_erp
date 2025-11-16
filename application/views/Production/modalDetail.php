@@ -1,3 +1,4 @@
+
 <div class="box box-primary">
 	<div class="box-header">
 		<label>A. PIPA FITTING</label>
@@ -7,16 +8,17 @@
 			<label class='label-control col-sm-2'><b>IPP Number</b></label>
 			<div class='col-sm-4'>
 				<?php
-					echo form_input(array('id'=>'no_ipp','name'=>'no_ipp','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'IPP Number','style'=>'text-transform:uppercase', 'readonly'=>'readonly'), str_replace('SO-','',$row[0]['so_number']));
+					echo form_input(array('id'=>'no_ipp','name'=>'no_ipp','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'IPP Number','style'=>'text-transform:uppercase', 'readonly'=>'readonly'), $no_ipp);
 				?>
 			</div>
 		</div>
+		<?php if($tandaT != 'IPPT'){ ?>
 		<div class='form-group row'>
 			<label class='label-control col-sm-2'><b>SO Number</b></label>
 			<div class='col-sm-4'>
 				<?php
-					echo form_input(array('id'=>'so_number','name'=>'so_number','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'SO Number', 'readonly'=>'readonly'), get_nomor_so(str_replace('SO-','',$row[0]['so_number'])));
-					echo form_input(array('type'=>'hidden','id'=>'id_produksi','name'=>'id_produksi','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Plane Name', 'readonly'=>'readonly'), $row[0]['id_produksi']);
+					echo form_input(array('id'=>'so_number','name'=>'so_number','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'SO Number', 'readonly'=>'readonly'), get_nomor_so($no_ipp));
+					echo form_input(array('type'=>'hidden','id'=>'id_produksi','name'=>'id_produksi','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Plane Name', 'readonly'=>'readonly'), $id_produksi);
 				?>
 			</div>
 			<label class='label-control col-sm-2'><b>Machine</b></label>
@@ -42,6 +44,7 @@
 		</div>
 		<button type='button' class='btn btn-sm btn-primary' id='btn_download' style='float:right;' title='Download Excel' data-id_produksi='<?=$id_produksi;?>'><i class='fa fa-file-excel-o'> &nbsp;Download Excel</i></button>
 		&nbsp; <button type='button' class='btn btn-sm btn-success' id='btn_qrcode' style='float:right;' title='Print QR Code' data-id_produksi='<?=$id_produksi;?>'><i class='fa fa-qrcode'> &nbsp;Print QR Code</i></button>
+		<?php } ?>
 		<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
 			<thead id='head_table'>
 				<tr class='bg-blue'>
@@ -97,13 +100,15 @@
 								}
 							}
 
+							$SPEC = (!empty($jalur))?spec_fd($valx['id_uniq'], $HelpDet):'';
+
 							$QTY_APP_SO = $sqlCheck[0]->Numc + $sqlCheckRed[0]->Numc;
 
 							echo "<tr>";
 								echo "<td align='center'>".$a."</td>";
 								echo "<td align='center'>".strtoupper($valx['no_komponen'])."</td>";
 								echo "<td>".strtoupper($valx['comp'])."</td>";
-								echo "<td>".spec_fd($valx['id_uniq'], $HelpDet)."</td>";
+								echo "<td>".$SPEC."</td>";
 								echo "<td>".$valx['id_product']."</td>";
 								echo "<td align='center'>".$by_from."</td>";
 								echo "<td align='center'><span class='badge bg-blue'>".$valx['qty']."</span></td>";
