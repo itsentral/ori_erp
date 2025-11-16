@@ -31,15 +31,15 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center" width='5%'>No</th>
-					<th class="text-center">Kode Pengajuan</th>
+					<th class="text-center">No</th>
+					<th class="text-center">Kode</th>
 					<th class="text-center">Asal Permintaan</th>
 					<th class="text-center">No PR</th>
 					<th class="text-center">Untuk Kebutuhan</th>
-					<th class="text-center">Request By</th>
-					<th class="text-center">Request Date</th>
+					<th class="text-center">Req. By</th>
+					<th class="text-center">Req. Date</th>
 					<th class="text-center">Status</th>
-					<th class="text-center no-sort" width='10%'>#</th>
+					<th class="text-center no-sort">#</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
