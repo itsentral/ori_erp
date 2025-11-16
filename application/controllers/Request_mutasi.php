@@ -638,8 +638,8 @@ class Request_mutasi extends CI_Controller {
 				  'no_reff'       => $reff,
 				  'debet'         => $total,
 				  'kredit'        => 0,
-				  'nilai_valas_debet'         => 0,
-				  'nilai_valas_kredit'        => $dolar,
+				  'nilai_valas_debet'         => $dolar,
+				  'nilai_valas_kredit'        => 0,
 				  
 				 );
 			
@@ -652,8 +652,8 @@ class Request_mutasi extends CI_Controller {
 				  'no_reff'       => $reff,
 				  'debet'         => 0,
 				  'kredit'        => $total,
-				  'nilai_valas_debet'         => $dolar,
-				  'nilai_valas_kredit'        => 0,
+				  'nilai_valas_debet'         => 0,
+				  'nilai_valas_kredit'        => $dolar,
 				  
 				 );
 				 
@@ -2366,7 +2366,7 @@ class Request_mutasi extends CI_Controller {
 		$data = array(
 			'kodebayar' => $kd_bayar,		
 		);		
-		$this->load->view('Request_mutasi/print_transaksi', $data);
+		$this->load->view('Request_mutasi/print_transaksi', $data); 
 	}
 	
 	function printout_pn(){

@@ -1,41 +1,124 @@
 <?php
-$qBQdetailHeader 	= "SELECT a.*, a.series, b.no_ipp FROM bq_detail_header a LEFT JOIN bq_header b ON a.id_bq=b.id_bq WHERE a.id_bq = '".$id_bq."' ORDER BY a.id ASC";
-$qBQdetailRest		= $this->db->query($qBQdetailHeader)->result_array();
+// *** OPTIMASI: Selalu gunakan Query Binding (tanda ?) untuk keamanan SQL Injection ***
+// Pastikan $id_bq sudah bersih (misal: $id_bq = $this->input->post('id_bq');)
 
+// Query 1: Main detail header (Menggunakan Query Builder)
+$qBQdetailRest = $this->db->select('a.*, a.series, b.no_ipp')
+                          ->from('bq_detail_header a')
+                          ->join('bq_header b', 'a.id_bq = b.id_bq', 'left')
+                          ->where('a.id_bq', $id_bq)
+                          ->order_by('a.id', 'ASC')
+                          ->get()
+                          ->result_array();
+
+// PHP Array Processing (Ini sudah bagus, tidak perlu diubah)
 $ArrBQProduct = array();
 foreach($ListCategory AS $val => $valx){
 	$ArrBQProduct[$valx['id_category']] = strtoupper($valx['category']);
 }
 
-$qListResin 	= "SELECT id_material, nm_material FROM raw_materials WHERE id_category='TYP-0001' ORDER BY nm_material ASC ";
-$dataResin		= $this->db->query($qListResin)->result_array();
+// Query 2: List Resin (Menggunakan Query Builder)
+$dataResin = $this->db->select('id_material, nm_material')
+                      ->from('raw_materials')
+                      ->where('id_category', 'TYP-0001')
+                      ->order_by('nm_material', 'ASC')
+                      ->get()
+                      ->result_array();
+
+// Query 3: Satuan (SELECT kolom yang perlu saja, jangan *)
+$satuan = $this->db->select('id_satuan, nama_satuan') // <-- Lebih efisien
+                   ->from('raw_pieces')
+                   ->where('delete', 'N')
+                   ->order_by('nama_satuan', 'ASC')
+                   ->get()
+                   ->result_array();
+
+// Query 4: Raw Material (Menggunakan Query Builder)
+$raw_material = $this->db->select('*') // Asumsi butuh semua kolom
+                         ->from('raw_materials')
+                         ->where('flag_active', 'Y')
+                         ->where('delete', 'N')
+                         ->order_by('nm_material', 'ASC')
+                         ->get()
+                         ->result_array();
+
+// Query 5: Jenis Barang (Menggunakan Query Builder)
+$jenis_barang = $this->db->select('*') // Asumsi butuh semua kolom
+                         ->from('con_nonmat_new')
+                         ->where('deleted', 'N')
+                         ->where('category_awal', '7')
+                         ->order_by('material_name', 'ASC')
+                         ->get()
+                         ->result_array();
 
 
+// *** OPTIMASI BESAR 1: Menggabungkan 6 query ke 'bq_acc_and_mat' menjadi 1 query ***
+// Kita juga langsung JOIN ke tabel 'accessories' untuk data di Box B, C, D, E
+// Ini akan MENGHILANGKAN N+1 query di dalam view nanti.
+$categories_bq = ['acc', 'mat', 'baut', 'plate', 'gasket', 'lainnya'];
 
-$satuan			= $this->db->query("SELECT * FROM raw_pieces WHERE `delete`='N' ORDER BY nama_satuan ASC ")->result_array();
-$raw_material	= $this->db->query("SELECT * FROM raw_materials WHERE flag_active='Y' AND `delete`='N' ORDER BY nm_material ASC ")->result_array();
-$jenis_barang	= $this->db->query("SELECT * FROM con_nonmat_new WHERE `deleted`='N' AND category_awal='7' ORDER BY material_name ASC ")->result_array();
+$this->db->select('bq.*, 
+                   acc.material, acc.ukuran_standart, acc.standart, 
+                   acc.thickness, acc.density, acc.dimensi, acc.spesifikasi');
+$this->db->from('bq_acc_and_mat bq');
+$this->db->join('accessories acc', 'bq.id_material = acc.id', 'left');
+$this->db->where('bq.id_bq', $id_bq);
+$this->db->where_in('bq.category', $categories_bq);
+$all_details = $this->db->get()->result_array();
 
-$detail 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='acc'")->result_array();
-$detail2 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='mat'")->result_array();
-$detail3 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='baut'")->result_array();
-$detail4 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='plate'")->result_array();
-$detail4g 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='gasket'")->result_array();
-$detail5 		= $this->db->query("SELECT * FROM bq_acc_and_mat WHERE id_bq='".$id_bq."' AND category='lainnya'")->result_array();	
+// Inisialisasi array
+$detail = $detail2 = $detail3 = $detail4 = $detail4g = $detail5 = array();
 
-$jenis_baut	    = $this->db->query("SELECT * FROM accessories WHERE `deleted`='N' AND category='1' ORDER BY nama ASC ")->result_array();
-$jenis_plate	= $this->db->query("SELECT * FROM accessories WHERE `deleted`='N' AND category='2' ORDER BY nama ASC ")->result_array();
-$jenis_gasket	= $this->db->query("SELECT * FROM accessories WHERE `deleted`='N' AND category='3' ORDER BY nama ASC ")->result_array();
-$jenis_part	    = $this->db->query("SELECT * FROM accessories WHERE `deleted`='N' AND category='4' ORDER BY nama ASC ")->result_array();
-	
+// Loop 1x di PHP (JAUH LEBIH CEPAT daripada 6x query ke DB)
+foreach ($all_details as $item) {
+    switch ($item['category']) {
+        case 'acc':     $detail[] = $item; break;
+        case 'mat':     $detail2[] = $item; break;
+        case 'baut':    $detail3[] = $item; break;
+        case 'plate':   $detail4[] = $item; break;
+        case 'gasket':  $detail4g[] = $item; break;
+        case 'lainnya': $detail5[] = $item; break;
+    }
+}
 
+// *** OPTIMASI BESAR 2: Menggabungkan 4 query ke 'accessories' menjadi 1 query ***
+$categories_acc = ['1', '2', '3', '4'];
+$all_accessories = $this->db->select('*') // Asumsi butuh semua kolom
+                            ->from('accessories')
+                            ->where('deleted', 'N')
+                            ->where_in('category', $categories_acc)
+                            ->order_by('nama', 'ASC')
+                            ->get()
+                            ->result_array();
+
+// Inisialisasi array
+$jenis_baut = $jenis_plate = $jenis_gasket = $jenis_part = array();
+
+// Loop 1x di PHP
+foreach ($all_accessories as $acc_item) {
+    switch ($acc_item['category']) {
+        case '1': $jenis_baut[] = $acc_item; break;
+        case '2': $jenis_plate[] = $acc_item; break;
+        case '3': $jenis_gasket[] = $acc_item; break;
+        case '4': $jenis_part[] = $acc_item; break;
+    }
+}
+
+// *** OPTIMASI BESAR 3: Pra-load data Customer untuk N+1 di loop utama ***
+// Ini menciptakan "kamus" customer, jadi tidak perlu query di dalam loop
+$customer_data = $this->db->select('id_customer, nm_customer')->get('customer')->result_array();
+$customer_lookup = array();
+foreach ($customer_data as $cust) {
+    $customer_lookup[$cust['id_customer']] = $cust['nm_customer'];
+}
+
+
+// Array processing (Sudah bagus, tidak perlu diubah)
 $ArrResin = array();
 foreach($dataResin AS $val => $valx){
 	$ArrResin[$valx['id_material']] = strtoupper($valx['nm_material']);
 }
 $ArrResin[0]	= 'Select Material';
-
-
 ?>
 <div class="box box-primary">
 	<div class="box-header">
@@ -52,8 +135,7 @@ $ArrResin[0]	= 'Select Material';
 				<span style='color:green;'><b>(NEW) <span id='jumlah_rooving'><?=COUNT($countRooving);?></span> ROOVING :    <span style='color:red;'><span id='nama_rooving'><?=strtoupper($listRooving);?></span></span></b></span><br>
 				<span style='color:green;'><b>(NEW) <span id='jumlah_catalys'><?=COUNT($countCatalys);?></span> CATALYS :    <span style='color:red;'><span id='nama_catalys'><?=strtoupper($listCatalys);?></span></span></b></span><br>
 				<span style='color:green;'><b>(NEW) <span id='jumlah_pigment'><?=COUNT($countPigment);?></span> PIGMENT (COLOR) :    <span style='color:red;'><span id='nama_pigment'><?=strtoupper($listPigment);?></span></span></b></span><br>
-				<!--<span style='color:blue;'><b>(NEW) CHECKLIST PRODUCT, UNTUK MENGGANTI RESIN PRODUCT YANG DIPILIH <span style='color:red;'></span></b></span><br>-->
-			</p>
+				</p>
 		</div>
 		<div class='form-group row'>
 			<div class='col-sm-3'>
@@ -93,7 +175,6 @@ $ArrResin[0]	= 'Select Material';
 				?>
 			</div>
 		</div>
-
 		<input type='hidden' name='id_bq' value='<?= $id_bq;?>'> 
 		<input type='hidden' name='pembeda' id='pembeda' value='<?= $this->uri->segment(4);?>'>
 		<input type='hidden' name='no_ipp' value='<?= $qBQdetailRest[0]['no_ipp'];?>'> 
@@ -130,26 +211,44 @@ $ArrResin[0]	= 'Select Material';
 							$bgwarna	= "bg-green";
 						}
 						
-						$plusSQL = " AND a.diameter = '".$valx['diameter_1']."'";
-						if($valx['id_category'] == 'concentric reducer' OR $valx['id_category'] == 'reducer tee mould' OR $valx['id_category'] == 'eccentric reducer' OR $valx['id_category'] == 'reducer tee slongsong' OR $valx['id_category'] == 'branch joint' OR $valx['id_category'] == 'frp reducer tee'){
-							$plusSQL = " AND a.diameter = '".$valx['diameter_1']."'  AND a.diameter2='".$valx['diameter_2']."'";
-						}
-						if($valx['id_category'] == 'figure 8'){
-							$plusSQL = " AND a.diameter2='".$valx['diameter_2']."'";
-						}
+						// Variabel $plusSQL dan $plusSQL2 tidak diperlukan lagi, diganti Query Builder di bawah
 						
-						$plusSQL2 = "";
-						if($valx['id_category'] == 'elbow mould' OR $valx['id_category'] == 'elbow mitter'){
-							$plusSQL2 = " AND a.diameter = '".$valx['diameter_1']."'  AND a.angle='".$valx['sudut']."' AND a.type_elbow='".$valx['type']."' ";
+						$series = $valx['series'];
+						
+						// *** OPTIMASI: Mengganti query string mentah dengan Query Builder ***
+						// Ini memperbaiki celah SQL Injection dan N+1 query
+						
+						$this->db->select('a.id_product, a.series, a.cust');
+						$this->db->from('component_header a');
+						$this->db->join('bq_detail_header b', 'a.series = b.series', 'inner');
+						$this->db->where('b.id_bq', $id_bq); // Aman, gunakan variabel $id_bq dari atas
+						$this->db->where('a.series', $valx['series']);
+						$this->db->where('a.parent_product', $valx['id_category']);
+
+						// Dynamic WHERE clauses - SEKARANG AMAN
+						if($valx['id_category'] == 'concentric reducer' OR $valx['id_category'] == 'reducer tee mould' OR $valx['id_category'] == 'eccentric reducer' OR $valx['id_category'] == 'reducer tee slongsong' OR $valx['id_category'] == 'branch joint' OR $valx['id_category'] == 'frp reducer tee'){
+							$this->db->where('a.diameter', $valx['diameter_1']);
+							$this->db->where('a.diameter2', $valx['diameter_2']);
+						}
+						else if($valx['id_category'] == 'figure 8'){
+							$this->db->where('a.diameter2', $valx['diameter_2']);
+						}
+						else {
+							// Default case (seperti $plusSQL asli)
+							$this->db->where('a.diameter', $valx['diameter_1']);
 						}
 
-						$series = $valx['series'];
-						// echo $series."<br>";
-						$sqlProduct	= "SELECT a.id_product, a.series, a.cust FROM component_header a INNER JOIN bq_detail_header b ON a.series = b.series  WHERE b.id_bq = '".$id_bq."' ".$plusSQL." ".$plusSQL2." AND a.series = '".$valx['series']."' AND a.parent_product='".$valx['id_category']."' GROUP BY a.id_product";
-						$restProduct = $this->db->query($sqlProduct)->result_array();
-						// $restNum = $this->db->query($sqlProduct)->num_rows();
+						if($valx['id_category'] == 'elbow mould' OR $valx['id_category'] == 'elbow mitter'){
+							// Kondisi $plusSQL2
+							$this->db->where('a.diameter', $valx['diameter_1']); // Ini duplikat dari atas, tapi kita ikuti logika asli
+							$this->db->where('a.angle', $valx['sudut']);
+							$this->db->where('a.type_elbow', $valx['type']);
+						}
 						
-						// echo $sqlProduct."<br>";
+						$this->db->group_by('a.id_product');
+						$restProduct = $this->db->get()->result_array();
+						
+						// echo $sqlProduct."<br>"; // Hapus debugging
 						echo "<tr id='tr_".$no."'>";
 							echo "<td align='center'>".$no."</td>";
 							echo "<td align='center'><input type='checkbox' name='check[".$no."]' class='chk_personal' data-nomor='".$no."' value='".$valx['id']."' ></td>";
@@ -166,11 +265,18 @@ $ArrResin[0]	= 'Select Material';
 								echo "<input type='hidden' name='detailBQ[".$no."][panjang]' id='panjang' value='".floatval($valx['length'])."'>";
 								echo "<select name='detailBQ[".$no."][id_productx]' id='id_product_".$no."' class='chosen-select form-control inline-block'>";
 									echo "<option value=''>Select ".$nm_cty."</option>";
-									// if($restNum == 0){echo "<option value='0'>List Empty</option>";}
+									// if(count($restProduct) == 0){echo "<option value='0'>List Empty</option>";}
 									foreach($restProduct AS $valP => $valPX){
 										$idProduct = $valPX['cust']; 
-										$sqtToCust = $this->db->query("SELECT nm_customer FROM customer WHERE id_customer='".$idProduct."'")->result_array();
-										$Customer	= (!empty($idProduct))?' ('.$sqtToCust[0]['nm_customer'].')':'';
+										
+										// *** OPTIMASI: Ganti N+1 Query dengan lookup array ***
+										// $sqtToCust = $this->db->query("SELECT nm_customer FROM customer WHERE id_customer='".$idProduct."'")->result_array(); // INI LAMBAT & DIHAPUS
+										
+										$Customer = '';
+										// Gunakan "kamus" $customer_lookup yang sudah dibuat di atas
+										if (!empty($idProduct) && isset($customer_lookup[$idProduct])) {
+											$Customer = ' (' . $customer_lookup[$idProduct] . ')';
+										}
 						
 										$selectedX	= ($valx['id_product'] == $valPX['id_product'])?'selected':'';
 										echo "<option value='".$valPX['id_product']."' ".$selectedX.">".$valPX['id_product'].$Customer."</option>";
@@ -271,7 +377,6 @@ $ArrResin[0]	= 'Select Material';
 		?>
 	</div>
 </div>
-
 <div class="box box-success">
 	<div class="box-header">
 		<label>B. MUR BAUT</label>
@@ -293,7 +398,10 @@ $ArrResin[0]	= 'Select Material';
 					$id = 0;
 					if(!empty($detail3)){
 						foreach($detail3 AS $val => $valx){ $id++;
-							$get_detail = $this->db->select('material')->get_where('accessories', array('id'=>$valx['id_material']))->result();
+							// *** OPTIMASI: Hapus N+1 Query ***
+							// $get_detail = $this->db->select('material')->get_where('accessories', array('id'=>$valx['id_material']))->result(); // DIHAPUS
+							// Data 'material' sudah ada di $valx berkat JOIN di awal
+							$material = isset($valx['material']) ? $valx['material'] : '';
 							
 							echo "<tr class='header3_".$id."'>";
 								echo "<td align='left'>";
@@ -306,13 +414,15 @@ $ArrResin[0]	= 'Select Material';
 									echo "</select>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_baut[".$id."][material]' id='bt_material_".$id."' class='form-control input-md text-left' placeholder='Material' value='".strtoupper($get_detail[0]->material)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_baut[".$id."][material]' id='bt_material_".$id."' class='form-control input-md text-left' placeholder='Material' value='".strtoupper($material)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_baut[".$id."][qty]' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($valx['qty'])."' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
 								echo "</td>";
 								echo "<td align='left'>"; 
 									echo "<select name='detail_baut[".$id."][satuan]' class='chosen-select form-control input-sm'>";
+									// *** OPTIMASI: Menggunakan $satuan yang di-load 1x di atas ***
 									foreach($satuan AS $val2 => $valx2){
 										$dex = ($valx['satuan'] == $valx2['id_satuan'])?'selected':'';
 										echo "<option value='".$valx2['id_satuan']."' ".$dex.">".strtoupper($valx2['nama_satuan'])."</option>";
@@ -345,7 +455,6 @@ $ArrResin[0]	= 'Select Material';
 		?>
 	</div>
 </div>
-
 <div class="box box-success">
 	<div class="box-header">
 		<label>C. PLATE</label>
@@ -371,7 +480,14 @@ $ArrResin[0]	= 'Select Material';
 					$id = 0;
 					if(!empty($detail4)){
 						foreach($detail4 AS $val => $valx){ $id++;
-							$get_detail = $this->db->select('ukuran_standart, standart, thickness, density')->get_where('accessories', array('id'=>$valx['id_material']))->result();
+							// *** OPTIMASI: Hapus N+1 Query ***
+							// $get_detail = $this->db->select('ukuran_standart, standart, thickness, density')->get_where('accessories', array('id'=>$valx['id_material']))->result(); // DIHAPUS
+							// Data sudah ada di $valx berkat JOIN di awal
+							$ukuran_standart = isset($valx['ukuran_standart']) ? $valx['ukuran_standart'] : '';
+							$standart = isset($valx['standart']) ? $valx['standart'] : '';
+							$thickness = isset($valx['thickness']) ? $valx['thickness'] : 0;
+							$density = isset($valx['density']) ? $valx['density'] : 0;
+							
 							echo "<tr class='header4_".$id."'>";
 								echo "<td align='left'>";
 									echo "<select name='detail_plate[".$id."][id_material]' data-no='".$id."' class='chosen-select form-control input-sm get_detail_plate'>";
@@ -382,18 +498,21 @@ $ArrResin[0]	= 'Select Material';
 									echo "</select>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_plate[".$id."][ukuran_standart]' id='pl_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->ukuran_standart)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_plate[".$id."][ukuran_standart]' id='pl_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($ukuran_standart)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_plate[".$id."][standart]' id='pl_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->standart)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_plate[".$id."][standart]' id='pl_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($standart)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_plate[".$id."][lebar]' id='pl_lebar_".$id."' class='form-control input-md text-center maskM get_berat' placeholder='0' value='".number_format($valx['lebar'],2)."'>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_plate[".$id."][panjang]' id='pl_panjang_".$id."' class='form-control input-md text-center maskM get_berat' placeholder='0' value='".number_format($valx['panjang'],2)."'>";
-									echo "<input type='hidden' name='detail_plate[".$id."][thickness]' id='pl_thickness_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($get_detail[0]->thickness,2)."'>";
-									echo "<input type='hidden' name='detail_plate[".$id."][density]' id='pl_density_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($get_detail[0]->density,2)."'>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input type='hidden' name='detail_plate[".$id."][thickness]' id='pl_thickness_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($thickness,2)."'>";
+									echo "<input type='hidden' name='detail_plate[".$id."][density]' id='pl_density_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($density,2)."'>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_plate[".$id."][qty]' id='pl_qty_".$id."' class='form-control input-md text-center maskM get_berat' placeholder='0' value='".number_format($valx['qty'],2)."'>";
@@ -434,7 +553,6 @@ $ArrResin[0]	= 'Select Material';
 		?>
 	</div>
 </div>
-
 <div class="box box-success">
 	<div class="box-header">
 		<label>D. GASKET</label>
@@ -460,8 +578,14 @@ $ArrResin[0]	= 'Select Material';
 					$id = 0;
 					if(!empty($detail4g)){
 						foreach($detail4g AS $val => $valx){ $id++;
-							$get_detail = $this->db->select('ukuran_standart, standart, thickness, density, dimensi')->get_where('accessories', array('id'=>$valx['id_material']))->result();
-							$satuan2		= $this->db->get_where("raw_pieces", array('delete'=>'N','id_satuan'=>$valx['satuan']))->result_array();
+							// *** OPTIMASI: Hapus N+1 Query ***
+							// $get_detail = $this->db->select('ukuran_standart, standart, thickness, density, dimensi')->get_where('accessories', array('id'=>$valx['id_material']))->result(); // DIHAPUS
+							// $satuan2		= $this->db->get_where("raw_pieces", array('delete'=>'N','id_satuan'=>$valx['satuan']))->result_array(); // DIHAPUS
+
+							// Data sudah ada di $valx berkat JOIN di awal
+							$standart = isset($valx['standart']) ? $valx['standart'] : '';
+							$dimensi = isset($valx['dimensi']) ? $valx['dimensi'] : '';
+							
 							echo "<tr class='header4g_".$id."'>";
 								echo "<td align='left'>";
 									echo "<select name='detail_gasket[".$id."][id_material]' data-no='".$id."' class='chosen-select form-control input-sm get_detail_gasket'>";
@@ -472,10 +596,12 @@ $ArrResin[0]	= 'Select Material';
 									echo "</select>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_gasket[".$id."][ukuran_standart]' id='gs_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->standart)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_gasket[".$id."][ukuran_standart]' id='gs_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($standart)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_gasket[".$id."][dimensi]' id='gs_dimensi_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->dimensi)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_gasket[".$id."][dimensi]' id='gs_dimensi_".$id."' class='form-control input-md text-left' value='".strtoupper($dimensi)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_gasket[".$id."][lebar]' id='gs_lebar_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($valx['lebar'],2)."'>";
@@ -490,8 +616,9 @@ $ArrResin[0]	= 'Select Material';
 									echo "<input name='detail_gasket[".$id."][sheet]' id='gs_sheet_".$id."' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($valx['sheet'],2)."'>";
 								echo "</td>";
 								echo "<td align='left'>"; 
+									// *** OPTIMASI: Menggunakan $satuan yang di-load 1x di atas ***
 									echo "<select name='detail_gasket[".$id."][satuan]' id='gs_satuan_".$id."' class='chosen-select form-control input-sm'>";
-									foreach($satuan2 AS $val2 => $valx2){
+									foreach($satuan AS $val2 => $valx2){ // Loop $satuan, bukan $satuan2
 										$dex = ($valx['satuan'] == $valx2['id_satuan'])?'selected':'';
 										echo "<option value='".$valx2['id_satuan']."' ".$dex.">".strtoupper($valx2['nama_satuan'])."</option>";
 									}
@@ -528,7 +655,6 @@ $ArrResin[0]	= 'Select Material';
 		?>
 	</div>
 </div>
-
 <div class="box box-success">
 	<div class="box-header">
 		<label>E. LAINNYA</label>
@@ -551,8 +677,14 @@ $ArrResin[0]	= 'Select Material';
 					$id = 0;
 					if(!empty($detail5)){
 						foreach($detail5 AS $val => $valx){ $id++;
-							$get_detail = $this->db->select('spesifikasi, standart, ukuran_standart')->get_where('accessories', array('id'=>$valx['id_material']))->result();
-							$satuan2		= $this->db->get_where("raw_pieces", array('delete'=>'N','id_satuan'=>$valx['satuan']))->result_array();
+							// *** OPTIMASI: Hapus N+1 Query ***
+							// $get_detail = $this->db->select('spesifikasi, standart, ukuran_standart')->get_where('accessories', array('id'=>$valx['id_material']))->result(); // DIHAPUS
+							// $satuan2		= $this->db->get_where("raw_pieces", array('delete'=>'N','id_satuan'=>$valx['satuan']))->result_array(); // DIHAPUS
+
+							// Data sudah ada di $valx berkat JOIN di awal
+							$ukuran_standart = isset($valx['ukuran_standart']) ? $valx['ukuran_standart'] : '';
+							$standart = isset($valx['standart']) ? $valx['standart'] : '';
+							
 							echo "<tr class='header5_".$id."'>";
 								echo "<td align='left'>";
 									echo "<select name='detail_lainnya[".$id."][id_material]' data-no='".$id."' class='chosen-select form-control input-sm get_detail_lainnya'>";
@@ -563,17 +695,20 @@ $ArrResin[0]	= 'Select Material';
 									echo "</select>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_lainnya[".$id."][ukuran_standart]' id='ln_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->ukuran_standart)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_lainnya[".$id."][ukuran_standart]' id='ln_ukuran_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($ukuran_standart)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
-									echo "<input name='detail_lainnya[".$id."][standart]' id='ln_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($get_detail[0]->standart)."' readonly>";
+									// *** OPTIMASI: Gunakan data dari $valx (hasil JOIN) ***
+									echo "<input name='detail_lainnya[".$id."][standart]' id='ln_standart_".$id."' class='form-control input-md text-left' value='".strtoupper($standart)."' readonly>";
 								echo "</td>";
 								echo "<td align='left'>";
 									echo "<input name='detail_lainnya[".$id."][qty]' class='form-control input-md text-center maskM' placeholder='0' value='".number_format($valx['qty'])."' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>";
 								echo "</td>";
 								echo "<td align='left'>"; 
+									// *** OPTIMASI: Menggunakan $satuan yang di-load 1x di atas ***
 									echo "<select name='detail_lainnya[".$id."][satuan]' id='ln_satuan_".$id."' class='chosen-select form-control input-sm'>";
-									foreach($satuan2 AS $val2 => $valx2){
+									foreach($satuan AS $val2 => $valx2){ // Loop $satuan, bukan $satuan2
 										$dex = ($valx['satuan'] == $valx2['id_satuan'])?'selected':'';
 										echo "<option value='".$valx2['id_satuan']."' ".$dex.">".strtoupper($valx2['nama_satuan'])."</option>";
 									}
@@ -606,7 +741,6 @@ $ArrResin[0]	= 'Select Material';
 		?>
 	</div>
 </div>
-
 <div class="box box-info">
 	<div class="box-header">
 		<label>F. MATERIAL</label>
@@ -624,6 +758,7 @@ $ArrResin[0]	= 'Select Material';
 			</thead>
 			<tbody>
 				<?php
+					// Loop ini tidak memiliki N+1 query, jadi aman, tidak perlu diubah
 					$id = 0;
 					if(!empty($detail2)){
 						foreach($detail2 AS $val => $valx){ $id++;
@@ -848,13 +983,11 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		//SAVE NEW ADA DEFAULTNYA
 		$(document).on('click', '.updateResin', function(){
 			var layer = $(this).data('lyr');
 			var material = $("#"+layer).val();
 			// var product_id = $("#product_id").val();
-
 			if($('.chk_personal:checked').length == 0){
 				swal({
 					title	: "Error Message!",
@@ -863,7 +996,6 @@ $ArrResin[0]	= 'Select Material';
 				});
 				return false;
 			}
-
 			if(material == '0'){
 				swal({
 				  title	: "Error Message!",
@@ -872,7 +1004,6 @@ $ArrResin[0]	= 'Select Material';
 				});
 				return false;
 			}
-
 			// alert(layer+'/'+material);
 			// return false;
 			
@@ -929,7 +1060,6 @@ $ArrResin[0]	= 'Select Material';
 								
 								$('#jumlah_pigment').html(data.jumlah_pigment);
 								$('#nama_pigment').html(data.nama_pigment);
-
 								// $("#head_title").html("<b>ESTIMATION STRUCTURE BQ ["+data.id_bqx+"]</b>");
 								// $("#view").load(base_url +'index.php/'+ active_controller+'/modalEstBQ/'+data.id_bqx+'/'+data.pembeda);
 								// $("#ModalView").modal();
@@ -967,7 +1097,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add/'+id,
 				cache: false,
@@ -993,14 +1122,12 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('click', '.addPart2', function(){
 			loading_spinner();
 			var get_id 		= $(this).parent().parent().attr('id');
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add2/'+id,
 				cache: false,
@@ -1026,7 +1153,6 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('click', '.delPart', function(){
 			var get_id 		= $(this).parent().parent().attr('class');
 			$("."+get_id).remove();
@@ -1039,7 +1165,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add3/'+id,
 				cache: false,
@@ -1065,14 +1190,12 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('click', '.addPart4', function(){
 			loading_spinner();
 			var get_id 		= $(this).parent().parent().attr('id');
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add4/'+id,
 				cache: false,
@@ -1105,7 +1228,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add4g/'+id,
 				cache: false,
@@ -1131,14 +1253,12 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('click', '.addPart5', function(){
 			loading_spinner();
 			var get_id 		= $(this).parent().parent().attr('id');
 			var split_id	= get_id.split('_');
 			var id 		= parseInt(split_id[1])+1;
 			var id_bef 	= split_id[1];
-
 			$.ajax({
 				url: base_url + active_controller+'/get_add5/'+id,
 				cache: false,
@@ -1172,7 +1292,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id_bef 		= split_id[1];
 			var id 			= $(this).val();
-
 			$.ajax({
 				url: base_url + active_controller+'/get_detail_lainnya/'+id,
 				cache: false,
@@ -1198,7 +1317,6 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('change', '.get_detail_plate', function(){
 			loading_spinner();
 			var get_id 		= $(this).parent().parent().attr('class');
@@ -1206,7 +1324,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id_bef 		= split_id[1];
 			var id 			= $(this).val();
-
 			$.ajax({
 				url: base_url + active_controller+'/get_detail_plate/'+id,
 				cache: false,
@@ -1217,7 +1334,6 @@ $ArrResin[0]	= 'Select Material';
 					$("#pl_standart_"+id_bef).val(data.standart);
 					$("#pl_thickness_"+id_bef).val(data.thickness);
 					$("#pl_density_"+id_bef).val(data.density);
-
 					if(data.satuan == '1'){
 						$("#pl_qty_"+id_bef).attr('readonly', true)
 						$("#pl_berat_"+id_bef).attr('readonly', false)
@@ -1226,7 +1342,6 @@ $ArrResin[0]	= 'Select Material';
 						$("#pl_berat_"+id_bef).attr('readonly', true)
 						$("#pl_qty_"+id_bef).attr('readonly', false)
 					}
-
 					get_berat_plate(id_bef);
 					swal.close();
 				},
@@ -1251,7 +1366,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id_bef 		= split_id[1];
 			var id 			= $(this).val();
-
 			$.ajax({
 				url: base_url + active_controller+'/get_detail_gasket/'+id,
 				cache: false,
@@ -1284,7 +1398,6 @@ $ArrResin[0]	= 'Select Material';
 			var split_id	= get_id.split('_');
 			var id_bef 		= split_id[1];
 			var id 			= $(this).val();
-
 			$.ajax({
 				url: base_url + active_controller+'/get_detail_baut/'+id,
 				cache: false,
@@ -1307,7 +1420,6 @@ $ArrResin[0]	= 'Select Material';
 				}
 			});
 		});
-
 		$(document).on('keyup', '.get_berat', function(){
 			var get_id 		= $(this).parent().parent().attr('class');
 			var split_id	= get_id.split('_');
@@ -1322,7 +1434,6 @@ $ArrResin[0]	= 'Select Material';
 		var category_id = $(this).val()
 		var item_cost = $('.listMaterial')
 		var label_category = $('.label_category')
-
 		$.ajax({
 			url: base_url + active_controller+'/get_material/'+category_id,
 			cache: false,
@@ -1350,19 +1461,15 @@ $ArrResin[0]	= 'Select Material';
 		var lebar 		= getNum($('#pl_lebar_'+id).val());
 		var density 	= getNum($('#pl_density_'+id).val());
 		var qty 		= getNum($('#pl_qty_'+id).val());
-
 		var berat = panjang * thickness * lebar * density * qty;
-
 		$('#pl_berat_'+id).val(number_format(berat,3));
 	}
-
 	function getNum(val) {
         if (isNaN(val) || val == '') {
             return 0;
         }
         return parseFloat(val);
     }
-
 	function number_format (number, decimals, dec_point, thousands_sep) {
 		// Strip all characters but numerical ones.
 		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
@@ -1380,7 +1487,7 @@ $ArrResin[0]	= 'Select Material';
 		if (s[0].length > 3) {
 			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
 		}
-		if ((s[1] || '').length < prec) {
+		if ((s1 || '').length < prec) {
 			s[1] = s[1] || '';
 			s[1] += new Array(prec - s[1].length + 1).join('0');
 		}

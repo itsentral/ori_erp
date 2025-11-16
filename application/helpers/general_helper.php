@@ -54,7 +54,7 @@ function get_detail_consumable() {
         $ArrGetCategory[$value['code_group']]['brand']          = $value['brand'];
         $ArrGetCategory[$value['code_group']]['kode_excel']     = $value['kode_excel'];
         $ArrGetCategory[$value['code_group']]['id_accurate']    = $value['id_accurate'];
-        $ArrGetCategory[$value['code_group']]['material_spec']  = $value['kode_excel'].' - '.$value['spec'];
+        $ArrGetCategory[$value['code_group']]['material_spec']  = $value['kode_excel'].' - '.$value['spec']; 
     }
     return $ArrGetCategory;
 }

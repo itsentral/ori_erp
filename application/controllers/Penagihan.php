@@ -316,7 +316,7 @@ class Penagihan extends CI_Controller {
 		foreach($getBq AS $val => $valx){
 			$in_ipp[$val]	= $valx['no_po'];
 			$in_bq[$val]	= 'BQ-'.$valx['no_po'];
-			$in_so[$val]	= get_nomor_so($valx['no_po']);
+			$in_so[$val]	= get_nomor_so($valx['no_po']); 
 			$base_cur		= $valx['base_cur'];
 		}
 		$getHeader	= $this->db->where_in('no_ipp',$in_ipp)->get('production')->result();
@@ -324,7 +324,7 @@ class Penagihan extends CI_Controller {
 		$getEngCost	= $this->db->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','eng')->get('billing_so_add')->result_array();
 		$getPackCost= $this->db->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','pack')->get('billing_so_add')->result_array();
 		$getTruck	= $this->db->order_by('id','asc')->where_in('no_ipp',$in_ipp)->where('category','ship')->get('billing_so_add')->result_array();
-		$non_frp	= $this->db->select('*')->from('billing_so_add')->where("(category='baut' OR category='plate' OR category='gasket' OR category='lainnya')")->where_in('no_ipp',$in_ipp)->get()->result_array();
+		$non_frp	= $this->db->select('*')->from('billing_so_add')->where("(category='baut' OR category='plate' OR category='gasket' OR category='lainnya' OR category='other')")->where_in('no_ipp',$in_ipp)->get()->result_array();
 		$material	= $this->db->where_in('no_ipp',$in_ipp)->get_where('billing_so_add',array('category'=>'mat'))->result_array();
 		$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 		if($penagihan[0]->kurs_jual==0){
