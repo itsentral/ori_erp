@@ -118,7 +118,7 @@ class Purchase_request_model extends CI_Model {
 							a.no_ipp='".$no_ipp."' 
 							AND a.purchase > 0 
 							AND a.sts_app = 'N' 
-							AND (c.id_gudang = '1' OR c.id_gudang = '2')
+							AND c.id_gudang = '2'
 						GROUP BY 
 							a.id_material";
 		if($tanda == 'P'){
@@ -140,7 +140,7 @@ class Purchase_request_model extends CI_Model {
 								AND b.created_by='".$user."' 
 								AND a.purchase > 0 
 								AND a.sts_app != 'D'
-								AND (c.id_gudang = '1' OR c.id_gudang = '2')
+								AND c.id_gudang = '2'
 							GROUP BY a.id_material ";
 		}
 		// echo $sql; exit;
