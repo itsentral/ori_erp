@@ -47,7 +47,7 @@
             <td><?= $r->tanggal; ?></td>
             <td><?= $r->nomor_jurnal; ?></td>
             <td><?= $r->no_invoice; ?></td>
-            <td><?= $r->no_so; ?></td>
+            <td><?= $r->so_number; ?></td>
             <td><?= $r->customer; ?></td>
             <td><?= number_format($r->revenue, 2); ?></td>
             <td><?= number_format($r->cogs, 2); ?></td>
