@@ -9,7 +9,7 @@ class M_laporan_jurnal_model extends CI_Model {
             a.nomor AS nomor_jurnal,
             a.no_reff,
             b.no_invoice,
-            b.no_so,
+            b.so_number,
             b.nm_customer AS customer,
 
             -- revenue
