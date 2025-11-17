@@ -736,7 +736,7 @@ class Rutin_model extends CI_Model {
 			5 => 'created_date'
 		);
 
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " ORDER BY a.created_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
 		$data['query'] = $this->db->query($sql);
@@ -886,20 +886,23 @@ class Rutin_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".ucwords($username)."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
 			$id_user = get_name('users','id_user','username',$row['created_by']);
-			$status = "WAITING APPROVAL";
+			$status = "WAITING APP. DEPT.HEAD";
 			$warna = "green";
-			if($row['sts_app'] == 'Y'){
+			if($row['sts_app'] == 'Y' AND $row['sts_app2'] == 'N'){
+				$status = "WAITING APP. DEPUTY";
+				$warna = "orange";
+			}
+			if($row['sts_app'] == 'D' OR $row['sts_app2'] == 'D'){
+				$status = "REJECT";
+				$warna = "red";
+			}
+			if($row['sts_app2'] == 'Y'){
 				$status = "CLOSE";
 				$warna = "red";
 				if(!empty($row['no_pr'])){
 					$status = "WAITING PO";
 					$warna = "blue";
 				}
-				
-			}
-			if($row['sts_app'] == 'D'){
-				$status = "REJECT";
-				$warna = "red";
 			}
 			$nestedData[]	= "<div align='left' class='badge bg-".$warna."'>".$status."</div>";
 			

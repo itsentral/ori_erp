@@ -4,7 +4,7 @@
 	<input type='hidden' id='no_rfq' name='no_rfq' value='<?=$no_rfq;?>'>
 	<input type='hidden' id='category' name='category' value='<?=$category;?>'>
 	<?php
-	$ColsPan = COUNT($resultSup) * 5;
+	$ColsPan = COUNT($resultSup) * 6;
 	?>
 	<div class="table-responsive">
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed">
@@ -19,7 +19,7 @@
 			<tr class='bg-darkgoldenrod'>
 				<?php
 					foreach($resultSup AS $val => $valx){
-						echo "<th class='text-center mid' colspan='5'>".$valx['nm_supplier']."</th>";
+						echo "<th class='text-center mid' colspan='6'>".$valx['nm_supplier']."</th>";
 					}
 				?>
 			</tr>
@@ -30,6 +30,7 @@
 						echo "<th class='text-center mid' width='60px;'>MOQ</th>";
 						echo "<th class='text-center mid' width='60px;'>L.Time</th>";
 						echo "<th class='text-center mid' width='100px;'>Toal Price</th>";
+						echo "<th class='text-center mid' width='50px;'>Ref</th>";
 						echo "<th class='text-center mid' width='50px;'>App?</th>";
 					}
 				?>
@@ -52,11 +53,15 @@
 						$harga_idr 	= $ArraySerach[$UNIQ]['harga_idr'];
 						$total_harga= $ArraySerach[$UNIQ]['total_harga'];
 						$id			= $ArraySerach[$UNIQ]['id'];
+						$status		= $ArraySerach[$UNIQ]['status'];
+
+						$StatusRef = ($status == 'SETUJU')?'<i class="fa fa-check text-success" title='.$status.'></i>':'<i class="fa fa-close text-danger" title='.$status.'></i>';
 
 						echo "<td class='text-right mid'>".number_format($harga_idr,2)."</td>";
 						echo "<td class='text-center mid'>".number_format($moq)."</td>";
 						echo "<td class='text-center mid'>".number_format($lead_time)."</td>";
 						echo "<td class='text-right mid'>".number_format($total_harga,2)."</td>";
+						echo "<td class='text-center mid'>".$StatusRef."</td>";
 						echo "<td class='text-center mid'><input type='checkbox' name='check[".$id."]' class='chk_personal' value='".$id."'></td>";
 					}
 				echo "</tr>";

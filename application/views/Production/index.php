@@ -14,13 +14,13 @@ $this->load->view('include/side_menu');
 		<table class="table table-bordered table-striped" id="my-grid" width='100%'>
 			<thead>
 				<tr class='bg-blue'>
-					<th class="text-center" width='5%'>#</th>
-					<th class="text-center" width='10%'>IPP</th>
-					<th class="text-center" width='10%'>SO Number</th>
+					<th class="text-center">#</th>
+					<th class="text-center">IPP</th>
+					<th class="text-center">SO Number</th>
 					<th class="text-center no-sort">Project</th>
-					<th class="text-center" width='10%'>Date</th>
-					<th class="text-center no-sort" width='13%'>Status</th>
-					<th class="text-center no-sort" width='13%'>Option</th>
+					<th class="text-center">Date</th>
+					<th class="text-center no-sort">Status</th>
+					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
