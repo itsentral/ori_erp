@@ -16,7 +16,7 @@ class M_laporan_jurnal_model extends CI_Model {
                 x.cogs
             FROM (
                 SELECT DISTINCT nomor, tanggal, no_reff, keterangan
-                FROM view_gl_jurnal
+                FROM view_gl_jurnalx
                 WHERE tanggal >= $dari AND tanggal <=$sampai
                 AND nomor LIKE '%GJ%'
             ) a
@@ -32,7 +32,7 @@ class M_laporan_jurnal_model extends CI_Model {
             ) x ON x.nomor = a.nomor
             ORDER BY a.tanggal ASC";
 
-        $rows  = $this->db->query($sql)->result();
+        $rows  = $this->db->query($sql)>result();
 
         // hitung persentase di PHP
         foreach ($rows as $r) { 
