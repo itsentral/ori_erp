@@ -1,5 +1,5 @@
 <?php
-class M_laporan_jurnal extends CI_Model {
+class M_laporan_jurnal_model extends CI_Model {
 
     public function get_laporan($dari, $sampai)
     {
