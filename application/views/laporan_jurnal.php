@@ -30,6 +30,7 @@
             <th>No</th>
             <th>Tanggal</th>
             <th>Nomor Jurnal</th>
+            <th>Keterangan</th>
             <th>Nomor Invoice</th>
             <th>Nomor SO</th>
             <th>Customer</th>
@@ -46,6 +47,7 @@
             <td><?= $no++; ?></td>
             <td><?= $r->tanggal; ?></td>
             <td><?= $r->nomor_jurnal; ?></td>
+            <td><?= $r->keterangan; ?></td>
             <td><?= $r->no_invoice; ?></td>
             <td><?= $r->so_number; ?></td>
             <td><?= $r->customer; ?></td>
