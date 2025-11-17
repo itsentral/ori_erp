@@ -18,7 +18,8 @@
 </form>
 
 <br>
-<a href="?download=excel&dari=<?= $_GET['dari'] ?? '' ?>&sampai=<?= $_GET['sampai'] ?? '' ?>">
+<a href="?download=excel&dari=<?= isset($_GET['dari']) ? $_GET['dari'] : '' ?>
+&sampai=<?= isset($_GET['sampai']) ? $_GET['sampai'] : '' ?>">
     <button type="button">Download Excel</button>
 </a>
 
