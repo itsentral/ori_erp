@@ -3,7 +3,7 @@
 <head>
     <title>Laporan Jurnal</title>
     <style>
-        table { border-collapse: collapse; width: 100%; }
+        table { border-collapse: collapse; width: 100%; } 
         td, th { border: 1px solid #000; padding: 6px; }
     </style>
 </head>

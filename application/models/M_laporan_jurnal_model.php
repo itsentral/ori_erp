@@ -35,7 +35,7 @@ class M_laporan_jurnal extends CI_Model {
         $rows  = $query->result();
 
         // hitung persentase di PHP
-        foreach ($rows as $r) {
+        foreach ($rows as $r) { 
             if ($r->revenue > 0) {
                 $r->persentase = ($r->cogs / $r->revenue) * 100;
             } else {

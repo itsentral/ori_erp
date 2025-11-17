@@ -7,7 +7,7 @@ class Laporan_jurnal extends CI_Controller {
         parent::__construct();
         $this->load->model('M_laporan_jurnal', 'laporan');
     }
-
+ 
     public function index()
     {
         $data['results'] = [];
