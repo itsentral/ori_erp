@@ -25,7 +25,7 @@ class M_laporan_jurnal_model extends CI_Model {
              AND no_perkiraan = '5104-01-01') AS cogs
         ");
 
-        $this->db->from("view_gl_jurnal a");
+        $this->db->from("view_gl_jurnalx a");
         $this->db->join("tr_invoice_header b", "b.no_invoice = a.no_reff", "left");
         $this->db->where("a.tanggal >=", $dari);
         $this->db->where("a.tanggal <=", $sampai);
