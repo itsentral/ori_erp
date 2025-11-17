@@ -16,7 +16,7 @@ class M_laporan_jurnal_model extends CI_Model {
                 x.cogs
             FROM (
                 SELECT DISTINCT nomor, tanggal, no_reff, keterangan
-                FROM view_gl_jurnalx
+                FROM view_gl_jurnal
                 WHERE tanggal >= $dari AND tanggal <=$sampai
                 AND nomor LIKE '%GJ%'
             ) a

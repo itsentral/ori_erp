@@ -19,6 +19,10 @@ class Laporan_jurnal extends CI_Controller {
             $sampai = $this->input->get('sampai');
 
             $data['results'] = $this->laporan->get_laporan($dari, $sampai);
+
+            print_r($data['results']);
+            exit;
+
         }
 
         $this->load->view('laporan_jurnal', $data);
