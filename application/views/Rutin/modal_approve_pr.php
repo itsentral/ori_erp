@@ -21,7 +21,7 @@
 					<th class="text-center">Unit</th>
 					<th class="text-center">Dibutuhkan</th>
 					<th class="text-center">Spec PR</th>
-					<th class="text-right">Price From Supplier</th>
+					<th class="text-right">Price Ref.<br>(From Purchase)</th>
 					<th class="text-right">Total Budget</th>
 					<th class="text-center" width='6%'>Rev Qty</th>
 					<th class="text-center" width='10%'>Keterangan</th>

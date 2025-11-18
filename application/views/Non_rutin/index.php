@@ -34,8 +34,10 @@ $this->load->view('include/side_menu');
 					<!-- <th class="text-center no-sort" width='7%'>Qty</th> -->
 					<!-- <th class="text-center no-sort">Dibutuhkan</th>
 					<th class="text-center no-sort">Keterangan</th> -->
+					<th class="text-center">Req. By</th>
+					<th class="text-center no-sort">Req. Date</th> 
 					<th class="text-center no-sort">Status</th> 
-					<th class="text-center no-sort" width='13%'>Option</th>
+					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>

@@ -1038,6 +1038,7 @@ class Purchase_order_model extends CI_Model {
 				$ArraySerach[$UNIQ]['harga_idr'] = $value['harga_idr'];
 				$ArraySerach[$UNIQ]['total_harga'] = $value['harga_idr']*$value['qty'];
 				$ArraySerach[$UNIQ]['id'] = $value['id'];
+				$ArraySerach[$UNIQ]['status'] = $value['status'];
 			}
 			
 			$data = array(

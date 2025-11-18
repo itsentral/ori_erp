@@ -80,8 +80,8 @@ class Non_rutin_model extends CI_Model {
 			$last_by 	= (!empty($row['updated_by']))?$row['updated_by']:$row['created_by'];
 			$last_date = (!empty($row['updated_date']))?$row['updated_date']:$row['created_date'];
 			
-			// $nestedData[]	= "<div align='center'>".$last_by."</div>";
-			// $nestedData[]	= "<div align='right'>".date('d-M-Y H:i:s', strtotime($last_date))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($last_by)."</div>";
+			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($last_date))."</div>";
 			
 			if($row['sts_app'] == 'N'){
 				$warna 	= 'blue';
