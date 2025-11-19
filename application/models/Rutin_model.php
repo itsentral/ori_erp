@@ -1179,14 +1179,17 @@ class Rutin_model extends CI_Model {
 			$get_price 		= $this->db->select('price_supplier')->get_where('price_ref',array('code_group'=>$value['code_group'],'deleted_date'=>NULL))->result();
 
 			$stock_oke 	= (!empty($get_stock[0]->stock))?$get_stock[0]->stock:0;
-			$purchase 	= ($get_kebutuhan[0]->sum_keb * 1.5) - $stock_oke;
+			$max_stock 	= $get_kebutuhan[0]->sum_keb * 1.5;
+			$purchase 	= $max_stock - $stock_oke;
 			$purchase2 	= ($purchase > 0)?ceil($purchase):0;
 			$price_ref 	= (!empty($get_price[0]->price_supplier))?$get_price[0]->price_supplier:0;
 			$MOQ 		= $value['min_order'];
 			if($purchase2 < $MOQ){
 				$purchase2 = $MOQ;
 			}
-
+			if($stock_oke >= $max_stock){
+				$purchase2 = 0;
+			}
 			$ArrUpdate[$key]['id'] = $value['id'];
 			$ArrUpdate[$key]['request'] = $purchase2;
 			$ArrUpdate[$key]['tgl_dibutuhkan'] = $tgl_next_month;
