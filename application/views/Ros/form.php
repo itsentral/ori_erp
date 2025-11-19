@@ -285,11 +285,11 @@ if(isset($data->status_rg_check)){
 
       <!-- F&C Cost Estimation -->
       <div class="box box-warning" id="dtlFccost" >
-        <div class="box-header" >
+        <div class="box-header" hidden>
           <!--<h4 class="box-title"><label for=""><i class="fa fa-truck"></i> F&C Cost Estimation</label></h4>-->
         </div>
         <div class="box-body">
-          <div class="table-responsive" >
+          <div class="table-responsive"hidden >
             <table id="tbl_dtlFccost" class="table table-bordered table-condensed table-striped">
               <thead class="bg-info">
                 <tr>
@@ -301,7 +301,7 @@ if(isset($data->status_rg_check)){
                   <th width="50px">#</th>
                 </tr>
               </thead>
-              <tbody class="data_fc" >
+              <tbody class="data_fc" hidden>
                 <?php
 				$fw_cost=0;$fw_ppn=0;$fw_grand_total=0;
 				$dt_supplier[]="Select Forwarder";
