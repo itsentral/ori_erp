@@ -18,10 +18,10 @@ $this->load->view('include/side_menu');
                         </span>
                     </div>
                     <input type="text" class="form-control float-right text-center" id="range_picker2" placeholder='Select range date' readonly value='' style='width:300px;'>
-                </div>
-				<div class='col-sm-8'>
-                <button type='button' class='btn btn-md btn-primary' id='download_excel_header3'  title='Excel'>Download</i></button>
+                </div>				
             </div>
+			<div class='col-sm-8'>
+                <button type='button' class='btn btn-md btn-primary' id='download_excel_header3'  title='Excel'>Download</i></button>
             </div>
         </div>
         <div class='form-group row'>
