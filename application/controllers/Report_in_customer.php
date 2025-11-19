@@ -555,15 +555,15 @@ class Report_in_customer extends CI_Controller {
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
 
-		$sheet->setCellValue('J'.$NewRow, 'Qty/Berat');
-		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
-		$sheet->getColumnDimension('J')->setWidth(20);
+		$sheet->setCellValue('K'.$NewRow, 'Qty/Berat');
+		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
+		$sheet->getColumnDimension('K')->setWidth(20);
 
-		$sheet->setCellValue('J'.$NewRow, 'Costbook');
-		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
-		$sheet->getColumnDimension('J')->setWidth(20);
+		$sheet->setCellValue('L'.$NewRow, 'Costbook');
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+		$sheet->getColumnDimension('L')->setWidth(20);
 
 		// echo $qDetail1; exit;
 		if($restDetail1){
