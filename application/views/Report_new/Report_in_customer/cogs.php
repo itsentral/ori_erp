@@ -14,11 +14,14 @@ $this->load->view('include/side_menu');
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
-                            <i class="far fa-calendar-alt"></i>
+                            <i class="far fa-calendar-alt"></i> 
                         </span>
                     </div>
                     <input type="text" class="form-control float-right text-center" id="range_picker2" placeholder='Select range date' readonly value='' style='width:300px;'>
                 </div>
+				<div class='col-sm-8'>
+                <button type='button' class='btn btn-md btn-primary' id='download_excel_header3'  title='Excel'>Download</i></button>
+            </div>
             </div>
         </div>
         <div class='form-group row'>
@@ -99,7 +102,7 @@ $this->load->view('include/side_menu');
 		DataTables2(tgl_awal,tgl_akhir);
 	});
 
-	$(document).on('click', '#download_excel_header2', function(){
+	$(document).on('click', '#download_excel_header3', function(){
 		let range = $('#range_picker2').val();
 		var tgl_awal 	= '0';
 		var tgl_akhir 	= '0';
@@ -112,7 +115,7 @@ $this->load->view('include/side_menu');
 			var tgl_awal 	= sPLT[0];
 			var tgl_akhir 	= sPLT[1];
 		}
-		var Links		= base_url + active_controller+'/excel_report_subgudang2/'+tgl_awal+'/'+tgl_akhir;
+		var Links		= base_url + active_controller+'/excel_report_subgudang3/'+tgl_awal+'/'+tgl_akhir;
 		window.open(Links,'_blank');
 	});
 
