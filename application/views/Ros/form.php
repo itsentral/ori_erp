@@ -196,7 +196,7 @@ if(isset($data->status_rg_check)){
 
 					$qty_ship=0;
 					if(isset($valx->qty_ship)) $qty_ship=$valx->qty_ship;
-					$total_price=$price*$qty_ship;
+					$total_price=$price*$qty_ship; 
 					$total_fc_costprd=$fc_cost_unit*$qty_ship;
 					$total_price_fc_cost=$total_price+$total_fc_costprd;
 					if(isset($valx->bm)) $bm=$valx->bm;
@@ -285,11 +285,11 @@ if(isset($data->status_rg_check)){
 
       <!-- F&C Cost Estimation -->
       <div class="box box-warning" id="dtlFccost" >
-        <div class="box-header" hidden>
+        <div class="box-header" >
           <!--<h4 class="box-title"><label for=""><i class="fa fa-truck"></i> F&C Cost Estimation</label></h4>-->
         </div>
         <div class="box-body">
-          <div class="table-responsive"hidden >
+          <div class="table-responsive" >
             <table id="tbl_dtlFccost" class="table table-bordered table-condensed table-striped">
               <thead class="bg-info">
                 <tr>
@@ -301,7 +301,7 @@ if(isset($data->status_rg_check)){
                   <th width="50px">#</th>
                 </tr>
               </thead>
-              <tbody class="data_fc" hidden>
+              <tbody class="data_fc" >
                 <?php
 				$fw_cost=0;$fw_ppn=0;$fw_grand_total=0;
 				$dt_supplier[]="Select Forwarder";
