@@ -709,7 +709,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm'] ))/($qtyIN+$stokjurnalakhir);
 		        }
 				
 				
@@ -740,8 +740,8 @@ class Warehouse_model extends CI_Model {
 				$ArrJurnalNew[$key]['harga'] 			= $PRICENEW;
 				$ArrJurnalNew[$key]['harga_bm'] 		= $value['bm'];
 				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN));
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN));
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm'] );
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+ $value['bm']);
 				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
 				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nomor_JV;
