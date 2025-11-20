@@ -290,8 +290,6 @@ class Warehouse_model extends CI_Model {
                 $id_material = $restWhDetail[0]->id_material;
                 $data_ros = $this->db->query("SELECT * FROM report_of_shipment_product WHERE id_ros='$no_ros' AND id_material='$id_material' ")->row();
 				
-				print_r($data_ros);
-				exit;
 				//update detail purchase
 				$ArrUpdate[$val]['id'] 			= $valx['id'];
 				$ArrUpdate[$val]['qty_in'] 		= $restWhDetail[0]->qty_in + $qtyIN;
