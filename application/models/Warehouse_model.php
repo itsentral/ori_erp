@@ -962,7 +962,7 @@ class Warehouse_model extends CI_Model {
         // $data_ros_forward = $this->db->query("SELECT * FROM report_of_shipment_forward WHERE id_ros='$no_ros' ")->result();
         // if(!empty($data_ros_forward)){
 		//     foreach ($data_ros_forward as $keys) {
-				$total_forward_bef_ppn=($total_forward_bef_ppn+$value->bm);
+				$total_forward_bef_ppn=($total_forward_bef_ppn+$value['bm']);
 				$total_forward_ppn=($total_forward_ppn);
         //     }
 		// }
