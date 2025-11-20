@@ -287,7 +287,8 @@ class Warehouse_model extends CI_Model {
 								";
 				$restWhDetail	= $this->db->query($sqlWhDetail)->result();
 
-
+                $id_material = $restWhDetail[0]->id_material;
+                $data_ros = $this->db->query("SELECT * FROM report_of_shipment_product WHERE id_ros='$no_ros' AND id_material='$id_material' ")->row();
 				//update detail purchase
 				$ArrUpdate[$val]['id'] 			= $valx['id'];
 				$ArrUpdate[$val]['qty_in'] 		= $restWhDetail[0]->qty_in + $qtyIN;
@@ -309,6 +310,7 @@ class Warehouse_model extends CI_Model {
 				$ArrDeatilAdj[$val]['update_by'] 		= $data_session['ORI_User']['username'];
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
 				$ArrDeatilAdj[$val]['harga']		 	= $valx['harga'];
+				$ArrDeatilAdj[$val]['harga_bm']		 	= $data_ros->bm;
 			}
 
 			//Upload File
@@ -443,7 +445,8 @@ class Warehouse_model extends CI_Model {
 		//echo $gudang;
 		// print_r($data);
 		// exit;
-
+        $bmunit = 0;
+		$bm = 0;
 		$ArrDeatil		 = array();
 		$ArrDeatilAdj		 = array();
 		$ArrUpdateStock		 = array();
@@ -692,8 +695,7 @@ class Warehouse_model extends CI_Model {
 				
 					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book',array('id_material'=>$key))->result();
 					//$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
+				
 				
 				
 				
@@ -804,9 +806,7 @@ class Warehouse_model extends CI_Model {
 				
 					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book',array('id_material'=>$key))->result();
 					//$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-				
+					
 				
 				
 				
@@ -818,7 +818,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm']))/($qtyIN+$stokjurnalakhir);
 		        }
 				
 				
@@ -847,8 +847,8 @@ class Warehouse_model extends CI_Model {
 				$ArrJurnalNew[$key]['harga'] 			= $PRICENEW;
 				$ArrJurnalNew[$key]['harga_bm'] 		= $value['bm'];
 				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN));
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN));
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm']);
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+ $value['bm']);
 				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
 				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nomor_JV;
@@ -959,13 +959,13 @@ class Warehouse_model extends CI_Model {
 		$total_forward_bef_ppn=0;
 		$total_forward_ppn=0;
 		$payment_date=date('Y-m-d');
-        $data_ros_forward = $this->db->query("SELECT * FROM report_of_shipment_forward WHERE id_ros='$no_ros' ")->result();
-        if(!empty($data_ros_forward)){
-		    foreach ($data_ros_forward as $keys) {
-				$total_forward_bef_ppn=($total_forward_bef_ppn+$keys->cost);
-				$total_forward_ppn=($total_forward_ppn+$keys->ppn);
-            }
-		}
+        // $data_ros_forward = $this->db->query("SELECT * FROM report_of_shipment_forward WHERE id_ros='$no_ros' ")->result();
+        // if(!empty($data_ros_forward)){
+		//     foreach ($data_ros_forward as $keys) {
+				$total_forward_bef_ppn=($total_forward_bef_ppn+$value->bm);
+				$total_forward_ppn=($total_forward_ppn);
+        //     }
+		// }
 		$this->db->trans_start();
 			// loping warehouse_adjustment_detail
 			$harga_freight=0;
@@ -1047,7 +1047,7 @@ class Warehouse_model extends CI_Model {
 				}
 				if ($rec->parameter_no == "3") {
 					$coa_hutang_unbill=$rec->no_perkiraan;
-					if($kurs_ros>1) $coa_hutang_unbill='2101-01-05';					
+					if($kurs_ros>1) $coa_hutang_unbill='2101-01-05';	 				
 					if ($hutang > 0) {
 						$det_Jurnaltes1[] = array(
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1"
