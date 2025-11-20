@@ -1069,7 +1069,7 @@ class Warehouse_model extends CI_Model {
 				}
 				if ($rec->parameter_no == "5") {
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Forwarder ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1"
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Bea masuk ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1"
 					);
 				}
 				if ($rec->parameter_no == "6") {
