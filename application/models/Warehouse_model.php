@@ -671,7 +671,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHist[$key]['update_by'] 		= $UserName;
 				$ArrHist[$key]['update_date'] 		= $DateTime;
 				//update agus
-				$ArrHist[$key]['harga'] 			= $value['unit_price']; 
+				$ArrHist[$key]['harga'] 			= $value['unit_price'];
 				//ambil saldo akhir 
 				$saldoakhir=0;
 				$saldo_akhir_gudang = $this->db->order_by('id', 'desc')->get_where('warehouse_history',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
@@ -709,7 +709,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm'] ))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 				
 				
@@ -740,8 +740,8 @@ class Warehouse_model extends CI_Model {
 				$ArrJurnalNew[$key]['harga'] 			= $PRICENEW;
 				$ArrJurnalNew[$key]['harga_bm'] 		= $value['bm'];
 				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm'] );
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+ $value['bm']);
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN) );
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN));
 				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
 				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nomor_JV;
@@ -819,7 +819,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm']))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 				
 				
@@ -848,8 +848,8 @@ class Warehouse_model extends CI_Model {
 				$ArrJurnalNew[$key]['harga'] 			= $PRICENEW;
 				$ArrJurnalNew[$key]['harga_bm'] 		= $value['bm'];
 				$ArrJurnalNew[$key]['nilai_awal_rp']	= $nilaijurnalakhir;
-				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN) + $value['bm']);
-				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+ $value['bm']);
+				$ArrJurnalNew[$key]['nilai_trans_rp']	= (( ($value['kurs'] * $value['unit_price'])*$qtyIN));
+				$ArrJurnalNew[$key]['nilai_akhir_rp']	= $nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN));
 				$ArrJurnalNew[$key]['update_by'] 		= $UserName;
 				$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 				$ArrJurnalNew[$key]['no_jurnal'] 		= $Nomor_JV;
@@ -963,7 +963,7 @@ class Warehouse_model extends CI_Model {
         // $data_ros_forward = $this->db->query("SELECT * FROM report_of_shipment_forward WHERE id_ros='$no_ros' ")->result();
         // if(!empty($data_ros_forward)){
 		//     foreach ($data_ros_forward as $keys) {
-				$total_forward_bef_ppn=($total_forward_bef_ppn+$value['bm']);
+				$total_forward_bef_ppn=($total_forward_bef_ppn);
 				$total_forward_ppn=($total_forward_ppn);
         //     }
 		// }
