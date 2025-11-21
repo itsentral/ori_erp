@@ -694,7 +694,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['qty_order'] 		= $qtyOrder;
 				$ArrDeatilAdj[$val]['qty_oke'] 			= $qtyIN;
 				$ArrDeatilAdj[$val]['keterangan'] 		= strtolower($valx['keterangan']);
-				$ArrDeatilAdj[$val]['no_ba'] 		    = strtolower($valx['status']);
+				$ArrDeatilAdj[$val]['no_ba'] 		    = null;
 				$ArrDeatilAdj[$val]['ket_req_pro'] 		= strtolower($valx['pemeriksa']);
 				$ArrDeatilAdj[$val]['update_by'] 		= $UserName;
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
