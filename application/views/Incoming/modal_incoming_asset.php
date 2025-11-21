@@ -10,8 +10,7 @@
 	<input type="hidden" name='note' id='note' value='<?= $note;?>'>
     <input type="hidden" name='adjustment' id='adjustment' value='IN'>
     <div class='form-group row'>
-        <label class='label-control col-sm-2'><b>Upload Document</b></label>
-        <div class='col-sm-4'>
+        <label class='label-control col-sm-2'><b>Upload Document</b></label> 
             <input type='file' name='upload_doc' class='form-control input-sm text-left'>
         </div>
     </div>	
@@ -59,11 +58,11 @@
                             <input type='hidden' name='addInMat[$No][nm_barang]' value='".$valx['nm_barang']."'>
                             <input type='hidden' name='addInMat[$No][spec]' value='".$valx['id_barang']."'>
                             <input type='hidden' name='addInMat[$No][id]' value='".$valx['id']."'>
-                            <input type='hidden' name='addInMat[$No][qty_rev]' value='".$qty."'>
+                            
                         </td>";
                         echo "<td>".strtoupper($dept)."</td>";
                         echo "<td>".strtoupper($valx['nm_barang'])."</td>";
-                        echo "<td align='center'>".number_format($qty)."</td>";
+                        echo "<td align='center'><input type='hidden' name='addInMat[$No][qty_rev]' value='".$qty."'></td>";
                         echo "<td align='center'>".strtoupper($satuan)."</td>";
                     echo "	<td>
                                 <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
