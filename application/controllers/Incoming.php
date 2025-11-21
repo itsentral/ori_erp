@@ -677,8 +677,8 @@ class Incoming extends CI_Controller {
 			$ArrJurnal		= array();
 			$SumMat = 0;
 			foreach($addInMat AS $val => $valx){
-				$qtyIN 		= str_replace(',','',$valx['qty_rev']);
-				
+				$qtyOrder 	= str_replace(',','',$valx['qty_rev']);
+				$qtyIN 		= str_replace(',','',$valx['qty_in']);
 				$SumMat 	+= $qtyIN;
 
 				//update detail purchase
@@ -691,7 +691,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['id_po_detail'] 	= $valx['id'];
 				$ArrDeatilAdj[$val]['nm_material'] 		= strtolower($valx['nm_barang']);
 				$ArrDeatilAdj[$val]['nm_category'] 		= strtolower($valx['spec']);
-				$ArrDeatilAdj[$val]['qty_order'] 		= $qtyIN;
+				$ArrDeatilAdj[$val]['qty_order'] 		= $qtyOrder;
 				$ArrDeatilAdj[$val]['qty_oke'] 			= $qtyIN;
 				$ArrDeatilAdj[$val]['keterangan'] 		= strtolower($valx['keterangan']);
 				$ArrDeatilAdj[$val]['no_ba'] 		    = strtolower($valx['status']);
@@ -707,7 +707,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilChk[$val]['kode_trans'] 	= $kode_trans;
 				$ArrDeatilChk[$val]['nm_material'] 	= strtolower($valx['nm_barang']);
 				$ArrDeatilChk[$val]['nm_category'] 	= strtolower($valx['spec']);
-				$ArrDeatilChk[$val]['qty_order'] 	= $qtyIN;
+				$ArrDeatilChk[$val]['qty_order'] 	= $qtyOrder;
 				$ArrDeatilChk[$val]['qty_oke'] 		= $qtyIN;
 				$ArrDeatilChk[$val]['keterangan'] 	= strtolower($valx['keterangan']);
 				$ArrDeatilChk[$val]['update_by'] 	= $UserName;
