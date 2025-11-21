@@ -55,7 +55,7 @@ class Incoming extends CI_Controller {
 			'no_po'			=> $no_po
 		);
 		history('View incoming departemen'); 
-		$this->load->view('Incoming/departemen',$data);
+		$this->load->view('Incoming/departemen',$data); 
 	}
 
     public function server_side_incoming(){
@@ -767,6 +767,9 @@ class Incoming extends CI_Controller {
 			$ArrHeader2 = array(
 				'status' => 'COMPLETE',
 			);
+			$ArrHeader3 = array(
+				'status' => 'IN PARSIAL',
+			);
 			// print_r($ArrUpdate);
 			// print_r($ArrDeatilAdj);
 			// print_r($ArrDeatilChk);
@@ -775,13 +778,30 @@ class Incoming extends CI_Controller {
 			$this->db->trans_start();
                 if($cek_type == 'NPO'){
                     $this->db->update_batch('tran_non_po_detail', $ArrUpdate, 'id');
-                    $this->db->where('no_non_po', $no_po);
-				    $this->db->update('tran_non_po_header', $ArrHeader2);
+					$qCheck = "SELECT * FROM tran_non_po_detail WHERE no_non_po='".$no_po."' AND qty_in < qty_rev ";
+					$NumChk = $this->db->query($qCheck)->num_rows();
+					if($NumChk < 1){
+						$this->db->where('no_non_po', $no_po);
+						$this->db->update('tran_non_po_header', $ArrHeader2);
+					}
+					if($NumChk > 0){
+						$this->db->where('no_non_po', $no_po);
+						$this->db->update('tran_non_po_header', $ArrHeader3);
+					}                    
+                    
                 }
                 else{
                     $this->db->update_batch('tran_po_detail', $ArrUpdate, 'id');
-                    $this->db->where('no_po', $no_po);
-				    $this->db->update('tran_po_header', $ArrHeader2);
+                    $qCheck = "SELECT * FROM tran_po_detail WHERE no_po='".$no_po."' AND qty_in < qty_po ";
+					$NumChk = $this->db->query($qCheck)->num_rows();
+					if($NumChk < 1){
+						$this->db->where('no_po', $no_po);
+						$this->db->update('tran_po_header', $ArrHeader2);
+					}
+					if($NumChk > 0){
+						$this->db->where('no_po', $no_po);
+						$this->db->update('tran_po_header', $ArrHeader3);
+					}
                 }
 				
 				$this->db->insert('warehouse_adjustment', $ArrInsertH);
