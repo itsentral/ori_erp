@@ -22,7 +22,6 @@
 				<th class="text-center" style='vertical-align:middle;'>Nama Barang/Jasa</th>
 				<th class="text-center" style='vertical-align:middle;' width='5%'>Qty</th>
 				<th class="text-center" style='vertical-align:middle;' width='5%'>Satuan</th>
-                <th class="text-center" style='vertical-align:middle;' width='7%'>Status</th> 
                 <th class="text-center" style='vertical-align:middle;' width='9%'>Qty Belum Dikirim</th>
                 <th class="text-center" style='vertical-align:middle;' width='9%'>Qty Diterima</th> 
 				<th class="text-center" style='vertical-align:middle;' width='12%'>Catatan</th> 
@@ -56,7 +55,7 @@
                     }
 
                     $Qty_kurang = $qty - $valx['qty_in'];
-                    
+
                     echo "<tr>";
                         echo "<td align='center'>".$No."
                             <input type='hidden' name='addInMat[$No][no_po]' value='".$no_pox."'>
