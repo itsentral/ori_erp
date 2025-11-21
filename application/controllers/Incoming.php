@@ -682,8 +682,15 @@ class Incoming extends CI_Controller {
 				$SumMat 	+= $qtyIN;
 
 				//update detail purchase
+				if($cek_type == 'POX'){
+					$result_det	= $this->db->get_where('tran_po_detail',array('id'=>$valx['id']))->result_array();
+				}
+				else{
+					$result_det	= $this->db->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result_array();
+				}
+
 				$ArrUpdate[$val]['id'] 			= $valx['id'];
-				$ArrUpdate[$val]['qty_in'] 		= $qtyIN;
+				$ArrUpdate[$val]['qty_in'] 		= $result_det[0]['qty_in'] + $qtyIN;
 				
 				//detail adjustmeny
 				$ArrDeatilAdj[$val]['no_ipp'] 			= $no_po;
