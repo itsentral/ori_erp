@@ -62,7 +62,7 @@
                         </td>";
                         echo "<td>".strtoupper($dept)."</td>";
                         echo "<td>".strtoupper($valx['nm_barang'])."</td>";
-                        echo "<td align='center'><input type='hidden' name='addInMat[$No][qty_rev]' value='".$qty."'></td>";
+                        echo "<td align='center'><input type='text' name='addInMat[$No][qty_rev]' value='".$qty."'></td>";
                         echo "<td align='center'>".strtoupper($satuan)."</td>";
                     echo "	<td>
                                 <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
