@@ -72,7 +72,7 @@ $(document).on('click', '#download_excel_header2', function(){
 			return false
 		}
 		var Links		= base_url + active_controller+'/excel_report_subgudang3/'+tgl_awal+'/'+tgl_akhir;
-		window.open(Links,'_blank');
+		//window.open(Links,'_blank');
 	});
 
     </script>
