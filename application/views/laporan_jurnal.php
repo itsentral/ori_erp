@@ -9,8 +9,8 @@ $this->load->view('include/side_menu');
 		
 		</div><br><br>
                 <form method="get">
-                Dari: <input type="date" name="dari" required>
-                Sampai: <input type="date" name="sampai" required> 
+                Dari: <input type="date" name="dari" id="dari" required>
+                Sampai: <input type="date" name="sampai" id="sampai" required> 
                 <button type="submit">Filter</button>
             </form>
 
@@ -18,10 +18,9 @@ $this->load->view('include/side_menu');
 
 
 <br>
-<a href="?download=excel&dari=<?= isset($_GET['dari']) ? $_GET['dari'] : '' ?>
-&sampai=<?= isset($_GET['sampai']) ? $_GET['sampai'] : '' ?>">
-    <button type="button">Download Excel</button>
-</a>
+            <div class='col-sm-8'>
+                <button type='button' class='btn btn-md btn-primary' id='download_excel_header2'  title='Excel'>Download</i></button>
+            </div>
 
 
 <div class="box-body">
@@ -63,4 +62,18 @@ $this->load->view('include/side_menu');
 </div>
 <div id="form-data"></div>
 <?php $this->load->view('include/footer'); ?>
+<script>
+$(document).on('click', '#download_excel_header2', function(){
+		let range = $('#dari').val();
+		var tgl_awal 	= $('#dari').val();
+		var tgl_akhir 	= $('#sampai').val();
+		if(range == ''){
+			alert('Range date wajib diisi !!!')
+			return false
+		}
+		var Links		= base_url + active_controller+'/excel_report_subgudang3/'+tgl_awal+'/'+tgl_akhir;
+		window.open(Links,'_blank');
+	});
+
+    </script>
 
