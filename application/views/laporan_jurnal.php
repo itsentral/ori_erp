@@ -71,8 +71,8 @@ $(document).on('click', '#download_excel_header2', function(){
 			alert('Range date wajib diisi !!!')
 			return false
 		}
-		var Links		= base_url + active_controller+'/excel_report_subgudang3/'+tgl_awal+'/'+tgl_akhir;
-		//window.open(Links,'_blank');
+		var Links		= 'laporan_jurnal/excel_report_subgudang3/'+tgl_awal+'/'+tgl_akhir;
+		window.open(Links,'_blank');
 	});
 
     </script>
