@@ -6,23 +6,46 @@ class Laporan_jurnal extends CI_Controller {
     public function __construct(){
         parent::__construct();
         $this->load->model('M_laporan_jurnal_model', 'laporan');
+
+        // Your own constructor code
+		if(!$this->session->userdata('isORIlogin')){
+			redirect('login');
+		}
     }
  
     public function index()
     {
-        $data['results'] = [];
+        $controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+		$data_session		= $this->session->userdata;
+		$dateTime = date('Y-m-d H:i:s');
+		$UserName = $data_session['ORI_User']['id_user'];
+
+        $datas = [];
 
         // jika form filter dijalankan
         if ($this->input->get('dari') && $this->input->get('sampai')) {
-
+ 
             $dari   = $this->input->get('dari');
             $sampai = $this->input->get('sampai');
 
-            $data['results'] = $this->laporan->get_laporan($dari, $sampai);
+            $datas = $this->laporan->get_laporan($dari, $sampai);
 
            
 
         }
+
+        $data = array(
+			'title'			=> 'Laporan Jurnal VS COGS',
+			'action'		=> 'index',
+			'status'	    => $this->status,
+			'results'	    => $datas,
+			'akses_menu'	=> $Arr_Akses
+		);
 
         $this->load->view('laporan_jurnal', $data);
     }

@@ -1,21 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Laporan Jurnal</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; } 
-        td, th { border: 1px solid #000; padding: 6px; }
-    </style>
-</head>
-<body>
+<?php
+$this->load->view('include/side_menu');
+?>
 
-<h2>Laporan Jurnal (Revenue vs COGS)</h2>
+<div class="box box-primary">
+	<div class="box-header">
+		<h3 class="box-title"><?php echo $title;?></h3> 
+		<div class="box-tool pull-right">
+		
+		</div><br><br>
+                <form method="get">
+                Dari: <input type="date" name="dari" required>
+                Sampai: <input type="date" name="sampai" required> 
+                <button type="submit">Filter</button>
+            </form>
 
-<form method="get">
-    Dari: <input type="date" name="dari" required>
-    Sampai: <input type="date" name="sampai" required>
-    <button type="submit">Filter</button>
-</form>
+	</div>
+
 
 <br>
 <a href="?download=excel&dari=<?= isset($_GET['dari']) ? $_GET['dari'] : '' ?>
@@ -24,8 +24,9 @@
 </a>
 
 
-<table>
-    <thead>
+<div class="box-body">
+        <table id="example1" class="table table-bordered table-striped">
+        <thead>
         <tr>
             <th>No</th>
             <th>Tanggal</th>
@@ -58,6 +59,8 @@
         <?php endforeach; ?>
     </tbody>
 </table>
+</div>
+</div>
+<div id="form-data"></div>
+<?php $this->load->view('include/footer'); ?>
 
-</body>
-</html>
