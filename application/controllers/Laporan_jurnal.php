@@ -182,10 +182,10 @@ class Laporan_jurnal extends CI_Controller {
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
 
-        $sheet->setCellValue('I'.$NewRow, 'Persentase (%)');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
-		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
-		$sheet->getColumnDimension('I')->setWidth(20);
+        $sheet->setCellValue('J'.$NewRow, 'Persentase (%)');
+		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
+		$sheet->getColumnDimension('J')->setWidth(20);
 		// echo $qDetail1; exit;
 		if($datas){
 			$awal_row	= $NextRow;
