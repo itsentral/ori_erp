@@ -42,7 +42,6 @@ class Laporan_jurnal extends CI_Controller {
         $data = array(
 			'title'			=> 'Laporan Jurnal VS COGS',
 			'action'		=> 'index',
-			'status'	    => $this->status,
 			'results'	    => $datas,
 			'akses_menu'	=> $Arr_Akses
 		);
