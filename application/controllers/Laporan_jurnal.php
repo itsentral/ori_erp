@@ -170,7 +170,7 @@ class Laporan_jurnal extends CI_Controller {
 		$sheet->setCellValue('G'.$NewRow, 'Customer');
 		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
-		$sheet->getColumnDimension('G')->setWidth(20);
+		$sheet->getColumnDimension('G')->setAutoSize(true);
 
         $sheet->setCellValue('H'.$NewRow, 'Revenue');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
@@ -234,25 +234,25 @@ class Laporan_jurnal extends CI_Controller {
 				$nilai_unit	= $row->customer;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nilai_unit);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
 				$no_spk	= number_format($row->revenue,2);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $no_spk);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
 				$jenis	= number_format($row->cogs,2);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $jenis);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
 				$awal_col++;
 				$QTY = number_format($row->persentase,4);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $QTY);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 
 			}
