@@ -125,7 +125,7 @@ class Laporan_jurnal extends CI_Controller {
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
         $datas = $this->laporan->get_laporan($dari, $sampai);
-		echo $datas; exit;
+		//echo $datas; exit;
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
