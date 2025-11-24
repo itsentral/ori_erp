@@ -106,8 +106,8 @@ class Laporan_jurnal extends CI_Controller {
 		//membuat objek PHPExcel
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
-		$tgl_awal		= $this->uri->segment(3);
-		$tgl_akhir		= $this->uri->segment(4);
+		$dari		= $this->uri->segment(3);
+		$sampai		= $this->uri->segment(4);
 
 		$this->load->library("PHPExcel");
 		$objPHPExcel	= new PHPExcel();
@@ -125,7 +125,7 @@ class Laporan_jurnal extends CI_Controller {
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
         $datas = $this->laporan->get_laporan($dari, $sampai);
-		// echo $qDetail1; exit;
+		echo $datas; exit;
 
 		$Row		= 1;
 		$NewRow		= $Row+1;
