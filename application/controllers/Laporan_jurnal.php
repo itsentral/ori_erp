@@ -157,25 +157,30 @@ class Laporan_jurnal extends CI_Controller {
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
-		$sheet->setCellValue('E'.$NewRow, 'Nomor SO');
+		$sheet->setCellValue('E'.$NewRow, 'Nomor Invoice');
 		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
-		$sheet->setCellValue('F'.$NewRow, 'Customer');
+        $sheet->setCellValue('F'.$NewRow, 'Nomor SO');
 		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
-		
-		$sheet->setCellValue('G'.$NewRow, 'Revenue');
+
+		$sheet->setCellValue('G'.$NewRow, 'Customer');
 		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-        $sheet->setCellValue('H'.$NewRow, 'COGS');
+        $sheet->setCellValue('H'.$NewRow, 'Revenue');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
+
+        $sheet->setCellValue('I'.$NewRow, 'COGS');
+		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
+		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+		$sheet->getColumnDimension('I')->setWidth(20);
 
         $sheet->setCellValue('I'.$NewRow, 'Persentase (%)');
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
@@ -265,7 +270,7 @@ class Laporan_jurnal extends CI_Controller {
 		header("Pragma: no-cache");
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		//ubah nama file saat diunduh
-		header('Content-Disposition: attachment;filename="report-in-customer.xls"');
+		header('Content-Disposition: attachment;filename="Revenue_vs_Cogs.xls"');
 		//unduh file
 		$objWriter->save("php://output");
 	}
