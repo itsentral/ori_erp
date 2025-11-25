@@ -10,8 +10,7 @@
 	<input type="hidden" name='note' id='note' value='<?= $note;?>'>
     <input type="hidden" name='adjustment' id='adjustment' value='IN'>
     <div class='form-group row'>
-        <label class='label-control col-sm-2'><b>Upload Document</b></label>
-        <div class='col-sm-4'>
+        <label class='label-control col-sm-2'><b>Upload Document</b></label> 
             <input type='file' name='upload_doc' class='form-control input-sm text-left'>
         </div>
     </div>	
@@ -23,7 +22,8 @@
 				<th class="text-center" style='vertical-align:middle;'>Nama Barang/Jasa</th>
 				<th class="text-center" style='vertical-align:middle;' width='5%'>Qty</th>
 				<th class="text-center" style='vertical-align:middle;' width='5%'>Satuan</th>
-                <th class="text-center" style='vertical-align:middle;' width='7%'>Status</th> 
+                <th class="text-center" style='vertical-align:middle;' width='9%'>Qty Belum Dikirim</th>
+                <th class="text-center" style='vertical-align:middle;' width='9%'>Qty Diterima</th> 
 				<th class="text-center" style='vertical-align:middle;' width='12%'>Catatan</th> 
 				<th class="text-center" style='vertical-align:middle;' width='12%'>Pemeriksa</th> 
 				<!-- <th class="text-center" style='vertical-align:middle;' width='15%'>Upload Doc</th>  -->
@@ -53,6 +53,9 @@
                         $dept = '';
                         $no_pox = $valx['no_po'];
                     }
+
+                    $Qty_kurang = $qty - $valx['qty_in'];
+
                     echo "<tr>";
                         echo "<td align='center'>".$No."
                             <input type='hidden' name='addInMat[$No][no_po]' value='".$no_pox."'>
@@ -65,12 +68,15 @@
                         echo "<td>".strtoupper($valx['nm_barang'])."</td>";
                         echo "<td align='center'>".number_format($qty)."</td>";
                         echo "<td align='center'>".strtoupper($satuan)."</td>";
-                    echo "	<td>
-                                <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
-                                    <option value='1'>YES</option>
-                                    <option value='2'>NO</option>
-                                </select>
-                            </td>";
+                        echo "<td align='center' class='belumDiterima'>".number_format($Qty_kurang,2)."</td>";
+                        // echo "<td align='center'>".strtoupper($satuan)."</td>";
+                    // echo "	<td>
+                    //             <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
+                    //                 <option value='1'>YES</option>
+                    //                 <option value='2'>NO</option>
+                    //             </select>
+                    //         </td>";
+                    echo "<td align='center'><input type='text' name='addInMat[$No][qty_in]' data-no='$No' class='form-control input-sm text-center maskM qtyDiterima' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][keterangan]' data-no='$No' class='form-control input-sm text-left'></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][pemeriksa]' data-no='$No' class='form-control input-sm text-left'></td>";
                     // echo "<td align='center'><input type='file' name='upload_".$No."' data-no='$No' class='form-control input-sm text-left'></td>";

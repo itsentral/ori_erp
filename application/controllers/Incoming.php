@@ -55,7 +55,7 @@ class Incoming extends CI_Controller {
 			'no_po'			=> $no_po
 		);
 		history('View incoming departemen'); 
-		$this->load->view('Incoming/departemen',$data);
+		$this->load->view('Incoming/departemen',$data); 
 	}
 
     public function server_side_incoming(){
@@ -677,13 +677,20 @@ class Incoming extends CI_Controller {
 			$ArrJurnal		= array();
 			$SumMat = 0;
 			foreach($addInMat AS $val => $valx){
-				$qtyIN 		= str_replace(',','',$valx['qty_rev']);
-				
+				$qtyOrder 	= str_replace(',','',$valx['qty_rev']);
+				$qtyIN 		= str_replace(',','',$valx['qty_in']);
 				$SumMat 	+= $qtyIN;
 
 				//update detail purchase
+				if($cek_type == 'POX'){
+					$result_det	= $this->db->get_where('tran_po_detail',array('id'=>$valx['id']))->result_array();
+				}
+				else{
+					$result_det	= $this->db->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result_array();
+				}
+
 				$ArrUpdate[$val]['id'] 			= $valx['id'];
-				$ArrUpdate[$val]['qty_in'] 		= $qtyIN;
+				$ArrUpdate[$val]['qty_in'] 		= $result_det[0]['qty_in'] + $qtyIN;
 				
 				//detail adjustmeny
 				$ArrDeatilAdj[$val]['no_ipp'] 			= $no_po;
@@ -691,10 +698,10 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['id_po_detail'] 	= $valx['id'];
 				$ArrDeatilAdj[$val]['nm_material'] 		= strtolower($valx['nm_barang']);
 				$ArrDeatilAdj[$val]['nm_category'] 		= strtolower($valx['spec']);
-				$ArrDeatilAdj[$val]['qty_order'] 		= $qtyIN;
+				$ArrDeatilAdj[$val]['qty_order'] 		= $qtyOrder;
 				$ArrDeatilAdj[$val]['qty_oke'] 			= $qtyIN;
 				$ArrDeatilAdj[$val]['keterangan'] 		= strtolower($valx['keterangan']);
-				$ArrDeatilAdj[$val]['no_ba'] 		    = strtolower($valx['status']);
+				$ArrDeatilAdj[$val]['no_ba'] 		    = null;
 				$ArrDeatilAdj[$val]['ket_req_pro'] 		= strtolower($valx['pemeriksa']);
 				$ArrDeatilAdj[$val]['update_by'] 		= $UserName;
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
@@ -707,7 +714,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilChk[$val]['kode_trans'] 	= $kode_trans;
 				$ArrDeatilChk[$val]['nm_material'] 	= strtolower($valx['nm_barang']);
 				$ArrDeatilChk[$val]['nm_category'] 	= strtolower($valx['spec']);
-				$ArrDeatilChk[$val]['qty_order'] 	= $qtyIN;
+				$ArrDeatilChk[$val]['qty_order'] 	= $qtyOrder;
 				$ArrDeatilChk[$val]['qty_oke'] 		= $qtyIN;
 				$ArrDeatilChk[$val]['keterangan'] 	= strtolower($valx['keterangan']);
 				$ArrDeatilChk[$val]['update_by'] 	= $UserName;
@@ -767,6 +774,9 @@ class Incoming extends CI_Controller {
 			$ArrHeader2 = array(
 				'status' => 'COMPLETE',
 			);
+			$ArrHeader3 = array(
+				'status' => 'IN PARSIAL',
+			);
 			// print_r($ArrUpdate);
 			// print_r($ArrDeatilAdj);
 			// print_r($ArrDeatilChk);
@@ -775,13 +785,30 @@ class Incoming extends CI_Controller {
 			$this->db->trans_start();
                 if($cek_type == 'NPO'){
                     $this->db->update_batch('tran_non_po_detail', $ArrUpdate, 'id');
-                    $this->db->where('no_non_po', $no_po);
-				    $this->db->update('tran_non_po_header', $ArrHeader2);
+					$qCheck = "SELECT * FROM tran_non_po_detail WHERE no_non_po='".$no_po."' AND qty_in < qty_rev ";
+					$NumChk = $this->db->query($qCheck)->num_rows();
+					if($NumChk < 1){
+						$this->db->where('no_non_po', $no_po);
+						$this->db->update('tran_non_po_header', $ArrHeader2);
+					}
+					if($NumChk > 0){
+						$this->db->where('no_non_po', $no_po);
+						$this->db->update('tran_non_po_header', $ArrHeader3);
+					}                    
+                    
                 }
                 else{
                     $this->db->update_batch('tran_po_detail', $ArrUpdate, 'id');
-                    $this->db->where('no_po', $no_po);
-				    $this->db->update('tran_po_header', $ArrHeader2);
+                    $qCheck = "SELECT * FROM tran_po_detail WHERE no_po='".$no_po."' AND qty_in < qty_po ";
+					$NumChk = $this->db->query($qCheck)->num_rows();
+					if($NumChk < 1){
+						$this->db->where('no_po', $no_po);
+						$this->db->update('tran_po_header', $ArrHeader2);
+					}
+					if($NumChk > 0){
+						$this->db->where('no_po', $no_po);
+						$this->db->update('tran_po_header', $ArrHeader3);
+					}
                 }
 				
 				$this->db->insert('warehouse_adjustment', $ArrInsertH);
