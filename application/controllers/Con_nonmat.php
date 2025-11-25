@@ -729,45 +729,50 @@ class Con_nonmat extends CI_Controller {
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setWidth(20);
 
-		$sheet->setCellValue('D'.$NewRow, 'Excel Code');
+		$sheet->setCellValue('D'.$NewRow, 'SubCategory');
 		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setWidth(20);
 
-		$sheet->setCellValue('E'.$NewRow, 'Item Code');
+		$sheet->setCellValue('E'.$NewRow, 'Excel Code');
 		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(20);
 
-		$sheet->setCellValue('F'.$NewRow, 'Accurate Code');
+		$sheet->setCellValue('F'.$NewRow, 'Item Code');
 		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(20);
 
-		$sheet->setCellValue('G'.$NewRow, 'Material Name');
+		$sheet->setCellValue('G'.$NewRow, 'Accurate Code');
 		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-		$sheet->setCellValue('H'.$NewRow, 'Trade Name');
+		$sheet->setCellValue('H'.$NewRow, 'Material Name');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-		$sheet->setCellValue('I'.$NewRow, 'Spec');
+		$sheet->setCellValue('I'.$NewRow, 'Trade Name');
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
 
-		$sheet->setCellValue('J'.$NewRow, 'Brand');
+		$sheet->setCellValue('J'.$NewRow, 'Spec');
 		$sheet->getStyle('J'.$NewRow.':J'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('J'.$NewRow.':J'.$NextRow);
 		$sheet->getColumnDimension('J')->setWidth(20);
 
-		$sheet->setCellValue('K'.$NewRow, 'Status');
+		$sheet->setCellValue('K'.$NewRow, 'Brand');
 		$sheet->getStyle('K'.$NewRow.':K'.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('K'.$NewRow.':K'.$NextRow);
 		$sheet->getColumnDimension('K')->setWidth(20);
+
+		$sheet->setCellValue('L'.$NewRow, 'Status');
+		$sheet->getStyle('L'.$NewRow.':L'.$NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('L'.$NewRow.':L'.$NextRow);
+		$sheet->getColumnDimension('L')->setWidth(20);
 
 		$where_inventory = "";
 		if($category != '0'){
@@ -781,9 +786,13 @@ class Con_nonmat extends CI_Controller {
 		
 		$SQL = "SELECT
 					a.*,
-					b.category AS categoryb
+					b.category AS categoryb,
+					d.category AS sub_category
 				FROM
-					con_nonmat_new a LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id
+					con_nonmat_new a 
+					LEFT JOIN con_nonmat_category_awal b ON a.category_awal = b.id
+					LEFT JOIN accessories c ON a.code_group = c.id_material
+					LEFT JOIN accessories_category d ON c.category = d.id
 				WHERE a.code_group LIKE 'CN%'
 					AND a.deleted='N' ".$where_inventory." ".$where_status." ORDER BY category_awal, a.material_name ";
 		$row		= $this->db->query($SQL)->result_array();
@@ -812,6 +821,12 @@ class Con_nonmat extends CI_Controller {
 				$categoryb	= strtoupper($row_Cek['categoryb']);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $categoryb);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+
+				$awal_col++;
+				$sub_category	= strtoupper($row_Cek['sub_category']);
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $sub_category);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
