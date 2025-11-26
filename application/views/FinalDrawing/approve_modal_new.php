@@ -243,7 +243,10 @@ else{
 					echo "<tbody class='body_x'>";
 					foreach($non_frp2 AS $val => $valx){ $no++;
 						$PRICE_DEAL = $valx['deal_price'];
-						$PRICE_DEAL_UNIT = $PRICE_DEAL / $valx['qty_deal'];
+						$PRICE_DEAL_UNIT = 0;
+						if($PRICE_DEAL > 0 AND $valx['qty_deal'] > 0){
+							$PRICE_DEAL_UNIT = $PRICE_DEAL / $valx['qty_deal'];
+						}
 						$SUM_NONFRP += $PRICE_DEAL;
 						$CHECK_FD_ACC = check_fd_acc($valx['id2']);
 						$dist = '';
