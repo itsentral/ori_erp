@@ -1028,7 +1028,7 @@ class Warehouse_model extends CI_Model {
 					// $det_Jurnaltes1[$key]['nilai_valas_kredit'] = $no_po;
 					// $det_Jurnaltes1[$key]['no_reff'] = $no_po;
 					// $det_Jurnaltes1[$key]['jenis_jurnal'] = $no_po;
-					$det_Jurnaltes1 = array(
+					$det_Jurnaltes1[] = array(
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : ($value['unit_price'])), 'kredit' => ($rec->posisi == 'D' ? 0 : ($total_harga_product+$total_forward_bef_ppn)), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
 					);
 					
