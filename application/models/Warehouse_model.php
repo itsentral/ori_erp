@@ -701,7 +701,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHist[$key]['qty_booking_akhir'] = $rest_pusat[0]->qty_booking;
 				$ArrHist[$key]['qty_rusak_awal'] 	= $rest_pusat[0]->qty_rusak;
 				$ArrHist[$key]['qty_rusak_akhir'] 	= $rest_pusat[0]->qty_rusak + $qtyRISK;
-				$ArrHist[$key]['no_ipp'] 			= $no_po."/".$kode_trans;
+				$ArrHist[$key]['no_ipp'] 			= $kode_trans;
 				$ArrHist[$key]['jumlah_mat'] 		= $qtyIN + $qtyRISK;
 				$ArrHist[$key]['ket'] 				= 'incoming material';
 				$ArrHist[$key]['update_by'] 		= $UserName;
@@ -811,7 +811,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHistNew[$key]['qty_booking_akhir']	= 0;
 				$ArrHistNew[$key]['qty_rusak_awal'] 	= 0;
 				$ArrHistNew[$key]['qty_rusak_akhir'] 	= $qtyRISK;
-				$ArrHistNew[$key]['no_ipp'] 			= $no_po."/".$kode_trans;
+				$ArrHistNew[$key]['no_ipp'] 			= $kode_trans;
 				$ArrHistNew[$key]['jumlah_mat'] 		= $qtyIN + $qtyRISK;
 				$ArrHistNew[$key]['ket'] 				= 'incoming material (insert new)';
 				$ArrHistNew[$key]['update_by'] 			= $UserName;
