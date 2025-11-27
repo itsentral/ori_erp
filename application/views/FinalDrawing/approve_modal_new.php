@@ -228,7 +228,7 @@ else{
 							echo "</tr>";
 						echo "<tr class='bg-blue'>";
 							echo "<th class='text-left' colspan='7'>MATERIAL NAME</th>";
-							echo "<th colspan='3' class='text-right'>UNIT PRICE</th>";
+							echo "<th colspan='3' class='text-right'>DEAL SO<br>UNIT PRICE</th>";
 							echo "<th class='text-center'>QTY</th>";
 							echo "<th class='text-center'>UNIT</th>";
 							echo "<th class='text-right'>TOTAL PRICE</th>";
@@ -243,17 +243,26 @@ else{
 					echo "<tbody class='body_x'>";
 					foreach($non_frp2 AS $val => $valx){ $no++;
 						$PRICE_DEAL = $valx['deal_price'];
-						$PRICE_DEAL_UNIT = $PRICE_DEAL / $valx['qty_deal'];
+						$QTY_DEAL = $valx['qty_deal'];
+						$PRICE_DEAL_UNIT = 0;
+						if($PRICE_DEAL > 0 AND $QTY_DEAL > 0){
+							$PRICE_DEAL_UNIT = $PRICE_DEAL / $QTY_DEAL;
+						}
 						$SUM_NONFRP += $PRICE_DEAL;
 						$CHECK_FD_ACC = check_fd_acc($valx['id2']);
 						$dist = '';
 						if($CHECK_FD_ACC == 'Y'){
 							$dist = "<center><input type='checkbox' name='check2[".$no."]' class='chk_personal_acc' data-nomor='".$no."' value='".$valx['id2']."' ></center>";
 						}
+						$Tanda = "";
+						if($QTY_DEAL === null){
+							$Tanda = "<br><span class='text-danger'><b>Item tidak ada di Deal Sales Order !</b></span>";
+							$QTY_DEAL = $valx['qty_fd'];
+						}
 						echo "<tr>";
-							echo "<td colspan='7'>".strtoupper(get_name_acc($valx['id_material']))."</td>";
+							echo "<td colspan='7'>".strtoupper(get_name_acc($valx['id_material'])).$Tanda."</td>";
 							echo "<td colspan='3' align='right'>".number_format($PRICE_DEAL_UNIT,2)."</td>";
-							echo "<td align='center'>".number_format($valx['qty_deal'])."</td>";
+							echo "<td align='center'>".number_format($QTY_DEAL)."</td>";
 							echo "<td align='center'>".strtoupper(get_name('raw_pieces', 'kode_satuan', 'id_satuan', $valx['satuan']))."</td>";
 							echo "<td align='right'>".number_format($PRICE_DEAL,2)."</td>";
 							echo "<td style='vertical-align: middle; text-align:right;'>".$dist."</td>";
@@ -298,7 +307,7 @@ else{
 						echo "</tr>";
 						echo "<tr class='bg-blue'>";
 							echo "<th class='text-left' colspan='7'>MATERIAL NAME</th>";
-							echo "<th class='text-right' colspan='3'>UNIT PRICE</th>";
+							echo "<th class='text-right' colspan='3'>DEAL SO<br>UNIT PRICE</th>";
 							echo "<th class='text-center'>QTY</th>";
 							echo "<th class='text-center'>UNIT</th>";
 							echo "<th class='text-right'>TOTAL PRICE</th>";
@@ -313,9 +322,10 @@ else{
 					echo "<tbody class='body_x'>";
 					foreach($material2 AS $val => $valx){ $no++;
 						$PRICE_DEAL = $valx['deal_price'];
+						$QTY_DEAL = $valx['qty_deal'];
 						$PRICE_DEAL_UNIT = 0;
-						if($PRICE_DEAL > 0 AND $valx['qty_deal'] > 0){
-						$PRICE_DEAL_UNIT = $PRICE_DEAL / $valx['qty_deal'];
+						if($PRICE_DEAL > 0 AND $QTY_DEAL > 0){
+						$PRICE_DEAL_UNIT = $PRICE_DEAL / $QTY_DEAL;
 						}
 						$SUM_MAT += $PRICE_DEAL;
 						$CHECK_FD_ACC = check_fd_acc($valx['id2']);
@@ -323,10 +333,16 @@ else{
 						if($CHECK_FD_ACC == 'Y'){
 							$dist = "<center><input type='checkbox' name='check2[".$no."]' class='chk_personal_mat' data-nomor='".$no."' value='".$valx['id2']."' ></center>";
 						}
+
+						$Tanda = "";
+						if($QTY_DEAL === null){
+							$Tanda = "<br><span class='text-danger'><b>Item tidak ada di Deal Sales Order !</b></span>";
+							$QTY_DEAL = $valx['qty_fd'];
+						}
 						echo "<tr>";
-							echo "<td colspan='7'>".strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $valx['id_material']))."</td>";
+							echo "<td colspan='7'>".strtoupper(get_name('raw_materials', 'nm_material', 'id_material', $valx['id_material'])).$Tanda."</td>";
 							echo "<td align='right' colspan='3'>".number_format($PRICE_DEAL_UNIT,2)."</td>";
-							echo "<td align='right'>".number_format($valx['qty_deal'],2)."</td>";
+							echo "<td align='right'>".number_format($QTY_DEAL,2)."</td>";
 							echo "<td align='center'>KG</td>";
 							echo "<td align='right'>".number_format($PRICE_DEAL,2)."</td>";
 							echo "<td style='vertical-align: middle; text-align:right;'>".$dist."</td>";
