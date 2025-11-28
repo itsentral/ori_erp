@@ -5934,7 +5934,8 @@
 			$temp['harga_baru'][]= $value['harga_baru'];
 		}
 
-		   
+		   print_r($temp);
+		   exit;
 
 		$ArrStock = array();
 		$ArrHist = array();
