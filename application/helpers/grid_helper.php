@@ -5923,13 +5923,16 @@
 		$temp = [];
 		foreach($ArrUpdateStock as $value) {
 
-			print_r($value);
-			exit;
+			
 
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
 			}
 			$temp[$value['id']] += $value['qty'];
+
+			print_r($value);
+			exit;
+
 			$temp[$value['harga_pusat']];
 			$temp[$value['harga_tujuan']];
 			$temp[$value['harga_baru']];
