@@ -5928,7 +5928,7 @@
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
 			}
-			$temp[$value['id']][] += $value['qty'];
+			$temp[$value['id']] += $value['qty'];
 			$temp['harga_pusat'][] = $value['harga_pusat'];
 			$temp['harga_tujuan'][] = $value['harga_tujuan'];;
 			$temp['harga_baru'][]= $value['harga_baru'];
