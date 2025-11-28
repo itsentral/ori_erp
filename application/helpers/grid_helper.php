@@ -5922,6 +5922,10 @@
 		//grouping sum
 		$temp = [];
 		foreach($ArrUpdateStock as $value) {
+
+			print_r($value);
+			exit;
+
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
 			}
