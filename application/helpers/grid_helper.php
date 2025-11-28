@@ -5929,14 +5929,13 @@
 				$temp[$value['id']] = 0;
 			}
 			$temp[$value['id']] += $value['qty'];
-
-			print_r($value);
-			exit;
-
 			$temp[$value['harga_pusat']];
 			$temp[$value['harga_tujuan']];
 			$temp[$value['harga_baru']];
 		}
+
+		    // print_r($value);
+			// exit;
 
 		$ArrStock = array();
 		$ArrHist = array();
