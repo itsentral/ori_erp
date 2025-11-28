@@ -670,7 +670,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
 		        }
 
 
@@ -775,7 +775,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
 		        }
 
 				//update stock
@@ -817,12 +817,14 @@ class Warehouse_model extends CI_Model {
 				$ArrHistNew[$key]['update_by'] 			= $UserName;
 				$ArrHistNew[$key]['update_date'] 		= $DateTime;
 
+				
+
 				//update syam 26/11/2025
-				$ArrHist[$key]['harga'] 			= $value['unit_price'];
-				$ArrHist[$key]['total_harga'] 		= $value['unit_price']*$qtyIN;
-				$ArrHist[$key]['saldo_awal']		= $nilaijurnalakhir;
-				$ArrHist[$key]['saldo_akhir']		= $stok_akhir;
-				$ArrHist[$key]['harga_baru'] 		= $PRICENEW;
+				$ArrHistNew[$key]['harga'] 			= $value['unit_price'];
+				$ArrHistNew[$key]['total_harga'] 		= $value['unit_price']*$qtyIN;
+				$ArrHistNew[$key]['saldo_awal']		= $nilaijurnalakhir;
+				$ArrHistNew[$key]['saldo_akhir']		= $stok_akhir;
+				$ArrHistNew[$key]['harga_baru'] 		= $PRICENEW;
 				
 				
 				
@@ -2239,9 +2241,7 @@ class Warehouse_model extends CI_Model {
 						$ArrDeatilAdj[$val2.$val]['update_by'] 		= $UserName;
 						$ArrDeatilAdj[$val2.$val]['update_date'] 	= $DateTime;
 
-						//MATERIAL YANG AKAN DI UPDATE
-						$ArrUpdateStock[$val2]['id'] 	= $ID_MATERIAL_ACT;
-						$ArrUpdateStock[$val2]['qty'] 	= $QTY_OKE;
+						
 
 						//MATERIAL YANG AKAN DI UPDATE EXPIRED
 						if(!empty($EXPIRED)){
@@ -2260,52 +2260,37 @@ class Warehouse_model extends CI_Model {
 						
 						}
 						
-				$key = $getDetMat[0]->id_material;				
-					
-			    $stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$key = $getDetMat[0]->id_material;
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				//ambil saldo akhir 
+						
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$PRICE=0;
+				$bmunit = 0;
+				$bm = 0;
+
+                $qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook)) $PRICE=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+				//MATERIAL YANG AKAN DI UPDATE
+				$ArrUpdateStock[$val2]['id'] 	= $ID_MATERIAL_ACT;
+				$ArrUpdateStock[$val2]['qty'] 	= $QTY_OKE;
+				$ArrUpdateStock[$val2]['harga_pusat'] 	= $PRICE;
+
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
 				$Thn 			= substr($tanggal,0,4);
 				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-				
-				
-				
 				$GudangFrom = $id_gudang_dari;
-				//if($GudangFrom == '2'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book',array('id_material'=>$key))->result();
-					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari,'id_material'=>$key),1)->row();
-					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
-
-				//}elseif($GudangFrom == '3'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					//$bmunit = 0;
-					//$bm = 0;
-
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$key),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
-		
-				//}elseif($GudangFrom == '30'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
-					//$PRICE = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					//$bmunit = 0;
-					//$bm = 0;
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
-
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
-					
-				//}
+				
 				
 				
 				$ArrJurnalNew[$val2]['id_material'] 		= $getDetMat[0]->id_material;
@@ -2342,39 +2327,15 @@ class Warehouse_model extends CI_Model {
 				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				
 				
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				$GudangFrom2 = $id_tujuan;
-				$PRICE2 = 0;
-				//if($GudangFrom2 == '2'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book',array('id_material'=>$key))->result();
-					//$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					$bmunit = 0;
-					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan,'id_material'=>$key),1)->row();
-					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
-				//}elseif($GudangFrom2 == '3'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book_subgudang',array('id_material'=>$key))->result();
-					//$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
-					//$bmunit = 0;
-					//$bm = 0;
-
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$key),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
-				//}elseif($GudangFrom2 == '30'){
-					//$get_price_book = $this->db->order_by('tgl_trans','desc')->get_where('price_book_produksi',array('id_material'=>$key))->result();
-					//$PRICE2 = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0; 
-					//$bmunit = 0;
-					//$bm = 0;
-
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('coa_gudang'=>'1103-01-03', 'id_material'=>$id_material),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
-
-					//$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>3, 'id_material'=>$key),1)->row();
-					//if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
-					
-				//}
-				
 				
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 				$in   = 'pindah gudang in';
@@ -2409,6 +2370,9 @@ class Warehouse_model extends CI_Model {
 					
 				}
 				$SUM_MAT 	+= $QTY_OKE;
+
+				$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
+				$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
 			}
 
 			//PROCESS UPDATE STOCK
@@ -2476,11 +2440,18 @@ class Warehouse_model extends CI_Model {
 						$ArrUpdateHist[$material]['qty_booking_akhir'] 	= $booking - $qtyInt;
 						$ArrUpdateHist[$material]['qty_rusak_awal'] 	= $rusak;
 						$ArrUpdateHist[$material]['qty_rusak_akhir'] 	= $rusak;
-						$ArrUpdateHist[$material]['no_ipp'] 			= $no_ipp;
+						$ArrUpdateHist[$material]['no_ipp'] 			= $kode_trans;
 						$ArrUpdateHist[$material]['jumlah_mat'] 		= $qtyInt;
-						$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$kode_trans;
+						$ArrUpdateHist[$material]['ket'] 				= 'pengurangan booking '.$no_ipp;
 						$ArrUpdateHist[$material]['update_by'] 			= $UserName;
 						$ArrUpdateHist[$material]['update_date'] 		= $DateTime;
+
+						//update syam 26/11/2025
+						$ArrUpdateHist[$material]['harga'] 			    = 0;
+						$ArrUpdateHist[$material]['total_harga'] 		= 0;
+						$ArrUpdateHist[$material]['saldo_awal']		    = $nilaijurnalakhir;
+						$ArrUpdateHist[$material]['saldo_akhir']		= $nilaijurnalakhir;
+						$ArrUpdateHist[$material]['harga_baru'] 		= $PRICE;
 					}
 				}
 			}
@@ -2777,7 +2748,7 @@ class Warehouse_model extends CI_Model {
 			$sql 		= "	SELECT
 								a.*,
 								b.qty_stock AS stock,
-								c.nm_material AS nm_material_stock,
+								c.nm_material AS nm_material_stock, 
 								c.id_category AS id_category2,
 								c.id_packing,
 								c.nilai_konversi AS konversi

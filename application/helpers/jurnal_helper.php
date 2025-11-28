@@ -180,7 +180,8 @@
 						'kredit'        => 0,
 						'jenis_jurnal'  => $jenis_jurnal,
 						'stspos'		  => '1',
-						'no_request'    => $no_request
+						'no_request'    => $no_request,
+						'id_material'    => $key
 						);
 						$datadetail[] = array(
 							'tipe'        => 'JV',
@@ -190,7 +191,10 @@
 							'keterangan'	=> $Keterangan_INV,
 							'no_reff'		=> $no_request,
 							'debet'			=> $nilaibayar,
-							'kredit'		=> 0
+							'kredit'		=> 0,
+							'id_material'    => $key,
+							'created_on'    => $DateTime,
+							'created_by'    => $UserName
 						);
 
 					} elseif ($posisi=='K'){
@@ -205,7 +209,8 @@
 						'kredit'        => $nilaibayar,
 						'jenis_jurnal'  => $jenis_jurnal,
 						'stspos'		  => '1',
-						'no_request'    => $no_request
+						'no_request'    => $no_request,
+						'id_material'    => $key
 						);
 						$datadetail[] = array(
 							'tipe'        => 'JV',
@@ -215,7 +220,10 @@
 							'keterangan'	=> $Keterangan_INV,
 							'no_reff'		=> $no_request,
 							'debet'			=> 0,
-							'kredit'		=> $nilaibayar
+							'kredit'		=> $nilaibayar,
+							'id_material'    => $key,
+							'created_on'    => $DateTime,
+							'created_by'    => $UserName
 						);
 					}
 				}
