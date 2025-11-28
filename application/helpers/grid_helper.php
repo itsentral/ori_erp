@@ -5929,9 +5929,9 @@
 				$temp[$value['id']] = 0;
 			}
 			$temp[$value['id']] += $value['qty'];
-			$temp[$value['harga_pusat']];
-			$temp[$value['harga_tujuan']];
-			$temp[$value['harga_baru']];
+			$temp['harga_pusat'] = $value['harga_pusat'];
+			$temp['harga_tujuan'] = $value['harga_tujuan'];;
+			$temp['harga_baru']= $value['harga_baru'];
 		}
 
 		    print_r($value);
