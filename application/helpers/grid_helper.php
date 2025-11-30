@@ -5921,16 +5921,14 @@
 		}
 		//grouping sum
 		$temp = [];
-		foreach($ArrUpdateStock as $value) {
-
-			
+		foreach($ArrUpdateStock as $value) {		
 
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
 			}
 			$temp[$value['id']]['qty']  += $value['qty'];
 			$temp[$value['id']]['harga_pusat'] = $value['harga_pusat'];
-			$temp[$value['id']]['harga_tujuan'] = $value['harga_tujuan'];;
+			$temp[$value['id']]['harga_tujuan'] = $value['harga_tujuan'];
 			$temp[$value['id']]['harga_baru']= $value['harga_baru'];
 		}
 
