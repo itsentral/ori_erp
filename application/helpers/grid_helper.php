@@ -5930,7 +5930,7 @@
 			
 		}
 
-		   print_r($ArrUpdateStock);
+		   print_r($temp);
 		   exit;
 
 		$ArrStock = array();
