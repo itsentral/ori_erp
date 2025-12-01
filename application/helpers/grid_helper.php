@@ -5927,6 +5927,7 @@
 				$temp[$value['id']] = 0;
 			}
 			$temp[$value['id']]  += $value['qty'];
+			$temp[$value['id']]   = $value['harga_tujuan'];
 			
 		}
 
