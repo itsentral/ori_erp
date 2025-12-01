@@ -89,7 +89,7 @@
 						<input type='hidden' name='detail[$val][id_material]' value='".$valx['id_material']."'>
 						<input type='hidden' name='detail[$val][qty_pax_max]' id='pack_".$valx['id']."' value='".$valx['qty_pack']."'>
 						<input type='hidden' name='detail[$val][konversi]' id='konversi_".$valx['id']."' value='".$konversi."'>
-						<input type='text' name='detail[$val][qty_out]' data-id='".$valx['id']."' id='request_".$valx['id']."' data-idmaterial='".$valx['id_material']."' style='background:floralwhite; border-ccolor:floralwhite;border:none;' placeholder='Otomatis' class='autoNumeric2 text-center changeRequest placeholder='Input Qty' readonly>
+						<input type='text' name='detail[$val][qty_out]' data-id='".$valx['id']."' id='request_".$valx['id']."' data-idmaterial='".$valx['id_material']."' style='background:floralwhite; border-ccolor:floralwhite;border:none;' placeholder='Otomatis' class='autoNumeric2 text-center changeRequest placeholder='Input Qty'>
 						</td>";
                     }
                     else{
