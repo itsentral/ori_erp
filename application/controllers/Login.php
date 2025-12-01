@@ -67,7 +67,7 @@ class Login extends CI_Controller {
 				
 				$this->load->view('login',$data);
 
-            } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
+            } else if ($resGoogle->success && $resGoogle->score >= 0.1) {
                 if($Cek_Data){
 					$Group_ID		= $Cek_Data[0]['group_id'];
 					$Aktif			= $Cek_Data[0]['st_aktif'];
