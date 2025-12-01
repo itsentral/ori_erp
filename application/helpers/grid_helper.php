@@ -5926,11 +5926,11 @@
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
 			}
-			$temp[$value['id']]['qty']  += $value['qty'];
-			$temp[$value['id']]['harga_tujuan']  += $value['harga_tujuan'];
+			$temp[$value['id']]['qty']  = $value['qty'];
+			$temp[$value['id']]['harga_tujuan']  = $value['harga_tujuan'];
 		}
 
-		   print_r($ArrUpdateStock);
+		   print_r($temp);
 		   exit;
 
 		$ArrStock = array();
