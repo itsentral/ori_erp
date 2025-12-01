@@ -32,8 +32,8 @@ class Login extends CI_Controller {
 
             $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
             $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            // print_r($resGoogle);
-            // exit;
+            print_r($resGoogle);
+            exit;
 
             if (!$resGoogle->success) {
              	$Arr_Return		= array(
@@ -51,7 +51,7 @@ class Login extends CI_Controller {
 				$this->load->view('login',$data);
 
 
-            } else if ($resGoogle->score < 0.1 || $resGoogle->action !== 'login') {
+            } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'login') {
                 
 				$Arr_Return		= array(
 									'status'		=> 2,
@@ -67,7 +67,7 @@ class Login extends CI_Controller {
 				
 				$this->load->view('login',$data);
 
-            } else if ($resGoogle->success && $resGoogle->score >= 0.1) {
+            } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
                 if($Cek_Data){
 					$Group_ID		= $Cek_Data[0]['group_id'];
 					$Aktif			= $Cek_Data[0]['st_aktif'];
