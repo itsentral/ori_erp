@@ -679,6 +679,7 @@ class Penerimaan extends CI_Controller {
 					 foreach($data_jurnal as $jr){
 						$jmlbayarusd   =$jr->total_bayar;
 						$jmlbayar   =$jr->total_bayar_idr;
+						$jmlinvoice   =$jr->total_invoice_idr;
 						$invoice2    =$jr->no_invoice;
 						$jenis_pphdt =$jr->jenis_pph; 
 						$jumlahpph   =$jr->total_pph_idr; 
@@ -723,7 +724,7 @@ class Penerimaan extends CI_Controller {
 							  'keterangan'    => $Keterangan_INV,
 							  'no_reff'       => $invoice2,
 							  'debet'         => 0,
-							  'kredit'        => $jmlbayar+$selisihidr,
+							  'kredit'        => $jmlinvoice,
 							  'nilai_valas_debet'         => 0,
 							  'nilai_valas_kredit'        => $jmlbayarusd,
 							  'created_on'         => $created_on,
@@ -740,7 +741,7 @@ class Penerimaan extends CI_Controller {
 							  'keterangan'    => $Keterangan_INV,
 							  'no_reff'       => $invoice2,
 							  'debet'         => 0,
-							  'kredit'        => $jmlbayar+$selisihidr,
+							  'kredit'        => $jmlinvoice,
 							  'nilai_valas_debet'         => 0,
 							  'nilai_valas_kredit'        => $jmlbayarusd,
 							  'created_on'         => $created_on,
