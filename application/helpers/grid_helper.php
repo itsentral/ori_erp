@@ -5976,7 +5976,7 @@
 				$ArrHist[$key]['id_gudang_ke'] 		= $id_gudang_ke;
 				$ArrHist[$key]['kd_gudang_ke'] 		= $kd_gudang_ke;
 				$ArrHist[$key]['qty_stock_awal'] 	= $rest_pusat[0]->qty_stock;
-				$ArrHist[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock - $value;
+				$ArrHist[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock - $value['qty'];
 				$ArrHist[$key]['qty_booking_awal'] 	= $rest_pusat[0]->qty_booking;
 				$ArrHist[$key]['qty_booking_akhir'] = $rest_pusat[0]->qty_booking;
 				$ArrHist[$key]['qty_rusak_awal'] 	= $rest_pusat[0]->qty_rusak;
