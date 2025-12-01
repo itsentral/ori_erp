@@ -229,6 +229,10 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$qty_pax_max        = $value['qty_pax_max'] * $konversi;
 				$qty_confirm_pack   = $qty_confirm * $konversi;
 
+				print_r($qty_confirm_pack);
+				exit;
+
+
                 $selisih_booking = $qty_pax_max - $qty_confirm_pack;
                 if($selisih_booking < 0){
                     $selisih_booking = 0;
