@@ -2337,7 +2337,7 @@ class Warehouse_model extends CI_Model {
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				$GudangFrom2 = $id_tujuan;
 				
-				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				$PRICENEW = round((($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2));
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				

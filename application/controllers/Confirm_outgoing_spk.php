@@ -251,17 +251,29 @@ class Confirm_outgoing_spk extends CI_Controller {
                 $ArrUpdateStock[$key]['id'] 	= $value['id_material'];
                 $ArrUpdateStock[$key]['qty'] 	= $qty_confirm_pack;
 				
+				
 				$ID_MATERIAL_ACT = $value['id_material'];	
                	$getDetMat 		= $this->db->get_where('raw_materials', array('id_material'=>$ID_MATERIAL_ACT))->result();
 						
 				$key2 = $getDetMat[0]->id_material;			
 				$QTY_OKE = 	$qty_confirm_pack;
-			    $stokjurnalakhir=0;
-				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key2),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+			  	$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$PRICE=0;
+				$bmunit = 0;
+				$bm = 0;
+
+                $qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key2),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key2),1)->row();
+				
+				
+				if(!empty($costbook)) $PRICE=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+				$ArrUpdateStock[$key]['harga_pusat'] 	= $PRICE;
+
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
@@ -271,10 +283,7 @@ class Confirm_outgoing_spk extends CI_Controller {
 				
 				
 				$GudangFrom = $id_gudang_dari;
-					$bmunit = 0;
-					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari,'id_material'=>$key2),1)->row();
-					if(!empty($harga_jurnal_akhir2)) $PRICE=$harga_jurnal_akhir2->harga;
+					
 
 				
 				
@@ -307,23 +316,30 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 				
 				
+			
+
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
+				$PRICE2 =0;
 				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
 				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 				
 				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
+				
+				
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				
 				
 				$GudangFrom2 = $id_tujuan;
-				$PRICE2 = 0;
-					$bmunit = 0;
-					$bm = 0;
-					$harga_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan,'id_material'=>$key2),1)->row();
-					if(!empty($harga_jurnal_akhir2)) $PRICE2=$harga_jurnal_akhir2->harga;
+			
 							
 				
-				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				$PRICENEW = round(($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
@@ -356,6 +372,9 @@ class Confirm_outgoing_spk extends CI_Controller {
 					
 				
 				$SUM_MAT 	+= $QTY_OKE;
+
+				$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
+				$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
 			}
 
             //grouping sum
