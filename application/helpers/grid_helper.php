@@ -5926,10 +5926,11 @@
          
 			if(!array_key_exists($value['id'], $temp)) {
 				$temp[$value['id']] = 0;
+				$value_qty += $value['qty'];
 			}
-			$value_qty += $value['qty'];
+			
 			  $temp[$value['id']] = [
-				'qty'          => $value['qty'],
+				'qty'          => $value_qty,
 				'harga_pusat'  => $value['harga_pusat'],
 				'harga_tujuan' => $value['harga_tujuan'],
 				'harga_baru'   => $value['harga_baru'],
