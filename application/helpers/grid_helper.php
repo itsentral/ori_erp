@@ -5930,7 +5930,7 @@
 			$temp[$value['id']]['harga_tujuan']  = $value['harga_tujuan'];
 		}
 
-		   print_r($temp);
+		   print_r($ArrUpdateStock);
 		   exit;
 
 		$ArrStock = array();
