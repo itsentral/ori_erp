@@ -5932,7 +5932,7 @@
 			
 			// $temp2[$value['id']] += $value['qty'];
 			  $temp[$value['id']] = [
-				'qty'          => $value['qty'];
+				'qty'          => $value['qty'],
 				'harga_pusat'  => $value['harga_pusat'],
 				'harga_tujuan' => $value['harga_tujuan'],
 				'harga_baru'   => $value['harga_baru'],
