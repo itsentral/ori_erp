@@ -373,8 +373,8 @@ class Confirm_outgoing_spk extends CI_Controller {
 				
 				$SUM_MAT 	+= $QTY_OKE;
 
-				$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
-				$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
+				$ArrUpdateStock[$key]['harga_tujuan'] 	= $PRICE2;
+				$ArrUpdateStock[$key]['harga_baru'] 	= $PRICENEW;
 			}
 
             //grouping sum
