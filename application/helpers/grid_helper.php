@@ -6123,7 +6123,7 @@
 					$ArrHistInsert2[$key]['harga'] 			    = $value['harga_tujuan'];//syam 28/11/2025
 					$ArrHistInsert2[$key]['total_harga'] 	    = $value['harga_pusat']*$value;
 					$ArrHistInsert2[$key]['saldo_awal']		    = 0;
-					$ArrHistInsert2[$key]['saldo_akhir']		= ($value['qty']))*$value['harga_baru'];
+					$ArrHistInsert2[$key]['saldo_akhir']		= ($value['qty'])*$value['harga_baru'];
 					$ArrHistInsert2[$key]['harga_baru'] 		= $value['harga_baru'];
 				}
 			}
