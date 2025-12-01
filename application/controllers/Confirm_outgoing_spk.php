@@ -220,9 +220,6 @@ class Confirm_outgoing_spk extends CI_Controller {
 			$ArrUpdate = [];
             $ArrUpdateStock		= array();
 
-				print_r($post);
-				exit;
-
 			$SUM_MAT = 0;
 
 			foreach ($detail as $key => $value) {
