@@ -5990,7 +5990,7 @@
 				$ArrHist[$key]['harga'] 			= $rest_pusat[0]->harga;
 				$ArrHist[$key]['total_harga'] 		= $rest_pusat[0]->harga*$value['qty'];
 				$ArrHist[$key]['saldo_awal']		= $rest_pusat[0]->qty_stock*$rest_pusat[0]->harga;
-				$ArrHist[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock - $value)*$rest_pusat[0]->harga;
+				$ArrHist[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock - $value['qty'])*$rest_pusat[0]->harga;
 				$ArrHist[$key]['harga_baru'] 		= $rest_pusat[0]->harga;
 			}
 			else{
@@ -6027,13 +6027,13 @@
 				$ArrHistInsert[$key]['qty_rusak_awal'] 	    = 0;
 				$ArrHistInsert[$key]['qty_rusak_akhir'] 	= 0;
 				$ArrHistInsert[$key]['no_ipp'] 			= $kode_trans;
-				$ArrHistInsert[$key]['jumlah_mat'] 		= $value;
+				$ArrHistInsert[$key]['jumlah_mat'] 		= $value['qty'];
 				$ArrHistInsert[$key]['ket'] 			= 'pengurangan gudang (insert new)';
 				$ArrHistInsert[$key]['update_by'] 		= $UserName;
 				$ArrHistInsert[$key]['update_date'] 	= $dateTime;
 
 				$ArrHistInsert[$key]['harga'] 			= $value['harga_pusat'];//syam 28/11/2025
-				$ArrHistInsert[$key]['total_harga'] 	= $value['harga_pusat']*$value;
+				$ArrHistInsert[$key]['total_harga'] 	= $value['harga_pusat']*$value['qty'];
 				$ArrHistInsert[$key]['saldo_awal']		= 0;
 				$ArrHistInsert[$key]['saldo_akhir']		=  (0 - $value['qty'])*$value['harga_pusat'];
 				$ArrHistInsert[$key]['harga_baru'] 		= $value['harga_pusat'];
@@ -6045,11 +6045,11 @@
 
 				if(!empty($rest_pusat)){
 					$ArrStock2[$key]['id'] 			= $rest_pusat[0]->id;
-					$ArrStock2[$key]['qty_stock'] 	= $rest_pusat[0]->qty_stock + $value;
+					$ArrStock2[$key]['qty_stock'] 	= $rest_pusat[0]->qty_stock + $value['qty'];
 					$ArrStock2[$key]['update_by'] 	=  $UserName;
 					$ArrStock2[$key]['update_date'] 	= $dateTime;
 					$ArrStock2[$key]['harga'] 	        = $value['harga_baru'];//syam 28/11/2025
-				    $ArrStock2[$key]['total_harga'] 	= ($rest_pusat[0]->qty_stock + $value) * $value['harga_baru'];//syam 28/11/2025
+				    $ArrStock2[$key]['total_harga'] 	= ($rest_pusat[0]->qty_stock + $value['qty']) * $value['harga_baru'];//syam 28/11/2025
 
 					$ArrHist2[$key]['id_material'] 	= $key;
 					$ArrHist2[$key]['idmaterial'] 	= $rest_pusat[0]->idmaterial;
@@ -6063,7 +6063,7 @@
 					$ArrHist2[$key]['id_gudang_ke'] 	= $id_gudang_ke;
 					$ArrHist2[$key]['kd_gudang_ke'] 	= $kd_gudang_ke;
 					$ArrHist2[$key]['qty_stock_awal'] 	= $rest_pusat[0]->qty_stock;
-					$ArrHist2[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock + $value;
+					$ArrHist2[$key]['qty_stock_akhir'] 	= $rest_pusat[0]->qty_stock + $value['qty'];
 					$ArrHist2[$key]['qty_booking_awal'] = $rest_pusat[0]->qty_booking;
 					$ArrHist2[$key]['qty_booking_akhir']= $rest_pusat[0]->qty_booking;
 					$ArrHist2[$key]['qty_rusak_awal'] 	= $rest_pusat[0]->qty_rusak;
@@ -6121,7 +6121,7 @@
 					$ArrHistInsert2[$key]['update_date'] 		= $dateTime;
 					
 					$ArrHistInsert2[$key]['harga'] 			    = $value['harga_tujuan'];//syam 28/11/2025
-					$ArrHistInsert2[$key]['total_harga'] 	    = $value['harga_pusat']*$value;
+					$ArrHistInsert2[$key]['total_harga'] 	    = $value['harga_pusat']*$value['qty'];
 					$ArrHistInsert2[$key]['saldo_awal']		    = 0;
 					$ArrHistInsert2[$key]['saldo_akhir']		= ($value['qty'])*$value['harga_baru'];
 					$ArrHistInsert2[$key]['harga_baru'] 		= $value['harga_baru'];
