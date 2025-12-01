@@ -5928,8 +5928,12 @@
 				$temp[$value['id']] = 0;
 			}
 			$value_qty += $value['qty'];
-			$temp[$value['id']]['qty']   = $value_qty;
-			$temp[$value['id']]['harga_tujuan']   = $value['harga_tujuan'];
+			  $temp[$value['id']] = [
+				'qty'          => $value['qty'],
+				'harga_pusat'  => $value['harga_pusat'],
+				'harga_tujuan' => $value['harga_tujuan'],
+				'harga_baru'   => $value['harga_baru'],
+			];
 			
 		}
 
