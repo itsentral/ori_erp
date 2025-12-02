@@ -3093,7 +3093,7 @@
 				$ArrWIP_IN[$nomor]['created_by'] = $UserName;
 				$ArrWIP_IN[$nomor]['created_date'] = $DateTime;
 				$ArrWIP_IN[$nomor]['jenis'] = 'in cutting';
-				$ArrWIP_IN[$nomor]['id_trans'] = $kode_spk;
+				$ArrWIP_IN[$nomor]['id_trans'] = $kode_spk; 
 
 				$ID_proDet  = $id_pro;
 			}
@@ -3216,9 +3216,9 @@
 				$fg_txt         ='FINISHED GOOD'; 
 				$wip_txt         ='WIP';	
 				$spasi       = ',';
-				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$kode; 
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$id          = $data->id_trans;
 				$noso 		 = ','.$data->no_so;
                	$no_request  = $data->no_spk;	
@@ -3272,9 +3272,9 @@
 				$fg_txt         ='FINISHED GOOD'; 
 				$wip_txt         ='COGS';	
 				$spasi       = ',';
-				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
+				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
+				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$id          = $data->id_trans;
 				$noso 		 = ','.$data->no_so;
                	$no_request  = $data->no_spk;	
