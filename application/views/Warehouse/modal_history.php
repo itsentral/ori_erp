@@ -73,7 +73,7 @@
 					echo "<td class='".$color."'>".strtoupper($valx['ket'])."</td>";
 					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['update_date']))."</td>";
 					if($this->uri->segment(5) =='1'){
-					echo "<td class='text-right ".$color."'>".number_format($valx['harga'],2)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['harga_baru'],2)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat']*$valx['harga'],2)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['saldo_awal'],2)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['saldo_akhir'],2)."</td>";
@@ -90,5 +90,5 @@
 	</table>
 </div>
 <script>
-	swal.close();
+	swal.close(); 
 </script>
