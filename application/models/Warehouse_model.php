@@ -559,7 +559,7 @@ class Warehouse_model extends CI_Model {
 					$ArrUpdateStock[$val2]['qty_good'] 	= $qtyIN;
 					$ArrUpdateStock[$val2]['qty_risk'] 	= $qtyRISK;
 					$ArrUpdateStock[$val2]['unit_price'] = $HARGA_UNIT;
-					$ArrUpdateStock[$val2]['unit_price_idr'] = $HARGA_UNIT * $kurs_ros;
+					$ArrUpdateStock[$val2]['unit_price_idr'] = $HARGA_UNIT * $kurs_ros; 
 					$ArrUpdateStock[$val2]['bm'] = $BM;
 
 					//MATERIAL YANG AKAN DI UPDATE EXPIRED
@@ -670,7 +670,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 
 
@@ -775,7 +775,7 @@ class Warehouse_model extends CI_Model {
 				if($stok_akhir==0){
 					$PRICENEW = 0;
 				} else{
-				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 
 				//update stock
