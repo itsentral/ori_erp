@@ -5158,7 +5158,16 @@ class Warehouse_model extends CI_Model {
 		$tanggalNow = date('Y-m-d H:i:s');
 		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-10 month', strtotime($tanggalNow)));
 
-		$result		= $this->db->get_where('warehouse_history', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'update_date >'=>$TanggalFirst,'jumlah_mat !='=>0,'UPPER(ket) !='=>'BOOKING MATERIAL CLOSE'))->result_array();
+		//$result		= $this->db->get_where('warehouse_history', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'update_date >'=>$TanggalFirst,'jumlah_mat !='=>0,'UPPER(ket) !='=>'BOOKING MATERIAL CLOSE'))->result_array();
+		$this->db->from('warehouse_history');
+		$this->db->where('id_material', $id_material);
+		$this->db->where('id_gudang', $id_gudang);
+		$this->db->where('update_date >', $TanggalFirst);
+		$this->db->where('jumlah_mat !=', 0);
+		$this->db->where('UPPER(ket) !=', 'BOOKING MATERIAL CLOSE', FALSE);
+		$this->db->order_by('update_date', 'DESC'); // <== Tambahkan ini
+		$result = $this->db->get()->result_array();
+		
 		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
 
 		$data = array(
