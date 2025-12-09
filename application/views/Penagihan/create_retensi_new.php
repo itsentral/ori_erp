@@ -113,8 +113,7 @@ $this->load->view('include/side_menu');
 			</div>
 
 
-<?php      print_r($base_cur);
-			exit;
+<?php      
 			if ($base_cur=='USD'){
 				$this->load->view('Penagihan/retensi_usd');
 			}else{
