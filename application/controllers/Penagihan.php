@@ -1957,7 +1957,7 @@ if($base_cur=='USD'){
 
 		$in_ipp = [];
 		$in_bq = [];
-		$base_cur='USD';
+		$base_cur='IDR';
 
 		foreach($getBq AS $val => $valx){
 			$in_ipp[$val] 	= $valx['no_ipp'];
@@ -2003,7 +2003,7 @@ if($base_cur=='USD'){
 			'id'			=> $id,
 			'approval'		=> $approval
 		);
-		$this->load->view('Penagihan/create_retensi_new',$data);
+		$this->load->view('Penagihan/create_retensi_new',$data); 
 	}
 	public function create_retensi_new_delivery(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)));
