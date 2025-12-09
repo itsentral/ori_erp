@@ -111,7 +111,10 @@ $this->load->view('include/side_menu');
 					<input type="text" name="keterangan" id="keterangan" class="form-control input-md " value="<?=$penagihan[0]->keterangan;?>">
 				</div>
 			</div>
-<?php
+
+
+<?php      print_r($base_cur);
+			exit;
 			if ($base_cur=='USD'){
 				$this->load->view('Penagihan/retensi_usd');
 			}else{
