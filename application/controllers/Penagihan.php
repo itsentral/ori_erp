@@ -1983,6 +1983,10 @@ if($base_cur=='USD'){
 		}else{
 			$kurs	= $penagihan[0]->kurs_jual;
 		}
+
+		print_r($getBq);
+		exit;
+
 		$approval	= $this->uri->segment(4);
 		$data = array(
 			'title'			=> 'Indeks Of Create Invoice Retensi',
