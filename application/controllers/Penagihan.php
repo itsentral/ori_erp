@@ -1984,8 +1984,7 @@ if($base_cur=='USD'){
 			$kurs	= $penagihan[0]->kurs_jual;
 		}
 
-		print_r($getBq);
-		exit;
+		
 
 		$approval	= $this->uri->segment(4);
 		$data = array(
