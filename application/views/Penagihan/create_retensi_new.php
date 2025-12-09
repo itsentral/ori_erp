@@ -63,7 +63,7 @@ $this->load->view('include/side_menu');
 				<label class='label-control col-sm-2'><b>Kurs <span class='text-red'>*</span></b></label>
 				<div class='col-sm-4'>
 					<input type='text' name='kurs' id='kurs' class='form-control input-md' value='<?=number_format($kurs,2);?>' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''>
-					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= get_name('so_number','wilayah','id_bq', "BQ-".$getHeader[0]->no_ipp);?>">
+					<input type="hidden" id='wilayah' name="wilayah" class="form-control input-sm" value="<?= substr($in_ipp,-1) ?>">
 				</div>
 			</div>
 			<div class='form-group row'>
@@ -262,7 +262,7 @@ if(isset($approval)){
 					allowOutsideClick	: false
 				});
 			}
-			else if ($('#kurs').val()=="" && $('#wilayah').val() == 'L') {
+			else if ($('#kurs').val()=="" && $('#wilayah').val() == 'L') { 
 				swal({
 					title	: "KURS HARUS DI UPDATE!",
 					text	: "SILAHKAN UPDATE KURS TERLEBIH DAHULU!",
