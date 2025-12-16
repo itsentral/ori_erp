@@ -5380,6 +5380,8 @@ else
 						$detailInv6[$val]['id_milik']	    		= $d6['id_milik'];
 					}
 
+				}
+
 					$detailInv9 = [];
 				if(!empty($_POST['data9'])){
 					foreach($_POST['data9'] as $val => $d9){
@@ -5423,7 +5425,9 @@ else
 						$detailInv9[$val]['id_milik']	    		= $d9['id_milik'];
 					}
 				}
+				
 			}
+		
 
 			if($jenis_invoice=='retensi'){
 				$detailInv6 = [];
