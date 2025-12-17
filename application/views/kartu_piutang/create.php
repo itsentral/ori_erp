@@ -11,7 +11,7 @@
     <div class="container mt-4">
         <div class="card">
             <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Tambah Data Kartu Hutang</h4>
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Tambah Data Kartu Piutang</h4>
             </div>
             <div class="card-body">
                 <?php if($this->session->flashdata('error')): ?>
