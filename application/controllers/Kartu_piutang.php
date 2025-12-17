@@ -70,10 +70,10 @@ class Kartu_piutang extends CI_Controller {
         }
 
         // Check if nomor already exists
-        if ($this->Kartu_piutang_model->check_nomor_exists($this->input->post('nomor'))) {
-            $this->session->set_flashdata('error', 'Nomor sudah digunakan');
-            redirect('kartu_piutang/create');
-        }
+        // if ($this->Kartu_piutang_model->check_nomor_exists($this->input->post('nomor'))) {
+        //     $this->session->set_flashdata('error', 'Nomor sudah digunakan');
+        //     redirect('kartu_piutang/create');
+        // }
 
         $data = array(
             'tipe' => $this->input->post('tipe'),
