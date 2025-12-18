@@ -2337,7 +2337,7 @@ class Warehouse_model extends CI_Model {
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				$GudangFrom2 = $id_tujuan;
 				
-				$PRICENEW = round((($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2));
+				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
@@ -3444,7 +3444,7 @@ class Warehouse_model extends CI_Model {
 						$ArrDeatilAdj2[$val2.$val]['kode_trans'] 	= $kode_trans;
 						$ArrDeatilAdj2[$val2.$val]['id_material'] 	= $rest_pusat[0]->id_material;
 						$ArrDeatilAdj2[$val2.$val]['nm_material'] 	= $rest_pusat[0]->nm_material;
-						$ArrDeatilAdj2[$val2.$val]['id_category'] 	= $rest_pusat[0]->id_category;
+						$ArrDeatilAdj2[$val2.$val]['id_category'] 	= $rest_pusat[0]->id_category; 
 						$ArrDeatilAdj2[$val2.$val]['nm_category'] 	= $rest_pusat[0]->nm_category;
 						$ArrDeatilAdj2[$val2.$val]['qty_order'] 	= $det_mat[0]->qty_order;
 						$ArrDeatilAdj2[$val2.$val]['qty_oke'] 		= str_replace(',','',$valx['qty_oke']);
