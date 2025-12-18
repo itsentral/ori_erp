@@ -1442,7 +1442,7 @@ function getPriceBookByDate2($dateFilter){
                             MAX( a.id ) AS id,
                             a.id_material 
                         FROM
-                            tran_warehouse_jurnal_detail_pusat a 
+                            tran_warehouse_jurnal_detail a 
                         WHERE
                             a.updated_date >= '2023-05-11 21:24:48' 
                             AND DATE( a.updated_date ) <= '".$dateFilter."'
@@ -1450,7 +1450,7 @@ function getPriceBookByDate2($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('tran_warehouse_jurnal_detail_pusat')->result_array();
+    $result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
