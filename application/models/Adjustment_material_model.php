@@ -1060,15 +1060,15 @@ class Adjustment_material_model extends CI_Model {
 
 
 				//update syam 18/12/2025
-						$ArrStockKe['harga'] 			= $PRICE;
-						$ArrStockKe['total_harga']   	= $PRICE*$qty_oke;
-						$ArrStockKe['saldo_awal']	    = $nilaijurnalakhir;
-						$ArrStockKe['saldo_akhir']		= $nilaijurnalakhir+($PRICE * $qty_oke);
-						$ArrStockKe['harga_baru'] 		= $PRICE;
+						$ArrHistKe['harga'] 			= $PRICE;
+						$ArrHistKe['total_harga']   	= $PRICE*$qty_oke;
+						$ArrHistKe['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistKe['saldo_akhir']		= $nilaijurnalakhir+($PRICE * $qty_oke);
+						$ArrHistKe['harga_baru'] 		= $PRICE;
 
 					//update syam 18/12/2025
-					$ArrHistKe['harga'] 		        = $PRICE;
-					$ArrHistKe['total_harga'] 	        = $PRICE*($stokjurnalakhir+$qty_oke);
+					$ArrStockKe['harga'] 		        = $PRICE;
+					$ArrStockKe['total_harga'] 	        = $PRICE*($stokjurnalakhir+$qty_oke);
 				
 					
 					if($expired_date != NULL AND $expired_date != '' AND $expired_date != '0'){
