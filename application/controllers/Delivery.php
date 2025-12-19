@@ -2062,7 +2062,7 @@ class Delivery extends CI_Controller
 			history('Lock release delivery ' . $kode_delivery);
 		}
 
-		echo json_encode($Arr_Kembali); 
+		echo json_encode($Arr_Kembali);
 	}
 
 	public function print_delivery2($kode_delivery)
@@ -6583,7 +6583,7 @@ class Delivery extends CI_Controller
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
-			unset($det_Jurnaltes);unset($datadetail); 
+			unset($det_Jurnaltes);unset($datadetail);
 		  
 		}
 	
