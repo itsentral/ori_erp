@@ -1967,7 +1967,10 @@ class Outgoing extends CI_Controller {
 							$ArrJurnalNew[$value['id']]['coa_gudang'] 		= $coa_gudang;
 
 							$grouping_tempGudang[$value['id']]['id'] 	= $value['id'];
-							$grouping_tempGudang[$value['id']]['qty'] 	= $temp[$value['id']]['good'];
+							$grouping_tempGudang[$value['id']]['qty'] 	= $temp[$value['id']]['good']; 
+							$grouping_tempGudang[$value['id']]['harga_pusat'] 	= $PRICE;
+							$grouping_tempGudang[$value['id']]['harga_tujuan'] 	= $PRICE;
+							$grouping_tempGudang[$value['id']]['harga_baru'] 	= $PRICE;
 						}
 						
 						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
