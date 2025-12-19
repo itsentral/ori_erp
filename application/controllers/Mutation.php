@@ -66,7 +66,7 @@ class Mutation extends CI_Controller {
 		{
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
-            $asc_desc       = $requestData['order'][0]['dir'];
+            $asc_desc       = $requestData['order'][0]['dir']; 
             if($asc_desc == 'desc')
             {
                 $nomor = $urut1 + $start_dari;
