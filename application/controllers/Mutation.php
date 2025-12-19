@@ -691,6 +691,19 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
 					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
+
+                   
+
+					//update syam 18/12/2025
+						$ArrHist[$key]['harga'] 			= $PRICE;
+						$ArrHist[$key]['total_harga'] 		= $PRICE*$QTY_OKE;
+						$ArrHist[$key]['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHist[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHist[$key]['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+						$ArrStock[$key]['harga'] 		    = $PRICE;
+						$ArrStock[$key]['total_harga'] 	    = ($stokjurnalakhir-$QTY_OKE)*$PRICE;
 				
                 }
                 else{
@@ -814,6 +827,19 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
 					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
+
+
+					
+					//update syam 18/12/2025
+						$ArrHist[$key]['harga'] 			= $PRICE;
+						$ArrHist[$key]['total_harga'] 		= $PRICE*$QTY_OKE;
+						$ArrHist[$key]['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHist[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHist[$key]['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+						$ArrStock[$key]['harga'] 		    = $PRICE;
+						$ArrStock[$key]['total_harga'] 	    = ($stokjurnalakhir-$QTY_OKE)*$PRICE;
 					
 				}
 
