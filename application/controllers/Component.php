@@ -14,7 +14,7 @@ class Component extends CI_Controller {
 			redirect('login');
 		}
 
-		ini_set('memory_limit', '256M');
+		ini_set('memory_limit', '2G');
     }
 	
 	//==========================================================================================================================
