@@ -2057,7 +2057,7 @@ class Delivery extends CI_Controller
 				'pesan'		=> 'Process Success. Thanks ...',
 				'status'	=> 1
 			);
-			move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
+			move_warehouse_fg($ArrMaterial, 15, 20, $kode_delivery);
 			$this->close_jurnal_in_transit($kode_delivery);
 			history('Lock release delivery ' . $kode_delivery);
 		}
@@ -2536,7 +2536,7 @@ class Delivery extends CI_Controller
 				$ArrKeyJurnal[] = $row['id_uniq'];
 			}
 		}
-		move_warehouse($ArrMaterial, 20, 15, $kode_delivery);
+		move_warehouse_fg($ArrMaterial, 20, 15, $kode_delivery);
 		//SAMPAI SINI
 		// exit;
 
@@ -2742,7 +2742,7 @@ class Delivery extends CI_Controller
 				}
 			}
 			if (!empty($ArrMaterial)) {
-				move_warehouse($ArrMaterial, 20, 21, $kode_delivery);
+				move_warehouse_fg($ArrMaterial, 20, 21, $kode_delivery);
 			}
 		}
 		//SAMPAI SINI
