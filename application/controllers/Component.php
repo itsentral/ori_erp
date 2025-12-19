@@ -10,9 +10,11 @@ class Component extends CI_Controller {
 
 		$this->load->database();
 		// $this->load->library('Mpdf');
-        if(!$this->session->userdata('isORIlogin')){
+        if(!$this->session->userdata('isORIlogin')){ 
 			redirect('login');
 		}
+
+		ini_set('memory_limit', '256M');
     }
 	
 	//==========================================================================================================================
@@ -20,7 +22,7 @@ class Component extends CI_Controller {
 	//==========================================================================================================================
 	
 	public function index(){
-		$this->component_model->index_component();
+		$this->component_model->index_component(); 
 	}
 	
 	public function server_side_component(){
