@@ -5959,8 +5959,8 @@
 			if(!empty($rest_pusat)){
 				$ArrStock[$key]['id'] 			= $rest_pusat[0]->id;
 				$ArrStock[$key]['qty_stock'] 	= $rest_pusat[0]->qty_stock - $value['qty'];
-				$ArrStock[$key]['harga'] 	    = $value['harga'];//syam 28/11/2025
-				$ArrStock[$key]['total_harga'] 	= ($rest_pusat[0]->qty_stock - $value['qty']) * $value['harga'];;//syam 28/11/2025
+				$ArrStock[$key]['harga'] 	    = $value['harga_pusat'];//syam 28/11/2025
+				$ArrStock[$key]['total_harga'] 	= ($rest_pusat[0]->qty_stock - $value['qty']) * $value['harga_pusat'];;//syam 28/11/2025
 				$ArrStock[$key]['update_by'] 	= $UserName;
 				$ArrStock[$key]['update_date'] 	= $dateTime;
 
@@ -5987,11 +5987,11 @@
 				$ArrHist[$key]['update_by'] 		= $UserName;
 				$ArrHist[$key]['update_date'] 		= $dateTime;
 
-				$ArrHist[$key]['harga'] 			= $value['harga'];;
-				$ArrHist[$key]['total_harga'] 		= $value['harga']*$value['qty'];
-				$ArrHist[$key]['saldo_awal']		= $rest_pusat[0]->qty_stock*$value['harga'];
-				$ArrHist[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock - $value['qty'])*$value['harga_baru'];
-				$ArrHist[$key]['harga_baru'] 		= $value['harga_baru'];
+				$ArrHist[$key]['harga'] 			= $value['harga_pusat'];;
+				$ArrHist[$key]['total_harga'] 		= $value['harga_pusat']*$value['qty'];
+				$ArrHist[$key]['saldo_awal']		= $rest_pusat[0]->qty_stock*$value['harga_pusat'];
+				$ArrHist[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock - $value['qty'])*$value['harga_pusat'];
+				$ArrHist[$key]['harga_baru'] 		= $value['harga_pusat'];
 			}
 			else{
 				$restMat	= $CI->db->get_where('raw_materials',array('id_material'=>$key))->result();
