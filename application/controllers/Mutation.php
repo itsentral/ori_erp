@@ -829,17 +829,18 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
 
 
+				
 					
 					//update syam 18/12/2025
-						$ArrHist[$key]['harga'] 			= $PRICE;
-						$ArrHist[$key]['total_harga'] 		= $PRICE*$QTY_OKE;
-						$ArrHist[$key]['saldo_awal']	    = $nilaijurnalakhir;
-						$ArrHist[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
-						$ArrHist[$key]['harga_baru'] 		= $PRICE;
+						$ArrHistInsert[$key]['harga'] 			= $PRICE;
+						$ArrHistInsert[$key]['total_harga'] 	= $PRICE*$QTY_OKE;
+						$ArrHistInsert[$key]['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistInsert[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHistInsert[$key]['harga_baru'] 		= $PRICE;
 
 					//update syam 18/12/2025
-						$ArrStock[$key]['harga'] 		    = $PRICE;
-						$ArrStock[$key]['total_harga'] 	    = ($stokjurnalakhir-$QTY_OKE)*$PRICE;
+						$ArrStockInsert[$key]['harga'] 		    = $PRICE;
+						$ArrStockInsert[$key]['total_harga'] 	= ($stokjurnalakhir-$QTY_OKE)*$PRICE;
 					
 				}
 
@@ -1019,6 +1020,18 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
+
+					
+					//update syam 18/12/2025
+						$ArrHist2[$key]['harga'] 			= $PRICE;
+						$ArrHist2[$key]['total_harga'] 	    = $PRICE*$QTY_OKE;
+						$ArrHist2[$key]['saldo_awal']	    = $nilaijurnalakhir2;
+						$ArrHist2[$key]['saldo_akhir']		= $nilaijurnalakhir2+($PRICE*$QTY_OKE);
+						$ArrHist2[$key]['harga_baru'] 		= $PRICENEW;
+
+					//update syam 18/12/2025
+						$ArrStock2[$key]['harga'] 		    = $PRICENEW;
+						$ArrStock2[$key]['total_harga'] 	= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
 				
 				
                 }
@@ -1195,6 +1208,18 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
+
+ 					
+					//update syam 18/12/2025
+						$ArrHistInsert2[$key]['harga'] 			    = $PRICE;
+						$ArrHistInsert2[$key]['total_harga'] 	    = $PRICE*$QTY_OKE;
+						$ArrHistInsert2[$key]['saldo_awal']	        = $nilaijurnalakhir2;
+						$ArrHistInsert2[$key]['saldo_akhir']		= $nilaijurnalakhir2+($PRICE*$QTY_OKE);
+						$ArrHistInsert2[$key]['harga_baru'] 		= $PRICENEW;
+
+					//update syam 18/12/2025
+						$ArrStockInsert2[$key]['harga'] 		    = $PRICENEW;
+						$ArrStockInsert2[$key]['total_harga'] 	    = ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
 				
                 }
             }
