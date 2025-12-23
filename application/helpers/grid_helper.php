@@ -6302,6 +6302,7 @@
 						$ArrFinishGood[$key]['product'] 		= $product;
 						$ArrFinishGood[$key]['no_spk'] 			= $no_spk;
 						$ArrFinishGood[$key]['kode_trans'] 		= $kode_trans;
+						$ArrFinishGood[$key]['id_trans'] 		= $kode_trans;
 						$ArrFinishGood[$key]['id_material'] 	= $key;
 						$ArrFinishGood[$key]['nm_material'] 	= $nm_material;
 						$ArrFinishGood[$key]['qty_mat'] 		= $value;
