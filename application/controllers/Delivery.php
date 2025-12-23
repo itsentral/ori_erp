@@ -5598,7 +5598,7 @@ class Delivery extends CI_Controller
 
 		$ArrGroupMaterial = [];
 		$ArrGroupOutMaterial = [];
-		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
+		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock']; 
 		$ArrayDeliveryMaterial = $this->db->where_in('sts_product',$ListIN)->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk'=>NULL))->result_array();
 		if(!empty($ArrayDeliveryMaterial)){
 			foreach ($ArrayDeliveryMaterial as $value => $valx) {
