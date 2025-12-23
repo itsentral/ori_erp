@@ -5668,7 +5668,7 @@ class Delivery extends CI_Controller
 						$ArrGroupMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
 
 						$ArrGroupOutMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
-						$ArrGroupOutMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit'; 
 						$ArrGroupOutMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
 						$ArrGroupOutMaterial[$UNIQ2]['product'] = $value2x['product'];
 						$ArrGroupOutMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
