@@ -12,6 +12,7 @@ class Delivery extends CI_Controller
 		$this->load->model('tanki_model');		
 		$this->load->model('Acc_model');
 		$this->load->model('Jurnal_model');
+		$this->load->model('All_model');
 		// Your own constructor code
 		if (!$this->session->userdata('isORIlogin')) {
 			redirect('login');
@@ -5569,7 +5570,7 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
 				$ArrGroup[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
 				$ArrGroup[$value]['kode_delivery'] = $kode_delivery;
-				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:GetAutoGenerate(id_trans);
+				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->All_model->GetAutoGenerate(id_trans);
 
 				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroupOut[$value]['keterangan'] = 'Finish Good to In Transit';
@@ -5738,7 +5739,7 @@ class Delivery extends CI_Controller
 					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
 					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
 
-					$id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:GetAutoGenerate(id_trans);
+					$id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->All_model->GetAutoGenerate(id_trans);
 				}
 			}
 		}
