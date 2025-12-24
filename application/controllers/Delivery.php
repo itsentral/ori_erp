@@ -5568,7 +5568,7 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 				$ArrGroup[$value]['created_by'] = $username;
 				$ArrGroup[$value]['created_date'] = $datetime;
-				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 				$ArrGroup[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
 				$ArrGroup[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
 				$ArrGroup[$value]['kode_delivery'] = $kode_delivery;
@@ -5703,7 +5703,7 @@ class Delivery extends CI_Controller
 					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 					$ArrGroupMaterial[$value]['created_by'] = $username;
 					$ArrGroupMaterial[$value]['created_date'] = $datetime;
-					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 					$ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
 					$ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
 					$ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
