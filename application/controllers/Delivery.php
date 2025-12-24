@@ -5548,7 +5548,7 @@ class Delivery extends CI_Controller
 		$username = $this->session->userdata['ORI_User']['username'];
 		$datetime = date('Y-m-d H:i:s');
 
-		print_r($this->kode_trans);
+		print_r($this->kode_trs);
 		exit;
 		
 		//GROUP DATA
