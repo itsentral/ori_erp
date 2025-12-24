@@ -82,12 +82,12 @@ class Report_in_transit extends CI_Controller {
 			$nestedData[]	= "<div align='center'>".str_replace(',','<br>',$row['id_trans'])."</div>";
 			$nestedData[]	= "<div align='center'>".$row['kode_trans']."</div>";
 			$nestedData[]	= "<div align='center'>1</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['nilai_unit'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$QTY = (!empty($row['id_material']))?number_format($row['qty_mat'],4):'';
 			$cost_book = (!empty($row['id_material']))?number_format($row['cost_book'],2):'';
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
 			$nestedData[]	= "<div align='right'>".$QTY."</div>";
-			$nestedData[]	= "<div align='right'>".$cost_book."</div>";
+			$nestedData[]	= "<div align='right'>".$cost_book."</div>"; 
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
