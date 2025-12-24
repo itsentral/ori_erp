@@ -113,7 +113,7 @@ class Report_in_transit extends CI_Controller {
                     (@row:=@row+1) AS nomor,
                     a.*
                 FROM
-                    data_erp_in_transit a,
+                    data_erp_in_transitx a,
                     (SELECT @row:=0) r
                 WHERE 1=1 ".$WHERE_DATE." 
                     AND (
