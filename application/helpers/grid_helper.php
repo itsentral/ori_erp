@@ -6283,7 +6283,7 @@
 					$ArrHist2[$key]['update_by'] 		= $UserName;
 					$ArrHist2[$key]['update_date'] 		= $dateTime;
 
-					$ArrHist2[$key]['harga'] 			= $value['harga_tujuan'];//syam 28/11/2025
+					$ArrHist2[$key]['harga'] 			= $value['harga_pusat'];//syam 28/11/2025
 					$ArrHist2[$key]['total_harga'] 	    = $value['harga_pusat']*$value['qty'];
 					$ArrHist2[$key]['saldo_awal']		= $rest_pusat[0]->qty_stock*$value['harga_tujuan'];
 					$ArrHist2[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock + $value['qty'])*$value['harga_baru'];
