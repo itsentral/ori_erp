@@ -328,6 +328,9 @@ class All_model extends CI_Model
 	function GetAutoGenerate($tipe){
 		$newcode='';
 		$data=$this->GetOneData('ms_generate',array('tipe'=>$tipe));
+		print_r($data);
+		exit;
+
 		if($data!==false) {
 			if(stripos($data->info,'YEAR',0)!==false){
 				if($data->kode_2!=date("Y")) {
