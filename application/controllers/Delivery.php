@@ -5562,7 +5562,7 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
 				$ArrGroup[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
 				$ArrGroup[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
-				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 				$ArrGroup[$value]['created_by'] = $username;
 				$ArrGroup[$value]['created_date'] = $datetime;
 				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
@@ -5644,7 +5644,7 @@ class Delivery extends CI_Controller
 						$ArrGroupMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
 						$ArrGroupMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
 						$ArrGroupMaterial[$UNIQ2]['qty'] = $value2x['qty'];
-						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_wip'];
 						$ArrGroupMaterial[$UNIQ2]['created_by'] = $username;
 						$ArrGroupMaterial[$UNIQ2]['created_date'] = $datetime;
 						$ArrGroupMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
@@ -5697,7 +5697,7 @@ class Delivery extends CI_Controller
 					$ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
 					$ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
 					$ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
-					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 					$ArrGroupMaterial[$value]['created_by'] = $username;
 					$ArrGroupMaterial[$value]['created_date'] = $datetime;
 					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
@@ -5765,7 +5765,7 @@ class Delivery extends CI_Controller
 					$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
 					$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
 					$ArrGroupSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
+					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
 					$ArrGroupSpool[$value]['created_by'] = $username;
 					$ArrGroupSpool[$value]['created_date'] = $datetime;
 					$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
