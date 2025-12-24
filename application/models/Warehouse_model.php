@@ -2333,7 +2333,7 @@ class Warehouse_model extends CI_Model {
 				
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
-				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				$GudangFrom2 = $id_tujuan;
 				
