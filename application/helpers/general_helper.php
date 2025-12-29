@@ -1468,7 +1468,7 @@ function getPriceBookByDate2($dateFilter){
 function getPriceBookByDatesubgudang($dateFilter){ 
     $CI =& get_instance();
 
-   "SELECT  MAX( a.id ) AS id,
+   $SQLPriceBook = "SELECT  MAX( a.id ) AS id,
                             a.id_material 
                         FROM
                             tran_warehouse_jurnal_detail a 
@@ -1531,7 +1531,7 @@ function getPriceBookByDateproduksi($dateFilter){
 
    $CI =& get_instance();
 
-   "SELECT  MAX( a.id ) AS id,
+   $SQLPriceBook = "SELECT  MAX( a.id ) AS id,
                             a.id_material 
                         FROM
                             tran_warehouse_jurnal_detail a 
