@@ -2279,7 +2279,7 @@ class Delivery extends CI_Controller
 			$ArrInsert[$key]['no_drawing'] = $value['no_drawing'];
 			$ArrInsert[$key]['upload_date'] = $value['upload_date'];
 			$ArrInsert[$key]['sts'] = (empty($value['id_milik']))?'cut':$value['sts'];
-			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
+			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':$value['sts'];
 			//agus
 			$ArrInsert[$key]['nilai_cogs'] = $value['finish_good'];
 			$ArrInsert[$key]['updated_by'] = $username;
