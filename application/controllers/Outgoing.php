@@ -1931,7 +1931,7 @@ class Outgoing extends CI_Controller {
 								
 							}
 							
-							$QTY_OKE  = $temp[$value['id']]['good'];
+							$QTY_OKE  = $temp[$value['id']]['good']; 
 							$ACTUAL_MAT = $id_material;
 							
 							$restWhDetail2	= $this->db->get_where('raw_materials',array('id_material'=>$id_material))->result();
@@ -1971,16 +1971,82 @@ class Outgoing extends CI_Controller {
 							$grouping_tempGudang[$value['id']]['harga_pusat'] 	= $PRICE;
 							$grouping_tempGudang[$value['id']]['harga_tujuan'] 	= $PRICE;
 							$grouping_tempGudang[$value['id']]['harga_baru'] 	= $PRICE;
+
+
+							$tempMaterial[$value['id']]['tanggal'] 		= $DateTime;
+							$tempMaterial[$value['id']]['keterangan'] 	= null;
+							$tempMaterial[$value['id']]['no_ipp'] 		= $no_ipp;
+							$tempMaterial[$value['id']]['no_spk'] 		= $no_spk;
+							$tempMaterial[$value['id']]['product'] 		= $nm_product;
+							$tempMaterial[$value['id']]['kode_trans'] 		= $kode_trans;
+							$tempMaterial[$value['id']]['id_material'] 		= $restWhDetail2[0]->id_material;
+							$tempMaterial[$value['id']]['nm_material'] 		= $restWhDetail2[0]->nm_material;
+							$tempMaterial[$value['id']]['qty'] 				= $QTY_OKE;
+							$tempMaterial[$value['id']]['cost_book'] 		= $PRICE;
+							$tempMaterial[$value['id']]['created_by'] 		= $UserName;
+							$tempMaterial[$value['id']]['created_date'] 	= $DateTime;
+							$tempMaterial[$value['id']]['tipe'] 			= 'out';
+							$tempMaterial[$value['id']]['gudang'] 			= $id_gudang;
+							$tempMaterial[$value['id']]['gudang_dari'] 		= $id_gudang;
+							$tempMaterial[$value['id']]['gudng_ke'] 		= $gudang_ke;
+
+
+                            $ArrFinishGood[$value['id']]['tanggal'] 		= $DateTime;
+							$ArrFinishGood[$value['id']]['keterangan'] 		= 'Subgudang to Finish Good';
+							$ArrFinishGood[$value['id']]['no_so'] 			= $no_ipp;
+							$ArrFinishGood[$value['id']]['product'] 		= $nm_product;
+							$ArrFinishGood[$value['id']]['no_spk'] 			= $no_spk;
+							$ArrFinishGood[$value['id']]['kode_trans'] 		= $kode_trans;
+							$ArrFinishGood[$value['id']]['id_material'] 	= $restWhDetail2[0]->id_material;
+							$ArrFinishGood[$value['id']]['nm_material'] 	= $restWhDetail2[0]->nm_material;
+							$ArrFinishGood[$value['id']]['qty_mat'] 		= $QTY_OKE;
+							$ArrFinishGood[$value['id']]['cost_book'] 		= $PRICE;
+							$ArrFinishGood[$value['id']]['nilai_unit'] 		= $PRICE;
+							$ArrFinishGood[$value['id']]['created_by'] 		= $UserName;
+							$ArrFinishGood[$value['id']]['created_date'] 	= $DateTime;
+							$ArrFinishGood[$value['id']]['gudang'] 			= $gudang_ke;
+							$ArrFinishGood[$value['id']]['nilai_wip'] 		= $PRICE*$QTY_OKE;
+
+
+							$tempMaterialIn[$value['id']]['tanggal'] 		= $DateTime;
+							$tempMaterialIn[$value['id']]['keterangan'] 	= null;
+							$tempMaterialIn[$value['id']]['no_ipp'] 		= $no_ipp;
+							$tempMaterialIn[$value['id']]['no_spk'] 		= $no_spk;
+							$tempMaterialIn[$value['id']]['product'] 		= $product;
+							$tempMaterialIn[$value['id']]['kode_trans'] 	= $kode_trans;
+							$tempMaterialIn[$value['id']]['id_material'] 	= $restWhDetail2[0]->id_material;
+							$tempMaterialIn[$value['id']]['nm_material'] 	= $restWhDetail2[0]->nm_material;
+							$tempMaterialIn[$value['id']]['qty'] 			= $QTY_OKE;
+							$tempMaterialIn[$value['id']]['cost_book'] 		= $PRICE;
+							$tempMaterialIn[$value['id']]['created_by'] 	= $UserName;
+							$tempMaterialIn[$value['id']]['created_date'] 	= $DateTime;
+							$tempMaterialIn[$value['id']]['tipe'] 			= 'in';
+							$tempMaterialIn[$value['id']]['gudang'] 		= $gudang_ke;
+							$tempMaterialIn[$value['id']]['gudang_dari'] 	= $id_gudang;
+							$tempMaterialIn[$value['id']]['gudng_ke'] 		= $gudang_ke;
+							
 						}
 						
 						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
-						insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
+
+						//insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
 						if(!empty($grouping_temp)){
 							insert_jurnal($grouping_temp,$key,15,$kode_trans,'material to FG','pengurangan subgudang','penambahan gudang finish good');
 							$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 						}
-					}
-				}
+                        if(!empty($tempMaterial)){
+							$this->db->insert_batch('erp_data_subgudang', $tempMaterial);
+						}
+						if(!empty($tempMaterialIn)){
+							$this->db->insert_batch('erp_data_subgudang', $tempMaterialIn);
+						}
+						if(!empty($ArrFinishGood)){
+							$this->db->insert_batch('data_erp_fg', $ArrFinishGood);
+						}
+		
+						
+
+		}
 			$this->db->trans_complete();
 		}
 
