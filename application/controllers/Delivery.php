@@ -5818,7 +5818,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOut)){
@@ -5827,7 +5827,7 @@ class Delivery extends CI_Controller
 		
 		if(!empty($ArrGroupMaterial)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOutMaterial)){
@@ -5836,7 +5836,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroupSpool)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOutSpool)){
@@ -6363,7 +6363,7 @@ class Delivery extends CI_Controller
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
 			
 			$totalfg =0;
 			  
