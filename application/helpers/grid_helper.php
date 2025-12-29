@@ -6527,7 +6527,7 @@
 
 				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
 
-				$pricebook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
+				$pricebook = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
 				$costbook 	= $pricebook->harga;
 					
 
