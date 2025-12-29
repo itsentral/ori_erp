@@ -2013,7 +2013,7 @@ class Outgoing extends CI_Controller {
 							$tempMaterialIn[$value['id']]['keterangan'] 	= null;
 							$tempMaterialIn[$value['id']]['no_ipp'] 		= $no_ipp;
 							$tempMaterialIn[$value['id']]['no_spk'] 		= $no_spk;
-							$tempMaterialIn[$value['id']]['product'] 		= $product;
+							$tempMaterialIn[$value['id']]['product'] 		= $nm_product;
 							$tempMaterialIn[$value['id']]['kode_trans'] 	= $kode_trans;
 							$tempMaterialIn[$value['id']]['id_material'] 	= $restWhDetail2[0]->id_material;
 							$tempMaterialIn[$value['id']]['nm_material'] 	= $restWhDetail2[0]->nm_material;
