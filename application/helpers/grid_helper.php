@@ -6245,7 +6245,7 @@
 				$ArrHistInsert[$key]['total_harga'] 	= $value['harga_pusat']*$value['qty'];
 				$ArrHistInsert[$key]['saldo_awal']		= 0;
 				$ArrHistInsert[$key]['saldo_akhir']		=  (0 - $value['qty'])*$value['harga_pusat'];
-				$ArrHistInsert[$key]['harga_baru'] 		= $value['harga_pusat'];
+				$ArrHistInsert[$key]['harga_baru'] 		= $value['harga_pusat']; 
 			}
 
 			//PENAMBAHAN GUDANG
@@ -6523,16 +6523,13 @@
 				$checkGudang = $CI->db->get_where('warehouse',array('id'=>$id_gudang_dari))->result_array();
 				$categoryGudang = (!empty($checkGudang[0]['category']))?$checkGudang[0]['category']:0;
 
+		
+
 				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
-					if($categoryGudang == 'pusat'){
-						$costbook 	= (!empty($GET_COSTBOOK_PUSAT[$key]))?$GET_COSTBOOK_PUSAT[$key]:0;
-					}
-					if($categoryGudang == 'subgudang'){
-						$costbook 	= (!empty($GET_COSTBOOK_SUBGUDANG[$key]))?$GET_COSTBOOK_SUBGUDANG[$key]:0;
-					}
-					if($categoryGudang == 'produksi'){
-						$costbook 	= (!empty($GET_COSTBOOK_PRODUKSI[$key]))?$GET_COSTBOOK_PRODUKSI[$key]:0;
-					}
+
+				$pricebook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
+				$costbook 	= $pricebook->harga;
+					
 
 					$tempMaterial[$key]['tanggal'] 		= $dateTime;
 					$tempMaterial[$key]['keterangan'] 	= null;
