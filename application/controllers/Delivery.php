@@ -5637,6 +5637,10 @@ class Delivery extends CI_Controller
 					$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
 					$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
 					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
+					
+					print_r($getSummary);
+					exit;
+					
 					foreach ($getSummary as $key => $value2x) {
 						$UNIQ2 = $value.'-'.$key;
 						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
