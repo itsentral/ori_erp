@@ -5618,7 +5618,7 @@ class Delivery extends CI_Controller
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
-					$getSummary 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
+					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
 				}
 
 				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] != 'loose_dead_modif'){
