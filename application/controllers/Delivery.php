@@ -5978,7 +5978,7 @@ class Delivery extends CI_Controller
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
 		}
 
-		$this->jurnalIntransitCustomer($id_trans);
+		$this->jurnalIntransitCustomer($kode_delivery);
 	}
 
 	public function close_jurnal_in_transit_reject_to_fg($kode_delivery){
@@ -6533,7 +6533,7 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
 			
 			$totalfg =0;
@@ -6546,8 +6546,8 @@ class Delivery extends CI_Controller
 				$tgl_voucher = $data->tanggal;	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$id          = $data->id_trans;
-               	$no_request  = $data->no_spk;	
+				$id          = $idtrans;
+               	$no_request  = $idtrans;	
 				
 				
 				$finishgood    	= $data->finishgood;
