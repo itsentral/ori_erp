@@ -6432,7 +6432,7 @@ class Delivery extends CI_Controller
 				$tgl_voucher = $data->tanggal;	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$id          = $data->id_trans;
+				$id          = $idtrans;
                	$no_request  = $data->no_spk;	
 				
 				
