@@ -66,7 +66,7 @@ class Mutation extends CI_Controller {
 		{
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
-            $asc_desc       = $requestData['order'][0]['dir'];
+            $asc_desc       = $requestData['order'][0]['dir']; 
             if($asc_desc == 'desc')
             {
                 $nomor = $urut1 + $start_dari;
@@ -613,12 +613,19 @@ class Mutation extends CI_Controller {
 					$kategori_gudang = $coa_1->category;
 					
 					$id_material = 	$rest_pusat[0]->id_material;
-					$stokjurnalakhir=0;
-					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
-					
-					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+
+					//ambil saldo akhir 
+						
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$PRICE1=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
+				
+				
+				if(!empty($costbook)) $PRICE1=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
 					
 					$tanggal		= date('Y-m-d');
 					$Bln 			= substr($tanggal,5,2);
@@ -684,6 +691,19 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
 					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
+
+                   
+
+					//update syam 18/12/2025
+						$ArrHist[$key]['harga'] 			= $PRICE;
+						$ArrHist[$key]['total_harga'] 		= $PRICE*$QTY_OKE;
+						$ArrHist[$key]['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHist[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHist[$key]['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+						$ArrStock[$key]['harga'] 		    = $PRICE;
+						$ArrStock[$key]['total_harga'] 	    = ($stokjurnalakhir-$QTY_OKE)*$PRICE;
 				
                 }
                 else{
@@ -731,12 +751,18 @@ class Mutation extends CI_Controller {
 					$kategori_gudang = $coa_1->category;
 					
 					$id_material = 	$restMat[0]->id_material;
+						//ambil saldo akhir 
+						
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					$PRICE1=0;
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$id_material),1)->row();
 					
-					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					if(!empty($costbook)) $PRICE1=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
 					
 					$tanggal		= date('Y-m-d');
 					$Bln 			= substr($tanggal,5,2);
@@ -801,6 +827,20 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew[$key]['no_jurnal'] 		= $Nojurnal;
 					$ArrJurnalNew[$key]['coa_gudang'] 		= $coa_gudang;
+
+
+				
+					
+					//update syam 18/12/2025
+						$ArrHistInsert[$key]['harga'] 			= $PRICE;
+						$ArrHistInsert[$key]['total_harga'] 	= $PRICE*$QTY_OKE;
+						$ArrHistInsert[$key]['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistInsert[$key]['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHistInsert[$key]['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+						$ArrStockInsert[$key]['harga'] 		    = $PRICE;
+						$ArrStockInsert[$key]['total_harga'] 	= ($stokjurnalakhir-$QTY_OKE)*$PRICE;
 					
 				}
 
@@ -842,13 +882,20 @@ class Mutation extends CI_Controller {
 					$kategori_gudang = $coa_1->category;
 					
 					$id_material = 	$rest_pusat[0]->id_material;
+
+						//ambil saldo akhir 						
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					$PRICE1=0;
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					
-					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
 					
+					if(!empty($costbook)) $PRICE1=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
+
+										
 					$tanggal		= date('Y-m-d');
 					$Bln 			= substr($tanggal,5,2);
 					$Thn 			= substr($tanggal,0,4);
@@ -925,12 +972,17 @@ class Mutation extends CI_Controller {
 					
 				}
 					
+					//ambil saldo akhir 						
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
-					$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
+					$PRICE1=0;
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					
-					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+					
+					if(!empty($costbook)) $PRICE1=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir2=$PRICE1*$stokjurnalakhir2;
 					
 									
 					$Price_1 = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2));
@@ -968,6 +1020,18 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
+
+					
+					//update syam 18/12/2025
+						$ArrHist2[$key]['harga'] 			= $PRICE;
+						$ArrHist2[$key]['total_harga'] 	    = $PRICE*$QTY_OKE;
+						$ArrHist2[$key]['saldo_awal']	    = $nilaijurnalakhir2;
+						$ArrHist2[$key]['saldo_akhir']		= $nilaijurnalakhir2+($PRICE*$QTY_OKE);
+						$ArrHist2[$key]['harga_baru'] 		= $PRICENEW;
+
+					//update syam 18/12/2025
+						$ArrStock2[$key]['harga'] 		    = $PRICENEW;
+						$ArrStock2[$key]['total_harga'] 	= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
 				
 				
                 }
@@ -1014,12 +1078,18 @@ class Mutation extends CI_Controller {
 					$kategori_gudang = $coa_1->category;
 					
 					$id_material = 	$restMat[0]->id_material;
+					//ambil saldo akhir 						
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+					$PRICE1=0;
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					
-					if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+					
+					if(!empty($costbook)) $PRICE1=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
+
 					
 					$tanggal		= date('Y-m-d');
 					$Bln 			= substr($tanggal,5,2);
@@ -1097,12 +1167,17 @@ class Mutation extends CI_Controller {
 			
 					
 				}
+					//ambil saldo akhir 						
 					$stokjurnalakhir2=0;
 					$nilaijurnalakhir2=0;
-					$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-					if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
+					$PRICE1=0;
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 					
-					if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
+					
+					if(!empty($costbook)) $PRICE1=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir2=$PRICE1*$stokjurnalakhir2;
 					
 					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 					
@@ -1133,6 +1208,18 @@ class Mutation extends CI_Controller {
 					$ArrJurnalNew2[$key]['update_date'] 		= $DateTime;
 					$ArrJurnalNew2[$key]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$key]['coa_gudang'] 		= $coa_gudang;
+
+ 					
+					//update syam 18/12/2025
+						$ArrHistInsert2[$key]['harga'] 			    = $PRICE;
+						$ArrHistInsert2[$key]['total_harga'] 	    = $PRICE*$QTY_OKE;
+						$ArrHistInsert2[$key]['saldo_awal']	        = $nilaijurnalakhir2;
+						$ArrHistInsert2[$key]['saldo_akhir']		= $nilaijurnalakhir2+($PRICE*$QTY_OKE);
+						$ArrHistInsert2[$key]['harga_baru'] 		= $PRICENEW;
+
+					//update syam 18/12/2025
+						$ArrStockInsert2[$key]['harga'] 		    = $PRICENEW;
+						$ArrStockInsert2[$key]['total_harga'] 	    = ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
 				
                 }
             }

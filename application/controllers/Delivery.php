@@ -12,6 +12,9 @@ class Delivery extends CI_Controller
 		$this->load->model('tanki_model');		
 		$this->load->model('Acc_model');
 		$this->load->model('Jurnal_model');
+		$this->load->model('All_model');
+
+		$this->kode_trs = $this->All_model->GetAutoGenerate('id_trans');
 		// Your own constructor code
 		if (!$this->session->userdata('isORIlogin')) {
 			redirect('login');
@@ -2057,7 +2060,7 @@ class Delivery extends CI_Controller
 				'pesan'		=> 'Process Success. Thanks ...',
 				'status'	=> 1
 			);
-			move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
+			move_warehouse_fg($ArrMaterial, 15, 20, $kode_delivery);
 			$this->close_jurnal_in_transit($kode_delivery);
 			history('Lock release delivery ' . $kode_delivery);
 		}
@@ -2276,7 +2279,7 @@ class Delivery extends CI_Controller
 			$ArrInsert[$key]['no_drawing'] = $value['no_drawing'];
 			$ArrInsert[$key]['upload_date'] = $value['upload_date'];
 			$ArrInsert[$key]['sts'] = (empty($value['id_milik']))?'cut':$value['sts'];
-			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
+			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':$value['sts'];
 			//agus
 			$ArrInsert[$key]['nilai_cogs'] = $value['finish_good'];
 			$ArrInsert[$key]['updated_by'] = $username;
@@ -2536,7 +2539,7 @@ class Delivery extends CI_Controller
 				$ArrKeyJurnal[] = $row['id_uniq'];
 			}
 		}
-		move_warehouse($ArrMaterial, 20, 15, $kode_delivery);
+		move_warehouse_fg($ArrMaterial, 20, 15, $kode_delivery);
 		//SAMPAI SINI
 		// exit;
 
@@ -2742,7 +2745,7 @@ class Delivery extends CI_Controller
 				}
 			}
 			if (!empty($ArrMaterial)) {
-				move_warehouse($ArrMaterial, 20, 21, $kode_delivery);
+				move_warehouse_fg($ArrMaterial, 20, 21, $kode_delivery);
 			}
 		}
 		//SAMPAI SINI
@@ -5544,7 +5547,7 @@ class Delivery extends CI_Controller
 		$data_session	= $this->session->userdata;
 		$username = $this->session->userdata['ORI_User']['username'];
 		$datetime = date('Y-m-d H:i:s');
-		
+
 		//GROUP DATA
 		$ArrGroup = [];
 		$ArrGroupOut = [];
@@ -5562,14 +5565,14 @@ class Delivery extends CI_Controller
 				$ArrGroup[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
 				$ArrGroup[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
 				$ArrGroup[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
-				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+				$ArrGroup[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 				$ArrGroup[$value]['created_by'] = $username;
 				$ArrGroup[$value]['created_date'] = $datetime;
-				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+				$ArrGroup[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 				$ArrGroup[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
 				$ArrGroup[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
 				$ArrGroup[$value]['kode_delivery'] = $kode_delivery;
-				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:0;
+				$id_trans         = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 
 				$ArrGroupOut[$value]['tanggal'] = date('Y-m-d');
 				$ArrGroupOut[$value]['keterangan'] = 'Finish Good to In Transit';
@@ -5615,8 +5618,13 @@ class Delivery extends CI_Controller
 				// 	$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 				// 	$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
+<<<<<<< HEAD
 				// 	$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
 				// }
+=======
+					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
+				}
+>>>>>>> dev_sam
 
 				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] != 'loose_dead_modif'){
 					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_uniq']))->result_array();
@@ -5630,6 +5638,7 @@ class Delivery extends CI_Controller
 					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'jenis'=>'in cutting deadstok'))->result_array();
 				}
 
+<<<<<<< HEAD
 				if(($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif') OR $valx['sts_product'] == 'field joint'){
 					if($valx['sts_product'] == 'field joint'){
 						$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
@@ -5644,6 +5653,14 @@ class Delivery extends CI_Controller
 						$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
 					}
 
+=======
+				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif'){
+					$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
+					$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
+					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
+					
+										
+>>>>>>> dev_sam
 					foreach ($getSummary as $key => $value2x) {
 						$UNIQ2 = $value.'-'.$key;
 						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
@@ -5654,7 +5671,7 @@ class Delivery extends CI_Controller
 						$ArrGroupMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
 						$ArrGroupMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
 						$ArrGroupMaterial[$UNIQ2]['qty'] = $value2x['qty'];
-						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_wip'];
 						$ArrGroupMaterial[$UNIQ2]['created_by'] = $username;
 						$ArrGroupMaterial[$UNIQ2]['created_date'] = $datetime;
 						$ArrGroupMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
@@ -5699,56 +5716,111 @@ class Delivery extends CI_Controller
 					}
 				}
 				else{
-					$ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
-					$ArrGroupMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
-					$ArrGroupMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
-					$ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
-					$ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
-					$ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
-					$ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
-					$ArrGroupMaterial[$value]['created_by'] = $username;
-					$ArrGroupMaterial[$value]['created_date'] = $datetime;
-					$ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
-					$ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
-					$ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
-					$ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
-					$ArrGroupMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
-					$ArrGroupMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
-					$ArrGroupMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
-					$ArrGroupMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
 
-					$ArrGroupOutMaterial[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupOutMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupOutMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
-					$ArrGroupOutMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
-					$ArrGroupOutMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
-					$ArrGroupOutMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
-					$ArrGroupOutMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
-					$ArrGroupOutMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
-					$ArrGroupOutMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
-					$ArrGroupOutMaterial[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
-					$ArrGroupOutMaterial[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
-					$ArrGroupOutMaterial[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
-					$ArrGroupOutMaterial[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
-					$ArrGroupOutMaterial[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
-					$ArrGroupOutMaterial[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
-					$ArrGroupOutMaterial[$value]['created_by'] = $username;
-					$ArrGroupOutMaterial[$value]['created_date'] = $datetime;
-					$ArrGroupOutMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
-					$ArrGroupOutMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
-					$ArrGroupOutMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
-					$ArrGroupOutMaterial[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupOutMaterial[$value]['jenis'] = 'out';
-					$ArrGroupOutMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
-					$ArrGroupOutMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
-					$ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
-					$ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
-					$ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+					foreach ($getSummary as $key => $value2x) {
+						$UNIQ2 = $value.'-'.$key;
+						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_wip'];
+						$ArrGroupMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
 
-					$id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+						$ArrGroupOutMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutMaterial[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutMaterial[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupOutMaterial[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupOutMaterial[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_unit'] = $value2x['nilai_unit'];
+						$ArrGroupOutMaterial[$UNIQ2]['nilai_wip'] = $value2x['nilai_wip'];
+						$ArrGroupOutMaterial[$UNIQ2]['material'] = $value2x['material'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_direct'] = $value2x['wip_direct'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_indirect'] = $value2x['wip_indirect'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_consumable'] = $value2x['wip_consumable'];
+						$ArrGroupOutMaterial[$UNIQ2]['wip_foh'] = $value2x['wip_foh'];
+						$ArrGroupOutMaterial[$UNIQ2]['created_by'] = $username;
+						$ArrGroupOutMaterial[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupOutMaterial[$UNIQ2]['id_trans'] = $value2x['id_trans'];
+						$ArrGroupOutMaterial[$UNIQ2]['id_pro'] = $value2x['id_pro'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_ke'] = $value2x['qty_ke'];
+						$ArrGroupOutMaterial[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutMaterial[$UNIQ2]['jenis'] = 'out';
+						$ArrGroupOutMaterial[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupOutMaterial[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupOutMaterial[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupOutMaterial[$UNIQ2]['gudang'] = $value2x['gudang'];
+
+						$id_trans = $value2x['id_trans'];
+					}
+
+					// $ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
+					// $ArrGroupMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					// $ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					// $ArrGroupMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					// $ArrGroupMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					// $ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					// $ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					// $ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					// $ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					// $ArrGroupMaterial[$value]['created_by'] = $username;
+					// $ArrGroupMaterial[$value]['created_date'] = $datetime;
+					// $ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
+					// $ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					// $ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					// $ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
+					// $ArrGroupMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					// $ArrGroupMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					// $ArrGroupMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					// $ArrGroupMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					// $ArrGroupMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					// $ArrGroupOutMaterial[$value]['tanggal'] = date('Y-m-d');
+					// $ArrGroupOutMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					// $ArrGroupOutMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					// $ArrGroupOutMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					// $ArrGroupOutMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					// $ArrGroupOutMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					// $ArrGroupOutMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					// $ArrGroupOutMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					// $ArrGroupOutMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					// $ArrGroupOutMaterial[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					// $ArrGroupOutMaterial[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+					// $ArrGroupOutMaterial[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+					// $ArrGroupOutMaterial[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+					// $ArrGroupOutMaterial[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+					// $ArrGroupOutMaterial[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+					// $ArrGroupOutMaterial[$value]['created_by'] = $username;
+					// $ArrGroupOutMaterial[$value]['created_date'] = $datetime;
+					// $ArrGroupOutMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					// $ArrGroupOutMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					// $ArrGroupOutMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					// $ArrGroupOutMaterial[$value]['kode_delivery'] = $kode_delivery;
+					// $ArrGroupOutMaterial[$value]['jenis'] = 'out';
+					// $ArrGroupOutMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					// $ArrGroupOutMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					// $ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					// $ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					// $ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					// $id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 				}
 			}
 		}
@@ -5775,7 +5847,7 @@ class Delivery extends CI_Controller
 					$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
 					$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
 					$ArrGroupSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
+					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
 					$ArrGroupSpool[$value]['created_by'] = $username;
 					$ArrGroupSpool[$value]['created_date'] = $datetime;
 					$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
@@ -5825,7 +5897,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOut)){
@@ -5834,7 +5906,7 @@ class Delivery extends CI_Controller
 		
 		if(!empty($ArrGroupMaterial)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOutMaterial)){
@@ -5843,7 +5915,7 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroupSpool)){
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
-			$this->jurnalIntransit($id_trans);
+			$this->jurnalIntransit($kode_delivery);
 		}
 
 		if(!empty($ArrGroupOutSpool)){
@@ -5928,7 +6000,7 @@ class Delivery extends CI_Controller
 			$this->db->insert_batch('data_erp_in_transit',$ArrGroupOut);
 		}
 
-		$this->jurnalIntransitCustomer($id_trans);
+		$this->jurnalIntransitCustomer($kode_delivery);
 	}
 
 	public function close_jurnal_in_transit_reject_to_fg($kode_delivery){
@@ -6370,7 +6442,7 @@ class Delivery extends CI_Controller
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
 			
 			$totalfg =0;
 			  
@@ -6382,13 +6454,13 @@ class Delivery extends CI_Controller
 				$tgl_voucher = $data->tanggal;	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$id          = $data->id_trans;
+				$id          = $idtrans;
                	$no_request  = $data->no_spk;	
 				
 				
 				$finishgood    	= $data->finishgood;
 				
-				
+				$totalfg += $finishgood;
 				
 				
 				if ($nm_material=='pipe'){			
@@ -6449,7 +6521,7 @@ class Delivery extends CI_Controller
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'FINISHED GOOD - INTRANSIT'.$keterangan;
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $finishgood, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => 'intransit', 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
@@ -6483,7 +6555,7 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
 			
 			$totalfg =0;
@@ -6496,12 +6568,12 @@ class Delivery extends CI_Controller
 				$tgl_voucher = $data->tanggal;	
 				$spasi       = ',';
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-				$id          = $data->id_trans;
-               	$no_request  = $data->no_spk;	
+				$id          = $idtrans;
+               	$no_request  = $idtrans;	
 				
 				
 				$finishgood    	= $data->finishgood;
-				
+				$totalfg        += $data->finishgood;
 				
 				
 				
@@ -6565,7 +6637,7 @@ class Delivery extends CI_Controller
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'INTRANSIT-CUSTOMER'.$keterangan;
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $finishgood, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalfg, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
