@@ -5695,9 +5695,9 @@ class Delivery extends CI_Controller
 				}
 				else{
 
-					print_r($getSummary);
+					print_r($value);
 					exit;
-					
+
 					$ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
 					$ArrGroupMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
 					$ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
