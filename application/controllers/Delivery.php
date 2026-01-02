@@ -5805,7 +5805,7 @@ class Delivery extends CI_Controller
 
 		//DATA SPOOL
 		//GROUP DATA
-		$ArrGroupSpool = [];
+		$ArrGroupSpool = []; 
 		$ArrGroupOutSpool = [];
 		$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
 		$ArrSpool = [];
