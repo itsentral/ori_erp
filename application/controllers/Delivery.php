@@ -5801,9 +5801,11 @@ class Delivery extends CI_Controller
 					// $id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 				}
 			}
-		}
-
 		
+
+		//DATA SPOOL
+		//GROUP DATA
+		$ArrGroupSpool = []; 
 		$ArrGroupOutSpool = [];
 		$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
 		$ArrSpool = [];
