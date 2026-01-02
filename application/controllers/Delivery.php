@@ -5749,13 +5749,61 @@ class Delivery extends CI_Controller
 						$id_trans = $value2x['id_trans'];
 					}
 
+					// $ArrGroupMaterial[$value]['tanggal'] = date('Y-m-d');
+					// $ArrGroupMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					// $ArrGroupMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					// $ArrGroupMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					// $ArrGroupMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					// $ArrGroupMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					// $ArrGroupMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					// $ArrGroupMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					// $ArrGroupMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					// $ArrGroupMaterial[$value]['created_by'] = $username;
+					// $ArrGroupMaterial[$value]['created_date'] = $datetime;
+					// $ArrGroupMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
+					// $ArrGroupMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					// $ArrGroupMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					// $ArrGroupMaterial[$value]['kode_delivery'] = $kode_delivery;
+					// $ArrGroupMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					// $ArrGroupMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					// $ArrGroupMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					// $ArrGroupMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					// $ArrGroupMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					// $ArrGroupOutMaterial[$value]['tanggal'] = date('Y-m-d');
+					// $ArrGroupOutMaterial[$value]['keterangan'] = 'Finish Good to In Transit';
+					// $ArrGroupOutMaterial[$value]['no_so'] 	= (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
+					// $ArrGroupOutMaterial[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
+					// $ArrGroupOutMaterial[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
+					// $ArrGroupOutMaterial[$value]['kode_trans'] = (!empty($getSummary[0]['kode_trans']))?$getSummary[0]['kode_trans']:NULL;
+					// $ArrGroupOutMaterial[$value]['id_pro_det'] = (!empty($getSummary[0]['id_pro_det']))?$getSummary[0]['id_pro_det']:NULL;
+					// $ArrGroupOutMaterial[$value]['qty'] = (!empty($getSummary[0]['qty']))?$getSummary[0]['qty']:NULL;
+					// $ArrGroupOutMaterial[$value]['nilai_unit'] = (!empty($getSummary[0]['nilai_unit']))?$getSummary[0]['nilai_unit']:0;
+					// $ArrGroupOutMaterial[$value]['nilai_wip'] = (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
+					// $ArrGroupOutMaterial[$value]['material'] = (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
+					// $ArrGroupOutMaterial[$value]['wip_direct'] = (!empty($getSummary[0]['wip_direct']))?$getSummary[0]['wip_direct']:0;
+					// $ArrGroupOutMaterial[$value]['wip_indirect'] = (!empty($getSummary[0]['wip_indirect']))?$getSummary[0]['wip_indirect']:0;
+					// $ArrGroupOutMaterial[$value]['wip_consumable'] = (!empty($getSummary[0]['wip_consumable']))?$getSummary[0]['wip_consumable']:0;
+					// $ArrGroupOutMaterial[$value]['wip_foh'] = (!empty($getSummary[0]['wip_foh']))?$getSummary[0]['wip_foh']:0;
+					// $ArrGroupOutMaterial[$value]['created_by'] = $username;
+					// $ArrGroupOutMaterial[$value]['created_date'] = $datetime;
+					// $ArrGroupOutMaterial[$value]['id_trans'] = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:NULL;
+					// $ArrGroupOutMaterial[$value]['id_pro'] = (!empty($getSummary[0]['id_pro']))?$getSummary[0]['id_pro']:0;
+					// $ArrGroupOutMaterial[$value]['qty_ke'] = (!empty($getSummary[0]['qty_ke']))?$getSummary[0]['qty_ke']:0;
+					// $ArrGroupOutMaterial[$value]['kode_delivery'] = $kode_delivery;
+					// $ArrGroupOutMaterial[$value]['jenis'] = 'out';
+					// $ArrGroupOutMaterial[$value]['id_material'] = (!empty($getSummary[0]['id_material']))?$getSummary[0]['id_material']:0;
+					// $ArrGroupOutMaterial[$value]['nm_material'] = (!empty($getSummary[0]['nm_material']))?$getSummary[0]['nm_material']:0;
+					// $ArrGroupOutMaterial[$value]['qty_mat'] = (!empty($getSummary[0]['qty_mat']))?$getSummary[0]['qty_mat']:0;
+					// $ArrGroupOutMaterial[$value]['cost_book'] = (!empty($getSummary[0]['cost_book']))?$getSummary[0]['cost_book']:0;
+					// $ArrGroupOutMaterial[$value]['gudang'] = (!empty($getSummary[0]['gudang']))?$getSummary[0]['gudang']:0;
+
+					// $id_trans = (!empty($getSummary[0]['id_trans']))?$getSummary[0]['id_trans']:$this->kode_trs;
 				}
 			}
 		}
 
-		//DATA SPOOL
-		//GROUP DATA
-		$ArrGroupSpool = []; 
+		
 		$ArrGroupOutSpool = [];
 		$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
 		$ArrSpool = [];
