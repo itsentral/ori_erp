@@ -981,7 +981,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 			
 		$Mulai_Next++;
-		$Mulai_Next2 	= $Mulai_Next + 2;
+		
 		
 		
 		$sheet->setCellValue($Col_Name.$NextRow, 'Stock');
@@ -991,7 +991,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Qty');
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
 
-		
+
 		$Mulai_Next++;
 		$Col_Name	= getColsChar($Mulai_Next);
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Harga');
