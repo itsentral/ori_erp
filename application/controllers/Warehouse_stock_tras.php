@@ -1003,7 +1003,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
 		
 		$Mulai_Next++;
-		$Mulai_Next2 	= $Mulai_Next + 1;
+		
 		
 		
 		$Col_Name2	= getColsChar($Mulai_Next2);
