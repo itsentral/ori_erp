@@ -729,7 +729,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Categori_Find	= urldecode($this->input->get('category'));
 		
 			
-		$Judul			= 'REPORT MATERIAL STOCK - TRAS';
+		$Judul			= 'REPORT MATERIAL STOCK';
 		$Arr_Bulan		= array(1=>'January','February','March','April','May','June','July','August','September','October','November','December');
 		
 		if(empty($Date_Find)){			
@@ -979,34 +979,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Col_Name	= getColsChar($Mulai_Next);
 		$Col_Name2	= getColsChar($Mulai_Next2);
 		
-		$sheet->setCellValue($Col_Name.$NextRow, 'Tras');
-		$sheet->getStyle($Col_Name.$NextRow.':'.$Col_Name2.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells($Col_Name.$NextRow.':'.$Col_Name2.$NextRow);
-		
-		$sheet->setCellValue($Col_Name.$NextRow2, 'Qty');
-		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
-		
-	/*	$Mulai_Next++;
-		$Col_Name	= getColsChar($Mulai_Next);
-		$sheet->setCellValue($Col_Name.$NextRow2, 'Saldo Awal');
-		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
-
-		$Mulai_Next++;
-		$Col_Name	= getColsChar($Mulai_Next);
-		$sheet->setCellValue($Col_Name.$NextRow2, 'Transaksi');
-		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);*/
-
-				
-		$Mulai_Next++;
-		$Col_Name	= getColsChar($Mulai_Next);
-		$sheet->setCellValue($Col_Name.$NextRow2, 'Harga');
-		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
-		
-		$Mulai_Next++;
-		$Col_Name	= getColsChar($Mulai_Next);
-		$sheet->setCellValue($Col_Name.$NextRow2, 'Total');
-		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
-		
+			
 		$Mulai_Next++;
 		$Mulai_Next2 	= $Mulai_Next + 2;
 		
@@ -1124,7 +1097,7 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Akhir,$Harga_HPP,$SaldoAkhir_HPP,$Qty_Temp,$Harga_HPP,$Total_Temp,$Selisih_Qty,$Selisih_Total);
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Temp,$Harga_HPP,$Total_Temp,$Selisih_Qty,$Selisih_Total);
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
