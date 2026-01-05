@@ -992,12 +992,12 @@ class Warehouse_stock_tras extends CI_Controller {
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
 
 
-		$Mulai_Next++;
+		
 		$Col_Name	= getColsChar($Mulai_Next);
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Harga');
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
 		
-		
+		$Mulai_Next++;
 		$Col_Name	= getColsChar($Mulai_Next);
 		$sheet->setCellValue($Col_Name.$NextRow2, 'Total');
 		$sheet->getStyle($Col_Name.$NextRow2)->applyFromArray($style_header);
