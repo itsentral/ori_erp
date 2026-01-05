@@ -976,6 +976,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		$Mulai_Next		= $Mula_Col + 1;
 		$Mulai_Next2 	= $Mulai_Next + 2;
 		
+		$Col_Name	= getColsChar($Mulai_Next);
 		$Col_Name2	= getColsChar($Mulai_Next2);
 		
 			
