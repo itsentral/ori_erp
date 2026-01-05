@@ -982,6 +982,10 @@ class Warehouse_stock_tras extends CI_Controller {
 			
 		$Mulai_Next++;
 		$Mulai_Next2 	= $Mulai_Next + 2;
+		
+		$Col_Name	= getColsChar($Mulai_Next);
+		$Col_Name2	= getColsChar($Mulai_Next2);
+		
 		$sheet->setCellValue($Col_Name.$NextRow, 'Stock');
 		$sheet->getStyle($Col_Name.$NextRow.':'.$Col_Name2.$NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells($Col_Name.$NextRow.':'.$Col_Name2.$NextRow);
