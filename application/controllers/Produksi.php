@@ -12930,7 +12930,7 @@ class Produksi extends CI_Controller {
 
 			$ArrUpdateStock[$UNIQ]['id'] 	= $value['id_material'];
 			$ArrUpdateStock[$UNIQ]['qty'] 	= $berat;
-			$ArrUpdateStock[$val2]['harga_pusat'] 	= $costbook;
+			$ArrUpdateStock[$UNIQ]['harga_pusat'] 	= $costbook;
 			$ArrUpdateStock[$UNIQ]['harga_tujuan'] 	= $costbook;
 			$ArrUpdateStock[$UNIQ]['harga_baru'] 	= $costbook;
 
