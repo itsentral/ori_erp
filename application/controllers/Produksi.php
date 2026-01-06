@@ -13593,7 +13593,7 @@ class Produksi extends CI_Controller {
 					'id_trans' => $vals->id_trans,
 					);
 
-		$this->db->insert('warehouse_stok_wip',$datastokwip);
+		$this->db->insert('warehouse_stock_wip',$datastokwip);
 		}
 
 
