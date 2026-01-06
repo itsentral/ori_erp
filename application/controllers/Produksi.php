@@ -13098,7 +13098,7 @@ class Produksi extends CI_Controller {
 			$this->db->insert_batch('data_erp_wip',$dataWIP);
 		}
 		if(!empty($ArrUpdateStock)){
-			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_ke,$kode_spk_time);
+			move_warehouse2($ArrUpdateStock,$id_gudang,$id_gudang_ke,$kode_spk_time);
 		}
 
 		//GROUP DATA
