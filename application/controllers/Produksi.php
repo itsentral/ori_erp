@@ -2701,7 +2701,7 @@ class Produksi extends CI_Controller {
 		$ArrAktualPlus = [];
 		$ArrAktualAdd = [];
 		$ArrUpdate = [];
-		$ArrUpdateStock = [];
+		$ArrUpdateStock = []; 
 
 		$nomor = 0;
 		foreach ($get_detail_spk as $key => $value) {
@@ -12930,6 +12930,9 @@ class Produksi extends CI_Controller {
 
 			$ArrUpdateStock[$UNIQ]['id'] 	= $value['id_material'];
 			$ArrUpdateStock[$UNIQ]['qty'] 	= $berat;
+			$ArrUpdateStock[$UNIQ]['harga_pusat'] 	= $costbook;
+			$ArrUpdateStock[$UNIQ]['harga_tujuan'] 	= $costbook;
+			$ArrUpdateStock[$UNIQ]['harga_baru'] 	= $costbook;
 
 			$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans']))->result_array();
 			$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
@@ -13113,7 +13116,7 @@ class Produksi extends CI_Controller {
 					$ArrGroup[$value]['no_so'] = (!empty($getSummary[0]['no_so']))?$getSummary[0]['no_so']:NULL;
 					$ArrGroup[$value]['product'] = (!empty($getSummary[0]['product']))?$getSummary[0]['product']:NULL;
 					$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
-					$ArrGroup[$value]['kode_trans'] = $kode_spk_time;
+					$ArrGroup[$value]['kode_trans'] = $kode_spk_time; 
 					$ArrGroup[$value]['id_pro_det'] = $value;
 
 					$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$kode_spk_time,'id_production_detail'=>$value))->result_array();
@@ -13159,6 +13162,10 @@ class Produksi extends CI_Controller {
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_wip_group',$ArrGroup);
 			$this->jurnalWIP($id_trans);
+            
+
+
+
 		}
 		if(!empty($tempMaterial)){
 			$this->db->insert_batch('erp_data_subgudang',$tempMaterial);
@@ -13517,7 +13524,7 @@ class Produksi extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $kredit,
 					  'jenis_jurnal'  => 'produksi wip',
@@ -13558,8 +13565,40 @@ class Produksi extends CI_Controller {
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
-		  
+
+
+		$wipgroup = $this->db->query("SELECT * FROM data_erp_wip WHERE id_trans ='".$idtrans."' limit 1")->row();	
+		$kodetrans = $wipgroup->kode_trans;
+		$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_group WHERE kode_trans ='".$kodetrans."' AND jenis='in' GROUP BY kode_trans,no_spk,product,no_so")->result();
+        
+		$datastokwip=array();
+		foreach ($stokwip as $vals) {
+		 $datastokwip = array(
+			        'tanggal' => $tgl_voucher,
+					'keterangan' => 'Gudang produksi to WIP',
+					'no_so' => $vals->no_so,
+					'product' => $vals->product,
+					'no_spk' => $vals->no_spk,
+					'kode_trans' => $vals->kode_trans,
+					'id_pro_det' => $vals->id_pro_det,
+					'qty' => $vals->total,
+					'nilai_wip' => $vals->nilai_wip,
+					'material' => $vals->material,
+					'wip_direct' =>  $vals->wip_direct,
+					'wip_indirect' =>  $vals->wip_indirect,
+					'wip_consumable' =>  $vals->wip_consumable,
+					'wip_foh' =>  $vals->wip_foh,
+					'created_by' => $vals->created_by,
+					'created_date' => $vals->created_date,
+					'id_trans' => $vals->id_trans,
+					);
+
+		$this->db->insert('warehouse_stock_wip',$datastokwip);
 		}
+
+
+		  
+	}
 		
 	function jurnalWIPdeadstock($kodespk){
 		
