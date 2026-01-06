@@ -13524,7 +13524,7 @@ class Produksi extends CI_Controller {
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $nokir,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $kredit,
 					  'jenis_jurnal'  => 'produksi wip',
