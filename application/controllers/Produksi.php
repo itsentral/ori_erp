@@ -12930,6 +12930,9 @@ class Produksi extends CI_Controller {
 
 			$ArrUpdateStock[$UNIQ]['id'] 	= $value['id_material'];
 			$ArrUpdateStock[$UNIQ]['qty'] 	= $berat;
+			$ArrUpdateStock[$val2]['harga_pusat'] 	= $costbook;
+			$ArrUpdateStock[$UNIQ]['harga_tujuan'] 	= $costbook;
+			$ArrUpdateStock[$UNIQ]['harga_baru'] 	= $costbook;
 
 			$getDetailSPK = $this->db->get_where('laporan_wip_per_hari_action',array('kode_trans'=>$value['kode_trans']))->result_array();
 			$id_trans = (!empty($getDetailSPK[0]['id']))?$getDetailSPK[0]['id']:0;
@@ -13098,7 +13101,7 @@ class Produksi extends CI_Controller {
 			$this->db->insert_batch('data_erp_wip',$dataWIP);
 		}
 		if(!empty($ArrUpdateStock)){
-			move_warehouse2($ArrUpdateStock,$id_gudang,$id_gudang_ke,$kode_spk_time);
+			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_ke,$kode_spk_time);
 		}
 
 		//GROUP DATA
