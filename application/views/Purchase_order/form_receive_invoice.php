@@ -31,7 +31,7 @@ $this->load->view('include/side_menu');
 							<option value=''>Pilih Matauang</option>
 							<option value ='IDR' selected >IDR</option>
 							<option value ='USD' >USD</option>	
-							<?php }elseif($matauang =='USD'){ ?>
+							<?php }else if($matauang =='USD'){ ?>
 							<option value=''>Pilih Matauang</option>
 							<option value ='IDR' >IDR</option>
 							<option value ='USD' selected >USD</option>	
