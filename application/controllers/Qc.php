@@ -4571,8 +4571,11 @@ class Qc extends CI_Controller
 			$wipgroup = $this->db->query("SELECT * FROM data_erp_fg WHERE id_trans ='".$idtrans."' limit 1")->row();	
 			$kodetrans = $wipgroup->kode_trans;
 			$Date      = $wipgroup->tanggal;
-			$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_group WHERE kode_trans ='".$kodetrans."' AND jenis='out' AND tanggal ='".$Date."' GROUP BY kode_trans,no_spk,product,no_so")->result();
+			$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_groupx WHERE kode_trans ='".$kodetrans."' AND jenis='out' AND tanggal ='".$Date."' GROUP BY kode_trans,no_spk,product,no_so")->result();
 			
+			print_r($stokwip);
+			exit;
+
 			$datastokfg=array();
 			foreach ($stokwip as $vals) {
 			$datastokfg = array(
