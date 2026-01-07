@@ -13569,7 +13569,8 @@ class Produksi extends CI_Controller {
 
 		$wipgroup = $this->db->query("SELECT * FROM data_erp_wip WHERE id_trans ='".$idtrans."' limit 1")->row();	
 		$kodetrans = $wipgroup->kode_trans;
-		$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_group WHERE kode_trans ='".$kodetrans."' AND jenis='in' GROUP BY kode_trans,no_spk,product,no_so")->result();
+		$Date      = $wipgroup->tanggal;
+		$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_group WHERE kode_trans ='".$kodetrans."' AND jenis='in' AND tanggal ='".$Date."' GROUP BY kode_trans,no_spk,product,no_so")->result();
         
 		$datastokwip=array();
 		foreach ($stokwip as $vals) {
