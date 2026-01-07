@@ -13570,7 +13570,39 @@ class Produksi extends CI_Controller {
 		$wipgroup = $this->db->query("SELECT * FROM data_erp_wip WHERE id_trans ='".$idtrans."' limit 1")->row();	
 		$kodetrans = $wipgroup->kode_trans;
 		$Date      = $wipgroup->tanggal;
-		$stokwip = $this->db->query("SELECT *, sum(qty) as total FROM data_erp_wip_group WHERE kode_trans ='".$kodetrans."' AND jenis='in' AND tanggal ='".$Date."' GROUP BY kode_trans,no_spk,product,no_so")->result();
+		$stokwip = $this->db->query("SELECT
+										`data_erp_wip_group`.`id` AS `id`,
+										`data_erp_wip_group`.`tanggal` AS `tanggal`,
+										`data_erp_wip_group`.`keterangan` AS `keterangan`,
+										`data_erp_wip_group`.`no_so` AS `no_so`,
+										`data_erp_wip_group`.`product` AS `product`,
+										`data_erp_wip_group`.`no_spk` AS `no_spk`,
+										`data_erp_wip_group`.`kode_trans` AS `kode_trans`,
+										`data_erp_wip_group`.`id_pro_det` AS `id_pro_det`,
+										sum(`data_erp_wip_group`.`qty`) AS `total`,
+										`data_erp_wip_group`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_wip_group`.`material` AS `material`,
+										`data_erp_wip_group`.`wip_direct` AS `wip_direct`,
+										`data_erp_wip_group`.`wip_indirect` AS `wip_indirect`,
+										`data_erp_wip_group`.`wip_consumable` AS `wip_consumable`,
+										`data_erp_wip_group`.`wip_foh` AS `wip_foh`,
+										`data_erp_wip_group`.`created_by` AS `created_by`,
+										`data_erp_wip_group`.`created_date` AS `created_date`,
+										`data_erp_wip_group`.`id_trans` AS `id_trans`,
+										`data_erp_wip_group`.`jenis` AS `jenis`,
+										`data_erp_wip_group`.`id_material` AS `id_material`,
+										`data_erp_wip_group`.`nm_material` AS `nm_material`,
+										`data_erp_wip_group`.`qty_mat` AS `qty_mat`,
+										`data_erp_wip_group`.`cost_book` AS `cost_book`,
+										`data_erp_wip_group`.`gudang` AS `gudang`,
+										`data_erp_wip_group`.`kode_spool` AS `kode_spool` 
+										FROM
+										`data_erp_wip_group` 
+										WHERE
+										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
+										AND (`data_erp_wip_group`.`jenis`='in')
+										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
+										GROUP BY kode_trans,no_spk,product,no_so")->result();
         
 		$datastokwip=array();
 		foreach ($stokwip as $vals) {
