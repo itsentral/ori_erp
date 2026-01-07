@@ -6434,7 +6434,7 @@ class Delivery extends CI_Controller
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$id          = $idtrans;
                	$no_request  = $data->no_spk;	
-				$noso        = $data->no_so; 
+				
 				
 				$finishgood    	= $data->finishgood;
 				
@@ -6461,7 +6461,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coaintransit,
 					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6476,21 +6476,13 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					 );
-
-
-					 $kode_trans = $data->kode_trans;
-					 $nospk      = $data->no_spk;
-					 $qty        = $data->qty;
-				
-					$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-				
 					  	
 				
 				
@@ -6526,7 +6518,6 @@ class Delivery extends CI_Controller
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
-			
 		  
 		}
 
