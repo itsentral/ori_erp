@@ -24,22 +24,15 @@ $this->load->view('include/side_menu');
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
                             <select id="matauang2" name="matauang2" class="form-control"> 
-							
+							<option value=''>Pilih Matauang</option>
 							<?php							
 							$matauang = $results->matauang_receive_invoice;		
 							if($matauang =='IDR'){?>
-							<option value=''>Pilih Matauang</option>
 							<option value ='IDR' selected >IDR</option>
-							<option value ='USD' >USD</option>	
 							<?php }elseif($matauang =='USD'){ ?>
-							<option value=''>Pilih Matauang</option>
-							<option value ='IDR' >IDR</option>
 							<option value ='USD' selected >USD</option>	
-							<?php }else{ ?>
-							<option value=''>Pilih Matauang</option>
-							<option value ='IDR' >IDR</option>
-							<option value ='USD' >USD</option>	
-							<?php}?>
+							<?php } ?>
+							
 							
 							
 							
