@@ -3232,6 +3232,7 @@ class Purchase_order_model extends CI_Model {
 						$ArrEditPO[$val]['syarat'] 		= strtolower($valx['syarat']);
 						$ArrEditPO[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 						$ArrEditPO[$val]['created_date']= date('Y-m-d H:i:s');
+						$ArrEditPO[$val]['kurs_receiving_invoice'] = 1; 
 					}
 				}
 			}
