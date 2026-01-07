@@ -4571,6 +4571,11 @@ class Qc extends CI_Controller
 			$wipgroup = $this->db->query("SELECT * FROM data_erp_fg WHERE id_trans ='".$idtrans."' limit 1")->row();	
 			$kodetrans = $wipgroup->kode_trans;
 			$Date      = $wipgroup->tanggal;
+			$so        = $wipgroup->no_so;
+			$spk       = $wipgroup->no_spk;
+			$product   = $wipgroup->product;
+
+
 			$stokwip = $this->db->query("SELECT
 										`data_erp_wip_group`.`id` AS `id`,
 										`data_erp_wip_group`.`tanggal` AS `tanggal`,
@@ -4604,7 +4609,17 @@ class Qc extends CI_Controller
 										AND (`data_erp_wip_group`.`jenis`='out')
 										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
+
 			
+			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kodetrans."' 
+			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+
+			if(!empty($cekstok)){
+            foreach ($stokwip as $vals) {
+			$qty = 	$vals->total;
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' ");
+			}
+			}else{
 			$datastokfg=array();
 			foreach ($stokwip as $vals) {
 			$datastokfg = array(
@@ -4628,6 +4643,8 @@ class Qc extends CI_Controller
 						);
 
 			$this->db->insert('warehouse_stock_fg',$datastokfg);
+			}
+			
 		}
 
 
