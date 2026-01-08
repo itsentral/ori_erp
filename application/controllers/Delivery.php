@@ -6422,7 +6422,7 @@ class Delivery extends CI_Controller
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,kode_trans,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
 			
 			$totalfg =0;
 			  
