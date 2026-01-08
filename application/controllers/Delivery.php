@@ -5604,7 +5604,7 @@ class Delivery extends CI_Controller
 		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
 		$ArrayDeliveryMaterial = $this->db->where_in('sts_product',$ListIN)->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk'=>NULL))->result_array();
 		if(!empty($ArrayDeliveryMaterial)){
-			foreach ($ArrayDeliveryMaterial as $value => $valx) {
+			foreach ($ArrayDeliveryMaterial as $value => $valx) { 
 				if($valx['sts_product'] == 'so material'){
 					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
@@ -5614,7 +5614,7 @@ class Delivery extends CI_Controller
 				}
 
 				if($valx['sts_product'] == 'field joint'){
-					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
+					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_jointx',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
