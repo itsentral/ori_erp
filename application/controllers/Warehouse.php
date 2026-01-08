@@ -1682,8 +1682,12 @@ class Warehouse extends CI_Controller {
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				
 				
-
+                if($QTY_OKE+$stokjurnalakhir2 != 0){
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				} else {
+				$PRICENEW = ($PRICE*$QTY_OKE);
+				}
+				
 					
 					
 					
