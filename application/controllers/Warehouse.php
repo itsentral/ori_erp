@@ -1585,10 +1585,15 @@ class Warehouse extends CI_Controller {
 					$ArrJurnalNew2[$value['id']]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$value['id']]['coa_gudang'] 		    = $coa_gudang2;
 			}
+
             $nomor = 999;
 			$ArrUpdateStock[$nomor]['harga_pusat'] 	    = $PRICE;
 			$ArrUpdateStock[$nomor]['harga_tujuan'] 	= $PRICE2;
 			$ArrUpdateStock[$nomor]['harga_baru'] 	    = $PRICENEW;
+
+
+			print_r($ArrUpdateStock);
+			exit;
 
 			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
 		}
