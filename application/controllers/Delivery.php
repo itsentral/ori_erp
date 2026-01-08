@@ -5604,7 +5604,7 @@ class Delivery extends CI_Controller
 		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
 		$ArrayDeliveryMaterial = $this->db->where_in('sts_product',$ListIN)->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk'=>NULL))->result_array();
 		if(!empty($ArrayDeliveryMaterial)){
-			foreach ($ArrayDeliveryMaterial as $value => $valx) {
+			foreach ($ArrayDeliveryMaterial as $value => $valx) { 
 				if($valx['sts_product'] == 'so material'){
 					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
@@ -5613,10 +5613,10 @@ class Delivery extends CI_Controller
 					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
 				}
 
-				// if($valx['sts_product'] == 'field joint'){
-				// 	$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
-				// 	$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
-				// 	$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
+				if($valx['sts_product'] == 'field joint'){
+					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
+					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
+					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
 					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
 				}
@@ -5803,103 +5803,105 @@ class Delivery extends CI_Controller
 			}
 		
 
-		//DATA SPOOL
-		//GROUP DATA
-		$ArrGroupSpool = []; 
-		$ArrGroupOutSpool = [];
-		$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
-		$ArrSpool = [];
-		foreach ($ArrProSpool as $key => $value) {
-			$ArrSpool[] = $value['spool_induk'];
-		}
+			//DATA SPOOL
+			//GROUP DATA
+			$ArrGroupSpool = []; 
+			$ArrGroupOutSpool = [];
+			$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
+			$ArrSpool = [];
+			foreach ($ArrProSpool as $key => $value) {
+				$ArrSpool[] = $value['spool_induk'];
+			}
 
-		if(!empty($ArrSpool)){
-			$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
-			if(!empty($getAllSpool)){
-				foreach ($getAllSpool as $value => $valx) {
-					$ArrGroupSpool[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupSpool[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupSpool[$value]['no_so'] 	= $valx['no_so'];
-					$ArrGroupSpool[$value]['product'] = $valx['product'];
-					$ArrGroupSpool[$value]['no_spk'] = $valx['no_spk'];
-					$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
-					$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
-					$ArrGroupSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
-					$ArrGroupSpool[$value]['created_by'] = $username;
-					$ArrGroupSpool[$value]['created_date'] = $datetime;
-					$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
-					$ArrGroupSpool[$value]['id_pro'] = $valx['id_pro'];
-					$ArrGroupSpool[$value]['qty_ke'] = $valx['qty_ke'];
-					$ArrGroupSpool[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupSpool[$value]['id_material'] = $valx['id_material'];
-					$ArrGroupSpool[$value]['nm_material'] = $valx['nm_material'];
-					$ArrGroupSpool[$value]['qty_mat'] = $valx['qty_mat'];
-					$ArrGroupSpool[$value]['cost_book'] = $valx['cost_book'];
-					$ArrGroupSpool[$value]['gudang'] = $valx['gudang'];
-					$ArrGroupSpool[$value]['kode_spool'] = $valx['kode_spool'];
+			if(!empty($ArrSpool)){
+				$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
+				if(!empty($getAllSpool)){
+					foreach ($getAllSpool as $value => $valx) {
+						$ArrGroupSpool[$value]['tanggal'] = date('Y-m-d');
+						$ArrGroupSpool[$value]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupSpool[$value]['no_so'] 	= $valx['no_so'];
+						$ArrGroupSpool[$value]['product'] = $valx['product'];
+						$ArrGroupSpool[$value]['no_spk'] = $valx['no_spk'];
+						$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
+						$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
+						$ArrGroupSpool[$value]['qty'] = $valx['qty'];
+						$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
+						$ArrGroupSpool[$value]['created_by'] = $username;
+						$ArrGroupSpool[$value]['created_date'] = $datetime;
+						$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
+						$ArrGroupSpool[$value]['id_pro'] = $valx['id_pro'];
+						$ArrGroupSpool[$value]['qty_ke'] = $valx['qty_ke'];
+						$ArrGroupSpool[$value]['kode_delivery'] = $kode_delivery;
+						$ArrGroupSpool[$value]['id_material'] = $valx['id_material'];
+						$ArrGroupSpool[$value]['nm_material'] = $valx['nm_material'];
+						$ArrGroupSpool[$value]['qty_mat'] = $valx['qty_mat'];
+						$ArrGroupSpool[$value]['cost_book'] = $valx['cost_book'];
+						$ArrGroupSpool[$value]['gudang'] = $valx['gudang'];
+						$ArrGroupSpool[$value]['kode_spool'] = $valx['kode_spool'];
 
-					$ArrGroupOutSpool[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupOutSpool[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupOutSpool[$value]['no_so'] 	= $valx['no_so'];
-					$ArrGroupOutSpool[$value]['product'] = $valx['product'];
-					$ArrGroupOutSpool[$value]['no_spk'] = $valx['no_spk'];
-					$ArrGroupOutSpool[$value]['kode_trans'] = $valx['kode_trans'];
-					$ArrGroupOutSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
-					$ArrGroupOutSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupOutSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
-					$ArrGroupOutSpool[$value]['nilai_wip'] = $valx['nilai_wip'];
-					$ArrGroupOutSpool[$value]['material'] = $valx['material'];
-					$ArrGroupOutSpool[$value]['wip_direct'] = $valx['wip_direct'];
-					$ArrGroupOutSpool[$value]['wip_indirect'] = $valx['wip_indirect'];
-					$ArrGroupOutSpool[$value]['wip_consumable'] = $valx['wip_consumable'];
-					$ArrGroupOutSpool[$value]['wip_foh'] = $valx['wip_foh'];
-					$ArrGroupOutSpool[$value]['created_by'] = $username;
-					$ArrGroupOutSpool[$value]['created_date'] = $datetime;
-					$ArrGroupOutSpool[$value]['id_trans'] = $valx['id_trans'];
-					$ArrGroupOutSpool[$value]['id_pro'] = $valx['id_pro'];
-					$ArrGroupOutSpool[$value]['qty_ke'] = $valx['qty_ke'];
-					$ArrGroupOutSpool[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupOutSpool[$value]['jenis'] = 'out';
-					$ArrGroupOutSpool[$value]['id_material'] = $valx['id_material'];
-					$ArrGroupOutSpool[$value]['nm_material'] = $valx['nm_material'];
-					$ArrGroupOutSpool[$value]['qty_mat'] = $valx['qty_mat'];
-					$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
-					$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
-					$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
+						$ArrGroupOutSpool[$value]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutSpool[$value]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutSpool[$value]['no_so'] 	= $valx['no_so'];
+						$ArrGroupOutSpool[$value]['product'] = $valx['product'];
+						$ArrGroupOutSpool[$value]['no_spk'] = $valx['no_spk'];
+						$ArrGroupOutSpool[$value]['kode_trans'] = $valx['kode_trans'];
+						$ArrGroupOutSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
+						$ArrGroupOutSpool[$value]['qty'] = $valx['qty'];
+						$ArrGroupOutSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
+						$ArrGroupOutSpool[$value]['nilai_wip'] = $valx['nilai_wip'];
+						$ArrGroupOutSpool[$value]['material'] = $valx['material'];
+						$ArrGroupOutSpool[$value]['wip_direct'] = $valx['wip_direct'];
+						$ArrGroupOutSpool[$value]['wip_indirect'] = $valx['wip_indirect'];
+						$ArrGroupOutSpool[$value]['wip_consumable'] = $valx['wip_consumable'];
+						$ArrGroupOutSpool[$value]['wip_foh'] = $valx['wip_foh'];
+						$ArrGroupOutSpool[$value]['created_by'] = $username;
+						$ArrGroupOutSpool[$value]['created_date'] = $datetime;
+						$ArrGroupOutSpool[$value]['id_trans'] = $valx['id_trans'];
+						$ArrGroupOutSpool[$value]['id_pro'] = $valx['id_pro'];
+						$ArrGroupOutSpool[$value]['qty_ke'] = $valx['qty_ke'];
+						$ArrGroupOutSpool[$value]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutSpool[$value]['jenis'] = 'out';
+						$ArrGroupOutSpool[$value]['id_material'] = $valx['id_material'];
+						$ArrGroupOutSpool[$value]['nm_material'] = $valx['nm_material'];
+						$ArrGroupOutSpool[$value]['qty_mat'] = $valx['qty_mat'];
+						$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
+						$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
+						$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
 
-					$id_trans = $valx['id_trans'];
+						$id_trans = $valx['id_trans'];
+					}
 				}
+			}
+
+			if(!empty($ArrGroup)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOut)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+			}
+			
+			if(!empty($ArrGroupMaterial)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOutMaterial)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
+			}
+
+			if(!empty($ArrGroupSpool)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOutSpool)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
 			}
 		}
 
-		if(!empty($ArrGroup)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOut)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
-		}
-		
-		if(!empty($ArrGroupMaterial)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOutMaterial)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
-		}
-
-		if(!empty($ArrGroupSpool)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOutSpool)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
-		}
-	}
+    }
 
 	public function close_jurnal_in_customer($kode_delivery){
 		$data 			= $this->input->post();
@@ -6420,7 +6422,7 @@ class Delivery extends CI_Controller
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,kode_trans,no_spk,id_trans,qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
 			
 			$totalfg =0;
 			  
@@ -6434,7 +6436,7 @@ class Delivery extends CI_Controller
 				$keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$id          = $idtrans;
                	$no_request  = $data->no_spk;	
-				
+				$noso        = $data->no_so; 
 				
 				$finishgood    	= $data->finishgood;
 				
@@ -6461,7 +6463,7 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coaintransit,
 					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => $finishgood,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
@@ -6476,13 +6478,29 @@ class Delivery extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => 'FINISHED GOOD - INTRANSIT',
-					  'no_reff'       => $id,
+					  'no_reff'       => $id.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					 );
+
+
+					 $kode_trans = $data->kode_trans;
+					 $nospk      = $data->no_spk;
+					 $qty1        = $data->qty;
+
+					 if ($qty1==null){
+					 $qty=1;	
+					 }else{
+					 $qty=$qty1;	
+					 }
+				    
+					if (!empty($nm_material)){
+                      $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+				    }
+					
 					  	
 				
 				
@@ -6518,8 +6536,85 @@ class Delivery extends CI_Controller
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
+
+			$wipgroup = $this->db->query("SELECT * FROM data_erp_in_transit WHERE kode_trans ='".$kode_trans."' AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();	
+			$kodetrans = $wipgroup->kode_trans;
+			$Date      = $wipgroup->tanggal;
+			$so        = $wipgroup->no_so;
+			$spk       = $wipgroup->no_spk;
+			$product   = $wipgroup->product;
+
+			$stokfg = $this->db->query("SELECT
+										`data_erp_fg`.`id` AS `id`,
+										`data_erp_fg`.`tanggal` AS `tanggal`,
+										`data_erp_fg`.`keterangan` AS `keterangan`,
+										`data_erp_fg`.`no_so` AS `no_so`,
+										`data_erp_fg`.`product` AS `product`,
+										`data_erp_fg`.`no_spk` AS `no_spk`,
+										`data_erp_fg`.`kode_trans` AS `kode_trans`,
+										`data_erp_fg`.`id_pro_det` AS `id_pro_det`,
+										sum(`data_erp_fg`.`qty`) AS `total`,
+										`data_erp_fg`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_fg`.`material` AS `material`,
+										`data_erp_fg`.`wip_direct` AS `wip_direct`,
+										`data_erp_fg`.`wip_indirect` AS `wip_indirect`,
+										`data_erp_fg`.`wip_consumable` AS `wip_consumable`,
+										`data_erp_fg`.`wip_foh` AS `wip_foh`,
+										`data_erp_fg`.`created_by` AS `created_by`,
+										`data_erp_fg`.`created_date` AS `created_date`,
+										`data_erp_fg`.`id_trans` AS `id_trans`,
+										`data_erp_fg`.`jenis` AS `jenis`,
+										`data_erp_fg`.`id_material` AS `id_material`,
+										`data_erp_fg`.`nm_material` AS `nm_material`,
+										`data_erp_fg`.`qty_mat` AS `qty_mat`,
+										`data_erp_fg`.`cost_book` AS `cost_book`,
+										`data_erp_fg`.`gudang` AS `gudang`,
+										`data_erp_fg`.`kode_spool` AS `kode_spool` 
+										FROM
+										`data_erp_fg` 
+										WHERE
+										(`data_erp_fg`.`kode_trans` = '".$kodetrans."') 
+										AND (`data_erp_fg`.`jenis`='out')
+										AND (`data_erp_fg`.`tanggal` = '".$Date."')
+										GROUP BY kode_trans,no_spk,product,no_so")->result();
+
+			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_intransit WHERE kode_trans ='".$kodetrans."' 
+			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+
+			if(!empty($cekstok)){
+				foreach ($stokfg as $vals) {
+				$qty = 	$vals->total;
+				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				}
+			}else{
+			$datastokfg=array();
+				foreach ($stokfg as $vals) {
+				$datastokfg = array(
+							'tanggal' => $tgl_voucher,
+							'keterangan' => 'FG To Intransit',
+							'no_so' => $vals->no_so,
+							'product' => $vals->product,
+							'no_spk' => $vals->no_spk,
+							'kode_trans' => $vals->kode_trans,
+							'id_pro_det' => $vals->id_pro_det,
+							'qty' => $vals->total,
+							'nilai_wip' => $vals->nilai_wip,
+							'material' => $vals->material,
+							'wip_direct' =>  $vals->wip_direct,
+							'wip_indirect' =>  $vals->wip_indirect,
+							'wip_consumable' =>  $vals->wip_consumable,
+							'wip_foh' =>  $vals->wip_foh,
+							'created_by' => $vals->created_by,
+							'created_date' => $vals->created_date,
+							'id_trans' => $vals->id_trans,
+							);
+
+				$this->db->insert('warehouse_stock_intransit',$datastokfg);
+				}
+
+			}
 		  
-		}
+	}
 
 
 
