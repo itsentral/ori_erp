@@ -2334,7 +2334,7 @@ class Warehouse_model extends CI_Model {
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				$GudangFrom2 = $id_tujuan;
 				
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
@@ -2594,7 +2594,7 @@ class Warehouse_model extends CI_Model {
 
 			//UPDATE NOMOR SURAT JALAN
 			$monthYear 		= date('/m/Y');
-			$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang_dari);
+			$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang_dari); 
 
 			$qIPP			= "SELECT MAX(no_surat_jalan) as maxP FROM warehouse_adjustment WHERE no_surat_jalan LIKE '%/IA".$kode_gudang.$monthYear."' ";
 			$numrowIPP		= $this->db->query($qIPP)->num_rows();
