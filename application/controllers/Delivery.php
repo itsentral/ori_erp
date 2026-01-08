@@ -6489,7 +6489,13 @@ class Delivery extends CI_Controller
 
 					 $kode_trans = $data->kode_trans;
 					 $nospk      = $data->no_spk;
-					 $qty        = $data->qty;
+					 $qty1        = $data->qty;
+
+					 if ($qty1==null){
+					 $qty=1;	
+					 }else{
+					 $qty=$qty1;	
+					 }
 				    
 					if (!empty($nm_material)){
                       $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
