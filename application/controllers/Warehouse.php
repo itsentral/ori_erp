@@ -1723,10 +1723,6 @@ class Warehouse extends CI_Controller {
          
 			
 
-
-			print_r($ArrUpdateStock);
-			exit;
-
 			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
 		}
 		//UPDATE NOMOR SURAT JALAN
