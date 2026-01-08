@@ -1908,7 +1908,36 @@ class Warehouse extends CI_Controller {
 		$nomor = 999;
 		if(!empty($requesta_add)){
 			foreach ($requesta_add as $key => $value) { $nomor++;
+
+				//ambil saldo akhir 
+				$key = $value['id_material'];
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$PRICE=0;
+				$bmunit = 0;
+				$bm = 0;
+          
+                $qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook)) $PRICE=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+				
 				$TERPAKAI = str_replace(',','',$value['terpakai']);
+
+				$PRICENEW = (($PRICE*$TERPAKAI) + ($PRICE2*$stokjurnalakhir2))/($TERPAKAI+$stokjurnalakhir2);
+				
 				$ArrRequest[$key]['kode_spk'] = $kode_spk;
 				$ArrRequest[$key]['kode_trans'] = $kode_trans;
 				$ArrRequest[$key]['hist_produksi'] = $hist_produksi;
@@ -1923,6 +1952,9 @@ class Warehouse extends CI_Controller {
 
 				$ArrUpdateStock[$nomor]['id'] 	= $value['actual_type'];
 				$ArrUpdateStock[$nomor]['qty'] 	= $TERPAKAI;
+				$ArrUpdateStock[$nomor]['harga_pusat'] 	    = $PRICE;
+				$ArrUpdateStock[$nomor]['harga_tujuan'] 	= $PRICE2;
+				$ArrUpdateStock[$nomor]['harga_baru'] 	    = $PRICENEW;
 
 				$ArrRequestHist[$key]['kode_spk'] = $kode_spk;
 				$ArrRequestHist[$key]['kode_trans'] = $kode_trans;
@@ -1952,8 +1984,40 @@ class Warehouse extends CI_Controller {
 					$ArrEditAdd[$key]['created_by'] 	= $username;
 					$ArrEditAdd[$key]['created_date'] 	= $datetime;
 
+
+					//ambil saldo akhir 
+					$key = $getLastQty[0]->id_material;
+					$stokjurnalakhir=0;
+					$nilaijurnalakhir=0;
+					$PRICE=0;
+					$bmunit = 0;
+					$bm = 0;
+			
+					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+					
+					
+					if(!empty($costbook)) $PRICE=$costbook->harga;
+					if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+					if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+					$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+					$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+					
+					
+					if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+					if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+					if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+					
+					
+					$PRICENEW = (($PRICE*$TERPAKAI) + ($PRICE2*$stokjurnalakhir2))/($TERPAKAI+$stokjurnalakhir2);
+
 					$ArrUpdateStock[$nomor]['id'] 	= $value['actual_type2'];
 					$ArrUpdateStock[$nomor]['qty'] 	= $TERPAKAI;
+					$ArrUpdateStock[$nomor]['harga_pusat'] 	    = $PRICE;
+					$ArrUpdateStock[$nomor]['harga_tujuan'] 	= $PRICE2;
+					$ArrUpdateStock[$nomor]['harga_baru'] 	    = $PRICENEW;
 
 					$UNIQ = '9999'.$key;
 					$ArrRequestHist[$UNIQ]['kode_spk'] = $kode_spk;
@@ -2074,9 +2138,42 @@ class Warehouse extends CI_Controller {
 										$ArrUpdate[$key.$key2.$key3.$nomor]['spk2_date']	= $datetime;
 										// $ArrUpdate[$key.$key2.$key3.$nomor]['gudang2']	= $id_gudang;
 
+										$key = $ACTUAL_MAT;
+										$stokjurnalakhir=0;
+										$nilaijurnalakhir=0;
+										$PRICE=0;
+										$bmunit = 0;
+										$bm = 0;
+								
+										$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+										$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+										
+										
+										if(!empty($costbook)) $PRICE=$costbook->harga;
+										if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+										if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+										$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+										$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+										
+										
+										if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+										if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+										if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+										
+										if($total_act+$stokjurnalakhir2 != 0){
+										$PRICENEW = (($PRICE*$total_act) + ($PRICE2*$stokjurnalakhir2))/($total_act+$stokjurnalakhir2);
+									    } else {
+										$PRICENEW = ($PRICE*$total_act);
+										}
+
 										//ARRAY STOCK
 										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
 										$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
+										$ArrUpdateStock[$nomor]['harga_pusat'] 	    = $PRICE;
+										$ArrUpdateStock[$nomor]['harga_tujuan'] 	= $PRICE2;
+										$ArrUpdateStock[$nomor]['harga_baru'] 	    = $PRICENEW;
 										//UPDATE ADJUSTMENT DETAIL
 										$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
 										$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
