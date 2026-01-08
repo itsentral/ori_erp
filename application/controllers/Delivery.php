@@ -5614,7 +5614,7 @@ class Delivery extends CI_Controller
 				}
 
 				if($valx['sts_product'] == 'field joint'){
-					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_jointx',array('id'=>$valx['id_uniq']))->result_array();
+					$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 					$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
