@@ -1131,7 +1131,7 @@ class Warehouse extends CI_Controller {
 			foreach ($requesta_add as $key => $value) { $nomor++;
 
 				//ambil saldo akhir 
-				$key = $value['id_material'];		
+				$key = $value['id_material'];
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
 				$PRICE=0;
@@ -1153,7 +1153,7 @@ class Warehouse extends CI_Controller {
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				
 				$TERPAKAI = str_replace(',','',$value['terpakai']);
 
@@ -1229,7 +1229,7 @@ class Warehouse extends CI_Controller {
 					
 					if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 					if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-					if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+					if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 					
 					
 					$PRICENEW = (($PRICE*$TERPAKAI) + ($PRICE2*$stokjurnalakhir2))/($TERPAKAI+$stokjurnalakhir2);
@@ -1389,11 +1389,13 @@ class Warehouse extends CI_Controller {
 										
 										if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 										if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-										if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+										if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 										
-										
+										if($total_act+$stokjurnalakhir2 != 0){
 										$PRICENEW = (($PRICE*$total_act) + ($PRICE2*$stokjurnalakhir2))/($total_act+$stokjurnalakhir2);
-
+									    } else {
+										$PRICENEW = ($PRICE*$total_act);
+										}
 										//ARRAY STOCK
 										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
 										$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
@@ -1568,6 +1570,27 @@ class Warehouse extends CI_Controller {
 					if(!empty($harga_jurnal_akhir)) $PRICE=$harga_jurnal_akhir->harga;			
 					
 				}
+
+
+				//ambil saldo akhir 
+				$key = $value['id_material'];		
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$PRICE=0;
+				$bmunit = 0;
+				$bm = 0;
+          
+                $qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook)) $PRICE=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+				
+
 					
 					$QTY_OKE  = $tempx[$value['id']]['good'];
 					$ACTUAL_MAT = $id_material;
@@ -1641,13 +1664,26 @@ class Warehouse extends CI_Controller {
 					
 				}
 					
-					$stok_akhir = $nilaijurnalakhir2+($PRICE*$QTY_OKE);
+					// $stok_akhir = $nilaijurnalakhir2+($PRICE*$QTY_OKE);
 					
-					if($stok_akhir==0){
-						$PRICENEW = 0;
-					} else{
-					$PRICENEW = $stok_akhir/($QTY_OKE+$stokjurnalakhir2);
-					}
+					// if($stok_akhir==0){
+					// 	$PRICENEW = 0;
+					// } else{
+					// $PRICENEW = $stok_akhir/($QTY_OKE+$stokjurnalakhir2);
+					// }
+
+
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_wip, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+				
+				
+
+				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 					
 					
 					
