@@ -1573,7 +1573,7 @@ class Warehouse extends CI_Controller {
 
 
 				//ambil saldo akhir 
-				$key = $value['id_material'];		
+				$key = $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];		
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
 				$PRICE=0;
