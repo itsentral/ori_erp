@@ -6537,7 +6537,7 @@ class Delivery extends CI_Controller
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 
-			$wipgroup = $this->db->query("SELECT * FROM data_erp_in_transit WHERE id_trans ='".$idtrans."' limit 1")->row();	
+			$wipgroup = $this->db->query("SELECT * FROM data_erp_in_transit WHERE kode_trans ='".$kode_trans."' AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();	
 			$kodetrans = $wipgroup->kode_trans;
 			$Date      = $wipgroup->tanggal;
 			$so        = $wipgroup->no_so;
