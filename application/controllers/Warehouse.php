@@ -1306,6 +1306,7 @@ class Warehouse extends CI_Controller {
 										//ARRAY STOCK
 										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
 										$ArrUpdateStock[$nomor]['qty'] 	= $total_act;
+										
 										//UPDATE ADJUSTMENT DETAIL
 										$ArrDeatil[$key.$key2.$key3.$nomor]['id'] 			    = $value3['id'];
 										$ArrDeatil[$key.$key2.$key3.$nomor]['id_material'] 		= $ACTUAL_MAT;
@@ -1584,6 +1585,10 @@ class Warehouse extends CI_Controller {
 					$ArrJurnalNew2[$value['id']]['no_jurnal'] 			= '-';
 					$ArrJurnalNew2[$value['id']]['coa_gudang'] 		    = $coa_gudang2;
 			}
+            $nomor = 999;
+			$ArrUpdateStock[$nomor]['harga_pusat'] 	    = $PRICE;
+			$ArrUpdateStock[$nomor]['harga_tujuan'] 	= $PRICE2;
+			$ArrUpdateStock[$nomor]['harga_baru'] 	    = $PRICENEW;
 
 			move_warehouse($ArrUpdateStock,$id_gudang,$id_gudang_wip,$kode_trans);
 		}
@@ -3411,7 +3416,7 @@ class Warehouse extends CI_Controller {
 			'dated' 	=> date('ymdhis', strtotime($result_header[0]->created_date)),
 			'resv' 		=> date('d F Y', strtotime($result_header[0]->created_date)),
 			'GET_USERNAME' => get_detail_user(),
-			'DETAIL_MATERIAL' => get_detailAktualAdjustmentCheck()
+			'DETAIL_MATERIAL' => get_detailAktualAdjustmentCheck() 
 
 		);
 
