@@ -1155,10 +1155,11 @@ class Warehouse extends CI_Controller {
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				
-				
-				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
-
 				$TERPAKAI = str_replace(',','',$value['terpakai']);
+
+				$PRICENEW = (($PRICE*$TERPAKAI) + ($PRICE2*$stokjurnalakhir2))/($TERPAKAI+$stokjurnalakhir2);
+
+				
 				$ArrRequest[$key]['kode_spk'] = $kode_spk;
 				$ArrRequest[$key]['kode_trans'] = $kode_trans;
 				$ArrRequest[$key]['hist_produksi'] = $hist_produksi;
@@ -1231,7 +1232,7 @@ class Warehouse extends CI_Controller {
 					if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 					
 					
-					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+					$PRICENEW = (($PRICE*$TERPAKAI) + ($PRICE2*$stokjurnalakhir2))/($TERPAKAI+$stokjurnalakhir2);
 
 					$ArrUpdateStock[$nomor]['id'] 	= $value['actual_type2'];
 					$ArrUpdateStock[$nomor]['qty'] 	= $TERPAKAI;
@@ -1391,7 +1392,7 @@ class Warehouse extends CI_Controller {
 										if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 										
 										
-										$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+										$PRICENEW = (($PRICE*$total_act) + ($PRICE2*$stokjurnalakhir2))/($total_act+$stokjurnalakhir2);
 
 										//ARRAY STOCK
 										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
