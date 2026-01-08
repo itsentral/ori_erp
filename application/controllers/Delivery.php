@@ -5803,103 +5803,105 @@ class Delivery extends CI_Controller
 			}
 		
 
-		//DATA SPOOL
-		//GROUP DATA
-		$ArrGroupSpool = []; 
-		$ArrGroupOutSpool = [];
-		$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
-		$ArrSpool = [];
-		foreach ($ArrProSpool as $key => $value) {
-			$ArrSpool[] = $value['spool_induk'];
-		}
+			//DATA SPOOL
+			//GROUP DATA
+			$ArrGroupSpool = []; 
+			$ArrGroupOutSpool = [];
+			$ArrProSpool = $this->db->select('spool_induk')->group_by('spool_induk')->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'spool_induk !='=>NULL))->result_array();
+			$ArrSpool = [];
+			foreach ($ArrProSpool as $key => $value) {
+				$ArrSpool[] = $value['spool_induk'];
+			}
 
-		if(!empty($ArrSpool)){
-			$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
-			if(!empty($getAllSpool)){
-				foreach ($getAllSpool as $value => $valx) {
-					$ArrGroupSpool[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupSpool[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupSpool[$value]['no_so'] 	= $valx['no_so'];
-					$ArrGroupSpool[$value]['product'] = $valx['product'];
-					$ArrGroupSpool[$value]['no_spk'] = $valx['no_spk'];
-					$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
-					$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
-					$ArrGroupSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
-					$ArrGroupSpool[$value]['created_by'] = $username;
-					$ArrGroupSpool[$value]['created_date'] = $datetime;
-					$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
-					$ArrGroupSpool[$value]['id_pro'] = $valx['id_pro'];
-					$ArrGroupSpool[$value]['qty_ke'] = $valx['qty_ke'];
-					$ArrGroupSpool[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupSpool[$value]['id_material'] = $valx['id_material'];
-					$ArrGroupSpool[$value]['nm_material'] = $valx['nm_material'];
-					$ArrGroupSpool[$value]['qty_mat'] = $valx['qty_mat'];
-					$ArrGroupSpool[$value]['cost_book'] = $valx['cost_book'];
-					$ArrGroupSpool[$value]['gudang'] = $valx['gudang'];
-					$ArrGroupSpool[$value]['kode_spool'] = $valx['kode_spool'];
+			if(!empty($ArrSpool)){
+				$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
+				if(!empty($getAllSpool)){
+					foreach ($getAllSpool as $value => $valx) {
+						$ArrGroupSpool[$value]['tanggal'] = date('Y-m-d');
+						$ArrGroupSpool[$value]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupSpool[$value]['no_so'] 	= $valx['no_so'];
+						$ArrGroupSpool[$value]['product'] = $valx['product'];
+						$ArrGroupSpool[$value]['no_spk'] = $valx['no_spk'];
+						$ArrGroupSpool[$value]['kode_trans'] = $valx['kode_trans'];
+						$ArrGroupSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
+						$ArrGroupSpool[$value]['qty'] = $valx['qty'];
+						$ArrGroupSpool[$value]['nilai_unit'] = $valx['nilai_wip'];
+						$ArrGroupSpool[$value]['created_by'] = $username;
+						$ArrGroupSpool[$value]['created_date'] = $datetime;
+						$ArrGroupSpool[$value]['id_trans'] = $valx['id_trans'];
+						$ArrGroupSpool[$value]['id_pro'] = $valx['id_pro'];
+						$ArrGroupSpool[$value]['qty_ke'] = $valx['qty_ke'];
+						$ArrGroupSpool[$value]['kode_delivery'] = $kode_delivery;
+						$ArrGroupSpool[$value]['id_material'] = $valx['id_material'];
+						$ArrGroupSpool[$value]['nm_material'] = $valx['nm_material'];
+						$ArrGroupSpool[$value]['qty_mat'] = $valx['qty_mat'];
+						$ArrGroupSpool[$value]['cost_book'] = $valx['cost_book'];
+						$ArrGroupSpool[$value]['gudang'] = $valx['gudang'];
+						$ArrGroupSpool[$value]['kode_spool'] = $valx['kode_spool'];
 
-					$ArrGroupOutSpool[$value]['tanggal'] = date('Y-m-d');
-					$ArrGroupOutSpool[$value]['keterangan'] = 'Finish Good to In Transit';
-					$ArrGroupOutSpool[$value]['no_so'] 	= $valx['no_so'];
-					$ArrGroupOutSpool[$value]['product'] = $valx['product'];
-					$ArrGroupOutSpool[$value]['no_spk'] = $valx['no_spk'];
-					$ArrGroupOutSpool[$value]['kode_trans'] = $valx['kode_trans'];
-					$ArrGroupOutSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
-					$ArrGroupOutSpool[$value]['qty'] = $valx['qty'];
-					$ArrGroupOutSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
-					$ArrGroupOutSpool[$value]['nilai_wip'] = $valx['nilai_wip'];
-					$ArrGroupOutSpool[$value]['material'] = $valx['material'];
-					$ArrGroupOutSpool[$value]['wip_direct'] = $valx['wip_direct'];
-					$ArrGroupOutSpool[$value]['wip_indirect'] = $valx['wip_indirect'];
-					$ArrGroupOutSpool[$value]['wip_consumable'] = $valx['wip_consumable'];
-					$ArrGroupOutSpool[$value]['wip_foh'] = $valx['wip_foh'];
-					$ArrGroupOutSpool[$value]['created_by'] = $username;
-					$ArrGroupOutSpool[$value]['created_date'] = $datetime;
-					$ArrGroupOutSpool[$value]['id_trans'] = $valx['id_trans'];
-					$ArrGroupOutSpool[$value]['id_pro'] = $valx['id_pro'];
-					$ArrGroupOutSpool[$value]['qty_ke'] = $valx['qty_ke'];
-					$ArrGroupOutSpool[$value]['kode_delivery'] = $kode_delivery;
-					$ArrGroupOutSpool[$value]['jenis'] = 'out';
-					$ArrGroupOutSpool[$value]['id_material'] = $valx['id_material'];
-					$ArrGroupOutSpool[$value]['nm_material'] = $valx['nm_material'];
-					$ArrGroupOutSpool[$value]['qty_mat'] = $valx['qty_mat'];
-					$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
-					$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
-					$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
+						$ArrGroupOutSpool[$value]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutSpool[$value]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutSpool[$value]['no_so'] 	= $valx['no_so'];
+						$ArrGroupOutSpool[$value]['product'] = $valx['product'];
+						$ArrGroupOutSpool[$value]['no_spk'] = $valx['no_spk'];
+						$ArrGroupOutSpool[$value]['kode_trans'] = $valx['kode_trans'];
+						$ArrGroupOutSpool[$value]['id_pro_det'] = $valx['id_pro_det'];
+						$ArrGroupOutSpool[$value]['qty'] = $valx['qty'];
+						$ArrGroupOutSpool[$value]['nilai_unit'] = $valx['nilai_unit'];
+						$ArrGroupOutSpool[$value]['nilai_wip'] = $valx['nilai_wip'];
+						$ArrGroupOutSpool[$value]['material'] = $valx['material'];
+						$ArrGroupOutSpool[$value]['wip_direct'] = $valx['wip_direct'];
+						$ArrGroupOutSpool[$value]['wip_indirect'] = $valx['wip_indirect'];
+						$ArrGroupOutSpool[$value]['wip_consumable'] = $valx['wip_consumable'];
+						$ArrGroupOutSpool[$value]['wip_foh'] = $valx['wip_foh'];
+						$ArrGroupOutSpool[$value]['created_by'] = $username;
+						$ArrGroupOutSpool[$value]['created_date'] = $datetime;
+						$ArrGroupOutSpool[$value]['id_trans'] = $valx['id_trans'];
+						$ArrGroupOutSpool[$value]['id_pro'] = $valx['id_pro'];
+						$ArrGroupOutSpool[$value]['qty_ke'] = $valx['qty_ke'];
+						$ArrGroupOutSpool[$value]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutSpool[$value]['jenis'] = 'out';
+						$ArrGroupOutSpool[$value]['id_material'] = $valx['id_material'];
+						$ArrGroupOutSpool[$value]['nm_material'] = $valx['nm_material'];
+						$ArrGroupOutSpool[$value]['qty_mat'] = $valx['qty_mat'];
+						$ArrGroupOutSpool[$value]['cost_book'] = $valx['cost_book'];
+						$ArrGroupOutSpool[$value]['gudang'] = $valx['gudang'];
+						$ArrGroupOutSpool[$value]['kode_spool'] = $valx['kode_spool'];
 
-					$id_trans = $valx['id_trans'];
+						$id_trans = $valx['id_trans'];
+					}
 				}
+			}
+
+			if(!empty($ArrGroup)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOut)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+			}
+			
+			if(!empty($ArrGroupMaterial)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOutMaterial)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
+			}
+
+			if(!empty($ArrGroupSpool)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
+				$this->jurnalIntransit($kode_delivery);
+			}
+
+			if(!empty($ArrGroupOutSpool)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
 			}
 		}
 
-		if(!empty($ArrGroup)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOut)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
-		}
-		
-		if(!empty($ArrGroupMaterial)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOutMaterial)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
-		}
-
-		if(!empty($ArrGroupSpool)){
-			$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
-			$this->jurnalIntransit($kode_delivery);
-		}
-
-		if(!empty($ArrGroupOutSpool)){
-			$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
-		}
-	}
+    }
 
 	public function close_jurnal_in_customer($kode_delivery){
 		$data 			= $this->input->post();
