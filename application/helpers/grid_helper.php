@@ -6172,7 +6172,7 @@
 			$rest_pusat = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key))->result();
             
 			//ambil saldo akhir 
-				$key = $value['id_material'];
+				
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
 				$PRICE=0;
