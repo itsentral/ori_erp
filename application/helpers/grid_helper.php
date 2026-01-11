@@ -6129,7 +6129,7 @@
 			$kd_gudang_ke 	= get_name('warehouse', 'kode', 'id', $id_gudang_ke);
 		}
 		//grouping sum
-		$temp = [];
+		$temp = []; 
 		$temp2 = [];
 		// $value_qty = 0;
 		foreach($ArrUpdateStock as $value) {		
@@ -6139,13 +6139,21 @@
 				// $value_qty += $value['qty'];
 			}
 			
-			// $temp2[$value['id']] += $value['qty'];
-			  $temp[$value['id']] = [
-				'qty'          => $value['qty'],
+			  $temp2[$value['id']] += $value['qty'];
+
+			  foreach ($temp2 as $key => $value) {
+			   $qty = $value;
+			  }
+
+			  $temp[$value['id']] = 
+			  [
+				'qty'          => $qty,
 				'harga_pusat'  => $value['harga_pusat'], 
 				'harga_tujuan' => $value['harga_tujuan'],
 				'harga_baru'   => $value['harga_baru'],
-			];
+			  ];
+
+			 
 			
 		}
 
