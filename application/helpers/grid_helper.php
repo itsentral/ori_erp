@@ -6118,7 +6118,7 @@
 		
 	}
 
-	function move_warehouse2($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
+	function move_warehouse($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
 		$CI 	=& get_instance();
 		$dateTime		= date('Y-m-d H:i:s');
 		$UserName 		= $CI->session->userdata['ORI_User']['username'];
@@ -6417,7 +6417,7 @@
 		
 	}
 
-	function move_warehouse($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
+	function move_warehouse2($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
 		$CI 	=& get_instance();
 		$dateTime		= date('Y-m-d H:i:s');
 		$UserName 		= $CI->session->userdata['ORI_User']['username'];
