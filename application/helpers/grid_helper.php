@@ -6118,7 +6118,7 @@
 		
 	}
 
-	function move_warehouse($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
+	function move_warehouse2($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
 		$CI 	=& get_instance();
 		$dateTime		= date('Y-m-d H:i:s');
 		$UserName 		= $CI->session->userdata['ORI_User']['username'];
@@ -6381,11 +6381,11 @@
 			}
 		}
 
-		print_r($ArrStock);
-		print_r($ArrStockInsert);
-		print_r($ArrStock2);
-		print_r($ArrStockInsert2);
-		exit;
+		// print_r($ArrStock);
+		// print_r($ArrStockInsert);
+		// print_r($ArrStock2);
+		// print_r($ArrStockInsert2);
+		// exit;
 
 		if(!empty($ArrStock)){
 			$CI->db->update_batch('warehouse_stock', $ArrStock, 'id');
@@ -6417,7 +6417,7 @@
 		
 	}
 
-	function move_warehouse2($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
+	function move_warehouse($ArrUpdateStock=null, $id_gudang_dari=null, $id_gudang_ke=null, $kode_delivery=null){
 		$CI 	=& get_instance();
 		$dateTime		= date('Y-m-d H:i:s');
 		$UserName 		= $CI->session->userdata['ORI_User']['username'];
