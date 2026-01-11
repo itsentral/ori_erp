@@ -6188,23 +6188,7 @@
 				
 				if(!empty($costbook)) $PRICE=$costbook->harga;
 				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
-				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
-
-
-				$qty_akhir2 = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
-				$costbook2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
-				
-				
-				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
-				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
-				
-				
-                if($value+$stokjurnalakhir2 != 0){
-				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
-				}else{
-				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2));
-				}
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;				
 				
 
 				
@@ -6294,6 +6278,21 @@
 			//PENAMBAHAN GUDANG
 			if($id_gudang_ke != null){
 				$rest_pusat = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key))->result();
+                
+				$qty_akhir2 = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
+				$costbook2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
+				
+				
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+				
+				
+                if($value+$stokjurnalakhir2 != 0){
+				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
+				}else{
+				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2));
+				}
 
 				if(!empty($rest_pusat)){
 					$ArrStock2[$key]['id'] 			= $rest_pusat[0]->id;
