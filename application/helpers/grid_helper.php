@@ -6178,6 +6178,9 @@
 				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
+				$PRICE2=0;
+				$stokjurnalakhir2=0;
+				$nilaijurnalakhir2=0;
           
                 $qty_akhir = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
 				$costbook = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
