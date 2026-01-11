@@ -6200,8 +6200,12 @@
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				
 				
-
+                if($value+$stokjurnalakhir2 != 0){
 				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
+				}else{
+				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2));
+				}
+				
 
 				
 			if(!empty($rest_pusat)){
