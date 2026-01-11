@@ -6139,9 +6139,10 @@
 				// $value_qty += $value['qty'];
 			}
 			
-			
-			 $qty += $value['qty'];
-			  
+			  $temp2[$value['id']] += $value['qty'];
+
+			 print_r($temp2[$value['id']]);
+			 exit;
 
 			  $temp[$value['id']] = 
 			  [
