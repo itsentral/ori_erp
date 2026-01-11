@@ -6381,11 +6381,11 @@
 			}
 		}
 
-		// print_r($ArrStock);
-		// print_r($ArrStockInsert);
-		// print_r($ArrStock2);
-		// print_r($ArrStockInsert2);
-		// exit;
+		print_r($ArrStock);
+		print_r($ArrStockInsert);
+		print_r($ArrStock2);
+		print_r($ArrStockInsert2);
+		exit;
 
 		if(!empty($ArrStock)){
 			$CI->db->update_batch('warehouse_stock', $ArrStock, 'id');
