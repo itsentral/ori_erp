@@ -6139,11 +6139,9 @@
 				// $value_qty += $value['qty'];
 			}
 			
-			  $temp2[$value['id']] += $value['qty'];
-
-			  foreach ($temp2 as $key1 => $value1) {
-			   $qty = $value1;
-			  }
+			
+			 $qty += $value['qty'];
+			  
 
 			  $temp[$value['id']] = 
 			  [
