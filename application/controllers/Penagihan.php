@@ -4265,6 +4265,111 @@ else
 
 			$this->db->query("INSERT INTO data_erp_cogs (tanggal,keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,jenis,id_material,nm_material,qty_mat,cost_book,gudang,kode_spool)			
 			SELECT '".$tgl1."','In customer-COGS',no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,'in',id_material,nm_material,qty_mat,cost_book,gudang,kode_spool FROM data_erp_in_customer WHERE kode_delivery IN (".$kode_delivery.")");
+
+            $wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery IN (".$kode_delivery.") AND jenis = 'out'")->result();
+			
+
+			foreach($wip AS $data){
+                     $nm_material = $data->product;	
+					 $tgl_voucher = $data->tanggal;	
+					 $spasi       = ',';
+					 $keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
+					 $id          = $idtrans;
+					 $no_request  = $idtrans;	
+				     $kode_trans = $data->kode_trans;
+					 $nospk      = $data->no_spk;
+					 $qty1        = $data->qty;
+
+					 if ($qty1==null){
+					 $qty=1;	
+					 }else{
+					 $qty=$qty1;	
+					 }
+				    
+					if (!empty($nm_material)){
+                      $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+				    }
+
+			}
+
+
+
+			$wipgroup = $this->db->query("SELECT * FROM data_erp_cogs WHERE kode_trans ='".$kode_trans."' AND tanggal='".$tgl1."' AND product IS NOT NULL limit 1")->row();	
+			$kodetrans = $wipgroup->kode_trans;
+			$Date      = $wipgroup->tanggal;
+			$so        = $wipgroup->no_so;
+			$spk       = $wipgroup->no_spk;
+			$product   = $wipgroup->product;
+
+			$stokfg = $this->db->query("SELECT
+										`data_erp_in_customer`.`id` AS `id`,
+										`data_erp_in_customer`.`tanggal` AS `tanggal`,
+										`data_erp_in_customer`.`keterangan` AS `keterangan`,
+										`data_erp_in_customer`.`no_so` AS `no_so`,
+										`data_erp_in_customer`.`product` AS `product`,
+										`data_erp_in_customer`.`no_spk` AS `no_spk`,
+										`data_erp_in_customer`.`kode_trans` AS `kode_trans`,
+										`data_erp_in_customer`.`id_pro_det` AS `id_pro_det`,
+										sum(`data_erp_in_customer`.`qty`) AS `total`,
+										`data_erp_in_customer`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_in_customer`.`material` AS `material`,
+										`data_erp_in_customer`.`wip_direct` AS `wip_direct`,
+										`data_erp_in_customer`.`wip_indirect` AS `wip_indirect`,
+										`data_erp_in_customer`.`wip_consumable` AS `wip_consumable`,
+										`data_erp_in_customer`.`wip_foh` AS `wip_foh`,
+										`data_erp_in_customer`.`created_by` AS `created_by`,
+										`data_erp_in_customer`.`created_date` AS `created_date`,
+										`data_erp_in_customer`.`id_trans` AS `id_trans`,
+										`data_erp_in_customer`.`jenis` AS `jenis`,
+										`data_erp_in_customer`.`id_material` AS `id_material`,
+										`data_erp_in_customer`.`nm_material` AS `nm_material`,
+										`data_erp_in_customer`.`qty_mat` AS `qty_mat`,
+										`data_erp_in_customer`.`cost_book` AS `cost_book`,
+										`data_erp_in_customer`.`gudang` AS `gudang`,
+										`data_erp_in_customer`.`kode_spool` AS `kode_spool` 
+										FROM
+										`data_erp_in_customer` 
+										WHERE
+										(`data_erp_in_customer`.`kode_trans` = '".$kodetrans."') 
+										AND (`data_erp_in_customer`.`jenis`='out')
+										AND (`data_erp_in_customer`.`tanggal` = '".$Date."')
+										GROUP BY kode_trans,no_spk,product,no_so")->result();
+
+			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_cogs WHERE kode_trans ='".$kodetrans."' 
+			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+
+			if(!empty($cekstok)){
+				foreach ($stokfg as $vals) {
+				$qty = 	$vals->total;
+				$this->db->query("UPDATE  warehouse_stock_cogs SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				}
+			}else{
+			$datastokfg=array();
+				foreach ($stokfg as $vals) {
+				$datastokfg = array(
+							'tanggal' => $tgl_voucher,
+							'keterangan' => 'Incustomer To Cogs',
+							'no_so' => $vals->no_so,
+							'product' => $vals->product,
+							'no_spk' => $vals->no_spk,
+							'kode_trans' => $vals->kode_trans,
+							'id_pro_det' => $vals->id_pro_det,
+							'qty' => $vals->total,
+							'nilai_wip' => $vals->nilai_wip,
+							'material' => $vals->material,
+							'wip_direct' =>  $vals->wip_direct,
+							'wip_indirect' =>  $vals->wip_indirect,
+							'wip_consumable' =>  $vals->wip_consumable,
+							'wip_foh' =>  $vals->wip_foh,
+							'created_by' => $vals->created_by,
+							'created_date' => $vals->created_date,
+							'id_trans' => $vals->id_trans,
+							);
+
+				$this->db->insert('warehouse_stock_cogs',$datastokfg);
+				}
+
+			}
 			
 		
 		}
