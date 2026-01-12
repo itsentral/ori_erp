@@ -1576,7 +1576,7 @@ class Warehouse extends CI_Controller {
 				$key = $GET_MATERIAL[$ACTUAL_MAT]['idmaterial'];		
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
+				
 				$bmunit = 0;
 				$bm = 0;
           
