@@ -2266,7 +2266,6 @@ class Warehouse_model extends CI_Model {
 						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
 

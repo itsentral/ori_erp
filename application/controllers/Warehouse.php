@@ -1134,7 +1134,6 @@ class Warehouse extends CI_Controller {
 				$key = $value['id_material'];
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
           
@@ -1210,7 +1209,6 @@ class Warehouse extends CI_Controller {
 					$key = $getLastQty[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$PRICE=0;
 					$bmunit = 0;
 					$bm = 0;
 			
@@ -1370,7 +1368,6 @@ class Warehouse extends CI_Controller {
 										$key = $ACTUAL_MAT;
 										$stokjurnalakhir=0;
 										$nilaijurnalakhir=0;
-										$PRICE=0;
 										$bmunit = 0;
 										$bm = 0;
 								
@@ -1913,7 +1910,6 @@ class Warehouse extends CI_Controller {
 				$key = $value['id_material'];
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
           
@@ -1989,7 +1985,6 @@ class Warehouse extends CI_Controller {
 					$key = $getLastQty[0]->id_material;
 					$stokjurnalakhir=0;
 					$nilaijurnalakhir=0;
-					$PRICE=0;
 					$bmunit = 0;
 					$bm = 0;
 			
@@ -2141,7 +2136,6 @@ class Warehouse extends CI_Controller {
 										$key = $ACTUAL_MAT;
 										$stokjurnalakhir=0;
 										$nilaijurnalakhir=0;
-										$PRICE=0;
 										$bmunit = 0;
 										$bm = 0;
 								
