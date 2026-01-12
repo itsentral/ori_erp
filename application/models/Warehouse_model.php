@@ -668,7 +668,7 @@ class Warehouse_model extends CI_Model {
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
 				
 				if($stok_akhir==0){
-					$PRICENEW = 0;
+					$PRICENEW = $PRICE2;
 				} else{
 				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
@@ -773,7 +773,7 @@ class Warehouse_model extends CI_Model {
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
 				
 				if($stok_akhir==0){
-					$PRICENEW = 0;
+					$PRICENEW = $PRICE2;
 				} else{
 				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
@@ -2323,11 +2323,7 @@ class Warehouse_model extends CI_Model {
 				
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-
+			
 				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				
@@ -2337,7 +2333,13 @@ class Warehouse_model extends CI_Model {
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				$GudangFrom2 = $id_tujuan;
 				
+				if($QTY_OKE+$stokjurnalakhir2 != 0){
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				} else {
+				$PRICENEW = ($PRICE2);
+				}
+
+				
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
@@ -5230,7 +5232,7 @@ class Warehouse_model extends CI_Model {
 			'gudang_to' 		=> $detAdjustment[0]['id_gudang_ke'],
 			'kode_spk' 				=> $detAdjustment[0]['kode_spk'],
 			'kode_trans' 				=> $detAdjustment[0]['kode_trans'],
-			'hist_produksi'			=> $detAdjustment[0]['created_date']
+			'hist_produksi'			=> $detAdjustment[0]['created_date'] 
 		);
 		$this->load->view('Warehouse/request_mat_resin', $data);
 	}
