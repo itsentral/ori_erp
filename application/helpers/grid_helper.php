@@ -6291,7 +6291,7 @@
                 if($value+$stokjurnalakhir2 != 0){
 				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
 				}else{
-				$PRICENEW = (($PRICE*$value) + ($PRICE2*$stokjurnalakhir2));
+				$PRICENEW = ($PRICE2);
 				}
 
 				if(!empty($rest_pusat)){
