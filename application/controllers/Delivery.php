@@ -6628,7 +6628,7 @@ class Delivery extends CI_Controller
 		$Date		    = date('Y-m-d'); 
 		
 		
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans, qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
 			
 			$totalfg =0;
