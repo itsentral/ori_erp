@@ -1394,7 +1394,7 @@ class Warehouse extends CI_Controller {
 										if($total_act+$stokjurnalakhir2 != 0){
 										$PRICENEW = (($PRICE*$total_act) + ($PRICE2*$stokjurnalakhir2))/($total_act+$stokjurnalakhir2);
 									    } else {
-										$PRICENEW = ($PRICE*$total_act);
+										$PRICENEW = ($PRICE2);
 										}
 										//ARRAY STOCK
 										$ArrUpdateStock[$nomor]['id'] 	= $ACTUAL_MAT;
@@ -1685,7 +1685,7 @@ class Warehouse extends CI_Controller {
                 if($QTY_OKE+$stokjurnalakhir2 != 0){
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 				} else {
-				$PRICENEW = ($PRICE*$QTY_OKE);
+				$PRICENEW = ($PRICE2);
 				}
 				
 					
@@ -2165,7 +2165,7 @@ class Warehouse extends CI_Controller {
 										if($total_act+$stokjurnalakhir2 != 0){
 										$PRICENEW = (($PRICE*$total_act) + ($PRICE2*$stokjurnalakhir2))/($total_act+$stokjurnalakhir2);
 									    } else {
-										$PRICENEW = ($PRICE*$total_act);
+										$PRICENEW = ($PRICE2);
 										}
 
 										//ARRAY STOCK
