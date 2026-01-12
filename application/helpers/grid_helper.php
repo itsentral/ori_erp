@@ -6175,7 +6175,6 @@
 				
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
 				$PRICE2=0;
