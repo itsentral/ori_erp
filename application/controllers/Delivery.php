@@ -6785,6 +6785,9 @@ class Delivery extends CI_Controller
 			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_incustomer WHERE kode_trans ='".$kodetrans."' 
 			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
 
+			print_r($stokfg);
+			exit;
+
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
