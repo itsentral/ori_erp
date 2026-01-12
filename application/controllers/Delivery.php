@@ -6763,7 +6763,7 @@ class Delivery extends CI_Controller
 										`data_erp_in_transit`.`kode_trans` AS `kode_trans`,
 										`data_erp_in_transit`.`id_pro_det` AS `id_pro_det`,
 										sum(`data_erp_in_transit`.`qty`) AS `total`,
-										`data_erp_in_transit`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_in_transit`.`nilai_unit` AS `nilai_wip`,
 										`data_erp_in_transit`.`material` AS `material`,
 										`data_erp_in_transit`.`wip_direct` AS `wip_direct`,
 										`data_erp_in_transit`.`wip_indirect` AS `wip_indirect`,
