@@ -6696,7 +6696,8 @@ class Delivery extends CI_Controller
 
 					 $kode_trans = $data->kode_trans;
 					 $nospk      = $data->no_spk;
-					 $qty1        = $data->qty;
+					 $qty1       = $data->qty;
+					 $noso       = $data->no_so;
 
 					 if ($qty1==null){
 					 $qty=1;	
