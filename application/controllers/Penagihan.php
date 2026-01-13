@@ -4276,6 +4276,7 @@ else
 					 $keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 					 $kode_trans = $data->kode_trans;
 					 $nospk      = $data->no_spk;
+					 $noso      = $data->no_so;
 					 $qty1        = $data->qty;
 
 					 if ($qty1==null){
