@@ -1411,17 +1411,18 @@ function getPriceBookByDate($dateFilter){
                             MAX( a.id ) AS id,
                             a.id_material 
                         FROM
-                            tran_warehouse_jurnal_detail a 
+                            price_book a 
                         WHERE
-                            a.id_gudang = '2' 
+                           a.updated_date >= '2023-05-11 21:24:48' 
+                            AND DATE( a.updated_date ) <= '".$dateFilter."'
                         GROUP BY
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('price_book')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
-        $ArrResult[$value['id']] = $value['harga'];
+        $ArrResult[$value['id']] = $value['price_book'];
     }
     
     $GET_PRICE_BOOK = $ArrResult;
@@ -1441,7 +1442,7 @@ function getPriceBookByDate2($dateFilter){
                             MAX( a.id ) AS id,
                             a.id_material 
                         FROM
-                            tran_warehouse_jurnal_detail a 
+                            price_book a 
                         WHERE
                             a.updated_date >= '2023-05-11 21:24:48' 
                             AND DATE( a.updated_date ) <= '".$dateFilter."'
@@ -1449,7 +1450,7 @@ function getPriceBookByDate2($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('price_book')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['price_book'];
@@ -1468,17 +1469,15 @@ function getPriceBookByDate2($dateFilter){
 function getPriceBookByDatesubgudang($dateFilter){ 
     $CI =& get_instance();
 
-   $SQLPriceBook = "SELECT  MAX( a.id ) AS id,
+   $SQLPriceBook = "SELECT  MAX( a.id ) AS id, 
                             a.id_material 
                         FROM
-                            tran_warehouse_jurnal_detail a 
-                        WHERE
-                            a.id_gudang = '3' 
+                            price_book a 
                         GROUP BY
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    $result = $CI->db->get('price_book')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
         $ArrResult[$value['id']] = $value['harga'];
