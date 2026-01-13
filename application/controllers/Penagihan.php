@@ -4274,9 +4274,7 @@ else
 					 $tgl_voucher = $data->tanggal;	
 					 $spasi       = ',';
 					 $keterangan  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
-					 $id          = $idtrans;
-					 $no_request  = $idtrans;	
-				     $kode_trans = $data->kode_trans;
+					 $kode_trans = $data->kode_trans;
 					 $nospk      = $data->no_spk;
 					 $qty1        = $data->qty;
 
