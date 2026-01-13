@@ -6808,7 +6808,7 @@ class Delivery extends CI_Controller
 							'id_trans' => $vals->id_trans,
 							);
 
-				$this->db->insert('warehouse_stock_incustomer',$datastokfg);
+				$this->db->insert('warehouse_stock_incustomerx',$datastokfg);
 				}
 
 			}
