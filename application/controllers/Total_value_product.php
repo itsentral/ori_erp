@@ -44,7 +44,7 @@ class Total_value_product extends CI_Controller {
 			'data_gudang'	=> $data_gudang
 		);
 		history('View Product Stock');
-		$this->load->view('Total_value/product_stock',$data);
+		$this->load->view('Total_value/product',$data);
 	}
 
     public function server_side_product_stock_wip(){
