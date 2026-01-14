@@ -18,9 +18,9 @@ $gudang = $this->uri->segment(3);
 					<?php
 					
 						echo "<option value='wip'>Gudang WIP</option>";
-                        echo "<option value='fg'>Gudang WIP</option>";
-                        echo "<option value='intransit'>Gudang WIP</option>";
-                        echo "<option value='incustomer'>Gudang WIP</option>";
+                        echo "<option value='fg'>Gudang FG</option>";
+                        echo "<option value='intransit'>Gudang Intransit</option>";
+                        echo "<option value='incustomer'>Gudang Incustomer</option>";
 					
 						
 					?>
