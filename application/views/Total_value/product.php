@@ -34,12 +34,14 @@ $gudang = $this->uri->segment(3);
 			</div> -->
 		</div>
 		
-		<?php if($gudang=='pusat') {?>
-		<button type='button' class='btn btn-sm btn-success' id='download_excel'><i class='fa fa-file-excel-o'></i> Download Pusat</button>
-		<?php } elseif($gudang=='subgudang') {?>		
-		<button type='button' class='btn btn-sm btn-success' id='download_excel2'><i class='fa fa-file-excel-o'></i> Download Subgudang</button>
-		<?php } elseif($gudang=='produksi') {?>
-			<button type='button' class='btn btn-sm btn-success' id='download_excel3'><i class='fa fa-file-excel-o'></i> Download Produksi</button>
+		<?php if($gudang=='wip') {?>
+		<button type='button' class='btn btn-sm btn-success' id='download_excel'><i class='fa fa-file-excel-o'></i> Download WIP</button>
+		<?php } elseif($gudang=='fg') {?>		
+		<button type='button' class='btn btn-sm btn-success' id='download_excel2'><i class='fa fa-file-excel-o'></i> Download FG</button>
+		<?php } elseif($gudang=='intransit') {?>
+			<button type='button' class='btn btn-sm btn-success' id='download_excel3'><i class='fa fa-file-excel-o'></i> Download Intransit</button>
+		<?php } elseif($gudang=='incustomer') {?>
+			<button type='button' class='btn btn-sm btn-success' id='download_excel4'><i class='fa fa-file-excel-o'></i> Download Incustomer</button>
 		<?php } ?>
 	</div>
 	<!-- /.box-header -->
