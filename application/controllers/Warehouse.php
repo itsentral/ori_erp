@@ -4430,4 +4430,14 @@ class Warehouse extends CI_Controller {
 		$this->warehouse_model->modal_history_booking_tras();
 	}
 
+
+	//PRODUCT STOCK
+	public function product_stock(){
+		$this->warehouse_model->index_product_stock();
+	}
+	
+	public function server_side_product_stock(){
+		$this->warehouse_model->get_data_json_product_stock();
+	}
+
 }

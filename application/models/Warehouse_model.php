@@ -5295,5 +5295,44 @@ class Warehouse_model extends CI_Model {
 		$this->load->view('Warehouse/modal_history_tras', $data);
 	}
 
+	public function index_product_stock(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'origa'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Product >> Gudang WIP >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'pusat'){
+			$judul = "Warehouse Product >> Gudang FG >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'subgudang'){
+			$judul = "Warehouse Product >> Intransit >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'virtual'){
+			$judul = "Warehouse Product >> Incustomer >> Stock";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		// else{
+		// 	$judul = "Warehouse Product >>  >> Stock";
+		// }
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Product Stock');
+		$this->load->view('Warehouse/product_stock',$data);
+	}
+
 
 }
