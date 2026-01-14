@@ -16,7 +16,7 @@ $gudang = $this->uri->segment(3);
 				<select id='gudang' name='gudang' class='form-control input-sm'>
 					
 					<?php
-					
+					    echo "<option value=''>Pilih Gudang</option>";
 						echo "<option value='wip'>Gudang WIP</option>";
                         echo "<option value='fg'>Gudang FG</option>";
                         echo "<option value='intransit'>Gudang Intransit</option>";
