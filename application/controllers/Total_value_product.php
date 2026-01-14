@@ -18,17 +18,17 @@ class Total_value_product extends CI_Controller {
 
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
-		if($this->uri->segment(3) == 'origa'){
+		if($this->uri->segment(3) == 'wip'){
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
 			$judul = "Warehouse Product >> Gudang WIP >> Stock";
 		}
-		elseif($this->uri->segment(3) == 'pusat'){
+		elseif($this->uri->segment(3) == 'fg'){
 			$judul = "Warehouse Product >> Gudang FG >> Stock";
 		}
-		elseif($this->uri->segment(3) == 'subgudang'){
+		elseif($this->uri->segment(3) == 'intransit'){
 			$judul = "Warehouse Product >> Intransit >> Stock";
 		}
-		elseif($this->uri->segment(3) == 'virtual'){
+		elseif($this->uri->segment(3) == 'incustomer'){
 			$judul = "Warehouse Product >> Incustomer >> Stock";
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
 		}
