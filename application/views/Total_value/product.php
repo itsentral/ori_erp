@@ -12,16 +12,17 @@ $gudang = $this->uri->segment(3);
 		<div class='form-group row'>
 			<div class='col-sm-8 text-right'><b>Search:</b></div>
 			<div class='col-sm-2'>
-				<!-- <label>Warehouse : </label> -->
+				
 				<select id='gudang' name='gudang' class='form-control input-sm'>
-					<!--<option value='0'>All Warehouse</option>-->
+					
 					<?php
-					if($category == 'produksi'){
-						echo "<option value='0'>All Gudang Produksi</option>";
-					}
-						foreach($data_gudang AS $val => $valx){
-							echo "<option value='".$valx['id']."'>".strtoupper($valx['nm_gudang'])."</option>";
-						}
+					
+						echo "<option value='wip'>Gudang WIP</option>";
+                        echo "<option value='fg'>Gudang WIP</option>";
+                        echo "<option value='intransit'>Gudang WIP</option>";
+                        echo "<option value='incustomer'>Gudang WIP</option>";
+					
+						
 					?>
 				</select>
 			</div>
