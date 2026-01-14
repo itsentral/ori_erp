@@ -197,11 +197,11 @@ $gudang = $this->uri->segment(3);
 		let qty_available	= 0;
 		let qty_rusak	= 0;
 		let gudang1 = $('#gudang1').val();
-		if(gudang1 =='pusat'){
+		if(gudang1 =='wip'){
 			var link =  base_url + active_controller+'/server_side_product_stock_wip';
-		}else if(gudang1 =='subgudang'){
+		}else if(gudang1 =='fg'){
 			var link =  base_url + active_controller+'/server_side_product_stock_fg';
-		}else if(gudang1 =='subgudang'){
+		}else if(gudang1 =='intransit'){
 			var link =  base_url + active_controller+'/server_side_product_stock_intransit';
 		}else{
 			var link =  base_url + active_controller+'/server_side_product_stock_incustomer';
