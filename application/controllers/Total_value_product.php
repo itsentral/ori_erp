@@ -92,7 +92,7 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper($row['no_so'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['no_spk'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_gudang'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['keterangan'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
