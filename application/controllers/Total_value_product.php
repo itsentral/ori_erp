@@ -286,12 +286,10 @@ class Total_value_product extends CI_Controller {
 
 			$sql = "
 			SELECT
-				(@row:=@row+1) AS nomor,
-				a.*
+				(@row:=@row+1) AS nomor, a.*
 			FROM
 				".$table." a
-				(SELECT @row:=0) r
-		    WHERE 
+			 WHERE 
 			(
 				a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
