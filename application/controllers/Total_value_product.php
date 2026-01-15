@@ -75,8 +75,6 @@ class Total_value_product extends CI_Controller {
 		$data	= array();
 		$urut1  = 1;
         $urut2  = 0;
-		$dateFilter = (!empty($requestData['date_filter']))?$requestData['date_filter']:date('Y-m-d');
-		$GET_PRICEBOOK = getPriceBookByDate2($dateFilter);
 		foreach($query->result_array() as $row)
 		{
 			$total_data     = $totalData;
@@ -91,18 +89,16 @@ class Total_value_product extends CI_Controller {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
-			$PRICEBOOK = (!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0;
-			//$PRICEBOOK = ($row['costbook']==0)?((!empty($GET_PRICEBOOK[$row['id_material']]))?$GET_PRICEBOOK[$row['id_material']]:0):$row['costbook'];
-
+			
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['idmaterial'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_material'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_category'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['no_so'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['no_spk'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['nm_gudang'])."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['qty_stock'],4)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($PRICEBOOK,2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($PRICEBOOK*$row['qty_stock'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -112,11 +108,7 @@ class Total_value_product extends CI_Controller {
 			"draw"            	=> intval( $requestData['draw'] ),
 			"recordsTotal"    	=> intval( $totalData ),
 			"recordsFiltered" 	=> intval( $totalFiltered ),
-			"data"            	=> $data,
-			"category"          => $get_category[0]->category,
-			"recordsStock"		=> $qty_stock,
-			"recordsBooking"	=> $qty_booking,
-			"recordsRusak"		=> $qty_rusak
+			"data"            	=> $data
 		);
 
 		echo json_encode($json_data);
@@ -273,81 +265,45 @@ class Total_value_product extends CI_Controller {
 	}
 
 	public function query_data_json_product_stock_wip($gudang, $date_filter, $category, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
-		$table = "warehouse_stock";
-		$where_gudang ='';
+		if($gudang=='wip'){
+            $table = "warehouse_stock_wip";
+        }elseif($gudang=='fg'){
+            $table = "warehouse_stock_fg";
+        }
+       
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
 		$group_by = '';
-		$fieldStock = 'a.qty_stock, a.qty_booking,a.qty_rusak, a.id_gudang,b.nm_gudang,';
-		if(!empty($gudang)){
-			$where_gudang = " AND a.id_gudang = '".$gudang."' ";
-		}
+		$fieldStock = 'a.qty, a.nilai_wip,';
+		
 
 		if(!empty($date_filter)){
-			$where_gudang = " AND a.id_gudang = '".$gudang."' ";
+			
 			$where_date = " AND DATE(a.hist_date) = '".$date_filter."' ";
 			$table = "warehouse_stock_per_day";
 			$field_add = "a.costbook, a.total_value,";
 		}
 
-		if($gudang == '0'){
-			$where_gudang = " AND a.id_gudang IN (".$this->gudang_produksi.") ";
-			$group_by = ' GROUP BY c.id_material ';
-			$fieldStock = 'SUM(a.qty_stock) AS qty_stock, SUM(a.qty_booking) AS qty_booking, SUM(a.qty_rusak) AS qty_rusak, "0" AS id_gudang, "Gudang Produksi" AS nm_gudang,';
-		}
-
-		$sql = "
+			$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				c.idmaterial,
-				c.id_material,
-				c.nm_material,
-				".$fieldStock."
-				".$field_add."
-				c.nm_category
+				a.*
 			FROM
 				".$table." a
-				LEFT JOIN warehouse b ON a.id_gudang=b.id
-				LEFT JOIN raw_materials c ON a.id_material = c.id_material,
 				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date." AND (
-				c.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR c.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR c.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR c.nm_category LIKE '%".$this->db->escape_like_str($like_value)."%'
-				OR b.nm_gudang LIKE '%".$this->db->escape_like_str($like_value)."%'
+		    WHERE 
+			(
+				a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR a.product LIKE '%".$this->db->escape_like_str($like_value)."%'
+				
 	        )
 		".$group_by;
 
-		$Query_Sum	= "SELECT
-					SUM(a.qty_stock) AS qty_stock,
-					SUM(a.qty_booking) AS qty_booking,
-					SUM(a.qty_rusak) AS qty_rusak
-				FROM
-					".$table." a
-					LEFT JOIN warehouse b ON a.kd_gudang=b.kd_gudang
-					LEFT JOIN raw_materials c ON a.id_material = c.id_material,
-					(SELECT @row:=0) r
-				WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date." AND (
-					c.id_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR c.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR c.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR c.nm_category LIKE '%".$this->db->escape_like_str($like_value)."%'
-					OR b.nm_gudang LIKE '%".$this->db->escape_like_str($like_value)."%'
-				)".$group_by;
-		$qty_stock = $qty_booking = $qty_rusak	= 0;
-		$Hasil_SUM		   = $this->db->query($Query_Sum)->result_array();
-		if($Hasil_SUM){
-			$qty_stock		= $Hasil_SUM[0]['qty_stock'];
-			$qty_booking	= $Hasil_SUM[0]['qty_booking'];
-			$qty_rusak		= $Hasil_SUM[0]['qty_rusak'];
-		}
+		
 		// echo $sql; exit;
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
-		$data['qty_stock'] 	= $qty_stock;
-		$data['qty_booking'] = $qty_booking;
-		$data['qty_rusak'] 	= $qty_rusak;
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
