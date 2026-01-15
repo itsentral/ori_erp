@@ -56,7 +56,6 @@ class Total_value_product extends CI_Controller {
 		$fetch			= $this->query_data_json_product_stock_wip(
 			$requestData['gudang'], 
 			$requestData['date_filter'],
-			$requestData['category'],
 			$requestData['search']['value'],
 			$requestData['order'][0]['column'],
 			$requestData['order'][0]['dir'],
@@ -261,7 +260,7 @@ class Total_value_product extends CI_Controller {
 		echo json_encode($json_data);
 	}
 
-	public function query_data_json_product_stock_wip($gudang, $date_filter, $category, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+	public function query_data_json_product_stock_wip($gudang, $date_filter, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 		//if($gudang=='wip'){
             $table = "warehouse_stock_wip";
         // }elseif($gudang=='fg'){
