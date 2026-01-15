@@ -1480,7 +1480,7 @@ function getPriceBookByDatesubgudang($dateFilter){
     $result = $CI->db->get('price_book')->result_array();
     $ArrResult = [];
     foreach ($result as $key => $value) {
-        $ArrResult[$value['id']] = $value['harga'];
+        $ArrResult[$value['id']] = $value['price_book'];
     }
     
     $GET_PRICE_BOOK = $ArrResult;
