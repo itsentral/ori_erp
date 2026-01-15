@@ -66,10 +66,7 @@ class Total_value_product extends CI_Controller {
 		$totalData		= $fetch['totalData'];
 		$totalFiltered	= $fetch['totalFiltered'];
 		$query			= $fetch['query'];
-		$qty_stock		= $fetch['qty_stock'];
-		$qty_booking	= $fetch['qty_booking'];
-		$qty_rusak		= $fetch['qty_rusak'];
-
+	
 		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$requestData['gudang']))->result();
 
 		$data	= array();
