@@ -301,12 +301,9 @@ class Total_value_product extends CI_Controller {
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'nomor',
-			1 => 'idmaterial',
-			2 => 'nm_material',
-			3 => 'nm_category',
-			4 => 'nm_gudang',
-			5 => 'nm_material',
-			6 => 'qty_stock'
+			1 => 'no_so',
+			2 => 'no_spk',
+			3 => 'product',
 		);
 
 		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";

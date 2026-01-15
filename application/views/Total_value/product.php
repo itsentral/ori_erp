@@ -237,12 +237,7 @@ $gudang = $this->uri->segment(3);
 					$("#my-grid_processing").css("display","none");
 				},
 				 dataSrc: function ( data ) {
-				   qty_stock = data.recordsStock;
-				   qty_booking = data.recordsBooking;
-				   qty_rusak = data.recordsRusak;
-				   qty_available = data.recordsStock - data.recordsBooking;
-				   category = data.category;
-				   return data.data;
+				    return data.data;
 				 }
 			},
 			// drawCallback: function( settings ) {
