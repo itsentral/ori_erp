@@ -51,12 +51,11 @@ $gudang = $this->uri->segment(3);
 			<thead>
 				<tr class='bg-blue'>
 					<th class="text-center">#</th>
-					<th class="text-center">Id Material</th>
-					<th class="text-center">Material</th>
-					<th class="text-center">Category</th> 
-					<th class="text-center">Warehouse</th>
+					<th class="text-center">Nomor SO</th>
+					<th class="text-center">Nomor SPK</th>
+					<th class="text-center">Produk</th> 
 					<th class="text-center">Stock</th>
-                    <th class="text-center">Price Book</th>
+                    <th class="text-center">Nilai per unit</th>
 					<th class="text-center">Total Value</th>
 				</tr>
 			</thead>
