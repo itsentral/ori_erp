@@ -265,11 +265,11 @@ class Total_value_product extends CI_Controller {
 	}
 
 	public function query_data_json_product_stock_wip($gudang, $date_filter, $category, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
-		if($gudang=='wip'){
+		//if($gudang=='wip'){
             $table = "warehouse_stock_wip";
-        }elseif($gudang=='fg'){
-            $table = "warehouse_stock_fg";
-        }
+        // }elseif($gudang=='fg'){
+        //     $table = "warehouse_stock_fg";
+        // }
        
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
@@ -277,12 +277,12 @@ class Total_value_product extends CI_Controller {
 		$fieldStock = 'a.qty, a.nilai_wip,';
 		
 
-		if(!empty($date_filter)){
+		// if(!empty($date_filter)){
 			
-			$where_date = " AND DATE(a.hist_date) = '".$date_filter."' ";
-			$table = "warehouse_stock_per_day";
-			$field_add = "a.costbook, a.total_value,";
-		}
+		// 	$where_date = " AND DATE(a.hist_date) = '".$date_filter."' ";
+		// 	$table = "warehouse_stock_per_day";
+		// 	$field_add = "a.costbook, a.total_value,";
+		// }
 
 			$sql = "
 			SELECT
