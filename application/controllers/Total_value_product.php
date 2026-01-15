@@ -91,6 +91,7 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper($row['no_so'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['no_spk'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['keterangan'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
@@ -260,11 +261,11 @@ class Total_value_product extends CI_Controller {
 	}
 
 	public function query_data_json_product_stock_wip($gudang, $date_filter, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
-		//if($gudang=='wip'){
+		if($gudang=='wip'){
             $table = "warehouse_stock_wip";
-        // }elseif($gudang=='fg'){
-        //     $table = "warehouse_stock_fg";
-        // }
+         }elseif($gudang=='fg'){
+             $table = "warehouse_stock_fg";
+         }
        
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
