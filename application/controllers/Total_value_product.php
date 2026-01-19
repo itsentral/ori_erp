@@ -377,6 +377,10 @@ class Total_value_product extends CI_Controller {
          }elseif($gudang=='incustomer'){
              $table = "warehouse_stock_incustomer";
          }
+
+		 print_r($gudang);
+		 exit;
+
        
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
@@ -384,13 +388,7 @@ class Total_value_product extends CI_Controller {
 		$fieldStock = 'a.qty, a.nilai_wip,';
 		
 
-		// if(!empty($date_filter)){
-			
-		// 	$where_date = " AND DATE(a.hist_date) = '".$date_filter."' ";
-		// 	$table = "warehouse_stock_per_day";
-		// 	$field_add = "a.costbook, a.total_value,";
-		// }
-
+	
 			$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor, a.*
