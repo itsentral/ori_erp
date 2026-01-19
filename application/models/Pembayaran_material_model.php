@@ -17,7 +17,7 @@ class Pembayaran_material_model extends CI_Model {
 	}
 	public function get_data_json_request_payment_nm($sqlwhere=''){
 
-		$sql = "SELECT a.*, b.nm_supplier FROM purchase_order_request_payment_nm a left join supplier b on a.id_supplier =b.id_supplier WHERE 1=1 ".($sqlwhere==''?'':" and ".$sqlwhere)." order by a.approved_on desc limit 200";
+		$sql = "SELECT a.*, b.nm_supplier FROM purchase_order_request_payment_nmx a left join supplier b on a.id_supplier =b.id_supplier WHERE 1=1 ".($sqlwhere==''?'':" and ".$sqlwhere)." order by a.approved_on desc limit 200";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -25,6 +25,6 @@ class Pembayaran_material_model extends CI_Model {
 
 		$sql = "SELECT nomor,tanggal,no_reff,stspos FROM jurnaltras a WHERE 1=1 ".($sqlwhere==''?'':" and ".$sqlwhere)." group by nomor,tanggal,no_reff,stspos order by no_reff desc ";
 		$query = $this->db->query($sql);
-		return $query->result();
+		return $query->result(); 
 	}
 }
