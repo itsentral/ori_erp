@@ -50,7 +50,7 @@ $this->load->view('include/side_menu');
 					<?php
 					$nilai_po_invoice=0;
 					if($info_payterm->matauang_receive_invoice=='IDR'){
-						$nilai_po_invoice=$info_payterm->invoice_total;
+						$nilai_po_invoice=$info_payterm->invoice_total - $info_payterm->nilai_ppn ;
 					}else{
 						$nilai_po_invoice=$info_payterm->invoice_total;						
 					}
