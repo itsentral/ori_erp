@@ -32,9 +32,7 @@ class Total_value_product extends CI_Controller {
 			$judul = "Warehouse Product >> Incustomer >> Stock";
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
 		}
-		// else{
-		// 	$judul = "Warehouse Product >>  >> Stock";
-		// }
+		
 		$data = array(
 			'title'			=> $judul,
 			'action'		=> 'index',
