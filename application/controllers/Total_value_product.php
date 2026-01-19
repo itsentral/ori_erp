@@ -377,10 +377,6 @@ class Total_value_product extends CI_Controller {
          }elseif($gudang=='incustomer'){
              $table = "warehouse_stock_incustomer";
          }
-
-		 print_r($gudang);
-		 exit;
-
        
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
