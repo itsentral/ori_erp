@@ -8,9 +8,9 @@ $gudang = $this->uri->segment(3);
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3><br>
-		<input type='hidden' id='gudang1' value='<?=$gudang;?>'>
+		<input type='hidden' id='gudang1' value='<?='wip';?>'>
 		<div class='form-group row'>
-			<div class='col-sm-2'>
+		<div class='col-sm-2'>
 			<input type="hidden" id='category' value='<?=$category;?>'>
 				<input type="text" name='date_filter' id='date_filter' class='form-control datepicker text-center' data-role="datepicker2" readonly placeholder='Change Date'>
 			</div>
@@ -210,7 +210,7 @@ $gudang = $this->uri->segment(3);
 				url :link,
 				type: "post",
 				data: function(d){
-					d.gudang = gudang,
+					d.gudang = gudang1,
 					d.date_filter = date_filter,
 					d.category = category
 				},
