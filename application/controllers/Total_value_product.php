@@ -44,7 +44,7 @@ class Total_value_product extends CI_Controller {
 			'data_gudang'	=> $data_gudang
 		);
 		history('View Product Stock');
-		$this->load->view('Total_value/product',$data);
+		$this->load->view('Total_value/product_wip',$data);
 	}
 
 
@@ -72,9 +72,7 @@ class Total_value_product extends CI_Controller {
 			$judul = "Warehouse Product >> Incustomer >> Stock";
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
 		}
-		// else{
-		// 	$judul = "Warehouse Product >>  >> Stock";
-		// }
+	
 		$data = array(
 			'title'			=> $judul,
 			'action'		=> 'index',
@@ -111,9 +109,7 @@ class Total_value_product extends CI_Controller {
 			$judul = "Warehouse Product >> Incustomer >> Stock";
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
 		}
-		// else{
-		// 	$judul = "Warehouse Product >>  >> Stock";
-		// }
+		
 		$data = array(
 			'title'			=> $judul,
 			'action'		=> 'index',
@@ -149,9 +145,7 @@ class Total_value_product extends CI_Controller {
 			$judul = "Warehouse Product >> Incustomer >> Stock";
 			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
 		}
-		// else{
-		// 	$judul = "Warehouse Product >>  >> Stock";
-		// }
+		
 		$data = array(
 			'title'			=> $judul,
 			'action'		=> 'index',
@@ -167,9 +161,6 @@ class Total_value_product extends CI_Controller {
     public function server_side_product_stock_wip(){
 		$requestData	= $_REQUEST;
 		
-		// print_r($requestData['gudang']);
-		 //exit;
-
 		$fetch			= $this->query_data_json_product_stock_wip(
 			$requestData['gudang'], 
 			$requestData['date_filter'],
