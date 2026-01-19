@@ -8,24 +8,8 @@ $gudang = $this->uri->segment(3);
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3><br>
-		<input type='hidden' id='gudang1' value='<?=$gudang;?>'>
+		<input type='hidden' id='gudang1' value='<?='intransit';?>'>
 		<div class='form-group row'>
-			<div class='col-sm-8 text-right'><b>Search:</b></div>
-			<div class='col-sm-2'>
-				
-				<select id='gudang' name='gudang' class='form-control input-sm'>
-					
-					<?php
-					    echo "<option value=''>Pilih Gudang</option>";
-						echo "<option value='wip'>Gudang WIP</option>";
-                        echo "<option value='fg'>Gudang FG</option>";
-                        echo "<option value='intransit'>Gudang Intransit</option>";
-                        echo "<option value='incustomer'>Gudang Incustomer</option>";
-					
-						
-					?>
-				</select>
-			</div>
 			<div class='col-sm-2'>
 			<input type="hidden" id='category' value='<?=$category;?>'>
 				<input type="text" name='date_filter' id='date_filter' class='form-control datepicker text-center' data-role="datepicker2" readonly placeholder='Change Date'>
@@ -51,12 +35,12 @@ $gudang = $this->uri->segment(3);
 			<thead>
 				<tr class='bg-blue'>
 					<th class="text-center">#</th>
-					<th class="text-center">Id Material</th>
-					<th class="text-center">Material</th>
-					<th class="text-center">Category</th> 
-					<th class="text-center">Warehouse</th>
+					<th class="text-center">Nomor SO</th>
+					<th class="text-center">Nomor SPK</th>
+					<th class="text-center">Produk</th> 
+					<th class="text-center">Keterangan</th> 
 					<th class="text-center">Stock</th>
-                    <th class="text-center">Price Book</th>
+                    <th class="text-center">Nilai per unit</th>
 					<th class="text-center">Total Value</th>
 				</tr>
 			</thead>
@@ -197,15 +181,9 @@ $gudang = $this->uri->segment(3);
 		let qty_available	= 0;
 		let qty_rusak	= 0;
 		let gudang1 = $('#gudang1').val();
-		if(gudang1 =='wip'){
+		
 			var link =  base_url + active_controller+'/server_side_product_stock_wip';
-		}else if(gudang1 =='fg'){
-			var link =  base_url + active_controller+'/server_side_product_stock_fg';
-		}else if(gudang1 =='intransit'){
-			var link =  base_url + active_controller+'/server_side_product_stock_intransit';
-		}else{
-			var link =  base_url + active_controller+'/server_side_product_stock_incustomer';
-		}
+		
 		
 		var dataTable = $('#my-grid').DataTable({
 			"processing": true,
@@ -226,7 +204,7 @@ $gudang = $this->uri->segment(3);
 				url :link,
 				type: "post",
 				data: function(d){
-					d.gudang = gudang,
+					d.gudang = gudang1,
 					d.date_filter = date_filter,
 					d.category = category
 				},
@@ -237,12 +215,7 @@ $gudang = $this->uri->segment(3);
 					$("#my-grid_processing").css("display","none");
 				},
 				 dataSrc: function ( data ) {
-				   qty_stock = data.recordsStock;
-				   qty_booking = data.recordsBooking;
-				   qty_rusak = data.recordsRusak;
-				   qty_available = data.recordsStock - data.recordsBooking;
-				   category = data.category;
-				   return data.data;
+				    return data.data;
 				 }
 			},
 			// drawCallback: function( settings ) {
