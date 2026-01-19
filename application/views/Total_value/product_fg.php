@@ -181,15 +181,9 @@ $gudang = $this->uri->segment(3);
 		let qty_available	= 0;
 		let qty_rusak	= 0;
 		let gudang1 = $('#gudang1').val();
-		if(gudang1 =='wip'){
+	
 			var link =  base_url + active_controller+'/server_side_product_stock_wip';
-		}else if(gudang1 =='fg'){
-			var link =  base_url + active_controller+'/server_side_product_stock_fg';
-		}else if(gudang1 =='intransit'){
-			var link =  base_url + active_controller+'/server_side_product_stock_intransit';
-		}else{
-			var link =  base_url + active_controller+'/server_side_product_stock_incustomer';
-		}
+	
 		
 		var dataTable = $('#my-grid').DataTable({
 			"processing": true,
@@ -210,7 +204,7 @@ $gudang = $this->uri->segment(3);
 				url :link,
 				type: "post",
 				data: function(d){
-					d.gudang = gudang,
+					d.gudang = gudang1,
 					d.date_filter = date_filter,
 					d.category = category
 				},
