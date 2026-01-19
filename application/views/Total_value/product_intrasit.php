@@ -8,7 +8,7 @@ $gudang = $this->uri->segment(3);
 <div class="box box-primary">
 	<div class="box-header">
 		<h3 class="box-title"><?php echo $title;?></h3><br>
-		<input type='hidden' id='gudang1' value='<?=$gudang;?>'>
+		<input type='hidden' id='gudang1' value='<?='intransit';?>'>
 		<div class='form-group row'>
 			<div class='col-sm-2'>
 			<input type="hidden" id='category' value='<?=$category;?>'>
