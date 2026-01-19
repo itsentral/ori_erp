@@ -10,22 +10,6 @@ $gudang = $this->uri->segment(3);
 		<h3 class="box-title"><?php echo $title;?></h3><br>
 		<input type='hidden' id='gudang1' value='<?=$gudang;?>'>
 		<div class='form-group row'>
-			<div class='col-sm-8 text-right'><b>Search:</b></div>
-			<div class='col-sm-2'>
-				
-				<select id='gudang' name='gudang' class='form-control input-sm'>
-					
-					<?php
-					    echo "<option value=''>Pilih Gudang</option>";
-						echo "<option value='wip'>Gudang WIP</option>";
-                        echo "<option value='fg'>Gudang FG</option>";
-                        echo "<option value='intransit'>Gudang Intransit</option>";
-                        echo "<option value='incustomer'>Gudang Incustomer</option>";
-					
-						
-					?>
-				</select>
-			</div>
 			<div class='col-sm-2'>
 			<input type="hidden" id='category' value='<?=$category;?>'>
 				<input type="text" name='date_filter' id='date_filter' class='form-control datepicker text-center' data-role="datepicker2" readonly placeholder='Change Date'>

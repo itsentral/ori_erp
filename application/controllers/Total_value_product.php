@@ -8,7 +8,7 @@ class Total_value_product extends CI_Controller {
 		$this->gudang_produksi = getGudangProduksi();
 	}
 
-    public function product(){
+    public function product_wip(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
@@ -45,6 +45,123 @@ class Total_value_product extends CI_Controller {
 		);
 		history('View Product Stock');
 		$this->load->view('Total_value/product',$data);
+	}
+
+
+	public function product_fg(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'wip'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Product >> Gudang WIP >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'fg'){
+			$judul = "Warehouse Product >> Gudang FG >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'intransit'){
+			$judul = "Warehouse Product >> Intransit >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'incustomer'){
+			$judul = "Warehouse Product >> Incustomer >> Stock";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		// else{
+		// 	$judul = "Warehouse Product >>  >> Stock";
+		// }
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Product Stock');
+		$this->load->view('Total_value/product_fg',$data);
+	}
+
+	public function product_intransit(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'wip'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Product >> Gudang WIP >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'fg'){
+			$judul = "Warehouse Product >> Gudang FG >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'intransit'){
+			$judul = "Warehouse Product >> Intransit >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'incustomer'){
+			$judul = "Warehouse Product >> Incustomer >> Stock";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		// else{
+		// 	$judul = "Warehouse Product >>  >> Stock";
+		// }
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Product Stock');
+		$this->load->view('Total_value/product_intransit',$data);
+	}
+	public function product_incustomer(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'wip'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Product >> Gudang WIP >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'fg'){
+			$judul = "Warehouse Product >> Gudang FG >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'intransit'){
+			$judul = "Warehouse Product >> Intransit >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'incustomer'){
+			$judul = "Warehouse Product >> Incustomer >> Stock";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		// else{
+		// 	$judul = "Warehouse Product >>  >> Stock";
+		// }
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Product Stock');
+		$this->load->view('Total_value/product_incustomer',$data);
 	}
 
     public function server_side_product_stock_wip(){
@@ -265,6 +382,11 @@ class Total_value_product extends CI_Controller {
             $table = "warehouse_stock_wip";
          }elseif($gudang=='fg'){
              $table = "warehouse_stock_fg";
+         }
+		 elseif($gudang=='intransit'){
+            $table = "warehouse_stock_intransit";
+         }elseif($gudang=='incustomer'){
+             $table = "warehouse_stock_incustomer";
          }
        
 		$where_date ='';
