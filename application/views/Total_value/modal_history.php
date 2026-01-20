@@ -3,22 +3,22 @@
     <table id="my-grid" class="table" width="100%">
 		<thead>
 			<tr>
-				<td class="text-left" style='vertical-align:middle;' width='15%'>ID Material</td>
+				<td class="text-left" style='vertical-align:middle;' width='15%'>No SO</td>
 				<td class="text-left" style='vertical-align:middle;' width='2%'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['no_so']);?></td>
 			</tr>
 			<tr>
-				<td class="text-left" style='vertical-align:middle;'>Nama Material</td> 
+				<td class="text-left" style='vertical-align:middle;'>No SPK</td> 
 				<td class="text-left" style='vertical-align:middle;'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['no_spk']);?></td>
 			</tr>
 			<tr>
-				<td class="text-left" style='vertical-align:middle;'>Category</td>
+				<td class="text-left" style='vertical-align:middle;'>Kode Trans</td>
 				<td class="text-left" style='vertical-align:middle;'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['kode_trans']);?></td>
 			</tr>
             <tr>
-				<td class="text-left" style='vertical-align:middle;'>Gudang</td>
+				<td class="text-left" style='vertical-align:middle;'>Product</td>
 				<td class="text-left" style='vertical-align:middle;'>:</td>
 				<td class="text-left" style='vertical-align:middle;'><b><?=strtoupper(get_name('warehouse','nm_gudang','id',$id_gudang));?></b></td>
 			</tr>
