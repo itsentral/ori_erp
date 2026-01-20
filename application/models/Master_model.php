@@ -430,7 +430,7 @@ class Master_model extends CI_Model {
 		$kodetrans      = $this->uri->segment(6);
 		$kodetrans2      = $this->uri->segment(7);
 		$kodetrans3 		= str_replace($kodetrans2,"_"," "); 
-		$kode_trans = $kodetrans.$kodetrans3;
+		$kode_trans = $kodetrans.$kodetrans2;
 
 		print_r($kode_trans);
 		exit;
