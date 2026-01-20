@@ -53,11 +53,11 @@
                 $bold2 = '';
 				$color = '';
                 $color2 = '';
-                if($id_gudang == $valx['id_gudang_dari']){
+                if('out' == $valx['jenis']){
                     $bold = 'text-bold';
                     $color = 'text-red';
                 }
-                if($id_gudang == $valx['id_gudang_ke']){
+                if('in' == $valx['jenis']){
                     $bold2 = 'text-bold';
 					$color = 'text-green';
                 }
@@ -68,10 +68,10 @@
 					echo "<td class='".$bold."'>".strtoupper($valx['no_spk'])."</td>";
 					echo "<td class='".$bold2."'>".strtoupper($valx['kode_trans'])."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty'],4)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat'],4)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['qty_stock_akhir'],4)."</td>";
-					echo "<td class='".$color."'>".strtoupper($valx['ket'])."</td>";
-					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['update_date']))."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],4)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['qty']*$valx['nilai_wip'],4)."</td>";
+					echo "<td class='".$color."'>".strtoupper($valx['product'])."</td>";
+					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['created_date']))."</td>";
 					if($this->uri->segment(5) =='1'){
 					echo "<td class='text-right ".$color."'>".number_format($valx['harga_baru'],2)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat']*$valx['harga'],2)."</td>";
