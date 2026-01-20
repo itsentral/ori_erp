@@ -203,7 +203,7 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
 			$nestedData[]	= "<div align='center'>
-								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".str_replace($kodetrans, " ", "_")."'><i class='fa fa-history'></i></button>
+								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".str_replace($kodetrans,'','_')."'><i class='fa fa-history'></i></button>
 								</div>";
 			$data[] = $nestedData;
             $urut1++;
