@@ -42,6 +42,7 @@ $gudang = $this->uri->segment(3);
 					<th class="text-center">Stock</th>
                     <th class="text-center">Nilai per unit</th>
 					<th class="text-center">Total Value</th>
+					<th class="text-center">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -172,6 +173,9 @@ $gudang = $this->uri->segment(3);
             $("#ModalView2").modal();
         });
     });
+
+
+	
     
 
 		
@@ -238,5 +242,12 @@ $gudang = $this->uri->segment(3);
 		});
 	}
 
+	   $(document).on('click', '.look_history', function(e){
+            e.preventDefault();
+            loading_spinner();
+			$("#head_title2").html("<b>History "+$(this).data('no_so')+"</b>");
+            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('kode_trans')+'/'+$(this).data('product'));
+            $("#ModalView2").modal();
+        });
 	
 </script>

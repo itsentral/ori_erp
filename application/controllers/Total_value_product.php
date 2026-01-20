@@ -4,6 +4,7 @@ class Total_value_product extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
         $this->load->model('master_model');
+		$this->load->model('warehouse_model');
 
 		$this->gudang_produksi = getGudangProduksi();
 	}
@@ -201,6 +202,9 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
+			$nestedData[]	= "<div align='center'>
+								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".$row['kode_trans']."'><i class='fa fa-history'></i></button>
+								</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
@@ -1132,6 +1136,10 @@ class Total_value_product extends CI_Controller {
 		header('Content-Type: vnd.ms-excel');
 		header('Content-Disposition: attachment;filename="'.$LABEL_TITLE.'.xls"');
 		$objWriter->save("php://output");
+	}
+
+	public function modal_history(){
+		$this->warehouse_model->modal_history();
 	}
 
 }
