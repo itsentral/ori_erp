@@ -5,17 +5,17 @@
 			<tr>
 				<td class="text-left" style='vertical-align:middle;' width='15%'>ID Material</td>
 				<td class="text-left" style='vertical-align:middle;' width='2%'>:</td>
-				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['idmaterial']);?></td>
+				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['no_so']);?></td>
 			</tr>
 			<tr>
-				<td class="text-left" style='vertical-align:middle;'>Nama Material</td>
+				<td class="text-left" style='vertical-align:middle;'>Nama Material</td> 
 				<td class="text-left" style='vertical-align:middle;'>:</td>
-				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['nm_material']);?></td>
+				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['no_spk']);?></td>
 			</tr>
 			<tr>
 				<td class="text-left" style='vertical-align:middle;'>Category</td>
 				<td class="text-left" style='vertical-align:middle;'>:</td>
-				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['nm_category']);?></td>
+				<td class="text-left" style='vertical-align:middle;'><?=strtoupper($material[0]['kode_trans']);?></td>
 			</tr>
             <tr>
 				<td class="text-left" style='vertical-align:middle;'>Gudang</td>
@@ -64,10 +64,10 @@
 				
 				echo "<tr>";
 					echo "<td>".$No."</td>";
-					echo "<td>".strtoupper($valx['no_ipp'])."</td>";
-					echo "<td class='".$bold."'>".strtoupper(get_name('warehouse','nm_gudang','id',$valx['id_gudang_dari']))."</td>";
-					echo "<td class='".$bold2."'>".strtoupper(get_name('warehouse','nm_gudang','id',$valx['id_gudang_ke']))."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['qty_stock_awal'],4)."</td>";
+					echo "<td>".strtoupper($valx['no_so'])."</td>";
+					echo "<td class='".$bold."'>".strtoupper($valx['no_spk'])."</td>";
+					echo "<td class='".$bold2."'>".strtoupper($valx['kode_trans'])."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['qty'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty_stock_akhir'],4)."</td>";
 					echo "<td class='".$color."'>".strtoupper($valx['ket'])."</td>";
