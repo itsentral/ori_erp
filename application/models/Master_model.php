@@ -430,7 +430,7 @@ class Master_model extends CI_Model {
 		$kodetrans      = $this->uri->segment(6);
 		$kode_trans 		= str_replace($kodetrans,"_"," "); 
 
-		print_r($kode_trans);
+		print_r($kodetrans);
 		exit;
 
 		$tanggalNow = date('Y-m-d H:i:s');
