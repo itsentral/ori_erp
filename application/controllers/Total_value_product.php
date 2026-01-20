@@ -1139,7 +1139,7 @@ class Total_value_product extends CI_Controller {
 	}
 
 	public function modal_history(){
-		$this->warehouse_model->modal_history();
+		$this->master_model->modal_history();
 	}
 
 }

@@ -424,19 +424,20 @@ class Master_model extends CI_Model {
 	}
 
 	public function modal_history(){
-		$id_material 	= $this->uri->segment(3);
-		$id_gudang 		= $this->uri->segment(4);
+		$no_so 	= $this->uri->segment(3);
+		$no_spk 		= $this->uri->segment(4);
+		$product 		= $this->uri->segment(5);
 
 		$tanggalNow = date('Y-m-d H:i:s');
 		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-10 month', strtotime($tanggalNow)));
 
-		$result		= $this->db->get_where('warehouse_history', array('id_material'=>$id_material, 'id_gudang'=>$id_gudang, 'update_date >'=>$TanggalFirst,'jumlah_mat !='=>0,'UPPER(ket) !='=>'BOOKING MATERIAL CLOSE'))->result_array();
-		$material	= $this->db->get_where('raw_materials', array('id_material'=>$id_material))->result_array();
+		$result		= $this->db->get_where('data_erp_wip_group', array('no_so'=>$no_so, 'no_spk'=>$no_spk, 'product'=>$product))->result_array();
+		$material	= $this->db->get_where('warehouse_stock_wip', array('no_so'=>$no_so, 'product'=>$product))->result_array();
 
 		$data = array(
 			'result' => $result,
 			'material' => $material,
-			'id_gudang' => $id_gudang
+			'id_gudang' => $product
 		);
 
 		$this->load->view('Total_value/modal_history', $data);
