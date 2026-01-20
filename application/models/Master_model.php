@@ -432,9 +432,6 @@ class Master_model extends CI_Model {
 		$kodetrans3 		= str_replace("_", " ", $kodetrans2); 
 		$kode_trans = $kodetrans."/".$kodetrans2;
 
-		print_r($kode_trans);
-		exit;
-
 		$tanggalNow = date('Y-m-d H:i:s');
 		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-10 month', strtotime($tanggalNow)));
 
