@@ -28,13 +28,14 @@
 		<thead id='head_table'>
 			<tr class='bg-blue'>
 				<th class="text-center" style='vertical-align:middle;'>#</th>
-				<th class="text-center" style='vertical-align:middle;'>No Dokumen</th>
-				<th class="text-center" style='vertical-align:middle;'>Gudang Dari</th>
-				<th class="text-center" style='vertical-align:middle;'>Gudang Ke</th>
-				<th class="text-center" style='vertical-align:middle;'>Stock Awal</th>
-				<th class="text-center" style='vertical-align:middle;'>Qty Material</th>
-				<th class="text-center" style='vertical-align:middle;'>Stock Akhir</th>
-				<th class="text-center" style='vertical-align:middle;'>Keterangan</th>
+				<th class="text-center" style='vertical-align:middle;'>No SO</th>
+				<th class="text-center" style='vertical-align:middle;'>No SPK</th>
+				<th class="text-center" style='vertical-align:middle;'>Kode Trans</th>
+                <th class="text-center" style='vertical-align:middle;'>Product</th>
+                <th class="text-center" style='vertical-align:middle;'>Jenis</th>
+				<th class="text-center" style='vertical-align:middle;'>Qty</th>
+				<th class="text-center" style='vertical-align:middle;'>Nilai Unit</th>
+				<th class="text-center" style='vertical-align:middle;'>Nilai Total</th>
 				<th class="text-center" style='vertical-align:middle;'>Tanggal</th>
 				<?php if($this->uri->segment(5) =='1'){ ?>
 					<th class="text-center" style='vertical-align:middle;'>Cost Book</th>
@@ -67,16 +68,17 @@
 					echo "<td>".strtoupper($valx['no_so'])."</td>";
 					echo "<td class='".$bold."'>".strtoupper($valx['no_spk'])."</td>";
 					echo "<td class='".$bold2."'>".strtoupper($valx['kode_trans'])."</td>";
+                    echo "<td class='".$color."'>".strtoupper($valx['product'])."</td>";
+                    echo "<td class='".$color."'>".strtoupper($valx['jenis'])."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty']*$valx['nilai_wip'],4)."</td>";
-					echo "<td class='".$color."'>".strtoupper($valx['product'])."</td>";
 					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['created_date']))."</td>";
 					if($this->uri->segment(5) =='1'){
-					echo "<td class='text-right ".$color."'>".number_format($valx['harga_baru'],2)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['jumlah_mat']*$valx['harga'],2)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['saldo_awal'],2)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['saldo_akhir'],2)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],2)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip']*$valx['harga'],2)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],2)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],2)."</td>";
 					}
 				echo "</tr>";
 			}
