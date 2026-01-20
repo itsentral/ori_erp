@@ -430,13 +430,13 @@ class Master_model extends CI_Model {
 		$kodetrans      = $this->uri->segment(6);
 		$kodetrans2      = $this->uri->segment(7);
 		$kodetrans3 		= str_replace("_", " ", $kodetrans2); 
-		$kode_trans = $kodetrans."/".$kodetrans2;
+		$kode_trans = $kodetrans."/".$kodetrans3;
 
 		$tanggalNow = date('Y-m-d H:i:s');
 		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-10 month', strtotime($tanggalNow)));
 
-		$result		= $this->db->get_where('data_erp_wip_groupx', array('no_so'=>$no_so, 'no_spk'=>$no_spk, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
-		$material	= $this->db->get_where('warehouse_stock_wipx', array('no_so'=>$no_so, 'kode_trans'=>'$kode_trans', 'product'=>$product))->result_array();
+		$result		= $this->db->get_where('data_erp_wip_group', array('no_so'=>$no_so, 'no_spk'=>$no_spk, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
+		$material	= $this->db->get_where('warehouse_stock_wip', array('no_so'=>$no_so, 'kode_trans'=>'$kode_trans', 'product'=>$product))->result_array();
 
 		$data = array(
 			'result' => $result,
