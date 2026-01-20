@@ -427,7 +427,8 @@ class Master_model extends CI_Model {
 		$no_so 	= $this->uri->segment(3);
 		$no_spk 		= $this->uri->segment(4);
 		$product 		= $this->uri->segment(5);
-		$kode_trans 		= str_replace($this->uri->segment(6),"_"," ");
+		$kodetrans      = $this->uri->segment(6);
+		$kode_trans 		= str_replace($kodetrans,"_"," ");
 
 		print_r($kode_trans);
 		exit;
