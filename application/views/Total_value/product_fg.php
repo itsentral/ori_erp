@@ -42,6 +42,7 @@ $gudang = $this->uri->segment(3);
 					<th class="text-center">Stock</th>
                     <th class="text-center">Nilai per unit</th>
 					<th class="text-center">Total Value</th>
+					<th class="text-center">Option</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
