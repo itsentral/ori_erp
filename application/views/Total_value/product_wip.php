@@ -245,8 +245,8 @@ $gudang = $this->uri->segment(3);
 	   $(document).on('click', '.look_history', function(e){
             e.preventDefault();
             loading_spinner();
-			$("#head_title2").html("<b>History "+$(this).data('no_so')+"</b>");
-            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('kode_trans')+'/'+$(this).data('product'));
+			$("#head_title2").html("<b>History "+$(this).data('no_so')+$(this).data('product')+"</b>");
+            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('kode_trans')+'/'+$(this).data('product')+'/<?=(isset($akses_menu)?$akses_menu['approve']:'0')?>');
             $("#ModalView2").modal();
         });
 	
