@@ -428,9 +428,11 @@ class Master_model extends CI_Model {
 		$no_spk 		= $this->uri->segment(4);
 		$product 		= $this->uri->segment(5);
 		$kodetrans      = $this->uri->segment(6);
-		$kode_trans 		= str_replace($kodetrans,"_"," "); 
+		$kodetrans2      = $this->uri->segment(7);
+		$kodetrans3 		= str_replace($kodetrans2,"_"," "); 
+		$kode_trans = $kodetrans.$kodetrans3;
 
-		print_r($kodetrans);
+		print_r($kode_trans);
 		exit;
 
 		$tanggalNow = date('Y-m-d H:i:s');
