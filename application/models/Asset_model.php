@@ -554,7 +554,7 @@ class Asset_model extends CI_Model{
 				a.id LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_barang LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%'
-	        ) ORDER BY a.no_pr DESC
+	        )
 		";
 		// echo $sql; exit;
 
