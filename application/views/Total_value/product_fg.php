@@ -157,11 +157,11 @@ $gudang = $this->uri->segment(3);
         	DataTables(gudang, date_filter, category);
 		});
 
-		$(document).on('click', '.look_history', function(e){
+	    $(document).on('click', '.look_history', function(e){
             e.preventDefault();
             loading_spinner();
-            $("#head_title2").html("<b>History "+$(this).data('nm_material')+"</b>");
-            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('id_material')+'/'+$(this).data('id_gudang'));
+			$("#head_title2").html("<b>History "+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('kode_trans')+'/'+$(this).data('product')+"</b>");
+            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('product')+'/'+$(this).data('kode_trans').replace(" ", "_")+'/fg');
             $("#ModalView2").modal();
         });
 
