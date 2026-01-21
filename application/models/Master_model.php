@@ -431,12 +431,29 @@ class Master_model extends CI_Model {
 		$kodetrans2      = $this->uri->segment(7);
 		$kodetrans3 		= str_replace("_", " ", $kodetrans2); 
 		$kode_trans = $kodetrans."/".$kodetrans3;
+		$gudang      = $this->uri->segment(8);
+
+		if($gudang == 'wip'){
+		$table1 ='data_erp_wip_group';
+		$table2 ='warehouse_stock_wip';
+
+		}else if($gudang == 'fg'){
+		$table1 ='data_erp_fg';
+		$table2 ='warehouse_stock_fg';
+		}else if($gudang == 'intransit'){
+        $table1 ='data_erp_in_transit';
+		$table2 ='warehouse_stock_intransit';
+		}else if($gudang == 'incustomer'){
+		$table1 ='data_erp_in_customer';
+		$table2 ='warehouse_stock_incustomer';
+		}
+
 
 		$tanggalNow = date('Y-m-d H:i:s');
 		$TanggalFirst = date('Y-m-d H:i:s', strtotime('-10 month', strtotime($tanggalNow)));
 
-		$result		= $this->db->get_where('data_erp_wip_groupx', array('no_so'=>$no_so, 'no_spk'=>$no_spk, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
-		$material	= $this->db->get_where('warehouse_stock_wipx', array('no_so'=>$no_so, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
+		$result		= $this->db->get_where($table1, array('no_so'=>$no_so, 'no_spk'=>$no_spk, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
+		$material	= $this->db->get_where($table2, array('no_so'=>$no_so, 'kode_trans'=>$kode_trans, 'product'=>$product))->result_array();
 
 		$data = array(
 			'result' => $result,
