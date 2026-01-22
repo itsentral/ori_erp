@@ -2062,7 +2062,7 @@ class Delivery extends CI_Controller
 				'status'	=> 1
 			);
 			move_warehouse_fg($ArrMaterial, 15, 20, $kode_delivery);
-			$this->close_jurnal_in_transit($kode_delivery);
+			$this->close_jurnal_in_transitx($kode_delivery);
 			history('Lock release delivery ' . $kode_delivery);
 		}
 
@@ -5874,8 +5874,7 @@ class Delivery extends CI_Controller
 				}
 			}
 
-			print_r($ArrGroup);
-			exit;
+			
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
