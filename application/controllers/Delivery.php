@@ -5880,12 +5880,12 @@ class Delivery extends CI_Controller
 			
 
 			if(!empty($ArrGroup)){
-				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
+				$this->db->insert_batch('data_erp_in_transitx',$ArrGroup);
 				$this->jurnalIntransit($kode_delivery);
 			}
 
 			if(!empty($ArrGroupOut)){
-				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+				$this->db->insert_batch('data_erp_fgx',$ArrGroupOut);
 			}
 			
 			if(!empty($ArrGroupMaterial)){
@@ -6550,7 +6550,7 @@ class Delivery extends CI_Controller
 			$spk       = $wipgroup->no_spk;
 			$product   = $wipgroup->product;
 
-			/*$stokfg = $this->db->query("SELECT
+			$stokfg = $this->db->query("SELECT
 										`data_erp_fg`.`id` AS `id`,
 										`data_erp_fg`.`tanggal` AS `tanggal`,
 										`data_erp_fg`.`keterangan` AS `keterangan`,
@@ -6618,7 +6618,7 @@ class Delivery extends CI_Controller
 				$this->db->insert('warehouse_stock_intransit',$datastokfg);
 				}
 
-			}*/
+			}
 		  
 	}
 
