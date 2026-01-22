@@ -5602,11 +5602,7 @@ class Delivery extends CI_Controller
 			}
 		}
 
-        	print_r($ArrGroup);
-			exit;
-
-
-
+        
 		$ArrGroupMaterial = [];
 		$ArrGroupOutMaterial = [];
 		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
@@ -6554,7 +6550,7 @@ class Delivery extends CI_Controller
 			$spk       = $wipgroup->no_spk;
 			$product   = $wipgroup->product;
 
-			$stokfg = $this->db->query("SELECT
+			/*$stokfg = $this->db->query("SELECT
 										`data_erp_fg`.`id` AS `id`,
 										`data_erp_fg`.`tanggal` AS `tanggal`,
 										`data_erp_fg`.`keterangan` AS `keterangan`,
@@ -6622,7 +6618,7 @@ class Delivery extends CI_Controller
 				$this->db->insert('warehouse_stock_intransit',$datastokfg);
 				}
 
-			}
+			}*/
 		  
 	}
 
