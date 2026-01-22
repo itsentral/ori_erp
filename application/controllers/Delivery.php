@@ -5553,8 +5553,7 @@ class Delivery extends CI_Controller
 		$ArrGroup = [];
 		$ArrGroupOut = [];
 		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose','spool_induk'=>NULL))->result_array();
-		print_r($ArrIdPro);
-		exit;
+	
 		
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
@@ -5602,6 +5601,11 @@ class Delivery extends CI_Controller
 				$ArrGroupOut[$value]['jenis'] = 'out';
 			}
 		}
+
+        	print_r($ArrGroup);
+			exit;
+
+
 
 		$ArrGroupMaterial = [];
 		$ArrGroupOutMaterial = [];
