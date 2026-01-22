@@ -5877,7 +5877,8 @@ class Delivery extends CI_Controller
 				}
 			}
 
-			
+			print_r($ArrGroup);
+			exit;
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transitx',$ArrGroup);
