@@ -2026,7 +2026,8 @@ class Delivery extends CI_Controller
 		}
 		// move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
 		//SAMPAI SINI
-		// exit;
+		print_r($ArrKeyJurnal);
+		exit;
 		$this->db->trans_start();
 		if (!empty($ArrKeyJurnal)) {
 			insert_jurnal_delivery($ArrKeyJurnal, $kode_delivery);
