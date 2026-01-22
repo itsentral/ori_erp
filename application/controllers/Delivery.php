@@ -2062,7 +2062,7 @@ class Delivery extends CI_Controller
 				'status'	=> 1
 			);
 			move_warehouse_fg($ArrMaterial, 15, 20, $kode_delivery);
-			$this->close_jurnal_in_transitx($kode_delivery);
+			$this->close_jurnal_in_transit($kode_delivery);
 			history('Lock release delivery ' . $kode_delivery);
 		}
 
@@ -5553,6 +5553,9 @@ class Delivery extends CI_Controller
 		$ArrGroup = [];
 		$ArrGroupOut = [];
 		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose','spool_induk'=>NULL))->result_array();
+		print_r($ArrIdPro);
+		exit;
+		
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro'=>$valx['id_pro']))->result_array();
