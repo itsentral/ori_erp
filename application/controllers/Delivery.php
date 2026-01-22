@@ -5618,13 +5618,8 @@ class Delivery extends CI_Controller
 				// 	$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 				// 	$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
 
-<<<<<<< HEAD
-				// 	$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
-				// }
-=======
 					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
 				}
->>>>>>> dev_sam
 
 				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] != 'loose_dead_modif'){
 					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_uniq']))->result_array();
@@ -5638,29 +5633,12 @@ class Delivery extends CI_Controller
 					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$valx['id_uniq'],'jenis'=>'in cutting deadstok'))->result_array();
 				}
 
-<<<<<<< HEAD
-				if(($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif') OR $valx['sts_product'] == 'field joint'){
-					if($valx['sts_product'] == 'field joint'){
-						$getDetOutgoing = $this->db->select('*')->get_where('outgoing_field_joint',array('id'=>$valx['id_uniq']))->result_array();
-						$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
-						$no_spk 		= (!empty($getDetOutgoing[0]['no_spk']))?$getDetOutgoing[0]['no_spk']:0;
-
-						$getSummary 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'no_spk'=>$no_spk))->result_array();
-					}
-					else{
-						$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
-						$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
-						$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
-					}
-
-=======
 				if($valx['sts_product'] == 'deadstok' AND $valx['sts'] == 'loose_dead_modif'){
 					$GetKodeSPK 	= $this->db->select('*')->get_where('deadstok_modif',array('id'=>$valx['id_uniq']))->result_array();
 					$getSummaryMax 	= $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk']))->result_array();
 					$getSummary 	= $this->db->select('*')->get_where('data_erp_fg',array('id_pro_det'=>$valx['id_milik'],'kode_trans'=>$GetKodeSPK[0]['kode_spk'],'created_date'=>$getSummaryMax[0]['created_date']))->result_array();
 					
 										
->>>>>>> dev_sam
 					foreach ($getSummary as $key => $value2x) {
 						$UNIQ2 = $value.'-'.$key;
 						$ArrGroupMaterial[$UNIQ2]['tanggal'] = date('Y-m-d');
