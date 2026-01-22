@@ -93,7 +93,7 @@ class Report_in_transit extends CI_Controller {
 			$cost_book = (!empty($row['id_material']))?number_format($row['cost_book'],2):'';
 			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
 			$nestedData[]	= "<div align='right'>".$QTY."</div>";
-			$nestedData[]	= "<div align='right'>".$cost_book."</div>";
+			$nestedData[]	= "<div align='right'>".$cost_book."</div>"; 
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;

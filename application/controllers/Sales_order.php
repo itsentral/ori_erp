@@ -12,6 +12,8 @@ class Sales_order extends CI_Controller {
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login'); 
 		}
+
+		ini_set('memory_limit', '2G');
 	}
 	
 	public function index(){

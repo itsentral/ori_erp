@@ -419,7 +419,7 @@ class Asset_model extends CI_Model{
 				'action'		=> 'asset',
 				'akses_menu'	=> $Arr_Akses,
 			);
-			$this->load->view('Asset/add_pr', $data);
+			$this->load->view('Asset/add_pr', $data); 
 		}
     }
 	

@@ -6,7 +6,7 @@ class Adjustment_material_model extends CI_Model {
 	}
 	
 	public function adjustment(){
-		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/adjustment';
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/adjustment'; 
 		$Arr_Akses			= getAcccesmenu($controller);
 		if($Arr_Akses['read'] !='1'){
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
@@ -278,6 +278,7 @@ class Adjustment_material_model extends CI_Model {
 					$ArrStockDari['update_by'] 		= $data_session['ORI_User']['username'];
 					$ArrStockDari['update_date'] 	= date('Y-m-d H:i:s');
 					
+					
 					$ArrHistDari['id_material'] 	= $rest_gudang_dari[0]->id_material;
 					$ArrHistDari['idmaterial'] 		= $rest_gudang_dari[0]->idmaterial;
 					$ArrHistDari['nm_material'] 	= $rest_gudang_dari[0]->nm_material;
@@ -307,12 +308,19 @@ class Adjustment_material_model extends CI_Model {
 				$kategori_gudang = $coa_1->category;
 				
 				$id_material = 	$rest_gudang_dari[0]->id_material;
+				//ambil saldo akhir 
+						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari_m, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$PRICE1=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari_m, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari_m, 'id_material'=>$id_material),1)->row();
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($costbook)) $PRICE1=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
+
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
@@ -368,7 +376,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['kode_trans'] 			= $kode_trans;
 				$ArrJurnalNew['tgl_trans'] 			= $DateTime;
 				$ArrJurnalNew['qty_out'] 			= $QTY_OKE;
-				$ArrJurnalNew['ket'] 				= 'pindah gudang';
+				$ArrJurnalNew['ket'] 				= 'adjustment mutasi';
 				$ArrJurnalNew['harga'] 			= $PRICE;
 				$ArrJurnalNew['harga_bm'] 		= 0;
 				$ArrJurnalNew['nilai_awal_rp']	= $nilaijurnalakhir;
@@ -378,6 +386,18 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['update_date'] 		= $DateTime;
 				$ArrJurnalNew['no_jurnal'] 		= $Nojurnal;
 				$ArrJurnalNew['coa_gudang'] 		= $coa_gudang;
+
+
+				//update syam 18/12/2025
+						$ArrHistDari['harga'] 			= $PRICE;
+						$ArrHistDari['total_harga'] 		= $PRICE*$QTY_OKE;
+						$ArrHistDari['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistDari['saldo_akhir']		= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+						$ArrHistDari['harga_baru'] 		= $PRICE;
+
+				//update syam 18/12/2025
+					$ArrStockDari['harga'] 		    = $PRICE;
+					$ArrStockDari['total_harga'] 	= ($rest_gudang_dari[0]->qty_stock - $qty_oke)*$PRICE;
 				
 				
 					
@@ -450,10 +470,15 @@ class Adjustment_material_model extends CI_Model {
 				$id_material = 	$rest_gudang_ke[0]->id_material;
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$PRICE2=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($costbook)) $PRICE2=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE2*$stokjurnalakhir;
+
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
@@ -525,17 +550,21 @@ class Adjustment_material_model extends CI_Model {
 					
 				}
 				
+				
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-				
-								
+				$PRICE3=0;
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke_m, 'id_material'=>$id_material),1)->row();
 				
 				
+				if(!empty($costbook2)) $PRICE3=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE3*$stokjurnalakhir2;
+
+
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+
 				
 				
 				$ArrJurnalNew2['id_material'] 		= $rest_gudang_ke[0]->id_material;
@@ -564,6 +593,20 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew2['update_date'] 		= $DateTime;
 				$ArrJurnalNew2['no_jurnal'] 			= '-';
 				$ArrJurnalNew2['coa_gudang'] 		= $coa_gudang;
+
+
+				//update syam 18/12/2025
+						$ArrHistKe['harga'] 			= $PRICE;
+						$ArrHistKe['total_harga'] 		= $PRICE*$QTY_OKE;
+						$ArrHistKe['saldo_awal']	    = $nilaijurnalakhir2;
+						$ArrHistKe['saldo_akhir']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+						$ArrHistKe['harga_baru'] 		= $PRICENEW;
+
+				//update syam 18/12/2025
+					$ArrStockKe['harga'] 		    = $PRICENEW;
+					$ArrStockKe['total_harga'] 	    = ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+
+
 				
 					
 					if($expired_date_m != NULL AND $expired_date_m != '' AND $expired_date_m != '0'){
@@ -653,6 +696,17 @@ class Adjustment_material_model extends CI_Model {
 					$ArrPlusHist['ket'] 				= 'penambahan gudang mutasi (insert new)';
 					$ArrPlusHist['update_by'] 			= $data_session['ORI_User']['username'];
 					$ArrPlusHist['update_date'] 		= date('Y-m-d H:i:s');
+
+					//update syam 18/12/2025
+						$ArrPlusHist['harga'] 			= $PRICE;
+						$ArrPlusHist['total_harga'] 	= $PRICE*$qty_oke;
+						$ArrPlusHist['saldo_awal']	    = 0;
+						$ArrPlusHist['saldo_akhir']		= $PRICE*$qty_oke;
+						$ArrPlusHist['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+					$ArrPlus['harga'] 		        = $PRICE;
+					$ArrPlus['total_harga'] 	    = $PRICE*$qty_oke;
 					
 					if($expired_date_m != NULL AND $expired_date_m != '' AND $expired_date_m != '0'){
 						$ArrPlusExp['id_material'] 	= $rest_mat[0]->id_material;
@@ -727,14 +781,21 @@ class Adjustment_material_model extends CI_Model {
 					$ArrHistDari['ket'] 				= 'pengurangan gudang mutasi';
 					$ArrHistDari['update_by'] 			= $data_session['ORI_User']['username'];
 					$ArrHistDari['update_date'] 		= date('Y-m-d H:i:s');
+
+					
 					
 				$id_material = $rest_gudang_dari[0]->id_material;
+				//ambil saldo akhir 						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$PRICE1=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($costbook)) $PRICE1=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
@@ -799,6 +860,18 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['update_date'] 		= $DateTime;
 				$ArrJurnalNew['no_jurnal'] 		= $Nojurnal;
 				$ArrJurnalNew['coa_gudang'] 		= $coa_gudang;
+
+
+				//update syam 18/12/2025
+						$ArrHistDari['harga'] 			= $PRICE;
+						$ArrHistDari['total_harga'] 	= $PRICE*$qty_oke;
+						$ArrHistDari['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistDari['saldo_akhir']		= $nilaijurnalakhir-($PRICE * $qty_oke);
+						$ArrHistDari['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+					$ArrStockDari['harga'] 		        = $PRICE;
+					$ArrStockDari['total_harga'] 	    = $PRICE*($stokjurnalakhir-$qty_oke);
 				
 					
 					if($expired_date != NULL AND $expired_date != '' AND $expired_date != '0'){
@@ -909,12 +982,17 @@ class Adjustment_material_model extends CI_Model {
 					$ArrHistKe['update_date'] 		= date('Y-m-d H:i:s');
 					
 				$id_material = $rest_gudang_ke[0]->id_material;
+				//ambil saldo akhir 						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$PRICE1=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($costbook)) $PRICE1=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
@@ -979,6 +1057,18 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew['update_date'] 		= $DateTime;
 				$ArrJurnalNew['no_jurnal'] 		= $Nojurnal;
 				$ArrJurnalNew['coa_gudang'] 		= $coa_gudang;
+
+
+				//update syam 18/12/2025
+						$ArrHistKe['harga'] 			= $PRICE;
+						$ArrHistKe['total_harga']   	= $PRICE*$qty_oke;
+						$ArrHistKe['saldo_awal']	    = $nilaijurnalakhir;
+						$ArrHistKe['saldo_akhir']		= $nilaijurnalakhir+($PRICE * $qty_oke);
+						$ArrHistKe['harga_baru'] 		= $PRICE;
+
+					//update syam 18/12/2025
+					$ArrStockKe['harga'] 		        = $PRICE;
+					$ArrStockKe['total_harga'] 	        = $PRICE*($stokjurnalakhir+$qty_oke);
 				
 					
 					if($expired_date != NULL AND $expired_date != '' AND $expired_date != '0'){
@@ -1071,12 +1161,17 @@ class Adjustment_material_model extends CI_Model {
 					
 					
 					$id_material = $rest_mat[0]->id_material;
+				//ambil saldo akhir 						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$stok_jurnal_akhir = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
-				if(!empty($stok_jurnal_akhir)) $stokjurnalakhir=$stok_jurnal_akhir->qty_stock_akhir;
+				$PRICE1=0;
+				$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$id_material),1)->row();
 				
-				if(!empty($stok_jurnal_akhir)) $nilaijurnalakhir=$stok_jurnal_akhir->nilai_akhir_rp;
+				
+				if(!empty($costbook)) $PRICE1=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE1*$stokjurnalakhir;
 				
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);

@@ -33,7 +33,7 @@
 				$dataSum = $HrgTot;
 				$unitT = $valx['unit'];
 				$sisa_inv = $valx['qty_delivery'];
-				$harga_sat	= round($valx['harga_satuan'],2);
+				$harga_sat	= round($valx['harga_satuan'],3);
 				$harga_tot	= round($valx['harga_total'],2);
 				$SUM += ($harga_tot);
 
@@ -49,7 +49,7 @@
 					$unitT = "Pcs";
 				}
 				$sisa_inv = $valx['qty_delivery'];//$valx['qty'] - $valx['qty_inv'];
-				$harga_sat	= round($dataSum / $valx['qty'],2);
+				$harga_sat	= round($dataSum / $valx['qty'],3);
 				$harga_tot	= round($harga_sat * $sisa_inv,2);
 				$SUM += ($harga_tot);
 			}

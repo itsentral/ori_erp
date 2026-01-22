@@ -559,7 +559,7 @@ class Warehouse_model extends CI_Model {
 					$ArrUpdateStock[$val2]['qty_good'] 	= $qtyIN;
 					$ArrUpdateStock[$val2]['qty_risk'] 	= $qtyRISK;
 					$ArrUpdateStock[$val2]['unit_price'] = $HARGA_UNIT;
-					$ArrUpdateStock[$val2]['unit_price_idr'] = $HARGA_UNIT * $kurs_ros;
+					$ArrUpdateStock[$val2]['unit_price_idr'] = $HARGA_UNIT * $kurs_ros; 
 					$ArrUpdateStock[$val2]['bm'] = $BM;
 
 					//MATERIAL YANG AKAN DI UPDATE EXPIRED
@@ -668,9 +668,9 @@ class Warehouse_model extends CI_Model {
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
 				
 				if($stok_akhir==0){
-					$PRICENEW = 0;
+					$PRICENEW = $PRICE2;
 				} else{
-				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 
 
@@ -773,9 +773,9 @@ class Warehouse_model extends CI_Model {
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
 				
 				if($stok_akhir==0){
-					$PRICENEW = 0;
+					$PRICENEW = $PRICE2;
 				} else{
-				   $PRICENEW = round(($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir));
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)))/($qtyIN+$stokjurnalakhir);
 		        }
 
 				//update stock
@@ -2266,7 +2266,6 @@ class Warehouse_model extends CI_Model {
 						
 				$stokjurnalakhir=0;
 				$nilaijurnalakhir=0;
-				$PRICE=0;
 				$bmunit = 0;
 				$bm = 0;
 
@@ -2323,21 +2322,23 @@ class Warehouse_model extends CI_Model {
 				
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
-				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
-				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-
+			
 				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
-				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				$GudangFrom2 = $id_tujuan;
 				
-				$PRICENEW = round((($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2));
+				if($QTY_OKE+$stokjurnalakhir2 != 0){
+				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				} else {
+				$PRICENEW = ($PRICE2);
+				}
+
+				
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
@@ -2594,7 +2595,7 @@ class Warehouse_model extends CI_Model {
 
 			//UPDATE NOMOR SURAT JALAN
 			$monthYear 		= date('/m/Y');
-			$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang_dari);
+			$kode_gudang 	= get_name('warehouse', 'kode', 'id', $id_gudang_dari); 
 
 			$qIPP			= "SELECT MAX(no_surat_jalan) as maxP FROM warehouse_adjustment WHERE no_surat_jalan LIKE '%/IA".$kode_gudang.$monthYear."' ";
 			$numrowIPP		= $this->db->query($qIPP)->num_rows();
@@ -3444,7 +3445,7 @@ class Warehouse_model extends CI_Model {
 						$ArrDeatilAdj2[$val2.$val]['kode_trans'] 	= $kode_trans;
 						$ArrDeatilAdj2[$val2.$val]['id_material'] 	= $rest_pusat[0]->id_material;
 						$ArrDeatilAdj2[$val2.$val]['nm_material'] 	= $rest_pusat[0]->nm_material;
-						$ArrDeatilAdj2[$val2.$val]['id_category'] 	= $rest_pusat[0]->id_category;
+						$ArrDeatilAdj2[$val2.$val]['id_category'] 	= $rest_pusat[0]->id_category; 
 						$ArrDeatilAdj2[$val2.$val]['nm_category'] 	= $rest_pusat[0]->nm_category;
 						$ArrDeatilAdj2[$val2.$val]['qty_order'] 	= $det_mat[0]->qty_order;
 						$ArrDeatilAdj2[$val2.$val]['qty_oke'] 		= str_replace(',','',$valx['qty_oke']);
@@ -4644,14 +4645,12 @@ class Warehouse_model extends CI_Model {
 			if($requestData['category'] == 'pusat'){
 			$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
-								<button type='button' class='btn btn-sm btn-primary look_history_tras' title='History Tras' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								<button type='button' class='btn btn-sm btn-default lot_history' title='Lot' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								</div>";
 			}
 			else{
 				$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
-								<button type='button' class='btn btn-sm btn-primary look_history_tras' title='History Tras' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>
 								</div>";
 			}
 			$data[] = $nestedData;
@@ -5232,7 +5231,7 @@ class Warehouse_model extends CI_Model {
 			'gudang_to' 		=> $detAdjustment[0]['id_gudang_ke'],
 			'kode_spk' 				=> $detAdjustment[0]['kode_spk'],
 			'kode_trans' 				=> $detAdjustment[0]['kode_trans'],
-			'hist_produksi'			=> $detAdjustment[0]['created_date']
+			'hist_produksi'			=> $detAdjustment[0]['created_date'] 
 		);
 		$this->load->view('Warehouse/request_mat_resin', $data);
 	}
@@ -5294,6 +5293,45 @@ class Warehouse_model extends CI_Model {
 		);
 
 		$this->load->view('Warehouse/modal_history_tras', $data);
+	}
+
+	public function index_product_stock(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['read'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
+		$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND category='".strtolower($this->uri->segment(3))."' ORDER BY urut ASC ")->result_array();
+		if($this->uri->segment(3) == 'origa'){
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE `status`='Y' AND id='23' ")->result_array();
+			$judul = "Warehouse Product >> Gudang WIP >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'pusat'){
+			$judul = "Warehouse Product >> Gudang FG >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'subgudang'){
+			$judul = "Warehouse Product >> Intransit >> Stock";
+		}
+		elseif($this->uri->segment(3) == 'virtual'){
+			$judul = "Warehouse Product >> Incustomer >> Stock";
+			$data_gudang		= $this->db->query("SELECT * FROM warehouse WHERE id='15' ")->result_array();
+		}
+		// else{
+		// 	$judul = "Warehouse Product >>  >> Stock";
+		// }
+		$data = array(
+			'title'			=> $judul,
+			'action'		=> 'index',
+			'category'		=> $this->uri->segment(3),
+			'row_group'		=> $data_Group,
+			'akses_menu'	=> $Arr_Akses,
+			'data_gudang'	=> $data_gudang
+		);
+		history('View Product Stock');
+		$this->load->view('Warehouse/product_stock',$data);
 	}
 
 
