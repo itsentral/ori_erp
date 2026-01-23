@@ -1,5 +1,10 @@
 <?php
 $this->load->view('include/side_menu');
+if($mata_uang =='IDR'){	
+	$nilainet = isset($results) ? $results->value_idr:0;
+	}elseif($mata_uang =='USD'){ 
+	$nilainet = isset($results) ? $results->value_usd:0;
+	}
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
@@ -26,14 +31,14 @@ $this->load->view('include/side_menu');
                             <select id="matauang2" name="matauang2" class="form-control"> 
 							
 							<?php						
-							$matauang = $results->matauang_receive_invoice;		
-							if($matauang =='IDR'){
+							//$matauang = $results->matauang_receive_invoice;		
+							if($mata_uang =='IDR'){
 								echo "<option value=''>Pilih Matauang</option>";
 								echo "<option value ='IDR' selected >IDR</option>";
 								echo "<option value ='USD' >USD</option>";	
-							 }elseif($matauang =='USD'){ 
+							 }elseif($mata_uang =='USD'){ 
 								echo "<option value=''>Pilih Matauang</option>";
-								echo "<option value ='IDR' >IDR</option>";
+								echo "<option value ='IDR' >IDR</option>"; 
 								echo "<option value ='USD' selected >USD</option>";	
 							 }else{ 
 								echo "<option value=''>Pilih Matauang</option>";
@@ -51,7 +56,10 @@ $this->load->view('include/side_menu');
 					<label for="tgl_bayar" class="control-label">Kurs :</label>
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
-                          
+                  <div class="col-md-6">
+					<label class="control-label">Net</label>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
+				  </div>        
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>

@@ -818,6 +818,7 @@ class Purchase extends CI_Controller {
         
 		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
         $total_price = $nilai_po->total_price;
+		$mata_uang   = $nilai_po->mata_uang;
 
 		$data = array(
 			'title'			=> 'Receive Invoice',
@@ -827,6 +828,7 @@ class Purchase extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses,
 			'dt_incoming'	=> $dt_incoming,
 			'total_price'	=> $total_price,
+			'mata_uang'		=> $mata_uang,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);
@@ -1004,7 +1006,7 @@ class Purchase extends CI_Controller {
 			$data_payterm 	= $this->db->query("select * from billing_top where no_po='".$info_payterm->no_po."'")->result();
 			$def_ppn=(object)array('info'=>$datapoh->tax);
 		}else{
-			$def_ppn=$this->All_model->getppn();
+			$def_ppn=$this->All_model->getppn(); 
 		}
 		$def_pph=$this->All_model->getpph();
 		$controller			= "";
