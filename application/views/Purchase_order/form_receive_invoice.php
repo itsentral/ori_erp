@@ -60,11 +60,11 @@ $this->load->view('include/side_menu');
 					</div>
                   <div class="col-md-6">
 					<label class="control-label">Net</label>
-					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required eadonly>
 				  </div>        
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
-					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:$ppn); ?>" required>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Total Invoice</label>
