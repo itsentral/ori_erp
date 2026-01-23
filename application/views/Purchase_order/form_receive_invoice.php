@@ -120,7 +120,7 @@ $this->load->view('include/side_menu');
 									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
 									echo "<td align='left'>".$record->tanggal."</td>";
 									echo "<td align='left'>".$record->pic."</td>";
-									echo "<td align='left'>".$record->total_harga_product."</td>";
+									echo "<td align='left'>".$record->total."</td>";
 									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
 								echo "</tr>";
 							}
