@@ -1,9 +1,11 @@
 <?php
 $this->load->view('include/side_menu');
-if($mata_uang =='IDR'){	
+    if($mata_uang =='IDR'){	
 	$nilainet = isset($results) ? $results->value_idr:0;
+	$ppn      = (11*$nilainet)/100;
 	}elseif($mata_uang =='USD'){ 
 	$nilainet = isset($results) ? $results->value_usd:0;
+	$ppn      = 0;
 	}
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
@@ -58,11 +60,11 @@ if($mata_uang =='IDR'){
 					</div>
                   <div class="col-md-6">
 					<label class="control-label">Net</label>
-					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required>
 				  </div>        
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
-					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:$ppn); ?>" required>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Total Invoice</label>
