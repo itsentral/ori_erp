@@ -48,7 +48,7 @@ $this->load->view('include/side_menu');
 					<?php
 					$nilai_po_invoice=0;
 					if($datapo->mata_uang=='IDR'){
-						$nilai_po_invoice=$info_payterm->value_idr;
+						$nilai_po_invoice=$info_payterm->value_idr-$info_payterm->nilai_ppn;
 					}else{
 						$nilai_po_invoice=$info_payterm->value_usd;						
 					}
