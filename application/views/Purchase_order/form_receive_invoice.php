@@ -4,10 +4,12 @@ $this->load->view('include/side_menu');
 	$nilainet = isset($results) ? $results->value_idr:0;
 	$ppn      = (11*$nilainet)/100;
 	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet)/100;
 	}elseif($mata_uang =='USD'){ 
 	$nilainet = isset($results) ? $results->value_usd:0;
 	$ppn      = 0;
 	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = $nilainet;
 	}
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
@@ -69,7 +71,11 @@ $this->load->view('include/side_menu');
                   <div class="col-md-6">
 					<label class="control-label">Nilai DP <?= $results->progress; ?>%</label>
 					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required readonly>
-				  </div>        
+				  </div>      
+				    <div class="col-md-6">
+					<label class="control-label">Nilai DPP <?= $results->progress; ?>%</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
+				  </div>   
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
