@@ -30,7 +30,7 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
-                            <select id="matauang2" name="matauang2" class="form-control"> 
+                            <select id="matauang2" name="matauang2" class="form-control" readonly> 
 							
 							<?php						
 							//$matauang = $results->matauang_receive_invoice;		
@@ -60,7 +60,7 @@ $this->load->view('include/side_menu');
 					</div>
                   <div class="col-md-6">
 					<label class="control-label">Net</label>
-					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required eadonly>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required readonly>
 				  </div>        
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
