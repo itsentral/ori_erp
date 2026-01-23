@@ -69,7 +69,7 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>"  readonly>
 				  </div>
                   <div class="col-md-6">
-					<label class="control-label">Nilai DP <?= $results->progress; ?>%</label>
+					<label class="control-label">Nilai <?= $results->group_top; ?> <?= $results->progress; ?>%</label>
 					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required readonly>
 				  </div>      
 				    <div class="col-md-6">
