@@ -18,7 +18,7 @@
 						<?php
 						$SUM=0;
 						$nomor=0;
-						foreach($get_retensi AS $val => $valx){
+						foreach($get_retensi AS $val => $valx){ 
 							$nomor++;
 							$harga_tot6			= number_format($valx['total_retensi2_idr'],2);
 							$harga_tot6_hidden	= round($valx['total_retensi2_idr'],2);
@@ -29,8 +29,8 @@
 								<td align='center'><span><a class="text-red" href="javascript:void(0)" title="No Deal" onClick='delRow6(<?= $nomor;?>)'><i class="fa fa-times"></i></a></span></td>
 								<td>
 									<input type="text" class="form-control" id="material_name6" name="data6[<?=$nomor ?>][material_name6]" value="<?=set_value('material_name6', isset($material_name) ? $material_name : ''); ?>" readonly tabindex='-1'>
-									<input type="hidden" id="unit6_ipp_<?=$nomor ?>" name="data6[<?=$nomor ?>][no_ipp]" value="<?=$valx['no_ipp']?>" >
-									<input type="hidden" id="unit6_so_<?=$nomor ?>" name="data6[<?=$nomor ?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>" >
+									<input type="hidden" id="unit6_ipp_<?=$nomor ?>" name="data6[<?=$nomor ?>][no_ipp]" value="<?=$valx['nomor_po']?>" >
+									<input type="hidden" id="unit6_so_<?=$nomor ?>" name="data6[<?=$nomor ?>][no_so]" value="<?=get_nomor_so($valx['nomor_po'])?>" >
 								</td>
 								<td>
 									<input type="hidden" class="form-control" id="unit6" name="data6[<?=$nomor ?>][unit6]" value="" readonly >

@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Kartu_hutang extends CI_Controller {
+class Kartu_piutang extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('Kartu_hutang_model');
+        $this->load->model('Kartu_piutang_model');
         $this->load->library('pagination');
         $this->load->helper('url');
         $this->load->library('form_validation');
@@ -14,8 +14,8 @@ class Kartu_hutang extends CI_Controller {
 
     // Display list with pagination
     public function index() {
-        $config['base_url'] = base_url('kartu_hutang/index');
-        $config['total_rows'] = $this->Kartu_hutang_model->count_all();
+        $config['base_url'] = base_url('kartu_piutang/index');
+        $config['total_rows'] = $this->Kartu_piutang_model->count_all();
         $config['per_page'] = 10;
         $config['uri_segment'] = 3;
         
@@ -45,16 +45,16 @@ class Kartu_hutang extends CI_Controller {
         $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
         $search = $this->input->get('search');
 
-        $data['kartu_hutang'] = $this->Kartu_hutang_model->get_all($config['per_page'], $page, $search);
+        $data['kartu_piutang'] = $this->Kartu_piutang_model->get_all($config['per_page'], $page, $search);
         $data['pagination'] = $this->pagination->create_links();
         $data['search'] = $search;
 
-        $this->load->view('kartu_hutang/index', $data);
+        $this->load->view('kartu_piutang/index', $data);
     }
 
     // Display create form
     public function create() {
-        $this->load->view('kartu_hutang/create');
+        $this->load->view('kartu_piutang/create');
     }
 
     // Store new record
@@ -66,13 +66,13 @@ class Kartu_hutang extends CI_Controller {
 
         if ($this->form_validation->run() === FALSE) {
             $this->session->set_flashdata('error', validation_errors());
-            redirect('kartu_hutang/create');
+            redirect('kartu_piutang/create');
         }
 
         // Check if nomor already exists
-        // if ($this->Kartu_hutang_model->check_nomor_exists($this->input->post('nomor'))) {
+        // if ($this->Kartu_piutang_model->check_nomor_exists($this->input->post('nomor'))) {
         //     $this->session->set_flashdata('error', 'Nomor sudah digunakan');
-        //     redirect('kartu_hutang/create');
+        //     redirect('kartu_piutang/create');
         // }
 
         $data = array(
@@ -97,34 +97,34 @@ class Kartu_hutang extends CI_Controller {
             'kredit_usd' => $this->input->post('kredit_usd') ?: 0
         );
 
-        if ($this->Kartu_hutang_model->insert($data)) {
+        if ($this->Kartu_piutang_model->insert($data)) {
             $this->session->set_flashdata('success', 'Data berhasil ditambahkan');
         } else {
             $this->session->set_flashdata('error', 'Gagal menambahkan data');
         }
 
-        redirect('kartu_hutang');
+        redirect('kartu_piutang');
     }
 
     // Display edit form
     public function edit($id) {
-        $data['kartu_hutang'] = $this->Kartu_hutang_model->get_by_id($id);
+        $data['kartu_piutang'] = $this->Kartu_piutang_model->get_by_id($id);
         
-        if (!$data['kartu_hutang']) {
+        if (!$data['kartu_piutang']) {
             $this->session->set_flashdata('error', 'Data tidak ditemukan');
-            redirect('kartu_hutang');
+            redirect('kartu_piutang');
         }
 
-        $this->load->view('kartu_hutang/edit', $data);
+        $this->load->view('kartu_piutang/edit', $data);
     }
 
     // Update record
     public function update($id) {
         // Get current data
-        $current_data = $this->Kartu_hutang_model->get_by_id($id);
+        $current_data = $this->Kartu_piutang_model->get_by_id($id);
         if (!$current_data) {
             $this->session->set_flashdata('error', 'Data tidak ditemukan');
-            redirect('kartu_hutang');
+            redirect('kartu_piutang');
         }
 
         $this->form_validation->set_rules('nomor', 'Nomor', 'required|max_length[50]');
@@ -134,15 +134,15 @@ class Kartu_hutang extends CI_Controller {
 
         if ($this->form_validation->run() === FALSE) {
             $this->session->set_flashdata('error', validation_errors());
-            redirect('kartu_hutang/edit/' . $id);
+            redirect('kartu_piutang/edit/' . $id);
         }
 
         // Check if nomor changed and already exists
         $new_nomor = $this->input->post('nomor');
         if ($new_nomor != $current_data->nomor) {
-            if ($this->Kartu_hutang_model->check_nomor_exists($new_nomor)) {
+            if ($this->Kartu_piutang_model->check_nomor_exists($new_nomor)) {
                 $this->session->set_flashdata('error', 'Nomor sudah digunakan oleh data lain');
-                redirect('kartu_hutang/edit/' . $id);
+                redirect('kartu_piutang/edit/' . $id);
             }
         }
 
@@ -168,35 +168,35 @@ class Kartu_hutang extends CI_Controller {
             'kredit_usd' => $this->input->post('kredit_usd') ?: 0
         );
 
-        if ($this->Kartu_hutang_model->update($id, $data)) {
+        if ($this->Kartu_piutang_model->update($id, $data)) {
             $this->session->set_flashdata('success', 'Data berhasil diupdate');
         } else {
             $this->session->set_flashdata('error', 'Gagal mengupdate data');
         }
 
-        redirect('kartu_hutang');
+        redirect('kartu_piutang');
     }
 
     // Delete record
     public function delete($id) {
-        if ($this->Kartu_hutang_model->delete($id)) {
+        if ($this->Kartu_piutang_model->delete($id)) {
             $this->session->set_flashdata('success', 'Data berhasil dihapus');
         } else {
             $this->session->set_flashdata('error', 'Gagal menghapus data');
         }
 
-        redirect('kartu_hutang');
+        redirect('kartu_piutang');
     }
 
     // View detail
     public function view($id) {
-        $data['kartu_hutang'] = $this->Kartu_hutang_model->get_by_id($id);
+        $data['kartu_piutang'] = $this->Kartu_piutang_model->get_by_id($id);
         
-        if (!$data['kartu_hutang']) {
+        if (!$data['kartu_piutang']) {
             $this->session->set_flashdata('error', 'Data tidak ditemukan');
-            redirect('kartu_hutang');
+            redirect('kartu_piutang');
         }
 
-        $this->load->view('kartu_hutang/view', $data);
+        $this->load->view('kartu_piutang/view', $data);
     }
 }

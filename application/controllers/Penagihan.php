@@ -1957,7 +1957,7 @@ if($base_cur=='USD'){
 
 		$in_ipp = [];
 		$in_bq = [];
-		$base_cur='USD';
+		$base_cur='IDR';
 
 		foreach($getBq AS $val => $valx){
 			$in_ipp[$val] 	= $valx['no_ipp'];
@@ -1983,6 +1983,9 @@ if($base_cur=='USD'){
 		}else{
 			$kurs	= $penagihan[0]->kurs_jual;
 		}
+
+		
+
 		$approval	= $this->uri->segment(4);
 		$data = array(
 			'title'			=> 'Indeks Of Create Invoice Retensi',
@@ -2003,7 +2006,7 @@ if($base_cur=='USD'){
 			'id'			=> $id,
 			'approval'		=> $approval
 		);
-		$this->load->view('Penagihan/create_retensi_new',$data);
+		$this->load->view('Penagihan/create_retensi_new',$data); 
 	}
 	public function create_retensi_new_delivery(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)));
@@ -4555,7 +4558,8 @@ else
 		$this->load->view('Penagihan/create_um_new_instalasi',$data);
 	}
 
-	public function create_progress_new_instalasi(){
+	public function create_progress_new_instalasi()
+	{
 		if($this->input->post()){
 			$data_session	= $this->session->userdata;
 
@@ -4580,8 +4584,8 @@ else
 
 			$no_ipp                 = $this->input->post('no_ipp');
 			$so_number				= $this->input->post('no_so');
-// sementara diganti
-//			$no_invoice 			= gen_invoice($no_ipp);
+			// sementara diganti
+			// $no_invoice 			= gen_invoice($no_ipp);
 			$no_invoice 			= $this->input->post('nomor_faktur');
 			$id_customer			= $this->input->post('id_customer');
 			$nm_customer			= $this->input->post('nm_customer');
@@ -4596,7 +4600,7 @@ else
 			$progressx				= $this->input->post('progressx');
 			$persen_retensi2		= $this->input->post('persen_retensi2');
 			$persen_retensi			= $this->input->post('persen_retensi');
-if($base_cur=='USD'){
+	if($base_cur=='USD'){
 			$total_invoice          = $this->input->post('total_invoice');
 			$total_invoice_idr      = $this->input->post('total_invoice')*$kurs;
 			$total_um               = $this->input->post('down_payment');
@@ -5469,8 +5473,55 @@ if($base_cur=='USD'){
 						$detailInv6[$val]['checked']				= $checked;
 						$detailInv6[$val]['id_milik']	    		= $d6['id_milik'];
 					}
+
 				}
+
+					$detailInv9 = [];
+				if(!empty($_POST['data9'])){
+					foreach($_POST['data9'] as $val => $d9){
+						$material_name9          = $d9['material_name9'];
+						$harga_sat9       		 = 0;
+						$qty9                    = 0;
+						$unit9                   = $d9['unit9'];
+						$harga_tot9=0;$checked='';
+						if(isset($d9['harga_tot9'])){
+							$harga_tot9   		= $d9['harga_tot9'];
+							if($harga_tot9>0) $checked='1';
+						}
+						$no_ippdtl				= $d9['no_ipp'];
+						$no_sodtl				= $d9['no_so'];
+						$harga_tot9_ori			= $d9['harga_tot9_ori'];
+						$harga_tot9_sisa		= $d9['harga_tot9_sisa'];
+
+						$detailInv9[$val]['id_penagihan']			= $id;
+						$detailInv9[$val]['id_bq'] 		     	    = $no_bq;
+						$detailInv9[$val]['no_ipp']		     	    = $no_ippdtl;
+						$detailInv9[$val]['so_number'] 		     	= $no_sodtl;
+						$detailInv9[$val]['no_invoice'] 		    = $no_invoice;
+						$detailInv9[$val]['tgl_invoice']      		= $Tgl_Invoice;
+						$detailInv9[$val]['id_customer']	 	    = $id_customer;
+						$detailInv9[$val]['nm_customer'] 		    = $nm_customer;
+						$detailInv9[$val]['jenis_invoice'] 		    = $jenis_invoice;
+						$detailInv9[$val]['nm_material']	        = $material_name9;
+						$detailInv9[$val]['unit']	                = $unit9;
+						$detailInv9[$val]['harga_satuan']	        = 0;
+						$detailInv9[$val]['harga_satuan_idr']	    = 0;
+						$detailInv9[$val]['qty']	                = 0;
+						$detailInv9[$val]['harga_total']	        = $harga_tot9/$kurs;
+						$detailInv9[$val]['harga_total_idr']	    = $harga_tot9;
+						$detailInv9[$val]['kategori_detail']	    = 'TRUCKING';
+						$detailInv9[$val]['created_by'] 	        = $data_session['ORI_User']['username'];
+						$detailInv9[$val]['created_date'] 	        = date('Y-m-d H:i:s');
+						$detailInv9[$val]['desc']	    			= $material_name9;
+						$detailInv9[$val]['harga_total_so']			= $harga_tot9_ori;
+						$detailInv9[$val]['harga_sisa_so']			= $harga_tot9_sisa;
+						$detailInv9[$val]['checked']				= $checked;
+						$detailInv9[$val]['id_milik']	    		= $d9['id_milik'];
+					}
+				}
+				
 			}
+		
 
 			if($jenis_invoice=='retensi'){
 				$detailInv6 = [];
@@ -5593,6 +5644,9 @@ if($base_cur=='USD'){
 				}
 				if(!empty($detailInv6)){
 					$this->db->insert_batch('penagihan_detail',$detailInv6);
+				}
+				if(!empty($detailInv9)){
+					$this->db->insert_batch('penagihan_detail',$detailInv9);
 				}
 			$this->db->trans_complete();
 
@@ -7063,7 +7117,7 @@ if($base_cur=='USD'){
 				'arr_in_ipp'	=> $in_ipp,
 				'penagihan'		=> $penagihan,
 				'kurs'			=> $get_kurs[0]->kurs,
-				'uang_muka_persen'	=> $uang_muka_persen,
+				'uang_muka_persen'	=> $uang_muka_persen, 
 				'uang_muka_persen2'	=> 0,
 				'down_payment'	=> $down_payment,
 				'down_payment2'	=> 0,
