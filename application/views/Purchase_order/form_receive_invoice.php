@@ -66,7 +66,7 @@ $this->load->view('include/side_menu');
 					</div>
 				  <div class="col-md-6">
 					<label class="control-label">Net</label>
-					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
+					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>"  readonly>
 				  </div>
                   <div class="col-md-6">
 					<label class="control-label">Nilai DP <?= $results->progress; ?>%</label>
