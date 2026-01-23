@@ -62,8 +62,12 @@ $this->load->view('include/side_menu');
 					<label for="tgl_bayar" class="control-label">Kurs :</label>
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
-                  <div class="col-md-6">
+				  <div class="col-md-6">
 					<label class="control-label">Net</label>
+					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
+				  </div>
+                  <div class="col-md-6">
+					<label class="control-label">Nilai DP <?= $results->progress; ?>%</label>
 					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required readonly>
 				  </div>        
 				  <div class="col-md-6">
@@ -86,10 +90,7 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
 				  </div>
-				  <div class="col-md-6">
-					<label class="control-label">Nilai PO</label>
-					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
-				  </div>
+				  
 				</div>
 				<div class="row">
 				  <div class="col-md-12">
