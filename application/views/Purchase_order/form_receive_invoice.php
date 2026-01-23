@@ -30,7 +30,9 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
-                            <select id="matauang2" name="matauang2" class="form-control" readonly> 
+						  <input type="text" name="matauang2" id="matauang2" value="<?= $mata_uang ?>" class="form-control" required>
+					
+                           <!-- <select id="matauang2" name="matauang2" class="form-control" readonly> 
 							
 							<?php						
 							//$matauang = $results->matauang_receive_invoice;		
@@ -52,7 +54,7 @@ $this->load->view('include/side_menu');
 							
 							
 							
-							</select>
+							</select>-->
                    </div>
                    <div class="col-sm-6">
 					<label for="tgl_bayar" class="control-label">Kurs :</label>
