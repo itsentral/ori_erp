@@ -4,7 +4,7 @@ $this->load->view('include/side_menu');
 	$nilainet = isset($results) ? $results->value_idr:0;
 	$ppn      = (11*$nilainet)/100;
 	$nilaiinvoice = $nilainet+$ppn;
-	$nilaidpp  = ((11/12)*$nilainet)/100;
+	$nilaidpp  = ((11/12)*$nilainet);
 	}elseif($mata_uang =='USD'){ 
 	$nilainet = isset($results) ? $results->value_usd:0;
 	$ppn      = 0;
