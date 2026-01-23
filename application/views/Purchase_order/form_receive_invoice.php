@@ -3,9 +3,11 @@ $this->load->view('include/side_menu');
     if($mata_uang =='IDR'){	
 	$nilainet = isset($results) ? $results->value_idr:0;
 	$ppn      = (11*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
 	}elseif($mata_uang =='USD'){ 
 	$nilainet = isset($results) ? $results->value_usd:0;
 	$ppn      = 0;
+	$nilaiinvoice = $nilainet+$ppn;
 	}
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
@@ -70,7 +72,7 @@ $this->load->view('include/side_menu');
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Total Invoice</label>
-					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= (isset($results)?$results->invoice_total:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nomor Faktur Pajak</label>
