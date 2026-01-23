@@ -30,7 +30,7 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
-						  <input type="text" name="matauang2" id="matauang2" value="<?= $mata_uang ?>" class="form-control" required>
+						  <input type="text" name="matauang2" id="matauang2" value="<?= $mata_uang ?>" class="form-control" required readonly>
 					
                            <!-- <select id="matauang2" name="matauang2" class="form-control" readonly> 
 							
