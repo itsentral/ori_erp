@@ -98,6 +98,7 @@ $this->load->view('include/side_menu');
 				  </div>
 				  
 				</div>
+				<?php if($results->group_top =='progress') {?>
 				<div class="row">
 				  <div class="col-md-12">
 					<h4>Dokumen Incoming </h4>
@@ -129,6 +130,8 @@ $this->load->view('include/side_menu');
 					</table>
 				  </div>
 				</div>
+
+				<?php } ?>
 			</div>
 
 			<div class="box-footer">
