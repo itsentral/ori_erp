@@ -881,7 +881,7 @@ class Purchase extends CI_Controller {
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
 
-		if($datapo->total_terima_barang_idr > 0){
+		if($data['group_top']=='progress'){
 			$ArrUpdate = [
 				'potong_um'      => $data['potong_um'],	
 			];
