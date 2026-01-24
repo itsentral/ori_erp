@@ -72,8 +72,9 @@ $this->load->view('include/side_menu');
                   <div class="col-md-6">
 					<label class="control-label">Net</label>
 					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $total_price; ?>" required readonly>
-				  </div>      
-				    <div class="col-md-6">
+				  </div>
+				  <?php if($results->group_top != 'progress' ) { ?>     
+				  <div class="col-md-6">
 					<label class="control-label">Nilai DPP</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>   
@@ -85,6 +86,20 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Total Invoice</label>
 					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
+				   <?php } else {?>
+				   <div class="col-md-6">
+					<label class="control-label">Nilai DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="0" required readonly>
+				  </div>   
+				  <div class="col-md-6">
+					<label class="control-label">Nilai PPN</label>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="0" required readonly>
+				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Total Invoice</label>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="0" required readonly>
+				  </div>
+				   <?php } ?>
 				  <div class="col-md-6">
 					<label class="control-label">Nomor Faktur Pajak</label>
 					<input type="text" id="faktur_pajak" name="faktur_pajak" value="<?= (isset($results)?$results->faktur_pajak:""); ?>" class="form-control">
