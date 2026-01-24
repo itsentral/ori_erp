@@ -823,6 +823,7 @@ class Purchase extends CI_Controller {
         $total_price = $nilai_po->net_price;
 		$mata_uang   = $nilai_po->mata_uang;
 		$total_harga = $nilai_po->total_price;
+		$tax = $nilai_po->tax;
 
 		$data = array(
 			'title'			=> 'Receive Invoice',
@@ -832,7 +833,9 @@ class Purchase extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses,
 			'dt_incoming'	=> $dt_incoming,
 			'total_price'	=> $total_price,
+			'total_harga'	=> $total_harga,
 			'mata_uang'		=> $mata_uang,
+			'tax'		    => $tax,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);

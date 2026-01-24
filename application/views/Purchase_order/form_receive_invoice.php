@@ -16,7 +16,7 @@ $this->load->view('include/side_menu');
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
 <input type="hidden" name="group_top" id="group_top" value="<?php echo (isset($results) ? $results->group_top: ''); ?>" />
 <input type="hidden" name="no_po" id="no_po" value="<?php echo (isset($results) ? $results->no_po: ''); ?>" />
-<input type="hidden" name="tax" id="tax" value="<?php echo (isset($results) ? $results->tax: ''); ?>" />
+<input type="hidden" name="tax" id="tax" value="<?php echo (isset($tax) ? $tax: ''); ?>" />
 <div class="tab-content">
 	<div class="tab-pane active">
 		<div class="box box-primary">
