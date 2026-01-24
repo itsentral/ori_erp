@@ -210,7 +210,7 @@ $kurs=1;
 						}
 					}
 					?>
-					<tr id='add_<?=$id;?>'>
+					<tr id='add_<?=$id;?>' hidden>
 						<td align='left'><button type='button' class='btn btn-sm btn-warning addPart' title='Add TOP'><i class='fa fa-plus'></i>&nbsp;&nbsp;Add TOP</button></td>
 						<td align='center' colspan='7'></td>
 					</tr>
@@ -218,7 +218,7 @@ $kurs=1;
 			</table>
 		</div>
 	</div>
-	<div class='form-group row'>
+	<div class='form-group row' hidden>
 		<label class='label-control col-sm-1'></label>
 		<div class='col-sm-11'><div id='alert-max' style="font-size: 17px;font-weight: bold;color: red;padding-bottom: 10px;">PROGRESS MELEBIHI 100% !!</div>
 			<?php
