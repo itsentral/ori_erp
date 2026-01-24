@@ -142,7 +142,6 @@ $this->load->view('include/side_menu');
 									echo "<td align='left'>".$record->pic."</td>";
 									echo "<td align='left' class='total_harga'>".$record->total."</td>";
 									echo "<td align='left'><input type='checkbox' class='chk_personal check_pr' data-nomor='".$record->kode_trans."' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
-									
 									echo "</tr>";
 							}
 						}
