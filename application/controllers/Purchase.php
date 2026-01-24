@@ -825,6 +825,8 @@ class Purchase extends CI_Controller {
 		$total_harga = $nilai_po->total_price;
 		$tax = $nilai_po->tax;
 
+		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang_muka' AND no_po='".$info_payterm->no_po."'")->row();
+
 		$data = array(
 			'title'			=> 'Receive Invoice',
 			'action'		=> 'index',
@@ -836,6 +838,7 @@ class Purchase extends CI_Controller {
 			'total_harga'	=> $total_harga,
 			'mata_uang'		=> $mata_uang,
 			'tax'		    => $tax,
+			'dp'		    => $info_dp->total_dp,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);

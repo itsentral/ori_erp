@@ -88,6 +88,10 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <?php } else {?>
 				   <div class="col-md-6">
+					<label class="control-label">Nilai DP</label>
+					<input type="text" class="form-control divide" id="nilai_dp" name="nilai_dp" value="<?= $dp; ?>" required readonly>
+				  </div> 
+				   <div class="col-md-6">
 					<label class="control-label">Nilai DPP</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="0" required readonly>
 				  </div>   
