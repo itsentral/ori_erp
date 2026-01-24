@@ -283,9 +283,9 @@ if($results->invoice_no!="") {
 
     
 	let sumTotal = () => {
-        let discount        =  getNum($('#discount').val().split(",").join(""))
-        let tax             =  getNum($('#tax').val().split(",").join(""))
-        let delivery_cost   =  getNum($('#delivery_cost').val().split(",").join(""))
+        let discount        =  getNum($('#discount').val())
+        let tax             =  getNum($('#tax').val())
+        let delivery_cost   =  getNum($('#delivery_cost').val())
 
 		let sum_total = 0
         let total
