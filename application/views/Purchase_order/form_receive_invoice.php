@@ -120,8 +120,8 @@ $this->load->view('include/side_menu');
 									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
 									echo "<td align='left'>".$record->created_date."</td>";
 									echo "<td align='left'>".$record->pic."</td>";
-									echo "<td align='left'>".$record->total."</td>";
-									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
+									echo "<td align='left' class='total_harga'>".$record->total."</td>";
+									echo "<td align='left'><input type='checkbox' class='chk_personal check_pr' data-nomor='".$record->kode_trans."' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
 								echo "</tr>";
 							}
 						}
@@ -276,4 +276,33 @@ if($results->invoice_no!="") {
 	$(".stsview").addClass("hidden");';
 }
 ?>
+
+ 	$(document).on('click', '.check_pr', function(){
+		sumTotal();
+	});
+
+    
+	let sumTotal = () => {
+        let discount        =  getNum($('#discount').val().split(",").join(""))
+        let tax             =  getNum($('#tax').val().split(",").join(""))
+        let delivery_cost   =  getNum($('#delivery_cost').val().split(",").join(""))
+
+		let sum_total = 0
+        let total
+        $(".check_pr" ).each(function() {
+            if ($(this).is(':checked')) {
+                total = getNum($(this).parent().parent().parent().find('.total_harga').html().split(",").join(""))
+                sum_total += Number(total);
+            }
+        });
+        $('#nilai_net').val(number_format(sum_total,2))
+        /*let net_price = sum_total - (sum_total * discount / 100)
+        $('#net_price').val(number_format(net_price,2))
+        let net_plus_tax = net_price + (net_price * tax / 100)
+        $('#net_plus_tax').val(number_format(net_plus_tax,2))
+        let grand_total = net_plus_tax + delivery_cost*/
+        $('#surat_jalan').val(number_format(sum_total,2))
+
+	}
+
 </script>
