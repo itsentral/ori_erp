@@ -89,19 +89,19 @@ $this->load->view('include/side_menu');
 				   <?php } else {?>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai Potongan DP</label>
-					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= $dp; ?>" required>
+					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->dpp:$dp); ?>" required>
 				  </div>
 				   <div class="col-md-6">
 					<label class="control-label">Nilai DPP</label>
-					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="0" required readonly>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
 				  </div>   
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
-					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="0" required readonly>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value=<?= (isset($results)?$results->nilai_ppn:"0"); ?> required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Total Invoice</label>
-					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="0" required readonly>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value=<?= (isset($results)?$results->invoice_total:"0"); ?> required readonly>
 				  </div>
 				   <?php } ?>
 				  <div class="col-md-6">
