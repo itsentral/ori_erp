@@ -16,6 +16,7 @@ $this->load->view('include/side_menu');
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
 <input type="hidden" name="group_top" id="group_top" value="<?php echo (isset($results) ? $results->group_top: ''); ?>" />
 <input type="hidden" name="no_po" id="no_po" value="<?php echo (isset($results) ? $results->no_po: ''); ?>" />
+<input type="hidden" name="tax" id="tax" value="<?php echo (isset($results) ? $results->tax: ''); ?>" />
 <div class="tab-content">
 	<div class="tab-pane active">
 		<div class="box box-primary">
@@ -65,12 +66,12 @@ $this->load->view('include/side_menu');
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
 				  <div class="col-md-6">
-					<label class="control-label">Net</label>
-					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>"  readonly>
+					<label class="control-label">Nilai PO</label>
+					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_harga)?$total_harga:""); ?>"  readonly>
 				  </div>
                   <div class="col-md-6">
-					<label class="control-label">Nilai TOP <?= $results->group_top; ?> <?= $results->progress; ?>%</label>
-					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $nilainet; ?>" required readonly>
+					<label class="control-label">Net</label>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $total_price; ?>" required readonly>
 				  </div>      
 				    <div class="col-md-6">
 					<label class="control-label">Nilai DPP</label>
@@ -295,14 +296,12 @@ if($results->invoice_no!="") {
                 sum_total += Number(total);
             }
         });
-        $('#nilai_net').val(number_format(sum_total,2))
-        /*let net_price = sum_total - (sum_total * discount / 100)
-        $('#net_price').val(number_format(net_price,2))
-        let net_plus_tax = net_price + (net_price * tax / 100)
-        $('#net_plus_tax').val(number_format(net_plus_tax,2))
-        let grand_total = net_plus_tax + delivery_cost*/
-        $('#surat_jalan').val(number_format(sum_total,2))
-
+        $('#nilai_dpp').val(number_format(sum_total,2))
+        let ppn = (sum_total * tax) / 100
+        $('#nilai_ppn').val(number_format(ppn,2))
+        let net_plus_tax = sum_total + ppn
+        $('#invoice_total').val(number_format(net_plus_tax,2))
+       
 	}
 
 </script>
