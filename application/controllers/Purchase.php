@@ -865,6 +865,10 @@ class Purchase extends CI_Controller {
 			'created_date_invoice' => $dateTime,
 //			'invoice_dokumen' => $data['invoice_dokumen'],
 			'created_by_invoice' => $Username,
+			'nilai_po' => $data['nilai_po'],
+			'net'      => $data['nilai_net'],
+			'dpp'      => $data['nilai_dpp'],
+			'potong_um'      => $data['potong_um'],
 		];
 		$total= $data['invoice_total'];
 		$totalunbill=0;
