@@ -196,9 +196,16 @@ $kurs=1;
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][syarat]' value='".strtoupper($valx['syarat'])."' class='form-control input-md' ".$styledisabled."></td>";
 								echo "<td align='center' nowrap>";
 								if($styledisabled==""){
-									echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
+
+								    if($valx['group_top']=='progress' && $data[0]->total_terima_barang_idr !=0){
+                                    //echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
 									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
-									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';									
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';	
+									}elseif($valx['group_top']=='uang muka' && $data[0]->total_terima_barang_idr = 0,00){
+									//echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
+									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';	
+									}																	
 								
 								}else{
 									echo '<a class="btn btn-xs btn-default" href="'.base_url('purchase/print_request/'.$valx['id']).'" title="Print Request" target="_blank"> <i class="fa fa-print"></i> Print Request</a>';
