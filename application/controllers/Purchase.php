@@ -820,7 +820,7 @@ class Purchase extends CI_Controller {
 		}
         
 		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
-        $total_price = $nilai_po->total_price;
+        $total_price = $nilai_po->net_price;
 		$mata_uang   = $nilai_po->mata_uang;
 
 		$data = array(
