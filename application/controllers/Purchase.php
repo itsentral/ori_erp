@@ -1010,9 +1010,6 @@ class Purchase extends CI_Controller {
 				//end auto jurnal
 			}
 		
-		print_r($ArrUpdate);
-		exit;
-
 		$this->db->where('id',$id);
 		$this->db->update('billing_top', $ArrUpdate);
 		$this->db->trans_complete();
