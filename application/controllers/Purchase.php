@@ -885,6 +885,8 @@ class Purchase extends CI_Controller {
 			$ArrUpdate = [
 				'potong_um'      => $data['potong_um'],	
 			];
+
+		}
        
 		if($data['group_top']=='uang muka'){			
 				$jenis_jurnal='JV053';
