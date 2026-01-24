@@ -196,7 +196,6 @@ $kurs=1;
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][syarat]' value='".strtoupper($valx['syarat'])."' class='form-control input-md' ".$styledisabled."></td>";
 								echo "<td align='center' nowrap>";
 								if($styledisabled==""){
-
 								    if($valx['group_top']=='progress' && $data[0]->total_terima_barang_idr > 0){
                                     //echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
 									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
