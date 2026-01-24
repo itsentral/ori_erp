@@ -847,6 +847,10 @@ class Purchase extends CI_Controller {
 	}
 	function receive_invoice_save(){
 		$data = $this->input->post();
+
+		print_r($data);
+		exit;
+
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
