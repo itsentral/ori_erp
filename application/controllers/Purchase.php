@@ -868,7 +868,8 @@ class Purchase extends CI_Controller {
 			'nilai_po' => $data['nilai_po'],
 			'net'      => $data['nilai_net'],
 			'dpp'      => $data['nilai_dpp'],
-			'potong_um'      => $data['potong_um'],
+			
+			
 		];
 		$total= $data['invoice_total'];
 		$totalunbill=0;
@@ -879,6 +880,11 @@ class Purchase extends CI_Controller {
 		$no_po=$data['no_po'];
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
+
+		if($datapo->total_terima_barang_idr > 0){
+			$ArrUpdate = [
+				'potong_um'      => $data['potong_um'],	
+			];
        
 		if($data['group_top']=='uang muka'){			
 				$jenis_jurnal='JV053';
