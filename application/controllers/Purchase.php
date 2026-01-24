@@ -853,6 +853,7 @@ class Purchase extends CI_Controller {
 		$dateTime		= date('Y-m-d H:i:s');
 
 		$id				= $data['id_top'];
+		if($data['group_top']=='progress'){
 		$ArrUpdate = [
 			'invoice_no' => $data['invoice_no'],
 			'nilai_ppn' => $data['nilai_ppn'],
@@ -869,11 +870,31 @@ class Purchase extends CI_Controller {
 			'nilai_po' => $data['nilai_po'],
 			'net'      => $data['nilai_net'],
 			'dpp'      => $data['nilai_dpp'],
-			if($data['group_top']=='progress'){
 			'potong_um'      => $data['potong_um'],	
-			}
+					
+			];
+			
+		}else{
+		$ArrUpdate = [
+			'invoice_no' => $data['invoice_no'],
+			'nilai_ppn' => $data['nilai_ppn'],
+			'invoice_total' => $data['invoice_total'],
+			'faktur_pajak' => $data['faktur_pajak'],
+			'surat_jalan' => $data['surat_jalan'],
+			'lainnya' => $data['lainnya'],
+			'tgl_terima' => $data['tgl_terima'],
+			'kurs_receive_invoice' => $data['kurs'],
+			'matauang_receive_invoice' => $data['matauang2'],
+			'created_date_invoice' => $dateTime,
+//			'invoice_dokumen' => $data['invoice_dokumen'],
+			'created_by_invoice' => $Username,
+			'nilai_po' => $data['nilai_po'],
+			'net'      => $data['nilai_net'],
+			'dpp'      => $data['nilai_dpp'],
+			
 			
 		];
+		}
 		$total= $data['invoice_total'];
 		$totalunbill=0;
 		$totalap=0;
