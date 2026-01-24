@@ -210,12 +210,14 @@ $kurs=1;
 													
 								} else{
 
-								    if($valx['proses_inv']=='1'){
+								    if($valx['proses_inv']=='1' && $valx['invoice_no']!='null' ){
 									echo '<a class="btn btn-xs btn-default" href="'.base_url('purchase/print_request/'.$valx['id']).'" title="Print Request" target="_blank"> <i class="fa fa-print"></i> Print Request</a>';
 								    echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> View Receive Inv</a>';									
-									}else{
-										echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
-										echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> View Receive Inv</a>';									
+									}elseif($valx['proses_inv']=='0' && $valx['invoice_no']!='null' ){
+									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> View Receive Inv</a>';									
+									}elseif($valx['proses_inv']=='0' && $valx['invoice_no']=='null' ){
+
 									}
 								}
 								echo "</td>";
