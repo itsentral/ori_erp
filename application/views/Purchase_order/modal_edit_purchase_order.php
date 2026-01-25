@@ -15,7 +15,7 @@
 			<select id='id_supplier' name='id_supplier' class='form-control input-sm chosen_select'>
 				<?php
 				foreach($listSupplier AS $val => $valx){
-					if($valx['id_supplier'] == $data[0]->id_supplier){
+					if($valx['id_supplier'] == $data[0]->id_supplier){ 
 					$sel = ($valx['id_supplier'] == $data[0]->id_supplier)?'selected':'';
 					echo "<option value='".$valx['id_supplier']."' ".$sel.">".strtoupper($valx['nm_supplier'])."</option>";
 					}
@@ -37,9 +37,9 @@
 			 echo form_input(array('id'=>'request_date','name'=>'request_date','class'=>'form-control input-md datepicker','placeholder'=>'Request Date','readonly'=>'readonly'), strtoupper($data[0]->tgl_dibutuhkan));
 			?>
 		</div>
-		<label class='label-control col-sm-1'><b>Harga Pembelian</b></label>
+		<label class='label-control col-sm-1'><b>Currency</b></label>
 		<div class='col-sm-3'>
-			<select id='current' name='current' class='form-control input-sm chosen_select'>
+			<select id='current' name='current' class='form-control input-sm chosen_select' onfocus="this.blur();" onchange="this.value = this.defaultValue;">
 				<?php
 				$kurs_mata_uang = (!empty($data[0]->mata_uang))?$data[0]->mata_uang:$data_rfq[0]->currency;
 				foreach(get_list_kurs2() AS $val => $valx){
@@ -70,7 +70,7 @@
 		<div class='col-sm-3'>
 			<?php
 			$buyer = (!empty($data[0]->buyer))?strtoupper($data[0]->buyer):strtoupper(get_name('users','nm_lengkap','username',$data[0]->updated_by));
-			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer'), $buyer);
+			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer' readonly), $buyer);
 			?>
 		</div>
 		<label class='label-control col-sm-1'><b>Currency Amount Word</b></label>
@@ -102,7 +102,7 @@
 						$SUM += $qty_p * $valx['price_ref_sup'];
 						echo "<tr>";
 							echo "<td align='left'>
-									<input name='detail[".$no."][nm_material]' id='nm_material_".$no."' class='form-control input-md ' value='".strtoupper($valx['nm_material'])."' >
+									<input name='detail[".$no."][nm_material]' id='nm_material_".$no."' class='form-control input-md ' value='".strtoupper($valx['nm_material'])."' readonly >
 									<input type='hidden' name='detail[".$no."][id]' id='id_".$no."' value='".$valx['id']."'>
 									
 									</td>";
@@ -124,7 +124,7 @@
                         <td class='text-right mid' width='25%'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='total_po'  name='total_po' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Total' readonly value='<?=$SUM;?>'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='discount' name='discount' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Discount (%)' value='<?=$data[0]->discount;?>'></td>
@@ -174,7 +174,7 @@
 				<thead id='head_table'>
 					<tr class='bg-blue'>
 						<th class="text-center" width='5%'>Group TOP</th>
-						<th class="text-center" width='8%'>Progress (%)</th>
+						<th class="text-center" width='8%'>Percentase (%)</th>
 						<th class="text-center hidden" width='11%'>Value(USD)</th>
 						<th class="text-center" width='11%'>Value  <!--(IDR)--></th>
 						<th class="text-center" width='25%'>Keterangan</th>
