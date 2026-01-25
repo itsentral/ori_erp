@@ -48,7 +48,7 @@
 				}
 				?>
 			</select>
-			<input type="text" name="current" value='<?=$kurs_mata_uang?>''>
+			<input type="hidden" name="current" value='<?=$kurs_mata_uang?>''>
 			<input type='hidden' id='kurs' value='<?=$data_rfq[0]->kurs;?>'>
 		</div>
 	</div>
