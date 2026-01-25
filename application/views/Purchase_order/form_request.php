@@ -13,7 +13,7 @@ $this->load->view('include/side_menu');
 			<div class="box-body">
 				<div class="row">
 				  <div class="col-md-6">
-					<label class="control-label">Request Date</label>
+					<label class="control-label">Tanggal Dibutuhkan PO</label>
 					<input type="text" id="request_date" name="request_date" value="<?php echo date("Y-m-d"); ?>" class="form-control tanggal" required>
 					<label class="control-label">No Request</label>
 					<input type="text" id="no_request" name="no_request" value="" class="form-control" placeholder="Auto" readonly>
@@ -27,7 +27,7 @@ $this->load->view('include/side_menu');
 					<p><?=$info_payterm->matauang_receive_invoice?><input type="hidden" name="curs_header" id="curs_header" value="<?=$info_payterm->matauang_receive_invoice?>" />
 					<input type="hidden" name="kurs" id="kurs" value="<?=$info_payterm->kurs_receive_invoice?>" />
 					</p>
-					<label class="control-label">PO</label>
+					<label class="control-label">Total Price before tax</label>
 					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?php echo $datapo->nilai_total; ?>" readonly tabindex="-1">
 					<label class="control-label">PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?php echo $datapo->nilai_ppn; ?>" readonly tabindex="-1">
@@ -40,19 +40,19 @@ $this->load->view('include/side_menu');
 					<input type="hidden" class="form-control divide" id="sisa_dp" name="sisa_dp" value="<?php echo $datapo->sisa_dp; ?>" readonly tabindex="-1">
 					<label class="control-label">Bank Account</label>
 					<input type="text" id="bank_transfer" name="bank_transfer" value="<?=$datapo->data_bank?>" class="form-control">
-					<label class="control-label">Payment Date</label>
+					<label class="control-label">Rencana Bayar</label>
 					<input type="text" id="req_payment_date" name="req_payment_date" value="<?php echo date("Y-m-d"); ?>" class="form-control tanggal" required>
 					<label class="control-label">Nomor Invoice</label>
 					<input type="text" class="form-control" id="no_invoice" name="no_invoice" value="<?=$info_payterm->invoice_no?>">
 					<label class="control-label">Keterangan Invoice</label>
 					<input type="text" class="form-control" id="keterangan" name="keterangan" value="">
-					<label class="control-label">PO yang akan dibayar</label>
+					<label class="control-label">Nilai Invoice</label>
 					<?php
 					$nilai_po_invoice=0;
 					if($info_payterm->matauang_receive_invoice=='IDR'){
 						$nilai_po_invoice=$info_payterm->invoice_total - $info_payterm->nilai_ppn ;
 					}else{
-						$nilai_po_invoice=$info_payterm->invoice_total;						
+						$nilai_po_invoice=$info_payterm->invoice_total; 						
 					}
 					?>
 					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required onchange="calculate_invoice()" readonly>
@@ -105,7 +105,7 @@ $this->load->view('include/side_menu');
 							<td><?=number_format($record->net_price,2)?></td>
 							<td><?=number_format($record->total_price,2)?></td>
 							<td><?=number_format($record->qty_in)?></td>
-							<td align=center><?=($record->status_pay==""?'<input type="checkbox" name="payfor[]" value="'.$record->id.'">':'')?></td>
+							<td align=center><?=($record->status_pay==""?'<input type="checkbox" name="payfor[]" value="'.$record->id.'" checked>':'')?></td>
 							</tr>
 							<?php
 							}
