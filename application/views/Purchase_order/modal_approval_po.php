@@ -36,7 +36,7 @@
         <div class='col-sm-4'>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=date('d F Y', strtotime($result[0]['tgl_butuh']));?></div>
 	</div>
     <div class="form-group row">
-		<div class='col-sm-1 text-bold'><label>Customer</label></div>
+		<div class='col-sm-1 text-bold'><label>Supplier</label></div>
         <div class='col-sm-5'>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=$result[0]['nm_supplier'];?></div>
 	</div>
 	<table id="my-grid" class="table table-striped table-bordered table-hover table-condensed" width="100%">
@@ -46,7 +46,7 @@
                 <th class="text-center">Material Name</th>
                 <th class="text-center" width='8%'>MOQ</th>
                 <th class="text-center" width='8%'>Lead Time</th>
-                <th class="text-center" width='15%'>Net Price (<?=$result[0]['mata_uang']?>)</th>
+                <th class="text-center" width='15%'>Price Unit (<?=$result[0]['mata_uang']?>)</th>
                 <th class="text-center" width='10%'>Qty PO</th>
                 <th class="text-center" width='15%'>Total Price (<?=$result[0]['mata_uang']?>)</th>
             </tr>
@@ -80,7 +80,7 @@
                 <td class='text-right mid' colspan='6'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                 <td class='text-right mid text-bold'><?=number_format($result[0]['total_po'],2);?></td>
             </tr>
-            <tr>
+            <tr hidden>
                 <td class='text-right mid' colspan='6'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                 <td class='text-right mid text-bold'><?=number_format($result[0]['discount'],2);?></td>
             </tr>

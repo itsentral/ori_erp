@@ -16,11 +16,11 @@ $this->load->view('include/side_menu');
 				<tr class='bg-blue'>
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
-					<th class="text-center">Suppier</th>
+					<th class="text-center">Supplier</th>
 					<th class="text-center">Material Name</th>
 					<th class="text-center">Weight PO</th>
+					<th class="text-center">Price Unit</th>
 					<th class="text-center">Net Price</th>
-					<th class="text-center">Total PO</th>
 					<th class="text-center no-sort">Option</th>
 				</tr>
 			</thead>
