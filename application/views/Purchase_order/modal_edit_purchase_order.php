@@ -70,7 +70,7 @@
 		<div class='col-sm-3'>
 			<?php
 			$buyer = (!empty($data[0]->buyer))?strtoupper($data[0]->buyer):strtoupper(get_name('users','nm_lengkap','username',$data[0]->updated_by));
-			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer' readonly), $buyer);
+			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer', readonly), $buyer);
 			?>
 		</div>
 		<label class='label-control col-sm-1'><b>Currency Amount Word</b></label>
