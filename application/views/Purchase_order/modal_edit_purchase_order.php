@@ -155,7 +155,7 @@
                         <td class='text-right mid'><b>NET PRICE + TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='net_plus_tax' name='net_plus_tax' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price + Tax' value='<?=$data[0]->net_plus_tax;?>'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='delivery_cost' name='delivery_cost' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Delivery Cost' value='<?=$data[0]->delivery_cost;?>'></td>
