@@ -19,7 +19,7 @@
                 <input type="text" id='tanggal_dibutuhkan' name='tanggal_dibutuhkan' class='form-control input-md datepicker' placeholder='Tanggal Dibutuhkan' readonly>
             </div>
         </div>
-        <div class='form-group row'>
+        <div class='form-group row' hidden>
             <label class='label-control col-sm-2'><b>Repeat-PO Valid</b></label>
             <div class='col-sm-4'>              
                 <input type="text" id='valid_date' name='valid_date' class='form-control input-md datepicker' placeholder='Jangan dipilih jika tidak repeat PO' readonly>
@@ -39,13 +39,13 @@
                         <th class="text-center">Material Name</th>
                         <th class="text-center" width='6%'>MOQ</th>
                         <th class="text-right" width='8%'>Qty PR</th>
-                        <th class="text-right" width='8%'>Qty PO</th>
-						<th class="text-center" width='8%'>Dibutuhkan</th>
-						<th class="text-center" width='7%'>Created</th>
+                        <th class="text-right" width='8%'>Qty Release PO</th>
+						<th class="text-center" width='8%'>Tgl Dibutuhkan</th>
+						<th class="text-center" width='7%'>RFQ Created By</th>
 						<th class="text-center" width='7%'>Dated</th>
-						<th class="text-right" width='8%'>Net Price</th>
-						<th class="text-left" width='4%'>#</th>
-                        <th class="text-center" width='10%'>Qty PO</th>
+						<th class="text-right" width='8%'>Price Unit</th>
+						<th class="text-left" width='4%'>Curency</th>
+                        <th class="text-center" width='10%'>Qty Draft PO</th>
                         <th class="text-center" width='10%'>Total Price</th>
                     </tr>
                 </thead>
@@ -56,15 +56,15 @@
                 <tbody>
                     <tr>
                         <td width='60%'></td>
-                        <td class='text-right mid' width='25%'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+                        <td class='text-right mid' width='25%'><b>Net Price&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='total_po'  name='total_po' class='form-control input-sm text-right text-bold' placeholder='Total' readonly></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td></td>
                         <td class='text-right mid'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='discount' name='discount' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Discount (%)'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td></td>
                         <td class='text-right mid'><b>NET PRICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='net_price' name='net_price' class='form-control input-sm text-right text-bold' readonly placeholder='Net Price'></td>

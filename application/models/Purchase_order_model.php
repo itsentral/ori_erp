@@ -2667,13 +2667,13 @@ class Purchase_order_model extends CI_Model {
 
 			if($status_po==""){ 
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
-					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
+					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
 					$print_po = $print_old."&nbsp;<a href='".base_url('purchase/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";				
 					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					// $delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 				}
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
-					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
+					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
 					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					$delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 					//$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
@@ -2748,7 +2748,7 @@ class Purchase_order_model extends CI_Model {
 		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
-		$data['query'] = $this->db->query($sql);
+		$data['query'] = $this->db->query($sql); 
 		return $data;
 	}
 	

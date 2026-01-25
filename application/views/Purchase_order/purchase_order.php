@@ -8,7 +8,7 @@ $this->load->view('include/side_menu');
 		<div class="box-tool pull-right">
 			<?php
 				if($akses_menu['create']=='1'){
-					echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Add PO','content'=>'Add PO','id'=>'addPO')).' ';
+					echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Add PO','content'=>'Create Draft PO','id'=>'addPO')).' ';
 				}
 			?>
 		</div>
@@ -21,12 +21,12 @@ $this->load->view('include/side_menu');
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">No Invoice</th> 
-					<th class="text-center">Suppier</th>
+					<th class="text-center">Supplier</th>
 					<th class="text-center">Material Name</th>
 					<!-- <th class="text-center">Qty</th> -->
-					<th class="text-center">Total PO</th>
-					<th class="text-center">By</th>
-					<th class="text-center">Dated</th>
+					<th class="text-center">Net Price + Tax</th>
+					<th class="text-center">Created By</th>
+					<th class="text-center">Tanggal Dibutuhkan</th>
 					<th class="text-center">Status</th>
 					<th class="text-center no-sort">Option</th>
 				</tr>
