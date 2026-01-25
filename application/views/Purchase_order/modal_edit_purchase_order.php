@@ -39,7 +39,7 @@
 		</div>
 		<label class='label-control col-sm-1'><b>Currency</b></label>
 		<div class='col-sm-3'>
-			<select id='current' name='current' class='form-control input-sm chosen_select' onfocus="this.blur();" onchange="this.value = this.defaultValue;">
+			<select id='current1' name='current1' class='form-control input-sm chosen_select' disabled>
 				<?php
 				$kurs_mata_uang = (!empty($data[0]->mata_uang))?$data[0]->mata_uang:$data_rfq[0]->currency;
 				foreach(get_list_kurs2() AS $val => $valx){
@@ -48,6 +48,7 @@
 				}
 				?>
 			</select>
+			<input type="text" name="current" value='<?=$kurs_mata_uang?>''>
 			<input type='hidden' id='kurs' value='<?=$data_rfq[0]->kurs;?>'>
 		</div>
 	</div>
