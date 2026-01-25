@@ -75,9 +75,13 @@ $this->load->view('include/side_menu');
 				  </div>
 				  <?php if($results->group_top != 'progress' ) { ?>     
 				  <div class="col-md-6">
-					<label class="control-label">Nilai DPP</label>
+					<label class="control-label">Total Price Before Tax</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>   
+				   <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $total_price; ?>" required readonly>
+				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
@@ -92,9 +96,13 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required>
 				  </div>
 				   <div class="col-md-6">
-					<label class="control-label">Nilai DPP</label>
+					<label class="control-label">Total Price Before Tax</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
-				  </div>   
+				  </div> 
+				   <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $total_price; ?>" required readonly>
+				  </div>  
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value=<?= (isset($results)?$results->nilai_ppn:"0"); ?> required readonly>
