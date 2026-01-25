@@ -22,7 +22,7 @@
 						<th class="text-center">Supplier</th>
 						<th class="text-center">Term Of Payment</th>
 						<th class="text-center">Currency</th>
-						<th class="text-center">Nilai PO</th>
+						<th class="text-center">Nilai Invoice</th>
 						<th class="text-center">PPN</th>
 						<th class="text-center">PPH</th>
 						<th class="text-center">Request Payment</th>
