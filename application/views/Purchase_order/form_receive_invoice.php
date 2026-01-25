@@ -80,7 +80,7 @@ $this->load->view('include/side_menu');
 				  </div>   
 				   <div class="col-md-6">
 					<label class="control-label">Nilai TOP</label>
-					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $total_price; ?>" required readonly>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
@@ -101,7 +101,7 @@ $this->load->view('include/side_menu');
 				  </div> 
 				   <div class="col-md-6">
 					<label class="control-label">Nilai TOP</label>
-					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $total_price; ?>" required readonly>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>  
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
