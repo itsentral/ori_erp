@@ -4350,7 +4350,7 @@ class Qc extends CI_Controller
 	
 	function jurnalFG($idtrans){
 		
-		$data_session	= $this->session->userdata;
+		$data_session	= $this->session->userdata; 
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
@@ -4532,7 +4532,7 @@ class Qc extends CI_Controller
 					 $nospk      = $data->no_spk;
 					 $qty        = $data->qty;
 				
-					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					$this->db->query("UPDATE  warehouse_stock_wipx SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				
 			}
 			
