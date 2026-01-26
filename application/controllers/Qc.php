@@ -4350,7 +4350,7 @@ class Qc extends CI_Controller
 	
 	function jurnalFG($idtrans){
 		
-		$data_session	= $this->session->userdata;
+		$data_session	= $this->session->userdata; 
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
@@ -4375,7 +4375,7 @@ class Qc extends CI_Controller
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
+				$noso 		 = $data->no_so;
                	$no_request  = $data->no_spk;	
 				
 				$wip           	= $data->wip;
@@ -4415,7 +4415,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_material,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $material,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4429,7 +4429,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_direct,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $wip_direct,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4443,7 +4443,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_indirect,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $wip_indirect,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4457,7 +4457,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_foh,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $wip_foh,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4471,7 +4471,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_consumable,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $wip_consumable,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4489,7 +4489,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coa_wip,
 					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4505,7 +4505,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coafg,
 					  'keterangan'    => $keterangan1,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => $cogs,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4520,7 +4520,7 @@ class Qc extends CI_Controller
 					  'tipe'          => 'JV',
 					  'no_perkiraan'  => $coacogs,
 					  'keterangan'    => $keterangan2,
-					  'no_reff'       => $id.$noso,
+					  'no_reff'       => $id.$spasi.$noso,
 					  'debet'         => 0,
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
@@ -4532,10 +4532,11 @@ class Qc extends CI_Controller
 					 $nospk      = $data->no_spk;
 					 $qty        = $data->qty;
 				
-					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-				
+					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			
 			}
 			
+				
 			        
 				
 			
