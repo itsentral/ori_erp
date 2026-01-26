@@ -4532,10 +4532,10 @@ class Qc extends CI_Controller
 					 $nospk      = $data->no_spk;
 					 $qty        = $data->qty;
 				
-					
+					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			
 			}
 			
-			$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				
 			        
 				
