@@ -4338,7 +4338,7 @@ class Qc extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroup);
-			$this->jurnalFG($id_trans);
+			$this->jurnalFG($id_trans,$datetime);
 		}
 		if(!empty($ArrOutWIP)){
 			$this->db->insert_batch('data_erp_wip_group',$ArrOutWIP);
@@ -4348,7 +4348,7 @@ class Qc extends CI_Controller
 	}
 	
 	
-	function jurnalFG($idtrans){
+	function jurnalFG($idtrans,$datetime){
 		
 		$data_session	= $this->session->userdata; 
 		$UserName		= $data_session['ORI_User']['username'];
@@ -4358,7 +4358,7 @@ class Qc extends CI_Controller
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."'")->result();
+			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND created_date='".$datetime."'")->result();
 			
 			$totalfg =0;
 			  
