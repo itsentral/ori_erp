@@ -426,7 +426,9 @@
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 
-		console.log(current);
+		console.log(total);
+		console.log(progress);
+		console.log(kurs);
 
 		
 		if(current == 'USD'){
