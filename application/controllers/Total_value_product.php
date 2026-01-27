@@ -377,15 +377,32 @@ class Total_value_product extends CI_Controller {
              $table = "warehouse_stock_fg";
          }
 		 elseif($gudang=='intransit'){
-            $table = "warehouse_stock_intransit";
+            $table = "warehouse_stock_intransit"; 
          }elseif($gudang=='incustomer'){
              $table = "warehouse_stock_incustomer";
+         }elseif($gudang=='cogs'){
+             $table = "warehouse_stock_cogs";
          }
        
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
 		$group_by = '';
 		$fieldStock = 'a.qty, a.nilai_wip,';
+
+		if(!empty($date_filter)){
+			$where_date = " DATE(a.hist_date) = '".$date_filter."' AND";
+			if($gudang=='wip'){
+           		$table = "warehouse_stock_wip_per_day";
+			}elseif($gudang=='fg'){
+				$table = "warehouse_stock_fg_per_day";
+			}
+			elseif($gudang=='intransit'){
+				$table = "warehouse_stock_intransit_per_day";
+			}elseif($gudang=='incustomer'){
+				$table = "warehouse_stock_incustomer_per_day";
+			}
+			
+		}
 		
 
 	
@@ -394,7 +411,7 @@ class Total_value_product extends CI_Controller {
 				(@row:=@row+1) AS nomor, a.*
 			FROM
 				".$table." a
-			 WHERE 
+			 WHERE ".$where_date."
 			(
 				a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -536,46 +553,52 @@ class Total_value_product extends CI_Controller {
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
-		$table = "warehouse_stock";
-		$where_gudang ='';
+	    if($gudang=='wip'){
+            $table = "warehouse_stock_wip";
+         }elseif($gudang=='fg'){
+             $table = "warehouse_stock_fg";
+         }
+		 elseif($gudang=='intransit'){
+            $table = "warehouse_stock_intransit"; 
+         }elseif($gudang=='incustomer'){
+             $table = "warehouse_stock_incustomer";
+         }elseif($gudang=='cogs'){
+             $table = "warehouse_stock_cogs";
+         }
+       
 		$where_date ='';
 		$field_add = "0 AS costbook, 0 AS total_value,";
-		if(!empty($gudang)){
-			$where_gudang = " AND a.id_gudang = '".$gudang."' ";
-		}
+		$group_by = '';
+		$fieldStock = 'a.qty, a.nilai_wip,';
 
 		if(!empty($date_filter)){
-			$where_gudang = " AND a.id_gudang = '".$gudang."' ";
-			$where_date = " AND DATE(a.hist_date) = '".$date_filter."' ";
-			$table = "warehouse_stock_per_day";
-			$field_add = "a.costbook, a.total_value,";
-		}
-		$sql = "
+			$where_date = " DATE(a.hist_date) = '".$date_filter."' AND";
+			if($gudang=='wip'){
+           		$table = "warehouse_stock_wip_per_day";
+			}elseif($gudang=='fg'){
+				$table = "warehouse_stock_fg_per_day";
+			}
+			elseif($gudang=='intransit'){
+				$table = "warehouse_stock_intransit_per_day";
+			}elseif($gudang=='incustomer'){
+				$table = "warehouse_stock_incustomer_per_day";
+			}
+			
+		}	
+			$sql = "
 			SELECT
-				(@row:=@row+1) AS nomor,
-				c.idmaterial,
-				c.id_material,
-				c.nm_material,
-				c.nm_category,
-				a.qty_stock,
-				a.qty_booking,
-				a.qty_rusak,
-				a.id_gudang,
-				".$field_add."
-				b.nm_gudang
+				(@row:=@row+1) AS nomor, a.*
 			FROM
-				".$table." a 
-				LEFT JOIN warehouse b ON a.kd_gudang=b.kd_gudang
-				LEFT JOIN raw_materials c ON a.id_material = c.id_material,
-				(SELECT @row:=0) r
-		    WHERE 1=1 AND a.id_material <> 'MTL-1903000' ".$where_gudang." ".$where_date."
-		";
+				".$table." a
+			 WHERE ".$where_date."
+			";
+
 		$restDetail1	= $this->db->query($sql)->result_array();
 
 		
 
 		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$gudang))->result();
-		$nm_gudang = strtoupper(get_name('warehouse','nm_gudang','id',$gudang));
+		$nm_gudang = strtoupper($gudang);
 		
 		$tanggal_update = (!empty($date_filter))?" (".date('d F Y', strtotime($date_filter)).")":" (".date('d F Y').")";
 		$tanggal_update2 = $date_filter;
@@ -583,7 +606,7 @@ class Total_value_product extends CI_Controller {
 		$Row		= 1;
 		$NewRow		= $Row+1;
 		$Col_Akhir	= $Cols	= getColsChar(9);
-		$sheet->setCellValue('A'.$Row, 'TOTAL VALUE STOCK - '.$nm_gudang.$tanggal_update);
+		$sheet->setCellValue('A'.$Row, 'TOTAL VALUE PRODUCT - '.$nm_gudang.$tanggal_update);
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
 
@@ -595,42 +618,42 @@ class Total_value_product extends CI_Controller {
 		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
-		$sheet->setCellValue('B'.$NewRow, 'ID PROGRAM');
+		$sheet->setCellValue('B'.$NewRow, 'Nomor SO');
 		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
-		$sheet->setCellValue('C'.$NewRow, 'ID MATERIAL');
+		$sheet->setCellValue('C'.$NewRow, 'Nomor SPK');
 		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
-		$sheet->setCellValue('D'.$NewRow, 'MATERIAL');
+		$sheet->setCellValue('D'.$NewRow, 'Kode Trans');
 		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
-		$sheet->setCellValue('E'.$NewRow, 'CATEGORY');
+		$sheet->setCellValue('E'.$NewRow, 'Produk');
 		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
-		$sheet->setCellValue('F'.$NewRow, 'WAREHOUSE');
+		$sheet->setCellValue('F'.$NewRow, 'Keterangan');
 		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 		
-		$sheet->setCellValue('G'.$NewRow, 'STOCK');
+		$sheet->setCellValue('G'.$NewRow, 'Stock');
 		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
 		$sheet->getColumnDimension('G')->setWidth(20);
 
-		$sheet->setCellValue('H'.$NewRow, 'PRICE BOOK');
+		$sheet->setCellValue('H'.$NewRow, 'Nilai per Unit');
 		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
 		$sheet->getColumnDimension('H')->setWidth(20);
 
-		$sheet->setCellValue('I'.$NewRow, 'TOTAL VALUE');
+		$sheet->setCellValue('I'.$NewRow, 'Total Value');
 		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
 		$sheet->getColumnDimension('I')->setWidth(20);
@@ -646,61 +669,61 @@ class Total_value_product extends CI_Controller {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
-                $awal_col++;
+
+				$awal_col++;
 				$detail_name	= $no;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $detail_name);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$id_material	= $row_Cek['id_material'];
+				$id_material	= $row_Cek['no_so'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_material);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$idmaterial	= $row_Cek['idmaterial'];
+				$idmaterial	= $row_Cek['no_spk'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $idmaterial);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_material	= strtoupper($row_Cek['nm_material']);
+				$nm_material	= strtoupper($row_Cek['product']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_material);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_category	= $row_Cek['nm_category'];
+				$nm_category	= $row_Cek['kode_trans'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_category);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_gudang	= $row_Cek['nm_gudang'];
+				$keterangan	= $row_Cek['keteramgan'];
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nm_gudang);
+				$sheet->setCellValue($Cols.$awal_row, $keterangan);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
+				
 				$awal_col++;
-				$qty_stock	= $row_Cek['qty_stock'];
+				$qty_stock	= number_format($row['qty'],4);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $qty_stock);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
-				//$PRICEBOOK = (!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0;
-				//$PRICEBOOK = ($row_Cek['costbook']==0)?((!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0):$row_Cek['costbook'];
-                $PRICEBOOK = $GET_PRICEBOOK[$row_Cek['id_material']];
-				$TOTAL_VALUE = $qty_stock * $PRICEBOOK;
-
+				
 				$awal_col++;
+				$nilai_wip = number_format($row['nilai_wip'],2);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $PRICEBOOK);
+				$sheet->setCellValue($Cols.$awal_row, $nilai_wip);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
+				$total_value = number_format($row['nilai_wip']*$row['qty'],2);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $TOTAL_VALUE);
+				$sheet->setCellValue($Cols.$awal_row, $total_value);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 			}
 		}
@@ -1072,54 +1095,53 @@ class Total_value_product extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$id_material	= $row_Cek['id_material'];
+				$id_material	= $row_Cek['no_so'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $id_material);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$idmaterial	= $row_Cek['idmaterial'];
+				$idmaterial	= $row_Cek['no_spk'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $idmaterial);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_material	= strtoupper($row_Cek['nm_material']);
+				$nm_material	= strtoupper($row_Cek['product']);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_material);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_category	= $row_Cek['nm_category'];
+				$nm_category	= $row_Cek['kode_trans'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nm_category);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$nm_gudang	= $row_Cek['nm_gudang'];
+				$keterangan	= $row_Cek['keteramgan'];
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nm_gudang);
+				$sheet->setCellValue($Cols.$awal_row, $keterangan);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
+				
 				$awal_col++;
-				$qty_stock	= $row_Cek['qty_stock'];
+				$qty_stock	= number_format($row['qty'],4);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $qty_stock);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
-				//$PRICEBOOK = (!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0;
-				//$PRICEBOOK = ($row_Cek['costbook']==0)?((!empty($GET_PRICEBOOK[$row_Cek['id_material']]))?$GET_PRICEBOOK[$row_Cek['id_material']]:0):$row_Cek['costbook'];
-                $PRICEBOOK = $GET_PRICEBOOK[$row_Cek['id_material']];
-				$TOTAL_VALUE = $qty_stock * $PRICEBOOK;
-
+				
 				$awal_col++;
+				$nilai_wip = number_format($row['nilai_wip'],2);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $PRICEBOOK);
+				$sheet->setCellValue($Cols.$awal_row, $nilai_wip);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
+				$total_value = number_format($row['nilai_wip']*$row['qty'],2);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $TOTAL_VALUE);
+				$sheet->setCellValue($Cols.$awal_row, $total_value);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 			}
 		}
