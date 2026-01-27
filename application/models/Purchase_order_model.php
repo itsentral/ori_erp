@@ -2868,7 +2868,7 @@ class Purchase_order_model extends CI_Model {
 			$ArrHeader['remarks'] 			= $rfqheader->remarks;
 			$ArrHeader['mata_uang'] 		= $rfqheader->currency;
             
-			$ArrHeader['status_po'] 		= 'DRAFT PO';
+			$ArrHeader['status'] 		    = 'DRAFT PO';
 			$ArrHeader['created_by'] 		= $Username;
 			$ArrHeader['created_date'] 		= $dateTime;
 			$ArrHeader['updated_by'] 		= $Username;
