@@ -721,7 +721,7 @@ class Total_value_product extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
-				$total_value = number_format($row_Cek['nilai_wip']*$row['qty'],2);
+				$total_value = number_format($row_Cek['nilai_wip']*$row_Cek['qty'],2);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $total_value);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
