@@ -1664,6 +1664,7 @@ class Purchase_order_model extends CI_Model {
 				'remarks' 		=> strtolower($data['remarks']),
 				'buyer' 		=> strtolower($data['buyer']),
 				'mata_uang' 	=> $data['current'],
+				'status' 	    => 'WAITING IN',
 				'amount_words' 	=> $data['amount_words'],
 				'updated_by' 	=> $data_session['ORI_User']['username'],
 				'updated_date' 	=> date('Y-m-d H:i:s')
