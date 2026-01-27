@@ -140,7 +140,7 @@ $this->load->view('include/side_menu');
 	$(document).on('click', '.edit_po_qty', function(e){
 		e.preventDefault();
 		loading_spinner();
-		$("#head_title2").html("<b>EDIT PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
+		$("#head_title2").html("<b>CREATE PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/edit_po_qty/'+$(this).data('no_po'),
@@ -721,7 +721,7 @@ $this->load->view('include/side_menu');
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 150, 1500], [10, 20, 50, 100, 150, 1500]],
 			"ajax":{
-				url : base_url + active_controller+'/server_side_purchase_order',
+				url : base_url + active_controller+'/server_side_purchase_order', 
 				type: "post",
 				data: function(d){
 					// d.kode_partner = $('#kode_partner').val()
