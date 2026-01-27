@@ -407,7 +407,7 @@
 	
 
 	function term_value(a){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#net_price').html().split(",").join(""));
 		var values 		= getNum($('#idr_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();		
@@ -421,7 +421,7 @@
 	}
 	
 	function term_process(a){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#net_price').html().split(",").join(""));
 		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
@@ -441,7 +441,7 @@
 	}
 	
 	function change_kurs(){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#net_price').html().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);
@@ -468,7 +468,7 @@
 	}
 	
 	function change_kurs2(){
-		var total		= getNum($('#total').html().split(",").join(""));
+		var total		= getNum($('#net_price').html().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);
