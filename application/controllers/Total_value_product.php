@@ -572,7 +572,7 @@ class Total_value_product extends CI_Controller {
 		$fieldStock = 'a.qty, a.nilai_wip,';
 
 		if(!empty($date_filter)){
-			$where_date = " DATE(a.hist_date) = '".$date_filter."' AND";
+			$where_date = " DATE(a.hist_date) = '".$date_filter."'";
 			if($gudang=='wip'){
            		$table = "warehouse_stock_wip_per_day";
 			}elseif($gudang=='fg'){
