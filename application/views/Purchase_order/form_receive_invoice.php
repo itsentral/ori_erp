@@ -75,9 +75,13 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Net</label>
 					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $total_price; ?>" required readonly>
 				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Price Before Tax</label>
+					<input type="text" class="form-control divide" id="price_before_tax" name="price_before_tax" value="<?= $total_price; ?>" required readonly>
+				  </div>
 				  <?php if($results->group_top != 'progress' ) { ?>     
 				  <div class="col-md-6">
-					<label class="control-label">Total Price Before Tax</label>
+					<label class="control-label">DPP</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>   
 				   <div class="col-md-6">
@@ -98,7 +102,7 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
 				  </div>
 				   <div class="col-md-6">
-					<label class="control-label">Total Price Before Tax</label>
+					<label class="control-label">DPP</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
 				  </div> 
 				   <div class="col-md-6">
