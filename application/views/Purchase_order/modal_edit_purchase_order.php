@@ -405,14 +405,135 @@
 		change_kurs2();
 	}
 	
+
+	function term_value(a){
+		var total		= getNum($('#total').html().split(",").join(""));
+		var values 		= getNum($('#idr_'+a).val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();		
+		if(current == 'USD'){
+			var progress 	= (values*100) / total;
+		}		
+		if(current == 'IDR'){
+			var progress 	= (values*100) / total;
+		}		
+		$('#progress_'+a).val(number_format(progress,4));
+	}
+	
 	function term_process(a){
+		var total		= getNum($('#total').html().split(",").join(""));
+		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+		
+		if(current == 'USD'){
+			var tot_usd 	= (progress/100) * total;
+			var tot_idr 	= (progress/100) * (total * kurs);
+		}
+		
+		if(current == 'IDR'){
+			var tot_idr 	= (progress/100) * total;
+			var tot_usd 	= (progress/100) * (total * kurs);
+		}
+		
+		$('#usd_'+a).val(number_format(tot_usd,2));
+		$('#idr_'+a).val(number_format(tot_idr,2));
+	}
+	
+	function change_kurs(){
+		var total		= getNum($('#total').html().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+		// alert(current);
+		$(".progress_term" ).each(function() {
+			var id 		= $(this).attr('id');
+			var det_id	= id.split('_');
+			var a		= det_id[1];
+			
+			var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+			// console.log(progress);
+			if(current == 'IDR'){
+				var tot_idr 	= (progress/100) * total;
+				var tot_usd 	= (progress/100) * (total * kurs);
+			}
+			
+			if(current == 'USD'){
+				var tot_usd 	= (progress/100) * total;
+				var tot_idr 	= (progress/100) * (total * kurs);
+			}
+			
+			$('#usd_'+a).val(number_format(tot_usd,2));
+			$('#idr_'+a).val(number_format(tot_idr,2));
+		});
+	}
+	
+	function change_kurs2(){
+		var total		= getNum($('#total').html().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+		// alert(current);
+		$(".progress_term" ).each(function() {
+			var id 		= $(this).attr('id');
+			var det_id	= id.split('_');
+			var a		= det_id[1];
+			
+			var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+			// console.log(progress);
+			if(current == 'USD'){
+				var tot_usd 	= (progress/100) * total;
+				var tot_idr 	= (progress/100) * (total * kurs);
+			}
+			
+			if(current == 'IDR'){
+				var tot_idr 	= (progress/100) * total;
+				var tot_usd 	= (progress/100) * (total * kurs);
+			}
+			
+			$('#usd_'+a).val(number_format(tot_usd,2));
+			$('#idr_'+a).val(number_format(tot_idr,2));
+		});
+	}
+	
+	function getNum(val) {
+	   if (isNaN(val) || val == '') {
+		 return 0;
+	   }
+	   return parseFloat(val);
+	}
+	
+	function number_format (number, decimals, dec_point, thousands_sep) {
+		// Strip all characters but numerical ones.
+		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+		var n = !isFinite(+number) ? 0 : +number,
+			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+			s = '',
+			toFixedFix = function (n, prec) {
+				var k = Math.pow(10, prec);
+				return '' + Math.round(n * k) / k;
+			};
+		// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+		if (s[0].length > 3) {
+			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+		}
+		if ((s[1] || '').length < prec) {
+			s[1] = s[1] || '';
+			s[1] += new Array(prec - s[1].length + 1).join('0');
+		}
+		return s.join(dec);
+	}
+
+
+	/*function term_process(a){
 		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var progress 	= getNum($('#progress_'+a).val().split(",").join("")); 
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 
 
 		console.log(total);
-		
+
 
 		var current  	= $('#current').val();
 		
@@ -428,7 +549,6 @@
 		$('#usd_'+a).val(number_format(tot_usd,2));
 		$('#idr_'+a).val(number_format(tot_idr,2));
 	}
-	
 	function change_kurs(){
 		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
@@ -512,5 +632,6 @@
 			s[1] += new Array(prec - s[1].length + 1).join('0');
 		}
 		return s.join(dec);
-	}
+	}*/
+	
 </script>
