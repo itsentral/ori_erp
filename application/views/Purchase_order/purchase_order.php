@@ -114,7 +114,7 @@ $this->load->view('include/side_menu');
 	$(document).on('click', '.edit_po', function(e){
 		e.preventDefault();
 		loading_spinner();
-		$("#head_title").html("<b>EDIT PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
+		$("#head_title").html("<b>CREATE PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/modal_edit_purchase_order/'+$(this).data('no_po'),
