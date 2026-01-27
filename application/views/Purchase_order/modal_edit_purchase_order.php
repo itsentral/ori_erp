@@ -425,6 +425,9 @@
 		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
+
+		console.log(current);
+
 		
 		if(current == 'USD'){
 			var tot_usd 	= (progress/100) * total;
