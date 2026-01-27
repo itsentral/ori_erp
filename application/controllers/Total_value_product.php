@@ -628,12 +628,12 @@ class Total_value_product extends CI_Controller {
 		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
-		$sheet->setCellValue('D'.$NewRow, 'Kode Trans');
+		$sheet->setCellValue('D'.$NewRow, 'Produk');
 		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
-		$sheet->setCellValue('E'.$NewRow, 'Produk');
+		$sheet->setCellValue('E'.$NewRow, 'Kode Trans');
 		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($tableHeader);
 		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
