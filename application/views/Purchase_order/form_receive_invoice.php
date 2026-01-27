@@ -66,7 +66,7 @@ $this->load->view('include/side_menu');
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
 				  <div class="col-md-6">
-					<label class="control-label">Nilai PO</label>
+					<label class="control-label">Net Price + Tax</label>
 					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_harga)?$total_harga:""); ?>"  readonly>
 				  </div>
                   <div class="col-md-6">
@@ -80,7 +80,7 @@ $this->load->view('include/side_menu');
 				  </div>   
 				   <div class="col-md-6">
 					<label class="control-label">Nilai TOP</label>
-					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilaidpp; ?>" required readonly>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
