@@ -1700,6 +1700,9 @@ class Purchase_order_model extends CI_Model {
 						$ArrEditPO[$val]['syarat'] 		= strtolower($valx['syarat']);
 						$ArrEditPO[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 						$ArrEditPO[$val]['created_date']= date('Y-m-d H:i:s');
+						$ArrEditPO[$val]['matauang_receive_invoice'] 		= $data['current'];
+						$ArrEditPO[$val]['kurs_receive_invoice'] 		= 1;
+
 					}
 				}
 			}
@@ -1721,6 +1724,8 @@ class Purchase_order_model extends CI_Model {
 					$ArrEditPOHist[$val]['created_date']= $valx['created_date'];
 					$ArrEditPOHist[$val]['hist_by'] 	= $data_session['ORI_User']['username'];
 					$ArrEditPOHist[$val]['hist_date']	= date('Y-m-d H:i:s');
+					$ArrEditPOHist[$val]['matauang_receive_invoice'] 		= $data['current'];
+					$ArrEditPOHist[$val]['kurs_receive_invoice'] 		= 1;
 				}
 			}
 			
