@@ -12,9 +12,7 @@ $this->load->view('include/side_menu');
 	$nilaidpp  = ((11/12)*$nilainet); 
 	}
 
-	print_r($nilainet);
-	exit;
-
+	
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
