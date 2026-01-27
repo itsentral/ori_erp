@@ -2677,7 +2677,7 @@ class Purchase_order_model extends CI_Model {
 			$print_tnc="&nbsp;<a href='".base_url('purchase/print_po_tnc/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print T&C' data-role='qtip'><b>Print T&C</b></a>";
 
 			if($status_po==""){ 
-				if($row['status'] == 'DRAFT PO' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
+				if($row['status'] == 'DRAFT PO' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
 					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
 				}
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
