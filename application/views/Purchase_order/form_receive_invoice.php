@@ -9,7 +9,7 @@ $this->load->view('include/side_menu');
 	$nilainet = isset($results) ? $results->value_usd:0;
 	$ppn      = ($tax*$nilainet)/100;
 	$nilaiinvoice = $nilainet+$ppn;
-	$nilaidpp  = ((11/12)*$nilainet);
+	$nilaidpp  = ((11/12)*$nilainet); 
 	}
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
