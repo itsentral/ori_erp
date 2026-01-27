@@ -2613,6 +2613,10 @@ class Purchase_order_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
 			$status_po=$row['status_po'];
+			if($row['status'] == 'DRAFT PO'){
+				$warna = 'bg-yellow';
+				$status = $row['status'];
+			}
 			if($row['status'] == 'COMPLETE'){
 				$warna = 'bg-green';
 				$status = $row['status'];
@@ -2863,7 +2867,8 @@ class Purchase_order_model extends CI_Model {
 			$ArrHeader['top'] 				= $rfqheader->top;
 			$ArrHeader['remarks'] 			= $rfqheader->remarks;
 			$ArrHeader['mata_uang'] 		= $rfqheader->currency;
-
+            
+			$ArrHeader['status_po'] 		= 'DRAFT PO';
 			$ArrHeader['created_by'] 		= $Username;
 			$ArrHeader['created_date'] 		= $dateTime;
 			$ArrHeader['updated_by'] 		= $Username;
