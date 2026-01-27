@@ -407,8 +407,13 @@
 	
 	function term_process(a){
 		var total		= getNum($('#grand_total').val().split(",").join(""));
-		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+		var progress 	= getNum($('#progress_'+a).val().split(",").join("")); 
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
+
+
+		console.log(total);
+		
+
 		var current  	= $('#current').val();
 		
 		if(current == 'USD'){
