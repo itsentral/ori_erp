@@ -701,27 +701,27 @@ class Total_value_product extends CI_Controller {
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				$awal_col++;
-				$keterangan	= $row_Cek['keteramgan'];
+				$keterangan	= $row_Cek['keterangan'];
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $keterangan);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
 
 				
 				$awal_col++;
-				$qty_stock	= number_format($row['qty'],4);
+				$qty_stock	= number_format($row_Cek['qty'],4);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $qty_stock);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 				
 				
 				$awal_col++;
-				$nilai_wip = number_format($row['nilai_wip'],2);
+				$nilai_wip = number_format($row_Cek['nilai_wip'],2);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $nilai_wip);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
 
                 $awal_col++;
-				$total_value = number_format($row['nilai_wip']*$row['qty'],2);
+				$total_value = number_format($row_Cek['nilai_wip']*$row['qty'],2);
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $total_value);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyRight);
