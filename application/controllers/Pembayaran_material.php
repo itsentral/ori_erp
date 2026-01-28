@@ -642,10 +642,13 @@ class Pembayaran_material extends CI_Controller {
 				$datapoheader = $this->db->query("select * from tran_material_po_header where no_po='".$data->no_po."'")->row();
 				
 				if($datapoheader->terima_barang_idr!=0) {
-                      $kurs_hutang = $data->kurs_receive_invoice;
+                    $kurs_hutang = $data->kurs_receive_invoice;
 					
-					
-					$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice);
+					if($kurs_hutang > 1){
+						$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice);
+					}else{
+						$selisih_kurs=0;
+					}
 					
 					if($selisih_kurs < 0) {
 						$selisih_kurs1 = $selisih_kurs*(-1);
@@ -656,9 +659,11 @@ class Pembayaran_material extends CI_Controller {
 				} else {
 					
 					$kurs_hutang = $data->kurs_receive_invoice;
-					
+					if($kurs_hutang > 1){
 					$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-(($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice));
-					
+					}else{
+						$selisih_kurs=0;
+					}
 					if($selisih_kurs < 0) {
 						$selisih_kurs1 = $selisih_kurs*(-1);
 					} else {
@@ -767,7 +772,7 @@ class Pembayaran_material extends CI_Controller {
 					if($rec->parameter_no=="2"){
 						if($data->tipe=='TR-01'){
 							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $coahutang,'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' =>0, 'debet' => round(($data->nilai_po_invoice+$data->invoice_ppn)*$kurs_hutang), 'nilai_valas_debet' => ($data->nilai_po_invoice+$data->invoice_ppn), 'nilai_valas_kredit' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $coahutang,'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' =>0, 'debet' => round(($data->nilai_po_invoice+$data->invoice_ppn)*$kurs_hutang), 'nilai_valas_debet' => (($curs_header!='IDR')?($data->nilai_po_invoice+$data->invoice_ppn):0), 'nilai_valas_kredit' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
 							);
 						}else{
 							if($data->potongan_dp>0){
@@ -781,7 +786,7 @@ class Pembayaran_material extends CI_Controller {
 					if($rec->parameter_no=="3"){
 						if($data->tipe=='TR-02'){
 							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $coahutang, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => 0, 'debet' => round((($data->nilai_po_invoice+$data->invoice_ppn)*$kurs_hutang)), 'nilai_valas_debet' => ($data->nilai_po_invoice+$data->invoice_ppn), 'nilai_valas_kredit' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $coahutang, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => 0, 'debet' => round((($data->nilai_po_invoice+$data->invoice_ppn)*$kurs_hutang)), 'nilai_valas_debet' => (($curs_header!='IDR')?($data->nilai_po_invoice+$data->invoice_ppn):0), 'nilai_valas_kredit' => 0, 'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
 							);
 						}else{
 							$det_Jurnaltes1[] = array(
@@ -818,7 +823,7 @@ class Pembayaran_material extends CI_Controller {
 				// SELISIH KURS
 				if($rec->parameter_no=="9"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => round($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => round($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => round($selisih_kurs<0?($selisih_kurs1*-1):0), 'debet' => round($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
 					);
 				}
 			}
