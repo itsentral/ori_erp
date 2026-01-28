@@ -311,7 +311,7 @@ class Warehouse_model extends CI_Model {
 				$ArrDeatilAdj[$val]['update_by'] 		= $data_session['ORI_User']['username'];
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
 				$ArrDeatilAdj[$val]['harga']		 	= $valx['harga'];
-				$ArrDeatilAdj[$val]['bm']		 	    = $data_ros->bm;
+				$ArrDeatilAdj[$val]['bm']		 	    = (!empty($data_ros->bm))?$data_ros->bm:0;
 			}
 
 			//Upload File
