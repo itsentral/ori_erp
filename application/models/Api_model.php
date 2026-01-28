@@ -141,7 +141,7 @@ class Api_model extends CI_Model {
     //===========================================TOTAL QUOTATION=======================================================
     //=================================================================================================================
 
-    public function api_total_quotation($year)
+    public function api_total_quotation()
 	{
 		$result = $this->db
                     ->select('  a.no_ipp, 
@@ -154,7 +154,7 @@ class Api_model extends CI_Model {
                     ->join('bq_header b','a.no_ipp = b.no_ipp','join')
                     ->where('b.app_quo','Y')
                     ->where('a.sts_hide','N')
-                    ->where('YEAR(b.app_quo_date)',$year)
+                    ->where('YEAR(b.app_quo_date)',date('Y'))
                     ->order_by('a.sts_price_date','asc')
                     ->get()
                     ->result_array();
@@ -163,8 +163,7 @@ class Api_model extends CI_Model {
 
     public function api_total_quotation_count()
 	{
-		$year = date('Y');
-	    $data_result = $this->api_total_quotation($year);
+		$data_result = $this->api_total_quotation();
 		$SUM = 0;
 		foreach ($data_result as $key => $value) {
             $get_revisi_max     = $this->db->select('MAX(revised_no) AS revised_no')->get_where('laporan_revised_header',array('id_bq'=>'BQ-'.$value['no_ipp']))->result();
@@ -182,13 +181,13 @@ class Api_model extends CI_Model {
     //===========================================TOTAL SALES ORDER=======================================================
     //=================================================================================================================
 
-    public function api_total_so($year)
+    public function api_total_so()
 	{
 		$result = $this->db
                     ->select('a.total_deal_usd')
                     ->from('billing_so a')
 					->join('so_bf_header b','a.no_ipp=b.no_ipp AND b.approved = "Y"','join')
-                    ->where('YEAR(b.approved_date)',$year)
+                    ->where('YEAR(b.approved_date)',date('Y'))
                     ->get()
                     ->result_array();
 		return $result;
@@ -196,8 +195,7 @@ class Api_model extends CI_Model {
 
     public function api_total_so_count()
 	{
-		$year = date('Y');
-	    $data_result = $this->api_total_so($year);
+		$data_result = $this->api_total_so();
 		$SUM = 0;
 		foreach ($data_result as $key => $value) {
             $SUM += $value['total_deal_usd'];
