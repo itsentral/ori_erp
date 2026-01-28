@@ -76,7 +76,7 @@
                echo "</tr>";
             }
             ?>
-            <tr>
+            <tr hidden>
                 <td class='text-right mid' colspan='6'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                 <td class='text-right mid text-bold'><?=number_format($result[0]['total_po'],2);?></td>
             </tr>
@@ -100,7 +100,7 @@
                 <td class='text-right mid' colspan='6'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                 <td class='text-right mid text-bold'><?=number_format($result[0]['delivery_cost'],2);?></td>
             </tr>
-            <tr>
+            <tr hidden>
                 <td class='text-right mid' colspan='6'><b>GRAND TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                 <td class='text-right mid text-bold'><?=number_format($result[0]['total_price2'],2);?></td>
             </tr>
