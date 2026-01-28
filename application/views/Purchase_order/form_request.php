@@ -24,7 +24,7 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Tipe Payment</label>
 					<p><?=strtoupper($payterm->name) ?><input type="hidden" name="tipe" id="tipe" value="<?=$payterm->data2?>" /></p>
 					<label class="control-label">Currency</label>
-					<p><?=$info_payterm->matauang_receive_invoice?><input type="hidden" name="curs_header" id="curs_header" value="<?=$info_payterm->matauang_receive_invoice?>" />
+					<p><?=$info_payterm->matauang_receive_invoice?> Kurs <?=$info_payterm->kurs_receive_invoice?><input type="hidden" name="curs_header" id="curs_header" value="<?=$info_payterm->matauang_receive_invoice?>" />
 					<input type="hidden" name="kurs" id="kurs" value="<?=$info_payterm->kurs_receive_invoice?>" />
 					</p>
 					<label class="control-label">Total Price before tax</label>
