@@ -320,6 +320,7 @@ if($results->invoice_no!="") {
         let discount        =  getNum($('#discount').val())
         let tax             =  getNum($('#tax').val())
         let delivery_cost   =  getNum($('#delivery_cost').val())
+		let dpp_cek             =  getNum($('#nilai_top').val())
 
 		let sum_total = 0
         let total
@@ -329,10 +330,11 @@ if($results->invoice_no!="") {
                 sum_total += Number(total);
             }
         });
-        $('#nilai_dpp').val(number_format(sum_total,2))
-        let ppn = (sum_total * tax) / 100
+		let dpp = (11/12)*dpp_cek;
+        $('#nilai_dpp').val(number_format(dpp,2))
+        let ppn = (dpp * tax) / 100
         $('#nilai_ppn').val(number_format(ppn,2))
-        let net_plus_tax = sum_total + ppn
+        let net_plus_tax = dpp + ppn
         $('#invoice_total').val(number_format(net_plus_tax,2))
        
 	}
