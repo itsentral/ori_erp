@@ -799,7 +799,7 @@ class Purchase extends CI_Controller {
 		$this->purchase_order_model->po_top();
 	}
 	public function save_po_top() {
-		$this->purchase_order_model->save_po_top();
+		$this->purchase_order_model->save_po_top(); 
 	}
 	public function invoice_receive($id) {
 		$controller			= 'purchase/purchase_order';
@@ -1080,6 +1080,7 @@ class Purchase extends CI_Controller {
 		$id_supplier = $this->input->post("id_supplier");
 		$nilai_ppn = $this->input->post("nilai_ppn");
 		$curs_header = $this->input->post("curs_header");
+		$kurs     = $this->input->post("kurs");
 		$nilai_total = $this->input->post("nilai_total");
 		$total_bayar = $this->input->post("total_bayar");
 		$po_belum_dibayar = $this->input->post("po_belum_dibayar");
@@ -1125,6 +1126,7 @@ class Purchase extends CI_Controller {
 				'req_payment_date'=>$req_payment_date,
 				'status' => '0',
 				'curs_header' => $curs_header,
+				'kurs_receive_invoice' => $kurs,
 				'nilai_total' => $nilai_total,
 				'total_bayar' => $total_bayar,
 				'po_belum_dibayar' => $po_belum_dibayar,
@@ -1155,6 +1157,7 @@ class Purchase extends CI_Controller {
 				'id_top' => $id_top,
 				'request_date' => $request_date,
 				'curs_header' => $curs_header,
+				'kurs_receive_invoice' => $kurs,
 				'no_invoice' => $no_invoice,
 				'nilai_invoice' => $nilai_invoice,
 				'keterangan' => $keterangan,
