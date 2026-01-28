@@ -5,7 +5,7 @@ class Pembayaran_material extends CI_Controller {
 	public function __construct(){
         parent::__construct();
 		$this->load->model('master_model');
-		$this->load->model('pembayaran_material_model');
+		$this->load->model('pembayaran_material_model'); 
 		$this->load->model('All_model');
 		$this->load->model('Jurnal_model');
 		$this->load->database();
@@ -642,7 +642,9 @@ class Pembayaran_material extends CI_Controller {
 				$datapoheader = $this->db->query("select * from tran_material_po_header where no_po='".$data->no_po."'")->row();
 				
 				if($datapoheader->terima_barang_idr!=0) {
-					$kurs_hutang = $data->kurs_receive_invoice;
+                      $kurs_hutang = $data->kurs_receive_invoice;
+					
+					
 					$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice);
 					
 					if($selisih_kurs < 0) {
