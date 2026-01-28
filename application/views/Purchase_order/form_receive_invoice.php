@@ -97,7 +97,7 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
 				   <?php } else {?>
-				  <div class="col-md-6">
+				  <div class="col-md-6" hidden>
 					<label class="control-label">Nilai Potongan DP</label>
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
 				  </div>
