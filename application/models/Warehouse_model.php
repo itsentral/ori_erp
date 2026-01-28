@@ -1018,20 +1018,9 @@ class Warehouse_model extends CI_Model {
 			foreach ($datajurnal1 as $rec) {
 				if ($rec->parameter_no == "1") {
 					foreach ($grouping_temp as $key => $value) {
-					// $det_Jurnaltes1[$key]['nomor'] = $nomor_jurnal;
-					// $det_Jurnaltes1[$key]['tanggal'] = $payment_date;
-					// $det_Jurnaltes1[$key]['tipe'] = 'JV';
-					// $det_Jurnaltes1[$key]['no_perkiraan'] = $rec->no_perkiraan;
-                    // $det_Jurnaltes1[$key]['keterangan'] = 'Material ' . $no_po;
-					// $det_Jurnaltes1[$key]['no_request'] = $no_po;
-					// $det_Jurnaltes1[$key]['debet'] = $no_po;
-					// $det_Jurnaltes1[$key]['kredit'] = $no_po;
-					// $det_Jurnaltes1[$key]['nilai_valas_debet'] = $no_po;
-					// $det_Jurnaltes1[$key]['nilai_valas_kredit'] = $no_po;
-					// $det_Jurnaltes1[$key]['no_reff'] = $no_po;
-					// $det_Jurnaltes1[$key]['jenis_jurnal'] = $no_po;
+					
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : ($value['unit_price'])), 'kredit' => ($rec->posisi == 'D' ? 0 : ($total_harga_product+$total_forward_bef_ppn)), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])), 'kredit' => ($rec->posisi == 'D' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
 					);
 					
 				   }
