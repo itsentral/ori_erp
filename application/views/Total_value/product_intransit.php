@@ -96,7 +96,7 @@ $gudang = $this->uri->segment(3);
 		dateFormat: 'yy-mm-dd',
 		changeMonth:true,
 		changeYear:true,
-		maxDate:'-1d',
+		//maxDate:'-1d',
 		showButtonPanel: true,
 		closeText: 'Clear',
 			onClose: function (dateText, inst) {
@@ -111,14 +111,13 @@ $gudang = $this->uri->segment(3);
 		}
 	});
 
-	$(document).on('click', '#download_excel', function(e){
+	$(document).on('click', '#download_excel3', function(e){
 		e.preventDefault();
-		var gudang = $('#gudang').val();
+		var gudang = $('#gudang1').val();
 		var date_filter = $('#date_filter').val();
 		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+date_filter;
 		window.open(Links,'_blank');
 	});
-	
 	$(document).on('click', '#download_excel2', function(e){
 		e.preventDefault();
 		var gudang = $('#gudang').val();
@@ -127,14 +126,7 @@ $gudang = $this->uri->segment(3);
 		window.open(Links,'_blank');
 	});
 	
-	$(document).on('click', '#download_excel3', function(e){
-		e.preventDefault();
-		var gudang = $('#gudang').val();
-		var date_filter = $('#date_filter').val();
-		var category = $('#category').val();
-		var Links		= base_url + active_controller+'/ExcelGudangProduksi/'+gudang+'/'+category+'/'+date_filter;
-		window.open(Links,'_blank');
-	});
+	
 
 	$(document).ready(function(){
         var gudang = $('#gudang').val();
