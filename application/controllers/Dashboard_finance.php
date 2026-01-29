@@ -221,12 +221,6 @@ class Dashboard_finance extends CI_Controller {
 			'hampir_exp_rutin'			=> COUNT($hampir_exp_rutin),
 			'price_oke_rutin'			=> COUNT($price_oke_rutin),
 
-
-			'late_enggenering'	=> $this->api_model->api_late_enginnering_count(),
-			'late_costing'		=> $this->api_model->api_late_costing_count(),
-			'late_quotation'	=> $this->api_model->api_late_quotation_count(),
-			'total_quotation'	=> $this->api_model->api_total_quotation_count(),
-			'total_so'			=> $this->api_model->api_total_so_count(),
 			'api_app_bq'		=> COUNT($this->api_model->api_app_bq()),
 			'api_app_est'		=> COUNT($this->api_model->api_app_est()),
 			'api_app_est_fd'	=> COUNT($this->api_model->api_app_est_fd()),
