@@ -572,7 +572,7 @@ class Total_value_product extends CI_Controller {
 	
 
 		}else{
-			$where_date = " DATE(a.hist_date) = '".$date_filter."'";
+			$where_date = "  WHERE DATE(a.hist_date) = '".$date_filter."'";
 			if($gudang=='wip'){
            		$table = "warehouse_stock_wip_per_day";
 			}elseif($gudang=='fg'){
@@ -593,7 +593,7 @@ class Total_value_product extends CI_Controller {
 				(@row:=@row+1) AS nomor, a.*
 			FROM
 				".$table." a
-			 WHERE ".$where_date."
+			".$where_date."
 			";
 
 		$restDetail1	= $this->db->query($sql)->result_array();
