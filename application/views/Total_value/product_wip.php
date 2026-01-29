@@ -113,7 +113,7 @@ $gudang = $this->uri->segment(3);
 
 	$(document).on('click', '#download_excel', function(e){
 		e.preventDefault();
-		var gudang = $('#gudang').val();
+		var gudang = 'wip';
 		var date_filter = $('#date_filter').val();
 		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+date_filter;
 		window.open(Links,'_blank');
