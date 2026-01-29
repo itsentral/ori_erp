@@ -552,26 +552,26 @@ class Total_value_product extends CI_Controller {
 
 		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
+   
 
-	    if($gudang=='wip'){
-            $table = "warehouse_stock_wip";
-         }elseif($gudang=='fg'){
-             $table = "warehouse_stock_fg";
-         }
-		 elseif($gudang=='intransit'){
-            $table = "warehouse_stock_intransit"; 
-         }elseif($gudang=='incustomer'){
-             $table = "warehouse_stock_incustomer";
-         }elseif($gudang=='cogs'){
-             $table = "warehouse_stock_cogs";
-         }
-       
-		$where_date ='';
-		$field_add = "0 AS costbook, 0 AS total_value,";
-		$group_by = '';
-		$fieldStock = 'a.qty, a.nilai_wip,';
+	    if($date_filter == date('Y-m-d')){
+	    	if($gudang=='wip'){
+				$table = "warehouse_stock_wip";
+			}elseif($gudang=='fg'){
+				$table = "warehouse_stock_fg";
+			}
+			elseif($gudang=='intransit'){
+				$table = "warehouse_stock_intransit"; 
+			}elseif($gudang=='incustomer'){
+				$table = "warehouse_stock_incustomer";
+			}elseif($gudang=='cogs'){
+				$table = "warehouse_stock_cogs";
+			}
+		
+			$where_date = " DATE(a.hist_date) = '".$date_filter."'";
+	
 
-		if(!empty($date_filter)){
+		}else{
 			$where_date = " DATE(a.hist_date) = '".$date_filter."'";
 			if($gudang=='wip'){
            		$table = "warehouse_stock_wip_per_day";
@@ -583,8 +583,11 @@ class Total_value_product extends CI_Controller {
 			}elseif($gudang=='incustomer'){
 				$table = "warehouse_stock_incustomer_per_day";
 			}
+		}
+
 			
-		}	
+			
+			
 			$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor, a.*
@@ -674,7 +677,7 @@ class Total_value_product extends CI_Controller {
 				$detail_name	= $no;
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $detail_name);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($tableBodyLeft); 
 
 				$awal_col++;
 				$id_material	= $row_Cek['no_so'];
