@@ -568,7 +568,7 @@ class Total_value_product extends CI_Controller {
 				$table = "warehouse_stock_cogs";
 			}
 		
-			$where_date = " DATE(a.hist_date) = '".$date_filter."'";
+			$where_date = "";
 	
 
 		}else{
