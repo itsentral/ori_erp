@@ -96,7 +96,7 @@ $gudang = $this->uri->segment(3);
 		dateFormat: 'yy-mm-dd',
 		changeMonth:true,
 		changeYear:true,
-		maxDate:'-1d',
+		//maxDate:'-1d',
 		showButtonPanel: true,
 		closeText: 'Clear',
 			onClose: function (dateText, inst) {
