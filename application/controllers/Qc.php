@@ -4618,7 +4618,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
