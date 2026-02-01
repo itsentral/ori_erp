@@ -12,7 +12,7 @@ ini_set('memory_limit','1024M');
 ob_start();
 date_default_timezone_set('Asia/Jakarta');
 $today = date('l, d F Y [H:i:s]');
-
+$year = (!empty($year))?$year:date('Y');
 ?>
 
 <table class="gridtable2" border='1' width='100%' cellpadding='2'>
@@ -20,7 +20,7 @@ $today = date('l, d F Y [H:i:s]');
 		<td align='center'><b>PT  ORI POLYTEC COMPOSITE</b></td>
 	</tr>
 	<tr>
-		<td align='center'><b><h2>LIST QUOTATION <?=date('Y');?></h2></b></td>
+		<td align='center'><b><h2>LIST QUOTATION <?=$year;?></h2></b></td>
 	</tr>
 </table>
 <br>

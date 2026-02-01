@@ -86,7 +86,7 @@ $this->load->view('include/side_menu_dashboard');
                                         <div class="icon">
                                         <i class="ion ion-stats-bars"></i>
                                         </div>
-                                        <a href="<?php echo site_url('dashboard/print_total_quotation') ?>" target='_blank' class="small-box-footer">Print <i class="fa fa-arrow-circle-right"></i></a>
+                                        <a href="<?php echo site_url('dashboard_sales/print_total_quotation/'.$year) ?>" target='_blank' class="small-box-footer">Print <i class="fa fa-arrow-circle-right"></i></a>
                                     </div>
                                 </div>
 
@@ -99,7 +99,7 @@ $this->load->view('include/side_menu_dashboard');
                                         <div class="icon">
                                         <i class="ion ion-stats-bars"></i>
                                         </div>
-                                        <a href="<?php echo site_url('dashboard/print_total_sales_order') ?>" target='_blank' class="small-box-footer">Print <i class="fa fa-arrow-circle-right"></i></a>
+                                        <a href="<?php echo site_url('dashboard_sales/print_total_sales_order/'.$year) ?>" target='_blank' class="small-box-footer">Print <i class="fa fa-arrow-circle-right"></i></a>
                                     </div>
                                 </div>
 
