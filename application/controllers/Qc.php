@@ -4338,10 +4338,12 @@ class Qc extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroup);
-			$this->jurnalFG($id_trans,$datetime);
+			
 		}
 		if(!empty($ArrOutWIP)){
 			$this->db->insert_batch('data_erp_wip_group',$ArrOutWIP);
+
+			$this->jurnalFG($id_trans,$datetime);
 		}
 
 
