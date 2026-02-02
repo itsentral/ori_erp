@@ -4289,7 +4289,7 @@ else
 					 }
 				    
 					if (!empty($nm_material)){
-                      $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+                      $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
 
 			}
@@ -4338,7 +4338,7 @@ else
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_cogs SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				$this->db->query("UPDATE  warehouse_stock_cogs SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 				}
 			}else{
 			$datastokfg=array();
@@ -4351,7 +4351,7 @@ else
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-							'qty' => $vals->total,
+							'qty' => 1,
 							'nilai_wip' => $vals->nilai_wip,
 							'created_by' => $vals->created_by,
 							'created_date' => $vals->created_date,
