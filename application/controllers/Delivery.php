@@ -5887,7 +5887,7 @@ class Delivery extends CI_Controller
 
 			if(!empty($ArrGroupOut)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
-				$this->jurnalIntransit($kode_delivery); 
+				$this->jurnalIntransit($kode_delivery);
 			}
 			
 			if(!empty($ArrGroupMaterial)){
