@@ -70,4 +70,66 @@ class Dashboard_sales extends CI_Controller {
 		";
 		die();
 	}
+
+	public function print_total_quotation($year){
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+	
+		$data_url		= base_url();
+		$Split_Beda		= explode('/',$data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		$result = $this->db
+                    ->select('  a.no_ipp, 
+                                a.nm_customer, 
+                                a.project, 
+                                a.status, 
+                                b.app_quo_date
+                                ')
+                    ->from('production a')
+                    ->join('bq_header b','a.no_ipp = b.no_ipp AND b.app_quo = "Y"','join')
+                    ->where('a.sts_hide','N')
+                    ->where('YEAR(b.app_quo_date)',$year)
+                    ->order_by('b.app_quo_date','asc')
+                    ->get()
+                    ->result_array();
+		
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'year' => $year,
+			'printby' => $printby,
+			'result' => $result
+		);
+
+		$this->load->view('Print/print_total_quotation', $data);
+	}
+
+	public function print_total_sales_order($year){
+		$data_session	= $this->session->userdata;
+		$printby		= $data_session['ORI_User']['username'];
+	
+		$data_url		= base_url();
+		$Split_Beda		= explode('/',$data_url);
+		$Jum_Beda		= count($Split_Beda);
+		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+		$result = $this->db
+                    ->select('a.total_deal_usd, a.no_ipp, a.project, a.nm_customer, b.approved_date')
+                    ->from('billing_so a')
+					->join('so_bf_header b','a.no_ipp=b.no_ipp AND b.approved = "Y"','join')
+                    ->where('YEAR(b.approved_date)',$year)
+					->order_by('b.approved_date','asc')
+                    ->get()
+                    ->result_array();
+		
+		$data = array(
+			'Nama_Beda' => $Nama_Beda,
+			'year' => $year,
+			'printby' => $printby,
+			'result' => $result
+		);
+
+		$this->load->view('Print/print_total_sales_order', $data);
+	}
 }
