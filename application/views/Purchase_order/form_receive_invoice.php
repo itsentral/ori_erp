@@ -67,7 +67,7 @@ $this->load->view('include/side_menu');
 					<label for="tgl_bayar" class="control-label">Kurs :</label>
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
-				  <div class="col-md-6">
+				  <div class="col-md-6" hidden>
 					<label class="control-label">Net Price + Tax</label>
 					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_harga)?$total_harga:""); ?>"  readonly>
 				  </div>
