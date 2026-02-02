@@ -4637,7 +4637,7 @@ class Qc extends CI_Controller
 						'no_spk' => $vals->no_spk,
 						'kode_trans' => $vals->kode_trans,
 						'id_pro_det' => $vals->id_pro_det,
-						'qty' => $vals->total,
+						'qty' => 1,
 						'nilai_wip' => $vals->nilai_wip,
 						'material' => $vals->material,
 						'wip_direct' =>  $vals->wip_direct,
