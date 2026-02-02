@@ -114,7 +114,7 @@ $kurs=1;
 						<td class='text-right'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
 						<td class='text-right mid text-bold'><?=number_format($data[0]->total_po,2);?></td>
 					</tr>
-					<tr>
+					<tr hidden>
 						<td align='left' colspan='2'></td>					
 						<td class='text-right'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
 						<td class='text-right mid text-bold'><?=number_format($data[0]->discount,2);?></td>
