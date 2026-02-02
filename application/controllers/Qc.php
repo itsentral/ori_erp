@@ -1189,7 +1189,7 @@ class Qc extends CI_Controller
 			'kode_spk' => $kode_spk,
 			'get_spk' => $get_spk,
 			'id_produksi' => $id_produksi,
-			'id_product' => $get_split_code[0]['id_product'],
+			'id_product' => $get_split_code[0]['id_product'], 
 			'id_milik' => $id_milik,
 			'id_milik2' => $get_split_code[0]['id'],
 			'kode_product' => $explode,
@@ -3574,7 +3574,7 @@ class Qc extends CI_Controller
 			"data"            	=> $data
 		);
 
-		echo json_encode($json_data);
+		echo json_encode($json_data); 
 	}
 
 	public function query_data_field_joint($status, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL)
@@ -4619,7 +4619,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fgx SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
@@ -4644,7 +4644,7 @@ class Qc extends CI_Controller
 						'id_trans' => $vals->id_trans,
 						);
 
-			$this->db->insert('warehouse_stock_fg',$datastokfg);
+			$this->db->insert('warehouse_stock_fgz',$datastokfg);
 			}
 			
 		}
