@@ -4617,8 +4617,7 @@ class Qc extends CI_Controller
 			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kodetrans."' 
 			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
 
-			print_r($stokwip);
-			exit;
+		
 
 
 			
