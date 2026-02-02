@@ -4624,7 +4624,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fgz SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
@@ -4649,7 +4649,7 @@ class Qc extends CI_Controller
 						'id_trans' => $vals->id_trans,
 						);
 
-			$this->db->insert('warehouse_stock_fgx',$datastokfg);
+			$this->db->insert('warehouse_stock_fg',$datastokfg);
 			}
 			
 		}
