@@ -5882,7 +5882,7 @@ class Delivery extends CI_Controller
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-				$this->jurnalIntransit($kode_delivery);
+				$this->jurnalIntransit($kode_delivery); 
 			}
 
 			if(!empty($ArrGroupOut)){
@@ -6587,6 +6587,8 @@ class Delivery extends CI_Controller
 
 			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_intransit WHERE kode_trans ='".$kodetrans."' 
 			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+			print_r($stokfg);
+			exit;
 
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
