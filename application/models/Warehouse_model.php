@@ -1024,7 +1024,7 @@ class Warehouse_model extends CI_Model {
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])+$value['bm']), 'kredit' => ($rec->posisi == 'D' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])+$value['bm']), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
 					);
 
-					$total_bm += +$value['bm'];
+					$total_bm += $value['bm'];
 					
 				   }
 
