@@ -966,6 +966,7 @@ class Warehouse_model extends CI_Model {
         $det_Jurnaltes1 = array();
 		$total_forward_bef_ppn=0;
 		$total_forward_ppn=0;
+		$total_bm = 0;
 		$payment_date=date('Y-m-d');
         // $data_ros_forward = $this->db->query("SELECT * FROM report_of_shipment_forward WHERE id_ros='$no_ros' ")->result();
         // if(!empty($data_ros_forward)){
@@ -1020,8 +1021,10 @@ class Warehouse_model extends CI_Model {
 					foreach ($grouping_temp as $key => $value) {
 					
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])), 'kredit' => ($rec->posisi == 'D' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])+$value['bm']), 'kredit' => ($rec->posisi == 'D' ? 0 : (($value['unit_price']*$value['kurs'])*$value['qty_good'])+$value['bm']), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
 					);
+
+					$total_bm += +$value['bm'];
 					
 				   }
 
@@ -1093,6 +1096,11 @@ class Warehouse_model extends CI_Model {
 				if ($rec->parameter_no == "7") {
 					$det_Jurnaltes1[] = array(
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs' . $no_po, 'no_request' => $no_po, 'kredit' => ($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => ($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0),'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
+					);
+				}
+				if ($rec->parameter_no == "8") {
+					$det_Jurnaltes1[] = array(
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'BM ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_bm), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : 0), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : 0), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
 					);
 				}
 			}
