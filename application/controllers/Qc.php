@@ -4267,7 +4267,7 @@ class Qc extends CI_Controller
 				$ArrGroup[$value]['no_spk'] = (!empty($getSummary[0]['no_spk']))?$getSummary[0]['no_spk']:NULL;
 				$ArrGroup[$value]['kode_trans'] = $kode_trans;
 				$ArrGroup[$value]['id_pro_det'] = $id_pro_det;
-				$ArrGroup[$value]['qty'] = $qty;
+				$ArrGroup[$value]['qty'] = 1;
 
 				//$nilai_wip 		= (!empty($getSummary[0]['nilai_wip']))?$getSummary[0]['nilai_wip']:0;
 				$material 		= (!empty($getSummary[0]['material']))?$getSummary[0]['material']:0;
