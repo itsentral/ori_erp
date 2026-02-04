@@ -63,7 +63,7 @@
 					$color = 'text-green';
                 }
 				
-				if(!empty($valx['nilai_wip'])){
+				if($valx['nilai_wip']){
 				$nilai = $valx['nilai_wip'];
 				}else{
 				$nilai = $valx['nilai_unit'];	
