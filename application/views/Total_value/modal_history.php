@@ -63,9 +63,11 @@
 					$color = 'text-green';
                 }
 				
-				
+				if(!empty($valx['nilai_wip'])){
 				$nilai = $valx['nilai_wip'];
-				
+				}else{
+				$nilai = $valx['nilai_unit'];	
+				}
 				echo "<tr>";
 					echo "<td>".$No."</td>";
 					echo "<td>".strtoupper($valx['no_so'])."</td>";
@@ -74,7 +76,7 @@
                     echo "<td class='".$color."'>".strtoupper($valx['product'])."</td>";
                     echo "<td class='".$color."'>".strtoupper($valx['jenis'])."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty'],4)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($nilai]/$valx['qty'],4)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($nilai/$valx['qty'],4)."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty']*($nilai/$valx['qty']),4)."</td>";
 					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['created_date']))."</td>";
 					if($this->uri->segment(5) =='1'){
