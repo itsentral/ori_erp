@@ -123,7 +123,7 @@ $this->load->view('include/side_menu');
 		});
 	});
 	//Save
-    $('#frm_data').on('submit', function(e){
+    $('#frm_data').on('submit', function(e){ 
         e.preventDefault();
 		var errors="";
 		if(errors==""){
@@ -157,7 +157,7 @@ $this->load->view('include/side_menu');
 							timer: 1500,
 							showConfirmButton: false
 						});
-						window.location.href= window.location.href;
+						window.open(base_url + active_controller+"/print_req/"+msg['noreq']);
 					} else {
 						swal({
 							title: "Gagal!",
