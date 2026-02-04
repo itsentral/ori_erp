@@ -71,8 +71,8 @@
                     echo "<td class='".$color."'>".strtoupper($valx['product'])."</td>";
                     echo "<td class='".$color."'>".strtoupper($valx['jenis'])."</td>";
 					echo "<td class='text-right ".$color."'>".number_format($valx['qty'],4)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],4)."</td>";
-					echo "<td class='text-right ".$color."'>".number_format($valx['qty']*$valx['nilai_wip'],4)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip']/$valx['qty'],4)."</td>";
+					echo "<td class='text-right ".$color."'>".number_format($valx['qty']*($valx['nilai_wip']/$valx['qty']),4)."</td>";
 					echo "<td class='text-right'>".date('d-M-Y H:i:s', strtotime($valx['created_date']))."</td>";
 					if($this->uri->segment(5) =='1'){
 					echo "<td class='text-right ".$color."'>".number_format($valx['nilai_wip'],2)."</td>";
