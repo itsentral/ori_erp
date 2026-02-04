@@ -26,7 +26,7 @@ table.garis {
  </head>
 
  <body>
-<table cellpadding=2 cellspacing=0 border=0 width=700>
+<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
 <tr>
 	<th colspan=5 height=50><?=$judul?></th>
 </tr>
@@ -45,7 +45,7 @@ table.garis {
 </tr>
 <tr>
 	<td colspan=5>
-	<table cellpadding=2 cellspacing=0 border=1 width=700 class="garis">
+	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
 		<tr>
 			<th>Request By</th>
 			<th>Tanggal</th>
@@ -70,6 +70,19 @@ table.garis {
 	</td>
 </tr>
 </table>
+<br>
+		<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
+		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
+		<tr><th width=100><br><br><br><br><br></th>
+		<th width=100><br><br><br><br><br></th>
+		<th width=120><br><br><br><br><br></th>
+		<th width=90><br><br><br><br><br></th>
+		<th width=90><br><br><br><br><br></th>
+		<th width=90><br><br><br><br><br></th>
+		<th width=90><br><br><br><br><br></th>
+		<th width=100><br><br><br><br><br></th></tr>
+		</table>
+
   <script type="text/javascript">
   <!--
   window.print();
