@@ -4341,7 +4341,7 @@ else
 				if(!empty($cekstok)){
 					foreach ($stokfg as $vals) {
 					$qty = 	$vals->total;
-					$this->db->query("UPDATE  warehouse_stock_cogs SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+					$this->db->query("UPDATE  warehouse_stock_cogs SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 					}
 				}else{
 				$datastokfg=array();
