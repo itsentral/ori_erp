@@ -852,7 +852,7 @@ class Purchase extends CI_Controller {
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
 		$kursInv        = $data['kurs'];
-		$net            = $data['nilai_net'];
+		$net            = $data['nilai_top'];
 
 		$id				= $data['id_top'];
 		if($data['group_top']=='progress'){
