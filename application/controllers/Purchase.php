@@ -851,6 +851,8 @@ class Purchase extends CI_Controller {
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
+		$kursInv        = $data['kurs'];
+		$net            = $data['nilai_net'];
 
 		$id				= $data['id_top'];
 		if($data['group_top']=='progress'){
@@ -905,6 +907,14 @@ class Purchase extends CI_Controller {
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
 
+		$dataros = $this->db->query("select * from warehouse_adjustment where no_ipp='".$no_po."'")->row();
+		if(!empty($dataros)){
+        $noRos = $dataros->no_ros;
+		$kursRos = $dataros->kurs;
+		$selisihKurs = $kursRos - $kursInv;
+		$selisihIDR = $selisihKurs*$net;
+		}
+
 		
        
 		if($data['group_top']=='uang muka'){			
@@ -938,8 +948,21 @@ class Purchase extends CI_Controller {
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
 					);
 				}
+				
+				if($rec->parameter_no=="7"){
+					if($kursRos > 1){
+					$det_Jurnaltes1[] = array(
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => ($selisihIDR<0?($selisihIDR*-1):0), 'debet' => ($selisihIDR>=0?$selisihIDR:0), 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+					);
+					}else{
+					$det_Jurnaltes1[] = array(
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => 0, 'debet' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+					);
+					}
+					
+				}
 			  }
-			  $this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
+			  $this->db->insert_batch('jurnaltras', $det_Jurnaltes1); 
 				//auto jurnal
 
 				$tanggal = $data['tgl_terima'];
