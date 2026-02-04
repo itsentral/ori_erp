@@ -71,3 +71,9 @@ if(!empty($data_request)){
 		<th width=90><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th></tr>
 		</table>
+		
+<script type="text/javascript">
+  <!--
+  window.print();
+  //-->
+  </script>
