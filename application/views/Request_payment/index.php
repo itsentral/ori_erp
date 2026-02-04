@@ -89,7 +89,7 @@ $this->load->view('include/side_menu');
 		</table>
 		<div class="pull-right">
 		<?php if($akses_menu['create']=='1'){ ?>
-		<button type="submit" name="save" class="btn btn-success btn-sm" id="submit"><i class="fa fa-save">&nbsp;</i>Update</button>
+		<button type="submit" name="save" class="btn btn-success btn-sm" id="submit"><i class="fa fa-save">&nbsp;</i>Update & Print</button>
 		<?php } ?>
 		</div>
 		</div>
