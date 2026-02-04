@@ -157,7 +157,7 @@ class Expense_model extends CI_Model
 	// list data
 	public function GetListData($where=''){
 		$this->db->select('a.*, b.username as nmuser, c.username as nmapproval');
-		$this->db->from($this->table_name.' a');
+		$this->db->from(DBERP.'.'.$this->table_name.' a');
 		$this->db->join('users b','a.nama=b.id_user','left');
 		$this->db->join('users c','a.approval=c.id_user','left');
 		if($where!='') $this->db->where($where);
