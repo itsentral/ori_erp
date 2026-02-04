@@ -16,7 +16,7 @@ if(!empty($data_request)){
 	$tglreq=tgl_indo($data_request[0]->created_on);
 }
 ?>
-<table cellpadding=2 cellspacing=0 border=0 width=650>
+<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
 <tr>
 	<th colspan=9 height=50><?=$judul?></th>
 </tr>
@@ -26,7 +26,7 @@ if(!empty($data_request)){
 </tr>
 <tr>
 	<td colspan=9>
-	<table cellpadding=2 cellspacing=0 border=1 width=650 class="garis">
+	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
 		<tr>
 			<th width="5">#</th>
 			<th>No Dokumen</th>
@@ -61,7 +61,7 @@ if(!empty($data_request)){
 </table>
 <br>
 		<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
-		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENGELUARAN</th></tr>
+		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
 		<tr><th width=100><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th>
 		<th width=120><br><br><br><br><br></th>
