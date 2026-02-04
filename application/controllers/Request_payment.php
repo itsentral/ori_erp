@@ -123,7 +123,8 @@ class Request_payment extends CI_Controller {
 			$result = true;
 		}
 		$param = array(
-			'save' => $result
+			'save' => $result,
+			'noreq' => $no_request
 		);
 		echo json_encode($param);
 	}

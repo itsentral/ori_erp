@@ -89,7 +89,7 @@ $this->load->view('include/side_menu');
 		</table>
 		<div class="pull-right">
 		<?php if($akses_menu['create']=='1'){ ?>
-		<button type="submit" name="save" class="btn btn-success btn-sm" id="submit"><i class="fa fa-save">&nbsp;</i>Update</button>
+		<button type="submit" name="save" class="btn btn-success btn-sm" id="submit"><i class="fa fa-save">&nbsp;</i>Update & Print</button>
 		<?php } ?>
 		</div>
 		</div>
@@ -123,7 +123,7 @@ $this->load->view('include/side_menu');
 		});
 	});
 	//Save
-    $('#frm_data').on('submit', function(e){
+    $('#frm_data').on('submit', function(e){ 
         e.preventDefault();
 		var errors="";
 		if(errors==""){
@@ -157,7 +157,7 @@ $this->load->view('include/side_menu');
 							timer: 1500,
 							showConfirmButton: false
 						});
-						window.location.href= window.location.href;
+						window.open(base_url + active_controller+"/print_req/"+msg['noreq']);
 					} else {
 						swal({
 							title: "Gagal!",
