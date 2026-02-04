@@ -911,7 +911,7 @@ class Purchase extends CI_Controller {
 		if(!empty($dataros)){
         $noRos = $dataros->no_ros;
 		$kursRos = $dataros->kurs;
-		$selisihKurs = $kursRos - $kursInv;
+		$selisihKurs = $kursInv - $kursRos;
 		$selisihIDR = $selisihKurs*$net;
 		}
 
@@ -931,7 +931,7 @@ class Purchase extends CI_Controller {
 			  foreach ($datajurnal1 as $rec) { 
 				if($rec->parameter_no=="1"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['invoice_total']-$data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['invoice_total']-$data['nilai_ppn'])*$kursRos, 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
 					);
 					$totalunbill=($data['invoice_total']-$data['nilai_ppn'])*$data['kurs'];
 					$coaunbill=$rec->no_perkiraan;	
