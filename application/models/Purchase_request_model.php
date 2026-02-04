@@ -154,7 +154,7 @@ class Purchase_request_model extends CI_Model {
 		$Jum_Beda		= count($Split_Beda);
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 		
-		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0))->result_array();
+		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'code_group !='=>'non acc'))->result_array();
 
 		$data = array(
 			'Nama_Beda' => $Nama_Beda,
