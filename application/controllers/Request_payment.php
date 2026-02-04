@@ -121,6 +121,7 @@ class Request_payment extends CI_Controller {
 		} else {
 			$this->db->trans_commit();
 			$result = true;
+			$this->print_req($no_request);
 		}
 		$param = array(
 			'save' => $result
