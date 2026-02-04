@@ -63,11 +63,9 @@
 					$color = 'text-green';
                 }
 				
-				if($valx['nilai_wip']){
+				
 				$nilai = $valx['nilai_wip'];
-				}else{
-				$nilai = $valx['nilai_unit'];	
-				}
+				
 				echo "<tr>";
 					echo "<td>".$No."</td>";
 					echo "<td>".strtoupper($valx['no_so'])."</td>";
