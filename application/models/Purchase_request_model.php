@@ -218,7 +218,7 @@ class Purchase_request_model extends CI_Model {
 		}
 		// echo $sql;
 		$result = $this->db->query($sql)->result_array();
-		$non_frp = $this->db->select('*, SUM(purchase) AS qty_request')->group_by('id_material','ASC')->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'sts_app'=>'N'))->result_array();
+		$non_frp = $this->db->select('*, SUM(purchase) AS qty_request')->group_by('id_material','ASC')->order_by('id','asc')->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'sts_app'=>'N'))->result_array();
 
 		$tgl_butuh = '';
 		if(!empty($result) OR !empty($non_frp)){
