@@ -55,7 +55,7 @@ $this->load->view('include/side_menu');
 						$nilai_po_invoice=$info_payterm->invoice_total;						
 					}
 					?>
-					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required onchange="calculate_invoice()" readonly>
+					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required onchange="calculate_invoice()">
 					<label class="control-label">PPN</label>
 					<div class="input-group">
 					<div class="input-group-addon"><input type="checkbox" value="1" onclick="calculate_invoice()" name="ch_ppn" id="ch_ppn" <?php
