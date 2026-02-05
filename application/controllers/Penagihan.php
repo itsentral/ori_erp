@@ -4356,7 +4356,7 @@ else
 								'no_spk' => $vals->no_spk,
 								'kode_trans' => $vals->kode_trans,
 								'id_pro_det' => $vals->id_pro_det,
-								'qty' => 1,
+								'qty' => $qty_n,
 								'nilai_wip' => $vals->nilai_wip,
 								'created_by' => $vals->created_by,
 								'created_date' => $vals->created_date,
