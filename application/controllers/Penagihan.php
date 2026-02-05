@@ -4274,7 +4274,7 @@ else
 
 				$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,qty,id_trans, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery IN (".$kode_delivery.") AND jenis = 'out'")->result();
 				
-
+                $qty_n = 0;
 				foreach($wip AS $data){
 						$nm_material = $data->product;	
 						$tgl_voucher = $data->tanggal;	
@@ -4294,6 +4294,8 @@ else
 						if (!empty($nm_material)){
 						$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 						}
+
+					$qty_n++;
 
 				}
 
@@ -4341,7 +4343,7 @@ else
 				if(!empty($cekstok)){
 					foreach ($stokfg as $vals) {
 					$qty = 	$vals->total;
-					$this->db->query("UPDATE  warehouse_stock_cogs SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+					$this->db->query("UPDATE  warehouse_stock_cogs SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 					}
 				}else{
 				$datastokfg=array();
