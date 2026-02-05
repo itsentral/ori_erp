@@ -2026,6 +2026,7 @@ class Delivery extends CI_Controller
 		}
 		// move_warehouse($ArrMaterial, 15, 20, $kode_delivery);
 		//SAMPAI SINI
+		// print_r($ArrKeyJurnal);
 		// exit;
 		$this->db->trans_start();
 		if (!empty($ArrKeyJurnal)) {
@@ -2515,7 +2516,7 @@ class Delivery extends CI_Controller
 			$MAT_ADD 	= $this->db->select('actual_type AS material, material_terpakai AS berat')->get_where('tmp_production_real_detail_add', array('catatan_programmer' => $row['kode_spk'] . '/' . $row['upload_date'], 'id_production_detail' => $ID_PRO, 'actual_type LIKE ' => 'MTL-%'))->result_array();
 			$MAT_ALL	= array_merge($MAT_DETAIL, $MAT_PLUS, $MAT_ADD);
 
-			foreach ($MAT_ALL as $key2 => $value2) {
+			foreach ($MAT_ALL as $key2 => $value2) { 
 				$nomor++;
 
 				$TOT_QTY = $row['tot_qty'];
@@ -5552,6 +5553,8 @@ class Delivery extends CI_Controller
 		$ArrGroup = [];
 		$ArrGroupOut = [];
 		$ArrIdPro = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts'=>'loose','spool_induk'=>NULL))->result_array();
+	
+		
 		if(!empty($ArrIdPro)){
 			foreach ($ArrIdPro as $value => $valx) {
 				$getSummary = $this->db->select('*')->get_where('data_erp_fg',array('id_pro'=>$valx['id_pro']))->result_array();
@@ -5599,6 +5602,7 @@ class Delivery extends CI_Controller
 			}
 		}
 
+        
 		$ArrGroupMaterial = [];
 		$ArrGroupOutMaterial = [];
 		$ListIN = ['so material','field joint','deadstok','cut','cut deadstock'];
@@ -5872,34 +5876,40 @@ class Delivery extends CI_Controller
 					}
 				}
 			}
+        
+		}
+			
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
-				$this->jurnalIntransit($kode_delivery);
+				
 			}
 
 			if(!empty($ArrGroupOut)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
+				$this->jurnalIntransit($kode_delivery);
 			}
 			
 			if(!empty($ArrGroupMaterial)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroupMaterial);
-				$this->jurnalIntransit($kode_delivery);
+				
 			}
 
 			if(!empty($ArrGroupOutMaterial)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
+				$this->jurnalIntransit($kode_delivery);
 			}
 
 			if(!empty($ArrGroupSpool)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroupSpool);
-				$this->jurnalIntransit($kode_delivery);
+				
 			}
 
 			if(!empty($ArrGroupOutSpool)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
+				$this->jurnalIntransit($kode_delivery);
 			}
-		}
+		
 
     }
 
@@ -6498,7 +6508,7 @@ class Delivery extends CI_Controller
 					 }
 				    
 					if (!empty($nm_material)){
-                      $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+                      $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
 					
 					  	
@@ -6580,11 +6590,12 @@ class Delivery extends CI_Controller
 
 			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_intransit WHERE kode_trans ='".$kodetrans."' 
 			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+		
 
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 				}
 			}else{
 			$datastokfg=array();
@@ -6597,7 +6608,7 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-							'qty' => $vals->total,
+							'qty' => 1,
 							'nilai_wip' => $vals->nilai_wip,
 							'material' => $vals->material,
 							'wip_direct' =>  $vals->wip_direct,
@@ -6706,7 +6717,7 @@ class Delivery extends CI_Controller
 					 }
 				    
 					if (!empty($nm_material)){
-                      $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-$qty  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+                      $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
 				
 				
@@ -6788,7 +6799,7 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+$qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 				}
 			}else{
 			$datastokfg=array();
@@ -6801,7 +6812,7 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-							'qty' => $vals->total,
+							'qty' => 1,
 							'nilai_wip' => $vals->nilai_wip,
 							'created_by' => $vals->created_by,
 							'created_date' => $vals->created_date,
