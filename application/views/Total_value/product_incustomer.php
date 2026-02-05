@@ -37,6 +37,7 @@ $gudang = $this->uri->segment(3);
 					<th class="text-center">#</th>
 					<th class="text-center">Nomor SO</th>
 					<th class="text-center">Nomor SPK</th>
+					<th class="text-center">No Trans</th>
 					<th class="text-center">Produk</th> 
 					<th class="text-center">Keterangan</th> 
 					<th class="text-center">Stock</th>

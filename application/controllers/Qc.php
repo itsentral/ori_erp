@@ -4365,7 +4365,7 @@ class Qc extends CI_Controller
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
-			  
+			$qty_n = 0;  
 			foreach($wip AS $data){
 				
 				$nm_material = $data->product;	
@@ -4535,7 +4535,7 @@ class Qc extends CI_Controller
 					 $qty        = $data->qty;
 				
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-			
+			   $qty_n++;
 			}
 			
 				
@@ -4624,7 +4624,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
