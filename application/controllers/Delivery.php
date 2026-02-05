@@ -6647,7 +6647,7 @@ class Delivery extends CI_Controller
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
-			  
+			$qty_n = 0; 
 			foreach($wip AS $data){
 				
 				$nm_material = $data->product;	
@@ -6722,7 +6722,7 @@ class Delivery extends CI_Controller
                       $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
 				
-				
+				$qty_n++;
 			}
 			
 			        
@@ -6801,7 +6801,7 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 				}
 			}else{
 			$datastokfg=array();
