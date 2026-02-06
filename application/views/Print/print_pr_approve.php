@@ -125,14 +125,23 @@ if(!empty($result)){
 			}
 			$satx = get_name('raw_pieces', 'kode_satuan', 'id_satuan', $satuan);
 			
+			// $nm_acc = get_name_acc($valx['id_material']);
+			// $nm_mat = strtoupper(get_name('accessories','material','id',$valx['id_material']));
+			// if(empty($valx['idmaterial'])){
+			// 	$satx = '-';
+			// 	$nm_acc = strtoupper($valx['nm_material']);
+			// 	$nm_mat = "";
+			// }
+			
+
 			$nm_acc = get_name_acc($valx['id_material']);
 			$nm_mat = strtoupper(get_name('accessories','material','id',$valx['id_material']));
-			if(empty($valx['idmaterial'])){
-				$satx = '-';
-				$nm_acc = strtoupper($valx['nm_material']);
-				$nm_mat = strtoupper(get_name('accessories','material','id',$valx['id_material']));
+
+			if($nm_acc == 'Not found'){
+			  $nm_acc = strtoupper($valx['nm_material']);
+			  $nm_mat = "";
 			}
-			
+
 			echo "<tr>";
 				echo "<td align='center'>".$no."</td>";
 				echo "<td align='left' colspan='3'>".$nm_acc."</td>";
