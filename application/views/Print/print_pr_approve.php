@@ -86,7 +86,7 @@ if(!empty($result)){
 				echo "<tr>";
 					echo "<td align='center'>".$no."</td>";
 					echo "<td align='left'>".$valx['nm_material']."</td>";
-					echo "<td align='left'>".get_name('raw_materials', 'nm_category', 'id_material', $valx['id_material'])."</td>";
+					echo "<td align='left'>".get_name('raw_materials', 'nm_category', 'id_material', $valx['id_material'])."</td>"; 
 					echo "<td align='right'>".number_format($valx['qty_stock'],2)."</td>";
 					echo "<td align='right'>".number_format($valx['qty_stock'] - $valx['qty_booking'],2)."</td>";
 					echo "<td align='right'>".number_format($reorder,2)."</td>";
@@ -130,7 +130,7 @@ if(!empty($result)){
 			if(empty($valx['idmaterial'])){
 				$satx = '-';
 				$nm_acc = strtoupper($valx['nm_material']);
-				$nm_mat = "";
+				$nm_mat = strtoupper(get_name('accessories','material','id',$valx['id_material']));
 			}
 			
 			echo "<tr>";
