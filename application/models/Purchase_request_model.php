@@ -85,6 +85,8 @@ class Purchase_request_model extends CI_Model {
 		$result = $this->db->query($sql)->result_array();
 		
 		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0))->result_array();
+        print_r($result);
+		exit;
 
 		$data = array(
 		  'no_ipp'		=> $no_ipp2,
@@ -154,7 +156,9 @@ class Purchase_request_model extends CI_Model {
 		$Jum_Beda		= count($Split_Beda);
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 		
-		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'code_group !='=>'non acc'))->result_array();
+		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0))->result_array();
+        print_r($result);
+		exit;
 
 		$data = array(
 			'Nama_Beda' => $Nama_Beda,
@@ -218,7 +222,7 @@ class Purchase_request_model extends CI_Model {
 		}
 		// echo $sql;
 		$result = $this->db->query($sql)->result_array();
-		$non_frp = $this->db->select('*, SUM(purchase) AS qty_request')->group_by('id_material','ASC')->order_by('id','asc')->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'sts_app'=>'N'))->result_array();
+		$non_frp = $this->db->select('*, SUM(purchase) AS qty_request')->group_by('id_material','ASC')->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0,'sts_app'=>'N'))->result_array();
 
 		$tgl_butuh = '';
 		if(!empty($result) OR !empty($non_frp)){
@@ -288,7 +292,7 @@ class Purchase_request_model extends CI_Model {
 			'sisa_avl' 		=> $sisa_avl,
 			'book_per_month'=> $book_per_month,
 			'tanggal' 		=> $tanggal,
-			'created_by' 	=> $this->session->userdata['ORI_User']['username'],
+			'created_by' 	=> $this->session->userdata['ORI_User']['username'], 
 			'created_date' 	=> date('Y-m-d H:i:s')
 		);
 		
