@@ -4263,7 +4263,7 @@ else
 			if($kodejurnal1		= 'JV061'){
             $tgl1       		= $gethd->tgl_invoice;
 
-		  	if($instalasi !='1')
+		  	if($instalasi !='1' || $jenis_invoice=='progress')
 			{
 
 				$this->db->query("INSERT INTO data_erp_in_customer (tanggal,keterangan,no_so,product,no_spk,kode_trans,id_pro_det,qty,nilai_unit,created_by,created_date,id_trans,id_pro,qty_ke,kode_delivery,jenis,id_material,nm_material,qty_mat,cost_book,gudang,kode_spool)			
