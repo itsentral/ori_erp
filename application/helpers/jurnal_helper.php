@@ -3352,7 +3352,7 @@
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 		
-		$wipgroup =	$CI->db->query("SELECT * FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND created_date='".$DateTime."' AND jenis LIKE 'out%'")->row();
+		$wipgroup =	$CI->db->query("SELECT * FROM data_erp_fgx WHERE id_pro_det ='".$kode."' AND created_date='".$DateTime."' AND jenis LIKE 'out%'")->row();
 		$kodetrans = $wipgroup->kode_trans;
 		$Date      = $wipgroup->tanggal;
 		$stokwip =$CI->db->query("SELECT
