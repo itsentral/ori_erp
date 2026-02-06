@@ -85,8 +85,6 @@ class Purchase_request_model extends CI_Model {
 		$result = $this->db->query($sql)->result_array();
 		
 		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0))->result_array();
-        print_r($result);
-		exit;
 
 		$data = array(
 		  'no_ipp'		=> $no_ipp2,
@@ -157,8 +155,6 @@ class Purchase_request_model extends CI_Model {
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 		
 		$non_frp = $this->db->get_where('warehouse_planning_detail_acc', array('no_ipp'=>$no_ipp,'purchase >'=>0))->result_array();
-        print_r($result);
-		exit;
 
 		$data = array(
 			'Nama_Beda' => $Nama_Beda,
@@ -292,7 +288,7 @@ class Purchase_request_model extends CI_Model {
 			'sisa_avl' 		=> $sisa_avl,
 			'book_per_month'=> $book_per_month,
 			'tanggal' 		=> $tanggal,
-			'created_by' 	=> $this->session->userdata['ORI_User']['username'], 
+			'created_by' 	=> $this->session->userdata['ORI_User']['username'],
 			'created_date' 	=> date('Y-m-d H:i:s')
 		);
 		
