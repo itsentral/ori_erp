@@ -1190,7 +1190,7 @@ class Outgoing extends CI_Controller {
 		echo json_encode($Arr_Data);
 	}
 
-	public function process_fg_material_sub(){
+	public function process_fg_material_sub(){ 
 		$data 			= $this->input->post();
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
@@ -1559,6 +1559,9 @@ class Outgoing extends CI_Controller {
 
 	public function process_fg_material_sub_new(){
 		$data 			= $this->input->post();
+		print_r($data);
+		exit;
+
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
 		$DateTime		= date('Y-m-d H:i:s');
