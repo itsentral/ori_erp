@@ -1559,9 +1559,6 @@ class Outgoing extends CI_Controller {
 
 	public function process_fg_material_sub_new(){
 		$data 			= $this->input->post();
-		print_r($data);
-		exit; 
-
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
 		$DateTime		= date('Y-m-d H:i:s');
@@ -1573,7 +1570,6 @@ class Outgoing extends CI_Controller {
 		$addInMat		= $data['addInMat'];
 		$adjustment 	= $data['adjustment'];
 		$field_joint 	= $data['field_joint'];
-		$qty_kit 		= $data['qty_kit'];
 		$GET_NO_SPK = get_detail_final_drawing();
 		$no_spk = null;
 		if(!empty($data['no_spk_field'])){
