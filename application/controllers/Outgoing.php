@@ -1560,7 +1560,7 @@ class Outgoing extends CI_Controller {
 	public function process_fg_material_sub_new(){
 		$data 			= $this->input->post();
 		print_r($data);
-		exit;
+		exit; 
 
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
