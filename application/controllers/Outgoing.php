@@ -2055,7 +2055,7 @@ class Outgoing extends CI_Controller {
 							
 						
 
-						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
+						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans); 
 
 						//insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
 						if(!empty($grouping_temp)){
