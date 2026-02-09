@@ -1559,9 +1559,6 @@ class Outgoing extends CI_Controller {
 
 	public function process_fg_material_sub_new(){
 		$data 			= $this->input->post();
-		print_r($data);
-		exit; 
-
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
 		$DateTime		= date('Y-m-d H:i:s');
@@ -2033,7 +2030,26 @@ class Outgoing extends CI_Controller {
 							$tempMaterialIn[$value['id']]['gudng_ke'] 		= $gudang_ke;
 							
 						}
+						    //=======NEW=============
+							$ArrFinishGoodProduct = [];
+							if($field_joint == 'yes'){
+								$ArrFinishGoodProduct = array(
+									'tanggal' 			=> $DateTime,
+									'keterangan' 		=> 'Field Join to Finish Good',
+									'no_so' 			=> $DateTime,
+									'product' 			=> $nm_product,
+									'no_spk' 			=> $no_spk,
+									'kode_trans' 		=> $kode_trans,									
+									'nilai_wip' 		=> $SumPriceBook,
+									'nilai_unit' 		=> $SumPriceBook,
+									'qty' 				=> str_replace(',','',$data['qty_kit']),
+									'created_by' 		=> $data_session['ORI_User']['username'],
+									'created_date' 		=> $dateTime
+								);
+							}
+							
 						
+
 						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
 
 						//insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
@@ -2049,6 +2065,9 @@ class Outgoing extends CI_Controller {
 						}
 						if(!empty($ArrFinishGood)){
 							$this->db->insert_batch('data_erp_fg', $ArrFinishGood);
+						}
+						if(!empty($ArrFinishGoodProduct)){
+							$this->db->insert_batch('data_erp_fg', $ArrFinishGoodProduct);
 						}
 					}
 				}
