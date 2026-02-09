@@ -2037,6 +2037,7 @@ class Outgoing extends CI_Controller {
 						    //=======NEW=============
 							$ArrFinishGoodProduct = [];
 							if($field_joint == 'yes'){
+								$qty = str_replace(',','',$data['qty_kit']);
 								$ArrFinishGoodProduct = array(
 									'tanggal' 			=> $DateTime,
 									'keterangan' 		=> 'Field Join to Finish Good',
@@ -2045,7 +2046,7 @@ class Outgoing extends CI_Controller {
 									'no_spk' 			=> $no_spk,
 									'kode_trans' 		=> $kode_trans,									
 									'nilai_wip' 		=> $TotalPriceBook,
-									'nilai_unit' 		=> $TotalPriceBook,
+									'nilai_unit' 		=> $TotalPriceBook/$qty,
 									'qty' 				=> str_replace(',','',$data['qty_kit']),
 									'created_by' 		=> $data_session['ORI_User']['username'],
 									'created_date' 		=> $dateTime
