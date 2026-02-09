@@ -2010,7 +2010,8 @@ class Outgoing extends CI_Controller {
 							$ArrFinishGood[$value['id']]['created_date'] 	= $DateTime;
 							$ArrFinishGood[$value['id']]['gudang'] 			= $gudang_ke;
 							$ArrFinishGood[$value['id']]['nilai_wip'] 		= $PRICE*$QTY_OKE;
-
+                            $total_harga  = $PRICE*$QTY_OKE;
+						   
 
 							$tempMaterialIn[$value['id']]['tanggal'] 		= $DateTime;
 							$tempMaterialIn[$value['id']]['keterangan'] 	= null;
@@ -2028,6 +2029,9 @@ class Outgoing extends CI_Controller {
 							$tempMaterialIn[$value['id']]['gudang'] 		= $gudang_ke;
 							$tempMaterialIn[$value['id']]['gudang_dari'] 	= $id_gudang;
 							$tempMaterialIn[$value['id']]['gudng_ke'] 		= $gudang_ke;
+
+
+							 $TotalPriceBook += $total_harga;
 							
 						}
 						    //=======NEW=============
@@ -2036,12 +2040,12 @@ class Outgoing extends CI_Controller {
 								$ArrFinishGoodProduct = array(
 									'tanggal' 			=> $DateTime,
 									'keterangan' 		=> 'Field Join to Finish Good',
-									'no_so' 			=> $DateTime,
+									'no_so' 			=> $no_ipp,
 									'product' 			=> $nm_product,
 									'no_spk' 			=> $no_spk,
 									'kode_trans' 		=> $kode_trans,									
-									'nilai_wip' 		=> $SumPriceBook,
-									'nilai_unit' 		=> $SumPriceBook,
+									'nilai_wip' 		=> $TotalPriceBook,
+									'nilai_unit' 		=> $TotalPriceBook,
 									'qty' 				=> str_replace(',','',$data['qty_kit']),
 									'created_by' 		=> $data_session['ORI_User']['username'],
 									'created_date' 		=> $dateTime
