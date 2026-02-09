@@ -2067,7 +2067,7 @@ class Outgoing extends CI_Controller {
 							$this->db->insert_batch('data_erp_fg', $ArrFinishGood);
 						}
 						if(!empty($ArrFinishGoodProduct)){
-							$this->db->insert_batch('data_erp_fg', $ArrFinishGoodProduct);
+							$this->db->insert('data_erp_fg', $ArrFinishGoodProduct);
 						}
 					}
 				}
