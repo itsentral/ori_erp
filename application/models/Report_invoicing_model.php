@@ -220,10 +220,12 @@ class Report_invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_invoice']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_customer']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice'],2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['persentase'])."%)</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_cogs'])."</div>";
+			$nestedData[]	= "<div align='left'>".number_format($row['total_invoice_idr']-$row['total_cogs']).")</div>";
             $nestedData[]	= "<div align='left'>".$row['delivery_no']."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['persentase'])."%)</div>";
+           
 				$print_jurnal	= "";
 				$print_idr		= "";
 				$create 		= "";
@@ -286,7 +288,7 @@ class Report_invoicing_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*, b.delivery_no
+				a.*, b.delivery_no, b.total_cogs
 			FROM
 				tr_invoice_header a INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
