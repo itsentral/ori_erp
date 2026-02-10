@@ -219,11 +219,43 @@ class Report_invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='right'>".date('d-M-Y', strtotime($row['tgl_invoice']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['no_invoice']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['nm_material']."</div>";
-			$nestedData[]	= "<div align='left'>".$row['spesifikasi']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['harga_total'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['harga_total_idr'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['qty'])."%)</div>";
+			$nestedData[]	= "<div align='left'>".$row['nm_customer']."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['persentase'])."%)</div>";
+            $nestedData[]	= "<div align='left'>".$row['delivery_no']."</div>";
+				$print_jurnal	= "";
+				$print_idr		= "";
+				$create 		= "";
+
+				if($row['proses_print']=='0'){
+					$print_jurnal	= " <button class='btn btn-sm bg-purple uploadfile' title='Upload Invoice' data-no_invoice='".$row['id_invoice']."'><i class='fa fa-cloud-upload'></i></button> ";
+					$print_jurnal	.= " <a href='".base_url('invoicing/excels/'.$row['id_invoice'])."' class='btn btn-sm bg-maroon' title='Export Excel'><i class='fa fa-file-excel-o'></i></a> ";
+					$print_jurnal	.= "<button class='btn btn-sm btn-primary print'  title='Post Jurnal' data-inv='".$row['id_invoice']."'><i class='fa fa-clipboard'></i></button>";
+				}
+				if($row['proses_print']=='1'){
+					$create	= "<button class='btn btn-sm btn-success terima' title='Create Penerimaan' data-inv='".$row['no_invoice']."'><i class='fa fa-list'></i></button>";
+				}
+
+				$detail		= "<button class='btn btn-sm btn-warning detail' title='View Invoice' data-no_invoice='".$row['id_invoice']."'><i class='fa fa-eye'></i></button>";
+				if($row['file_inv']!=''){
+					$detail		.= " <a href='".base_url('assets/invoice/'.$row['file_inv'])."' class='btn btn-sm bg-navy' title='Download Invoice' download><i class='fa fa-cloud-download'></i></a> ";
+				}
+				if($row['base_cur']=='USD'){
+					$print_usd	= "&nbsp;<a href='".base_url('invoicing/print_invoice_usd/'.$row['id_invoice'])."' target='_blank' class='btn btn-sm btn-success' title='Print Invoice USD' ><i class='fa fa-print'></i><b>&nbsp;&nbsp;USD</b></a>";
+					$print_idr = "";
+				}else{
+					$print_usd = "";
+					$print_idr = "&nbsp;<a href='".base_url('invoicing/print_invoice_fix/'.$row['id_invoice'])."' target='_blank' class='btn btn-sm btn-info' title='Print Invoice IDR' ><i class='fa fa-print'></i><b>&nbsp;&nbsp;IDR</b></a>";
+				}
+
+			$nestedData[]	= "<div align='left'>
+									".$detail."
+									".$print_jurnal."
+									".$create."
+									".$print_idr."
+									".$print_usd."
+									</div>";
 			$data[] = $nestedData;
             $urut1++;
             $urut2++;
