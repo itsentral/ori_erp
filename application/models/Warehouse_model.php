@@ -708,7 +708,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHist[$key]['update_date'] 		= $DateTime;
 				//update syam 26/11/2025
 				$ArrHist[$key]['harga'] 			= $value['kurs'] * $value['unit_price'];
-				$ArrHist[$key]['total_harga'] 		= (($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM);
+				$ArrHist[$key]['total_harga'] 		= (($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM;
 				$ArrHist[$key]['saldo_awal']		= $nilaijurnalakhir;
 				$ArrHist[$key]['saldo_akhir']		= $stok_akhir;
 				$ArrHist[$key]['harga_baru'] 		= $PRICENEW;
