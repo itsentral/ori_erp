@@ -821,7 +821,7 @@ class Warehouse_model extends CI_Model {
 
 				//update syam 26/11/2025
 				$ArrHistNew[$key]['harga'] 			= $value['unit_price'];
-				$ArrHistNew[$key]['total_harga'] 		= ( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM);
+				$ArrHistNew[$key]['total_harga'] 		= ( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM;
 				$ArrHistNew[$key]['saldo_awal']		= $nilaijurnalakhir;
 				$ArrHistNew[$key]['saldo_akhir']		= $stok_akhir;
 				$ArrHistNew[$key]['harga_baru'] 		= $PRICENEW;
