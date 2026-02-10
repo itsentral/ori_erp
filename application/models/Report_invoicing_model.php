@@ -239,7 +239,6 @@ class Report_invoicing_model extends CI_Model {
 									".$print_jurnal."
 									".$create."
 									".$print_idr."
-									".$print_usd."
 									</div>";
 			$data[] = $nestedData;
             $urut1++;
