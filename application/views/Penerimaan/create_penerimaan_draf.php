@@ -217,7 +217,7 @@ $this->load->view('include/side_menu');
 				<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_bayar divide" name="jml_bayar[]" id="jml_bayar<?=$Urut?>" style="text-align:right;" value="<?=$dt->total_bayar_idr ?>" onchange="cekall()" ></td>
 				
 				<td style="padding:3px;">
-				<select class="form-control input-sm" name="tipe_bayar[]" id="tipe_bayar<?=$Urut?>">
+				<select class="form-control input-sm tipe_bayar" name="tipe_bayar[]" id="tipe_bayar<?=$Urut?>">
 				<?php
 				$tipe = $dt->tipe_bayar;
 				?>
@@ -543,6 +543,17 @@ $this->load->view('include/side_menu');
           swal({
             title	: "BANK TIDAK BOLEH KOSONG!",
             text	: "ISI TANGGAL INVOICE!",
+            type	: "warning",
+            timer	: 3000,
+            showCancelButton	: false,
+            showConfirmButton	: false,
+            allowOutsideClick	: false
+          });
+        }
+		else if ($('.tipe_bayar').val() == "") {
+          swal({
+            title	: "TIPE TIDAK BOLEH KOSONG!",
+            text	: "ISI TIPE BAYAR!",
             type	: "warning",
             timer	: 3000,
             showCancelButton	: false,

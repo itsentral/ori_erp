@@ -25,6 +25,13 @@ class Report_invoicing extends CI_Controller {
 		$this->report_invoicing_model->modal_detail_invoice();
 	}
 
+	public function cogs(){
+		$this->report_invoicing_model->cogs();
+	}
+	public function server_side_inv_cogs(){
+		$this->report_invoicing_model->get_data_json_inv_cogs();
+	}
+
   
 
 }
