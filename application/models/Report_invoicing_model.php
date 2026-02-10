@@ -241,7 +241,7 @@ class Report_invoicing_model extends CI_Model {
 
 	public function query_data_inv_cogs($no_so, $customer, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
 
-		$where_no_so = "";
+			$where_no_so = "";
 		if($no_so <> '0'){
 			$where_no_so = " AND a.so_number='".$no_so."' ";
 		}
@@ -254,15 +254,16 @@ class Report_invoicing_model extends CI_Model {
 		$sql = "
 			SELECT
 				(@row:=@row+1) AS nomor,
-				a.*
+				a.*, b.delivery_no
 			FROM
-				tr_invoice_detail a,
+				tr_invoice_header a INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where_no_so." ".$where_cust."
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.nm_customer LIKE '%".$this->db->escape_like_str($like_value)."%'
+				OR b.delivery_no LIKE '%".$this->db->escape_like_str($like_value)."%'
 	        )
 		";
 		// echo $sql; exit;
@@ -275,8 +276,8 @@ class Report_invoicing_model extends CI_Model {
 			2 => 'no_invoice',
 			3 => 'so_number',
 			4 => 'nm_customer',
-			5 => 'harga_total',
-			6 => 'harga_total_idr'
+			5 => 'total_invoice',
+			6 => 'total_invoice_idr'
 		);
 
 		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
