@@ -464,7 +464,7 @@ class Penerimaan extends CI_Controller {
 		  
 		
 		
-		
+		$this->save_jurnal_BUM();
 		
 		
 	    if($this->db->trans_status() === FALSE){
@@ -474,8 +474,7 @@ class Penerimaan extends CI_Controller {
 					'pesan'			=> 'Save Process Failed. Please Try Again...' 
 			   );
 		}else{
-			 $this->db->trans_commit();
-			 $this->save_jurnal_BUM();
+			 $this->db->trans_commit();			 
 			 $Arr_Return		= array(
 				'status'		=> 1,
 				'nomor'		    => $kd_bayar,
