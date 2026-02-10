@@ -2039,7 +2039,7 @@ class Outgoing extends CI_Controller {
 							if($field_joint == 'yes'){
 								$qty = str_replace(',','',$data['qty_kit']);
 								$ArrFinishGoodProduct = array(
-									'tanggal' 			=> $DateTime,
+									'tanggal' 			=> date('Y-m-d'),
 									'keterangan' 		=> 'Field Join to Finish Good',
 									'no_so' 			=> $no_ipp,
 									'product' 			=> $nm_product,
@@ -2050,6 +2050,26 @@ class Outgoing extends CI_Controller {
 									'qty' 				=> str_replace(',','',$data['qty_kit']),
 									'created_by' 		=> $data_session['ORI_User']['username'],
 									'created_date' 		=> $dateTime
+								);
+
+								$datastokfg = array(
+									'tanggal' => date('Y-m-d'),
+									'keterangan' => 'Field Join to Finish Good',
+									'no_so' => $no_ipp,
+									'product' => $nm_product,
+									'no_spk' => $no_spk,
+									'kode_trans' => $kode_trans,
+									'id_pro_det' =>'',
+									'qty' => str_replace(',','',$data['qty_kit']),
+									'nilai_wip' => $TotalPriceBook/$qty,
+									'material' => ,
+									'wip_direct' =>  ,
+									'wip_indirect' =>  ,
+									'wip_consumable' =>  ,
+									'wip_foh' =>  ,
+									'created_by' => $data_session['ORI_User']['username'],
+									'created_date' => $dateTime,
+									'id_trans' => ,
 								);
 							}
 							
@@ -2073,6 +2093,9 @@ class Outgoing extends CI_Controller {
 						}
 						if(!empty($ArrFinishGoodProduct)){
 							$this->db->insert('data_erp_fg', $ArrFinishGoodProduct);
+						}
+						if(!empty($datastokfg)){
+						$this->db->insert('warehouse_stock_fg',$datastokfg);
 						}
 					}
 				}
