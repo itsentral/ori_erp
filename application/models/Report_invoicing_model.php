@@ -202,6 +202,8 @@ class Report_invoicing_model extends CI_Model {
         $urut2  = 0;
 		foreach($query->result_array() as $row)
 		{
+			$cogs           = $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
+							WHERE kode_delivery = $row['delivery_no']")->row();
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
@@ -223,9 +225,14 @@ class Report_invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_cogs'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr']-$row['total_cogs'])."</div>";
-            $nestedData[]	= "<div align='left'>".$row['delivery_no']."</div>";
+            $nestedData[]	= "<div align='right'>".number_format($cogs->material)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_direct)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_indirect)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_consumable)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_foh)."</div>";
+			$nestedData[]	= "<div align='left'>".$row['delivery_no']."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['jenis_invoice'])." (".number_format($row['persentase'])."%)</div>";
-           
+            
 				$print_jurnal	= "";
 				$print_idr		= "";
 				$create 		= "";
@@ -272,7 +279,8 @@ class Report_invoicing_model extends CI_Model {
 				(@row:=@row+1) AS nomor,
 				a.*, b.delivery_no, b.total_cogs
 			FROM
-				tr_invoice_header a INNER JOIN penagihan b ON b.id=a.id_penagihan,
+				tr_invoice_header a 
+				INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
 		    WHERE 1=1 ".$where_no_so." ".$where_cust."
 				AND (
