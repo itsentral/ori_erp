@@ -202,8 +202,9 @@ class Report_invoicing_model extends CI_Model {
         $urut2  = 0;
 		foreach($query->result_array() as $row)
 		{
+			$dv             = $row['delivery_no'];
 			$cogs           = $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
-							WHERE kode_delivery = $row['delivery_no']")->row();
+							WHERE kode_delivery = $dv")->row();
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
