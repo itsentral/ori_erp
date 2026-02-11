@@ -462,7 +462,7 @@ class Penerimaan extends CI_Controller {
 		 $updatepro	 = "UPDATE tr_invoice_payment SET jumlah_piutang_idr='$piutangidr', selisih_idr='$selisihidr' WHERE kd_pembayaran='$kd_bayar'";
 			$this->db->query($updatepro);
 		  
-			$this->save_jurnal_BUM();
+			
 		
 		
 		
@@ -480,6 +480,8 @@ class Penerimaan extends CI_Controller {
 				'nomor'		    => $kd_bayar,
 				'pesan'			=> 'Save Process Success. '
 		   );
+
+		   $this->save_jurnal_BUM();
 		}
 		echo json_encode($Arr_Return);
 		
