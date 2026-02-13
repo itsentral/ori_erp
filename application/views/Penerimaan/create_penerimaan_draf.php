@@ -542,7 +542,7 @@ $this->load->view('include/side_menu');
 		else if ($('#bank').val() == "") {
           swal({
             title	: "BANK TIDAK BOLEH KOSONG!",
-            text	: "ISI TANGGAL INVOICE!",
+            text	:  "Bank Harus di isi terlebih dahulu !",
             type	: "warning",
             timer	: 3000,
             showCancelButton	: false,

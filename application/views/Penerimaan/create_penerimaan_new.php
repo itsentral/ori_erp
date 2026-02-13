@@ -443,18 +443,6 @@ $this->load->view('include/side_menu');
           });
         }
 		
-		if ($('.tipe_bayar').val() == "") {
-          swal({
-            title	: "Tipe Bayar tidak boleh kosong!",
-            text	: "Silahkan Pilih Tipe Bayar Dahulu!",
-            type	: "warning",
-            timer	: 3000,
-            showCancelButton	: false,
-            showConfirmButton	: false,
-            allowOutsideClick	: false
-          });
-        }
-		
 		else if ($('#matauang').val() == "usd" && $('#kurs').val() == "0" ) {
           swal({
             title	: "Perhatian",
@@ -480,7 +468,18 @@ $this->load->view('include/side_menu');
 		else if ($('#bank').val() == "") {
           swal({
             title	: "BANK TIDAK BOLEH KOSONG!",
-            text	: "ISI BANK TERLEBIH DAHULU!",
+            text	:  "Bank Harus di isi terlebih dahulu !",
+            type	: "warning",
+            timer	: 3000,
+            showCancelButton	: false,
+            showConfirmButton	: false,
+            allowOutsideClick	: false
+          });
+        }
+		else if ($('.tipe_bayar').val() == "") {
+          swal({
+            title	: "TIPE TIDAK BOLEH KOSONG!",
+            text	: "ISI TIPE BAYAR!",
             type	: "warning",
             timer	: 3000,
             showCancelButton	: false,
@@ -612,7 +611,18 @@ $this->load->view('include/side_menu');
 		else if ($('#bank').val() == "") {
           swal({
             title	: "BANK TIDAK BOLEH KOSONG!",
-            text	: "ISI TANGGAL INVOICE!",
+            text	:  "Bank Harus di isi terlebih dahulu !",
+            type	: "warning",
+            timer	: 3000,
+            showCancelButton	: false,
+            showConfirmButton	: false,
+            allowOutsideClick	: false
+          });
+        }
+		else if ($('.tipe_bayar').val() == "") {
+          swal({
+            title	: "TIPE TIDAK BOLEH KOSONG!",
+            text	: "ISI TIPE BAYAR!",
             type	: "warning",
             timer	: 3000,
             showCancelButton	: false,
