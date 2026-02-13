@@ -283,7 +283,7 @@ class Report_invoicing_model extends CI_Model {
 				tr_invoice_header a 
 				INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
-		    WHERE 1=1 ".$where_no_so." ".$where_cust."
+		    WHERE 1=1 ".$where_no_so." ".$where_cust." AND a.jenis_invoice='progress'
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
