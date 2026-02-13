@@ -519,7 +519,7 @@ $this->load->view('include/side_menu');
 						  showConfirmButton	: false,
 						  allowOutsideClick	: false
 						});
-						window.location.href = base_url + active_controller+'/modal_detail_invoice/';
+						window.location.href = base_url + active_controller+'/printout_pn/'+data.nomor;
 					  }else{
 
 						if(data.status == 2){
