@@ -315,7 +315,7 @@ class Report_invoicing_model extends CI_Model {
 	public function modal_detail_invoice(){
 		$id = $this->uri->segment(3);
 		
-		$getDetail 		= $this->db->get_where('data_erp_in_customer', array('kode_delivery IN' => ($no_invoice), 'jenis'=>'out'))->result_array();
+		$getDetail 		= $this->db->get_where('data_erp_in_customer', array('kode_delivery IN' => ($id), 'jenis'=>'out'))->result_array();
 
 		$data = array(
 			'getDetail'		=> $getDetail
