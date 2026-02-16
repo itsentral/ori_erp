@@ -2256,9 +2256,10 @@ class Warehouse_model extends CI_Model {
 							$ArrUpdateRequest[$val2.$val]['total_request'] 	= $getRequest[0]->total_request - ($getDetAjust[0]->qty_oke - $QTY_OKE);
 						}
 						
-						}
+						$key = $getDetMat[0]->id_material;
+					}
 						
-				$key = $getDetMat[0]->id_material;
+				
 				
 				//ambil saldo akhir 
 						
