@@ -316,7 +316,7 @@ class Report_invoicing_model extends CI_Model {
 		$id = $this->uri->segment(3);
 		
 		$getDetail 		= $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
-							WHERE kode_delivery IN ('$dv')")->result_array();
+							WHERE kode_delivery IN ('$id')")->result_array();
 
 		$data = array(
 			'getDetail'		=> $getDetail
