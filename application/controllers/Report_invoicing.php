@@ -32,6 +32,9 @@ class Report_invoicing extends CI_Controller {
 		$this->report_invoicing_model->get_data_json_inv_cogs();
 	}
 
+	
+
+
   
 
 }
