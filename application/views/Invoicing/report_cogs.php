@@ -137,8 +137,7 @@ foreach($ListIPP AS $val => $valx){
 
 	$(document).on('click', '.detail', function(e){
 		e.preventDefault();
-		loading_spinner();
-		$("#head_title").html("<b>VIEW INVOICE ["+$(this).data('no_invoice')+"]</b>");
+		$("#head_title").html("<b>VIEW DETAIL PRODUCT ["+$(this).data('no_invoice')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/modal_detail_invoice/'+$(this).data('no_invoice'),
