@@ -2379,11 +2379,6 @@ class Warehouse_model extends CI_Model {
 			
 			}
 
-
-			print_r($ID_MATERIAL_ACT);
-			exit;
-
-
 			//PROCESS UPDATE STOCK
 			//grouping sum
 			$temp = [];
