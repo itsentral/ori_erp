@@ -93,7 +93,7 @@ $tandaKg 	= ($category_req == 'request produksi')?'text':'hidden';
 							
 						</td>";
 					if($tanda_req == 'Kg'){
-						echo "<td rowspan='1' class='id_".$No."' ><select name='detail[".$No."][id_material]' class='form-control chosen_select changeMaterial'>".$listMat."</select></td>";
+						echo "<td rowspan='1' class='id_".$No."' ><select name='detail[".$No."][id_material2]' class='form-control chosen_select changeMaterial'>".$listMat."</select></td>";
 						// echo "<td rowspan='1' class='id_".$No."' >".$valx['nm_material_stock']."</td>";
 					}
 					if($tanda_req == 'Pack'){

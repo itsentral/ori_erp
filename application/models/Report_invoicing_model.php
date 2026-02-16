@@ -240,7 +240,7 @@ class Report_invoicing_model extends CI_Model {
 
 				
 
-				$detail		= "<button class='btn btn-sm btn-warning detail' title='View History' data-no_invoice='".$row['id_invoice']."'><i class='fa fa-eye'></i></button>";
+				$detail		= "<button class='btn btn-sm btn-warning detail' title='View History' data-no_invoice='".$row['delivery_no']."'><i class='fa fa-eye'></i></button>";
 				
 			$nestedData[]	= "<div align='left'>
 									".$detail."
