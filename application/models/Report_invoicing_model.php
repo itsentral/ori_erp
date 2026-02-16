@@ -314,25 +314,16 @@ class Report_invoicing_model extends CI_Model {
 
 	public function modal_detail_invoice(){
 		$id = $this->uri->segment(3);
-		$no_invoice = get_name('tr_invoice_header','no_invoice','id_invoice',$id);
-
-		$data_header 	= $this->db->get_where('tr_invoice_header', array('no_invoice' => $no_invoice))->row();
-		$alamat_cust 	= $this->db->get_where('customer', array('id_customer' => $data_header->id_customer))->row();
-		$so          	= $this->db->get_where('billing_so', array('no_ipp' => str_replace('BQ-','',$data_header->id_bq)))->row();
-		$getDetail 		= $this->db->get_where('tr_invoice_detail', array('no_invoice' => $no_invoice, 'kategori_detail'=>'PRODUCT'))->result_array();
+		
+		$getDetail 		= $this->db->get_where('data_erp_in_customer', array('kode_delivery IN' => ($no_invoice), 'jenis'=>'out'))->result_array();
 
 		$data = array(
-			'no_invoice' => $no_invoice,
-			'data_header' => $data_header,
-			'alamat_cust' => $alamat_cust,
-			'getDetail'		=> $getDetail,
-			'so' => $so
+			'getDetail'		=> $getDetail
+			
 		);
-		if($data_header->base_cur=='IDR'){
-			$this->load->view('Invoicing/view_invoice_idr', $data);
-		}else{
-			$this->load->view('Invoicing/view_invoice', $data);
-		}
+		
+			$this->load->view('Invoicing/view_detail_delivery', $data);
+		
 	}
 
 }
