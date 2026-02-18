@@ -13,6 +13,7 @@
                                 <th class="text-center" width='8%'>Product</th>
                                 <th class="text-center" width='8%'>Kode Trans</th>
                                 <th class="text-center" width='8%'>No Delivery</th>
+                                <th class="text-center" width='12%'>Cogs</th>
                                 <th class="text-center" width='12%'>Material</th>
                                 <th class="text-center" width='12%'>Direct</th>
                                 <th class="text-center" width='12%'>Indirect</th>
@@ -36,6 +37,7 @@
                                 <td ><?= strtoupper($valx['product']);?></td>
                                 <td ><?= strtoupper($valx['kode_trans']);?></td>
                                 <td ><?= strtoupper($valx['kode_delivery']);?></td>
+                                 <td align='right'><?= number_format($valx['nilai_unit']);?></td>
                                 <td align='right'><?= number_format($valx['material']);?></td>
                                 <td align='right'><?= number_format($valx['wip_direct']);?></td>
                                 <td align='right'><?= number_format($valx['wip_indirect']);?></td>

@@ -315,7 +315,7 @@ class Report_invoicing_model extends CI_Model {
 	public function modal_detail_invoice(){
 		$id = $this->uri->segment(3);
 		
-		$getDetail 		= $this->db->query("SELECT no_spk,id_trans,kode_trans,kode_delivery, product,  material,  wip_direct, wip_indirect, wip_consumable,  wip_foh FROM view_incustomer_cogs_detail 
+		$getDetail 		= $this->db->query("SELECT no_spk,id_trans,kode_trans,kode_delivery,nilai_unit, product,  material,  wip_direct, wip_indirect, wip_consumable,  wip_foh FROM view_incustomer_cogs_detail 
 							WHERE kode_delivery IN ('$id')")->result_array();
 
 		$data = array(
