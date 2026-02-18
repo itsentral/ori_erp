@@ -641,7 +641,10 @@ class Qc_pipe_cutting extends CI_Controller {
 
 			$this->db->insert('warehouse_stock_fg',$datastokfg);
 			}
-		  
+
+			
 		}
+		  
+	}
 
 }
