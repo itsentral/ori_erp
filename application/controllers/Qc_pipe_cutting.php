@@ -452,7 +452,7 @@ class Qc_pipe_cutting extends CI_Controller {
 	        $idtrans = $idprodet;
 
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
 			
 			$totalfg =0;
 			  
