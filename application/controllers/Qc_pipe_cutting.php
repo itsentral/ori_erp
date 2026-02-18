@@ -561,7 +561,7 @@ class Qc_pipe_cutting extends CI_Controller {
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 
-			$wipgroup = $this->db->query("SELECT * FROM data_erp_fg WHERE id_trans ='".$idtrans."' limit 1")->row();	
+			$wipgroup = $this->db->query("SELECT * FROM data_erp_fgx WHERE id_trans ='".$idtrans."' limit 1")->row();	
 			$kodetrans = $wipgroup->kode_trans;
 			$Date      = $wipgroup->tanggal;
 			$so        = $wipgroup->no_so;
