@@ -36,6 +36,9 @@ if(!empty($data_request)){
 			<th>Tipe</th>
 			<th>Nilai Pengajuan</th>
 			<th>Tanggal Pembayaran</th>
+			<th>Bank</th>
+			<th>No Rek</th>
+			<th>Nama</th>
 		</tr>
 	<?php
 	$i=0;
@@ -50,12 +53,45 @@ if(!empty($data_request)){
 			<td><?= strtoupper($record->tipe) ?></td>
 			<td align=right><?= number_format($record->jumlah) ?></td>
 			<td><?= tgl_indo($record->tanggal) ?></td>
+			<td><?= strtoupper($record->bank_id) ?></td>
+			<td><?= $record->accnumber ?></td>
+			<td><?= strtoupper($record->accname) ?></td>
 		</tr>
 		<?php
 		}
 	}
-?>
+	?>
 	</table>
+
+	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
+		<tr>
+			<th width="5">#</th>
+			<th>Tanggal</th>
+			<th>Deskripsi</th>
+			<th>Qty</th>
+			<th>Harga</th>
+			<th>Total Harga</th>
+			<th>Keterangan</th>
+		</tr>
+	<?php
+	$i=0;
+	if(!empty($data_request)){
+		foreach($data_request AS $record){ $i++;?>
+		<tr>
+			<td><?=$i;?></td>
+			<td><?= $record->tanggal ?></td>
+			<td><?= $record->deskripsi ?></td>
+			<td align=right><?= number_format($record->qty) ?></td>
+			<td align=right><?= number_format($record->harga) ?></td>
+			<td align=right><?= number_format($record->total_harga) ?></td>
+			<td><?= $record->keterangan ?></td>
+		</tr>
+		<?php
+		}
+	}
+	?>
+	</table>
+
 	</td>
 </tr>
 </table>
