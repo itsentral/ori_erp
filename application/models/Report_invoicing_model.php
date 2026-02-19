@@ -223,9 +223,9 @@ class Report_invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_invoice']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_customer']."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_gab_product_idr'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_cogs'])."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr']-$row['total_cogs'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_gab_product_idr']-$row['total_cogs'])."</div>";
             $nestedData[]	= "<div align='right'>".number_format($cogs->material)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_direct)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_indirect)."</div>";
