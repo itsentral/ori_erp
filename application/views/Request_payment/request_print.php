@@ -24,6 +24,17 @@ if(!empty($data_request)){
 	<td colspan=9 align=center>Nomor Request : <?=$nomorreq?><br />
 	Tanggal Request : <?=$tglreq?><br /><br /></td>
 </tr>
+<?php
+	$i=0;
+	if(!empty($data_request)){
+		foreach($data_request AS $bank){?>
+<tr>
+	<td colspan=9 align=center>Bank : <?=$bank->bank_id?><br />
+	No rek : <?=$bank->accnumber?><br /> A.n : <?=$bank->accname?><br /><br /></td>
+</tr>
+
+<?php }?>
+
 <tr>
 	<td colspan=9>
 	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
