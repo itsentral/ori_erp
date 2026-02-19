@@ -75,8 +75,8 @@ if(!empty($data_request)){
 		</tr>
 	<?php
 	$i=0;
-	if(!empty($data_request)){
-		foreach($data_request AS $record){ $i++;?>
+	if(!empty($data_detail)){
+		foreach($data_detail AS $record){ $i++;?>
 		<tr>
 			<td><?=$i;?></td>
 			<td><?= $record->tanggal ?></td>
