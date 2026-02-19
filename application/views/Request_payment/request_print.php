@@ -49,9 +49,7 @@ if(!empty($data_request)){
 			<th>Tipe</th>
 			<th>Nilai Pengajuan</th>
 			<th>Tanggal Pembayaran</th>
-			<th>Bank</th>
-			<th>No Rek</th>
-			<th>Nama</th>
+		
 		</tr>
 	<?php
 	$i=0;
@@ -66,9 +64,7 @@ if(!empty($data_request)){
 			<td><?= strtoupper($record->tipe) ?></td>
 			<td align=right><?= number_format($record->jumlah) ?></td>
 			<td><?= tgl_indo($record->tanggal) ?></td>
-			<td><?= strtoupper($record->bank_id) ?></td>
-			<td><?= $record->accnumber ?></td>
-			<td><?= strtoupper($record->accname) ?></td>
+			
 		</tr>
 		<?php
 		}
