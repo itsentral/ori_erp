@@ -328,7 +328,7 @@ class Report_invoicing_model extends CI_Model {
 		$id = $this->uri->segment(3);
 		
 		$string = $id;
-		$dv = explode(',', $string);
+		$dv = array_map('trim', explode(',', $string));
 		$getDetail 		= $this->db->query("SELECT no_spk,id_trans,kode_trans,kode_delivery,nilai_unit, product,  material,  wip_direct, wip_indirect, wip_consumable,  wip_foh FROM view_incustomer_cogs_detail 
 							WHERE kode_delivery IN ($dv)")->result_array();
 
