@@ -33,7 +33,9 @@ if(!empty($data_request)){
 	No rek : <?=$bank->accnumber?><br /> A.n : <?=$bank->accname?><br /><br /></td>
 </tr>
 
-<?php }?>
+<?php }
+
+}?>
 
 <tr>
 	<td colspan=9>
