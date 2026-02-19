@@ -95,7 +95,7 @@ if(!empty($data_request)){
 	?>
 	</table>
 
-	</td>
+	
 
 	<br>
 	<br>
@@ -112,7 +112,7 @@ if(!empty($data_request)){
 		<th width=90><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th></tr>
 	</table>
-
+    </td>
 	</tr>
 </table>
  <script type="text/javascript">
