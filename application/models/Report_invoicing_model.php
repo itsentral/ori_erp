@@ -206,7 +206,7 @@ class Report_invoicing_model extends CI_Model {
 			$string = $row['delivery_no'];
 			$dv = explode(',', $string);
 			$cogs           = $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
-							WHERE kode_delivery IN ('$dv')")->row();
+							WHERE kode_delivery IN ($dv)")->row();
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
@@ -320,7 +320,7 @@ class Report_invoicing_model extends CI_Model {
 		$string = $id;
 		$dv = explode(',', $string);
 		$getDetail 		= $this->db->query("SELECT no_spk,id_trans,kode_trans,kode_delivery,nilai_unit, product,  material,  wip_direct, wip_indirect, wip_consumable,  wip_foh FROM view_incustomer_cogs_detail 
-							WHERE kode_delivery IN ('$dv')")->result_array();
+							WHERE kode_delivery IN ($dv)")->result_array();
 
 		$data = array(
 			'getDetail'		=> $getDetail
