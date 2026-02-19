@@ -134,7 +134,7 @@ class Request_payment extends CI_Controller {
 		$notr  = $req->no_doc;
 		$tipe  = $req->tipe;
 
-		if($tipe=='expese'){
+		if($tipe=='expense'){
 			$data_expense = $this->db->query("select * from tr_expense_detail where no_doc='".$notr."'")->result();
 		}elseif($tipe=='kasbon'){
             $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, '' as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_kasbon where no_doc='".$notr."'")->result();
