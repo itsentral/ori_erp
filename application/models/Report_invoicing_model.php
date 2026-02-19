@@ -204,11 +204,7 @@ class Report_invoicing_model extends CI_Model {
 		{
 			
 			$string = $row['delivery_no'];
-			$dv = explode(',', $string);
-
-			print_r($dv);
-			exit;
-
+			$dv = array_map('trim', explode(',', $string));
 			$cogs           = $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
 							WHERE kode_delivery IN ($dv)")->row();
 			$total_data     = $totalData;
