@@ -324,11 +324,7 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$stokjurnalakhir2=0;
 				$nilaijurnalakhir2=0;
 				$PRICE2 =0;
-				$stok_jurnal_akhir2 = $this->db->order_by('tgl_trans','desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
-				if(!empty($stok_jurnal_akhir2)) $stokjurnalakhir2=$stok_jurnal_akhir2->qty_stock_akhir;
 				
-				if(!empty($stok_jurnal_akhir2)) $nilaijurnalakhir2=$stok_jurnal_akhir2->nilai_akhir_rp;
-
 				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
 				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
 				
@@ -347,21 +343,21 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
 				$ArrJurnalNew2[$key]['id_material'] 		= $getDetMat[0]->id_material;
-				$ArrJurnalNew2[$key]['idmaterial'] 		= $getDetMat[0]->idmaterial;
+				$ArrJurnalNew2[$key]['idmaterial'] 		    = $getDetMat[0]->idmaterial;
 				$ArrJurnalNew2[$key]['nm_material'] 		= $getDetMat[0]->nm_material;
 				$ArrJurnalNew2[$key]['id_category'] 		= $getDetMat[0]->id_category;
 				$ArrJurnalNew2[$key]['nm_category'] 		= $getDetMat[0]->nm_category;
 				$ArrJurnalNew2[$key]['id_gudang'] 			= $id_tujuan;
 				$ArrJurnalNew2[$key]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
-				$ArrJurnalNew2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
-				$ArrJurnalNew2[$key]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+				$ArrJurnalNew2[$key]['id_gudang_dari'] 	    = $id_gudang_dari;
+				$ArrJurnalNew2[$key]['kd_gudang_dari'] 	    = get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
 				$ArrJurnalNew2[$key]['id_gudang_ke'] 		= $id_tujuan;
 				$ArrJurnalNew2[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
-				$ArrJurnalNew2[$key]['qty_stock_awal'] 	= $stokjurnalakhir2;
+				$ArrJurnalNew2[$key]['qty_stock_awal'] 	    = $stokjurnalakhir2;
 				$ArrJurnalNew2[$key]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
-				$ArrJurnalNew2[$key]['kode_trans'] 		= $kode_trans;
+				$ArrJurnalNew2[$key]['kode_trans'] 		    = $kode_trans;
 				$ArrJurnalNew2[$key]['tgl_trans'] 			= $DateTime;
-				$ArrJurnalNew2[$key]['qty_in'] 			= $QTY_OKE;
+				$ArrJurnalNew2[$key]['qty_in'] 			    = $QTY_OKE;
 				$ArrJurnalNew2[$key]['ket'] 				= $ket;
 				$ArrJurnalNew2[$key]['harga'] 				= $PRICENEW;
 				$ArrJurnalNew2[$key]['harga_bm'] 			= 0; 
