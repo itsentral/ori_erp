@@ -598,30 +598,30 @@ class Qc_pipe_cutting extends CI_Controller {
 										FROM
 										`data_erp_wip_group` 
 										WHERE
-										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
-										AND (`data_erp_wip_group`.`jenis`='out')
-										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
+										(`data_erp_wip_group`.`id_pro_det` = '".$kode."')
+										AND (`data_erp_wip_group`.`jenis`='out cutting')
+										AND (`data_erp_wip_group`.`keterangan` = 'WIP to Finish Good (Cutting)')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
 
 			
-			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kodetrans."' 
-			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
+			// $cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kodetrans."' 
+			// AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
 
 		
 
 
 			
-			if(!empty($cekstok)){
-            foreach ($stokwip as $vals) {
-			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
-			}
-			}else{
+			// if(!empty($cekstok)){
+            // foreach ($stokwip as $vals) {
+			// $qty = 	$vals->total;
+            // $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+			// }
+			// }else{
 			$datastokfg=array();
 			foreach ($stokwip as $vals) {
 			$datastokfg = array(
 						'tanggal' => $tgl_voucher,
-						'keterangan' => 'WIP To FG',
+						'keterangan' => 'WIP to Finish Good (Cutting)',
 						'no_so' => $vals->no_so,
 						'product' => $vals->product,
 						'no_spk' => $vals->no_spk,
@@ -643,7 +643,7 @@ class Qc_pipe_cutting extends CI_Controller {
 			}
 
 			
-		}
+		//}
 		  
 	}
 
