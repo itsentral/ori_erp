@@ -598,7 +598,7 @@ class Qc_pipe_cutting extends CI_Controller {
 										FROM
 										`data_erp_wip_group` 
 										WHERE
-										(`data_erp_wip_group`.`id_pro_det` = '".$kode."')
+										(`data_erp_wip_group`.`id_pro_det` = '".$idprodet."')
 										AND (`data_erp_wip_group`.`jenis`='out cutting')
 										AND (`data_erp_wip_group`.`keterangan` = 'WIP to Finish Good (Cutting)')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
