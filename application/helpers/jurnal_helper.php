@@ -3044,7 +3044,8 @@
 			$length_cutting 	= $get_detProduksi[0]->length_split;
 			$length_full 		= $get_detProduksi[0]->length;
 			$no_ipp 			= str_replace('BQ-','',$id_bq);
-
+			$kode_trans1        = $getReportFG[0]['kode_trans'];
+            $kode_trans_new     = $kode_trans1.$nomor;
 			$keterangan 		= $product.'/'.$id_milik.'/'.$nomor_so.'.'.$product_ke.'/'.$no_spk.'/'.$kode_pro;
 
 			$ArrDetailNew[$nomor]['kode_trans'] 	= $kode_trans;
@@ -3081,7 +3082,7 @@
 				$ArrWIP_IN[$nomor]['no_so'] 	= (!empty($getReportFG[0]['no_so']))?$getReportFG[0]['no_so']:NULL;
 				$ArrWIP_IN[$nomor]['product'] = (!empty($getReportFG[0]['product']))?$getReportFG[0]['product']:NULL;
 				$ArrWIP_IN[$nomor]['no_spk'] = (!empty($getReportFG[0]['no_spk']))?$getReportFG[0]['no_spk']:NULL;
-				$ArrWIP_IN[$nomor]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$getReportFG[0]['kode_trans']:NULL;
+				$ArrWIP_IN[$nomor]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$kode_trans_new:NULL;
 				$ArrWIP_IN[$nomor]['id_pro_det'] = $id_pro;
 				$ArrWIP_IN[$nomor]['qty'] = 1;
 				$ArrWIP_IN[$nomor]['nilai_wip'] = $nilai_wip;
@@ -3351,12 +3352,7 @@
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 		
-		$wipgroup =	$CI->db->query("SELECT * FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND jenis LIKE 'out'")->row();
-		
-		if(!empty($wipgroup)){
-            $kodetrans = $wipgroup->kode_trans;
-			$Date      = $wipgroup->tanggal;
-			$stokwip =$CI->db->query("SELECT
+		    $stokwip =$CI->db->query("SELECT
 										`data_erp_wip_group`.`id` AS `id`,
 										`data_erp_wip_group`.`tanggal` AS `tanggal`,
 										`data_erp_wip_group`.`keterangan` AS `keterangan`,
@@ -3385,16 +3381,17 @@
 										FROM
 										`data_erp_wip_group` 
 										WHERE
-										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
-										AND (`data_erp_wip_group`.`jenis`='in')
+										(`data_erp_wip_group`.`id_pro_det` = '".$kode."')
+										AND (`data_erp_wip_group`.`jenis`='in cutting')
 										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
+										AND (`data_erp_wip_group`.`keterangan` = 'Finish Good to WIP (Cutting)')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
         
 						$datastokwip=array();
 						foreach ($stokwip as $vals) {
 							$datastokwip = array(
 										'tanggal' => $tgl_voucher,
-										'keterangan' => 'Gudang produksi to WIP',
+										'keterangan' => 'Finish Good to WIP (Cutting)',
 										'no_so' => $vals->no_so,
 										'product' => $vals->product,
 										'no_spk' => $vals->no_spk,
@@ -3414,7 +3411,7 @@
 
 							$CI->db->insert('warehouse_stock_wip',$datastokwip);
 						}
-		}
+		
 		
 		
 		  
