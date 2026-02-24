@@ -2324,7 +2324,7 @@ class Warehouse_model extends CI_Model {
 				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
 				
 				print_r($costbook2);
-				exit;
+				echo "<br>";
 
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
