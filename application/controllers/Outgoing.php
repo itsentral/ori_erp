@@ -2062,14 +2062,14 @@ class Outgoing extends CI_Controller {
 									'id_pro_det' =>'',
 									'qty' => str_replace(',','',$data['qty_kit']),
 									'nilai_wip' => $TotalPriceBook/$qty,
-									'material' => ,
-									'wip_direct' =>  ,
-									'wip_indirect' =>  ,
-									'wip_consumable' =>  ,
-									'wip_foh' =>  ,
+									'material' =>'',
+									'wip_direct' =>'',
+									'wip_indirect' => '',
+									'wip_consumable' => '',
+									'wip_foh' => '',
 									'created_by' => $data_session['ORI_User']['username'],
 									'created_date' => $dateTime,
-									'id_trans' => ,
+									'id_trans' =>'',
 								);
 							}
 							
