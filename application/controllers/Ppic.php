@@ -1782,9 +1782,9 @@ class Ppic extends CI_Controller {
 			}
 		}
 
-		// print_r($ArrUpdateProduksi);
-		// print_r($ArrUpdateCutting);
-		// exit;
+		print_r($spool_induk);
+		print_r($ArrReportFG);
+		exit;
 		$this->db->trans_start();
 			if(!empty($ArrUpdateProduksi)){
 				$this->db->update_batch('production_detail',$ArrUpdateProduksi,'id');

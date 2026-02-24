@@ -96,12 +96,12 @@
                                                class="btn btn-sm btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="<?php echo base_url('kartu_piutang/delete/'.$row->id); ?>" 
+                                            <!-- <a href="<?php //echo base_url('kartu_piutang/delete/'.$row->id); ?>" 
                                                class="btn btn-sm btn-danger" 
                                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" 
                                                title="Hapus">
                                                 <i class="fas fa-trash"></i>
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </td>
                                 </tr>
