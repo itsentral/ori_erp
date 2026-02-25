@@ -4725,9 +4725,10 @@ class Qc extends CI_Controller
 			$ArrIN_FG_MATERIAL[$key]['kode_spool'] =  $kode;
 		}
 
-		// print_r($ArrIN_WIP_MATERIAL);
-		// print_r($ArrIN_FG_MATERIAL);
-		// exit;
+		print_r($ArrIN_WIP_MATERIAL);
+		echo "<br>";
+		print_r($ArrIN_FG_MATERIAL);
+		exit;
 
 		$this->db->trans_start();
 			if(!empty($ArrIN_WIP_MATERIAL)){
@@ -4904,7 +4905,7 @@ function jurnalIntoFG($kode){
 										`data_erp_wip_group` 
 										WHERE
 										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
-										AND (`data_erp_wip_group`.`jenis`='out')
+										AND (`data_erp_wip_group`.`jenis`='out spool')
 										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
 
