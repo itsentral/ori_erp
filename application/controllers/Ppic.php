@@ -2786,7 +2786,7 @@ class Ppic extends CI_Controller {
 			}
 			unset($det_Jurnaltes);unset($datadetail);
         $wipgroup =  $this->db->query("SELECT *  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool' limit 1")->row();
-		$kodetrans = $wipgroup->kode_trans;
+		$kode_spool = $wipgroup->kode_spool;
 		$Date      = $wipgroup->tanggal;
 		$stokwip = $this->db->query("SELECT
 										`data_erp_wip_group`.`id` AS `id`,
@@ -2817,8 +2817,8 @@ class Ppic extends CI_Controller {
 										FROM
 										`data_erp_wip_group` 
 										WHERE
-										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
-										AND (`data_erp_wip_group`.`jenis`='in')
+										(`data_erp_wip_group`.`kode_spool` = '".$kode."') 
+										AND (`data_erp_wip_group`.`jenis`='in spool')
 										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
         
