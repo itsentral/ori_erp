@@ -711,7 +711,7 @@ class Warehouse_model extends CI_Model {
 				$ArrHist[$key]['total_harga'] 		= (($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM;
 				$ArrHist[$key]['saldo_awal']		= $nilaijurnalakhir;
 				$ArrHist[$key]['saldo_akhir']		= $stok_akhir;
-				$ArrHist[$key]['harga_baru'] 		= $PRICENEW; 
+				$ArrHist[$key]['harga_baru'] 		= $PRICENEW;
 				
 				
 				
@@ -2141,7 +2141,7 @@ class Warehouse_model extends CI_Model {
 		echo json_encode($Arr_Data);
 	}
 
-	public function modal_request_check(){ 
+	public function modal_request_check(){
 		if($this->input->post()){
 			$data 			= $this->input->post();
 			$data_session	= $this->session->userdata;
@@ -2199,7 +2199,7 @@ class Warehouse_model extends CI_Model {
 			$ArrUpdateStockExp	= array();
 			$ArrUpdateRequest	= array();
 
-
+            $PRICE2 = 0;
 			$SUM_MAT = 0;
 			foreach($detail AS $val2 => $valx2){
 				$QTY_OKE 	= 0;
@@ -2211,7 +2211,6 @@ class Warehouse_model extends CI_Model {
 						$EXPIRED = (!empty($valx['expired']))?$valx['expired']:NULL;
 
 						$ID_MATERIAL_ACT = $valx2['id_material'];
-
 
 						//UPDATE ADJUSTMENT DETAIL
 						$ArrDeatil[$val2]['id'] 			    = $valx2['id'];
@@ -2256,127 +2255,124 @@ class Warehouse_model extends CI_Model {
 							$ArrUpdateRequest[$val2.$val]['total_request'] 	= $getRequest[0]->total_request - ($getDetAjust[0]->qty_oke - $QTY_OKE);
 						}
 						
+						}
 						
-					
+				$key = $getDetMat[0]->id_material;
+				
+				//ambil saldo akhir 
 						
-					$key = $getDetMat[0]->id_material;
-				
-					//ambil saldo akhir 
-						
-					$stokjurnalakhir=0;
-					$nilaijurnalakhir=0;
-					$bmunit = 0;
-					$bm = 0;
+				$stokjurnalakhir=0;
+				$nilaijurnalakhir=0;
+				$bmunit = 0;
+				$bm = 0;
 
-					$qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-					$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-					
-					
-					if(!empty($costbook)) $PRICE=$costbook->harga;
-					if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
-					if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
-
-
-					//MATERIAL YANG AKAN DI UPDATE
-					$ArrUpdateStock[$val2]['id'] 	= $ID_MATERIAL_ACT;
-					$ArrUpdateStock[$val2]['qty'] 	= $QTY_OKE;
-					$ArrUpdateStock[$val2]['harga_pusat'] 	= $PRICE;
-
-					
-					$tanggal		= date('Y-m-d');
-					$Bln 			= substr($tanggal,5,2);
-					$Thn 			= substr($tanggal,0,4);
-					$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
-					$GudangFrom = $id_gudang_dari;
-					
-					
-					
-					$ArrJurnalNew[$val2]['id_material'] 		= $getDetMat[0]->id_material;
-					$ArrJurnalNew[$val2]['idmaterial'] 			= $getDetMat[0]->idmaterial;
-					$ArrJurnalNew[$val2]['nm_material'] 		= $getDetMat[0]->nm_material;
-					$ArrJurnalNew[$val2]['id_category'] 		= $getDetMat[0]->id_category;
-					$ArrJurnalNew[$val2]['nm_category'] 		= $getDetMat[0]->nm_category;
-					$ArrJurnalNew[$val2]['id_gudang'] 			= $id_gudang_dari;
-					$ArrJurnalNew[$val2]['kd_gudang'] 			= $kode_gudang_dari;
-					$ArrJurnalNew[$val2]['id_gudang_dari'] 	    = $id_gudang_dari;
-					$ArrJurnalNew[$val2]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-					$ArrJurnalNew[$val2]['id_gudang_ke'] 		= $id_tujuan;
-					$ArrJurnalNew[$val2]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
-					$ArrJurnalNew[$val2]['qty_stock_awal'] 		= $stokjurnalakhir;
-					$ArrJurnalNew[$val2]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
-					$ArrJurnalNew[$val2]['kode_trans'] 			= $kode_trans;
-					$ArrJurnalNew[$val2]['tgl_trans'] 			= $DateTime;
-					$ArrJurnalNew[$val2]['qty_out'] 			= $QTY_OKE;
-					$ArrJurnalNew[$val2]['ket'] 				= 'pindah gudang out';
-					$ArrJurnalNew[$val2]['harga'] 			= $PRICE;
-					$ArrJurnalNew[$val2]['harga_bm'] 		= 0;
-					$ArrJurnalNew[$val2]['nilai_awal_rp']	= $nilaijurnalakhir;
-					$ArrJurnalNew[$val2]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
-					$ArrJurnalNew[$val2]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
-					$ArrJurnalNew[$val2]['update_by'] 		= $UserName;
-					$ArrJurnalNew[$val2]['update_date'] 		= $DateTime;
-					$ArrJurnalNew[$val2]['no_jurnal'] 		= $Nojurnal;
-					$ArrJurnalNew[$val2]['coa_gudang'] 		= $coa_gudang;
+                $qty_akhir = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
+				$costbook = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
 				
 				
-					$stokjurnalakhir2=0;
-					$nilaijurnalakhir2=0;
-				
-					$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
-					$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
-					
-					
-					if(!empty($costbook2)) $PRICE2=$costbook2->harga;
-					if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-					if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
-					$GudangFrom2 = $id_tujuan;
-					
-					if($QTY_OKE+$stokjurnalakhir2 != 0){
-					$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
-					} else {
-					$PRICENEW = ($PRICE2);
-					}
+				if(!empty($costbook)) $PRICE=$costbook->harga;
+				if(!empty($qty_akhir)) $stokjurnalakhir=$qty_akhir->qty_stock;				
+				if(!empty($qty_akhir)) $nilaijurnalakhir=$PRICE*$stokjurnalakhir;
+
+
+				//MATERIAL YANG AKAN DI UPDATE
+				$ArrUpdateStock[$val2]['id'] 	= $ID_MATERIAL_ACT;
+				$ArrUpdateStock[$val2]['qty'] 	= $QTY_OKE;
+				$ArrUpdateStock[$val2]['harga_pusat'] 	= $PRICE;
 
 				
-					$in   = 'pindah gudang in';
-					$ket  = $in.$id_gudang_dari.$id_tujuan;
-					
-					$ArrJurnalNew2[$val2]['id_material'] 		= $getDetMat[0]->id_material;
-					$ArrJurnalNew2[$val2]['idmaterial'] 		= $getDetMat[0]->idmaterial;
-					$ArrJurnalNew2[$val2]['nm_material'] 		= $getDetMat[0]->nm_material;
-					$ArrJurnalNew2[$val2]['id_category'] 		= $getDetMat[0]->id_category;
-					$ArrJurnalNew2[$val2]['nm_category'] 		= $getDetMat[0]->nm_category;
-					$ArrJurnalNew2[$val2]['id_gudang'] 			= $id_tujuan;
-					$ArrJurnalNew2[$val2]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
-					$ArrJurnalNew2[$val2]['id_gudang_dari'] 	= $id_gudang_dari;
-					$ArrJurnalNew2[$val2]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
-					$ArrJurnalNew2[$val2]['id_gudang_ke'] 		= $id_tujuan;
-					$ArrJurnalNew2[$val2]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
-					$ArrJurnalNew2[$val2]['qty_stock_awal'] 	= $stokjurnalakhir2;
-					$ArrJurnalNew2[$val2]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
-					$ArrJurnalNew2[$val2]['kode_trans'] 		= $kode_trans;
-					$ArrJurnalNew2[$val2]['tgl_trans'] 			= $DateTime;
-					$ArrJurnalNew2[$val2]['qty_in'] 			= $QTY_OKE;
-					$ArrJurnalNew2[$val2]['ket'] 				= $ket;
-					$ArrJurnalNew2[$val2]['harga'] 				= $PRICENEW;
-					$ArrJurnalNew2[$val2]['harga_bm'] 			= 0; 
-					$ArrJurnalNew2[$val2]['nilai_awal_rp']		= $nilaijurnalakhir2;
-					$ArrJurnalNew2[$val2]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-					$ArrJurnalNew2[$val2]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
-					$ArrJurnalNew2[$val2]['update_by'] 			= $UserName;
-					$ArrJurnalNew2[$val2]['update_date'] 		= $DateTime;
-					$ArrJurnalNew2[$val2]['no_jurnal'] 			= '-';
-					$ArrJurnalNew2[$val2]['coa_gudang'] 		= $coa_gudang2;
-
-					$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
-					$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
-						
-				  }
+				$tanggal		= date('Y-m-d');
+				$Bln 			= substr($tanggal,5,2);
+				$Thn 			= substr($tanggal,0,4);
+				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+				$GudangFrom = $id_gudang_dari;
 				
+				
+				
+				$ArrJurnalNew[$val2]['id_material'] 		= $getDetMat[0]->id_material;
+				$ArrJurnalNew[$val2]['idmaterial'] 			= $getDetMat[0]->idmaterial;
+				$ArrJurnalNew[$val2]['nm_material'] 		= $getDetMat[0]->nm_material;
+				$ArrJurnalNew[$val2]['id_category'] 		= $getDetMat[0]->id_category;
+				$ArrJurnalNew[$val2]['nm_category'] 		= $getDetMat[0]->nm_category;
+				$ArrJurnalNew[$val2]['id_gudang'] 			= $id_gudang_dari;
+				$ArrJurnalNew[$val2]['kd_gudang'] 			= $kode_gudang_dari;
+				$ArrJurnalNew[$val2]['id_gudang_dari'] 	    = $id_gudang_dari;
+				$ArrJurnalNew[$val2]['kd_gudang_dari'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+				$ArrJurnalNew[$val2]['id_gudang_ke'] 		= $id_tujuan;
+				$ArrJurnalNew[$val2]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
+				$ArrJurnalNew[$val2]['qty_stock_awal'] 		= $stokjurnalakhir;
+				$ArrJurnalNew[$val2]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+				$ArrJurnalNew[$val2]['kode_trans'] 			= $kode_trans;
+				$ArrJurnalNew[$val2]['tgl_trans'] 			= $DateTime;
+				$ArrJurnalNew[$val2]['qty_out'] 			= $QTY_OKE;
+				$ArrJurnalNew[$val2]['ket'] 				= 'pindah gudang out';
+				$ArrJurnalNew[$val2]['harga'] 			= $PRICE;
+				$ArrJurnalNew[$val2]['harga_bm'] 		= 0;
+				$ArrJurnalNew[$val2]['nilai_awal_rp']	= $nilaijurnalakhir;
+				$ArrJurnalNew[$val2]['nilai_trans_rp']	= $PRICE*$QTY_OKE;
+				$ArrJurnalNew[$val2]['nilai_akhir_rp']	= $nilaijurnalakhir-($PRICE*$QTY_OKE);
+				$ArrJurnalNew[$val2]['update_by'] 		= $UserName;
+				$ArrJurnalNew[$val2]['update_date'] 		= $DateTime;
+				$ArrJurnalNew[$val2]['no_jurnal'] 		= $Nojurnal;
+				$ArrJurnalNew[$val2]['coa_gudang'] 		= $coa_gudang;
+				
+				
+				$stokjurnalakhir2=0;
+				$nilaijurnalakhir2=0;
+			
+				$qty_akhir2 = $this->db->get_where('warehouse_stock',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
+				$costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key),1)->row();
+				
+				// print_r($costbook2);
+				// echo "<br>";
+
+				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
+				$GudangFrom2 = $id_tujuan;
+				
+				if($QTY_OKE+$stokjurnalakhir2 != 0){
+				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				} else {
+				$PRICENEW = ($PRICE2);
+				}
+
+				
+				$in   = 'pindah gudang in';
+				$ket  = $in.$id_gudang_dari.$id_tujuan;
+				
+				$ArrJurnalNew2[$val2]['id_material'] 		= $getDetMat[0]->id_material;
+				$ArrJurnalNew2[$val2]['idmaterial'] 		= $getDetMat[0]->idmaterial;
+				$ArrJurnalNew2[$val2]['nm_material'] 		= $getDetMat[0]->nm_material;
+				$ArrJurnalNew2[$val2]['id_category'] 		= $getDetMat[0]->id_category;
+				$ArrJurnalNew2[$val2]['nm_category'] 		= $getDetMat[0]->nm_category;
+				$ArrJurnalNew2[$val2]['id_gudang'] 			= $id_tujuan;
+				$ArrJurnalNew2[$val2]['kd_gudang'] 			= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
+				$ArrJurnalNew2[$val2]['id_gudang_dari'] 	= $id_gudang_dari;
+				$ArrJurnalNew2[$val2]['kd_gudang_dari'] 	= get_name('warehouse', 'kd_gudang', 'id', $id_gudang_dari);
+				$ArrJurnalNew2[$val2]['id_gudang_ke'] 		= $id_tujuan;
+				$ArrJurnalNew2[$val2]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
+				$ArrJurnalNew2[$val2]['qty_stock_awal'] 	= $stokjurnalakhir2;
+				$ArrJurnalNew2[$val2]['qty_stock_akhir'] 	= $stokjurnalakhir2+$QTY_OKE;
+				$ArrJurnalNew2[$val2]['kode_trans'] 		= $kode_trans;
+				$ArrJurnalNew2[$val2]['tgl_trans'] 			= $DateTime;
+				$ArrJurnalNew2[$val2]['qty_in'] 			= $QTY_OKE;
+				$ArrJurnalNew2[$val2]['ket'] 				= $ket;
+				$ArrJurnalNew2[$val2]['harga'] 				= $PRICENEW;
+				$ArrJurnalNew2[$val2]['harga_bm'] 			= 0; 
+				$ArrJurnalNew2[$val2]['nilai_awal_rp']		= $nilaijurnalakhir2;
+				$ArrJurnalNew2[$val2]['nilai_trans_rp']		= $PRICE*$QTY_OKE;
+				$ArrJurnalNew2[$val2]['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+				$ArrJurnalNew2[$val2]['update_by'] 			= $UserName;
+				$ArrJurnalNew2[$val2]['update_date'] 		= $DateTime;
+				$ArrJurnalNew2[$val2]['no_jurnal'] 			= '-';
+				$ArrJurnalNew2[$val2]['coa_gudang'] 		= $coa_gudang2;
+					
 				}
 				$SUM_MAT 	+= $QTY_OKE;
 
-			
+				$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
+				$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
 			}
 
 			//PROCESS UPDATE STOCK
