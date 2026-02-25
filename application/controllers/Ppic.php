@@ -1782,9 +1782,9 @@ class Ppic extends CI_Controller {
 			}
 		}
 
-		print_r($spool_induk);
-		print_r($ArrReportFG);
-		exit;
+		// print_r($spool_induk);
+		// print_r($ArrReportFG);
+		// exit;
 		$this->db->trans_start();
 			if(!empty($ArrUpdateProduksi)){
 				$this->db->update_batch('production_detail',$ArrUpdateProduksi,'id');
@@ -2604,6 +2604,11 @@ class Ppic extends CI_Controller {
 				$ArrIN_WIP_Spool[0]['gudang'] =  null;
 				$ArrIN_WIP_Spool[0]['kode_spool'] =  $kode;
 			}
+
+			print_r($ArrIN_WIP_Spool);
+			echo"<br>";
+			print_r($ArrIN_FG_MATERIAL);
+			exit;
 
 			$this->db->trans_start();
 				if(!empty($ArrIN_WIP_Spool)){
