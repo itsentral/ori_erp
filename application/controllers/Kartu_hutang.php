@@ -178,7 +178,7 @@ class Kartu_hutang extends CI_Controller {
     }
 
     // Delete record
-    public function delete($id) {
+    public function deleted($id) {
         if ($this->Kartu_hutang_model->delete($id)) {
             $this->session->set_flashdata('success', 'Data berhasil dihapus');
         } else {
