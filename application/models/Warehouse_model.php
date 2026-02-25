@@ -2199,7 +2199,7 @@ class Warehouse_model extends CI_Model {
 			$ArrUpdateStockExp	= array();
 			$ArrUpdateRequest	= array();
 
-
+            $PRICE2 = 0;
 			$SUM_MAT = 0;
 			foreach($detail AS $val2 => $valx2){
 				$QTY_OKE 	= 0;
