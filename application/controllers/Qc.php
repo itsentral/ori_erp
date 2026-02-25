@@ -4830,7 +4830,7 @@ function jurnalIntoFG($kode){
 					$nospk      = $data->no_spk;
 					$qty        = $data->qty;
 
-					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_spool ='".$kode."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 			   $qty_n++;
 			
 		}
@@ -4904,13 +4904,13 @@ function jurnalIntoFG($kode){
 										FROM
 										`data_erp_wip_group` 
 										WHERE
-										(`data_erp_wip_group`.`kode_trans` = '".$kodetrans."') 
+										(`data_erp_wip_group`.`kode_spool` = '".$kode."') 
 										AND (`data_erp_wip_group`.`jenis`='out spool')
 										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
 
 			
-			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kodetrans."' 
+			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_spool ='".$kode."' 
 			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
 
 		
@@ -4920,7 +4920,7 @@ function jurnalIntoFG($kode){
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_spool ='".$kode."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
@@ -4943,6 +4943,7 @@ function jurnalIntoFG($kode){
 						'created_by' => $vals->created_by,
 						'created_date' => $vals->created_date,
 						'id_trans' => $vals->id_trans,
+						'kode_spool' => $vals->kode_spool,
 						);
 
 			$this->db->insert('warehouse_stock_fg',$datastokfg);
