@@ -325,7 +325,7 @@ class Wip_pipe_cutting extends CI_Controller {
 
 				if(empty($get_header[0]->id_deadstok)){
 					$this->db->where('id_produksi', $id_produksi);
-					$this->db->where('id_milik', $id_milik);
+					$this->db->where('id_milik', $id_milik); 
 					$this->db->where('product_ke', $urut_nomor);
 					$this->db->update('production_detail', array('no_spk'=>$nomor_spk,'product_code_cut'=>$product_code,'urut_product_cut'=>$urut_nomor));
 				}
