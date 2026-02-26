@@ -157,6 +157,70 @@ class Total_value_product extends CI_Controller {
 		$this->load->view('Total_value/product_incustomer',$data);
 	}
 
+	 public function server_side_product_stock_wip2(){
+		$requestData	= $_REQUEST;
+		
+		$fetch			= $this->query_data_json_product_stock_wip(
+			$requestData['gudang'], 
+			$requestData['date_filter'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+	
+		$get_category = $this->db->select('category')->get_where('warehouse', array('id'=>$requestData['gudang']))->result();
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+
+			
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['no_so'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['no_spk'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['kode_trans'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['keterangan'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
+			$nestedData[]	= "<div align='center'>
+								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".$row['kode_trans']."'><i class='fa fa-history'></i></button>
+								</div>";
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
     public function server_side_product_stock_wip(){
 		$requestData	= $_REQUEST;
 		
