@@ -3313,13 +3313,15 @@
 					 ); 
 					 
 					 
-				    $kode_trans = $data->kode_trans;
+				    $kode_trans = substr($data->kode_trans, 0, -1);
 					$nospk      = $data->no_spk;
 					$qty        = $data->qty;
 
-					$CI->db->query("UPDATE  warehouse_stock_fgx SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-			        $qty_n++;
+					 $qty_n++;
 			}
+
+			       $CI->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			       
 
 			 
 			
