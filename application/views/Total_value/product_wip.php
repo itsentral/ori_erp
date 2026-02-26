@@ -187,7 +187,7 @@ $gudang = $this->uri->segment(3);
 		let qty_rusak	= 0;
 		let gudang1 = $('#gudang1').val();
 		if(gudang1 =='wip'){
-			var link =  base_url + active_controller+'/server_side_product_stock_wip';
+			var link =  base_url + active_controller+'/server_side_product_stock_wip2';
 		}else if(gudang1 =='fg'){
 			var link =  base_url + active_controller+'/server_side_product_stock_fg';
 		}else if(gudang1 =='intransit'){
