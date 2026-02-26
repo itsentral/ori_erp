@@ -169,6 +169,7 @@ class Total_value_product extends CI_Controller {
 			$requestData['start'],
 			$requestData['length']
 		);
+		$gudang = $requestData['gudang'];
 		$totalData		= $fetch['totalData'];
 		$totalFiltered	= $fetch['totalFiltered'];
 		$query			= $fetch['query'];
@@ -192,6 +193,19 @@ class Total_value_product extends CI_Controller {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
+			if($gudang=='wip'){
+            $nilai = $row['nilai_wip'];
+			}elseif($gudang=='fg'){
+				 $nilai = $row['nilai_unit'];
+			}
+			elseif($gudang=='intransit'){
+				 $nilai = $row['nilai_unit'];
+			}elseif($gudang=='incustomer'){
+				 $nilai = $row['nilai_unit'];
+			}elseif($gudang=='cogs'){
+				 $nilai = $row['nilai_unit'];
+			}
+
 			
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
@@ -201,8 +215,8 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['keterangan'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']*$row['qty'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($nilai,2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($nilai*$row['qty'],2)."</div>";
 			$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".$row['kode_trans']."'><i class='fa fa-history'></i></button>
 								</div>";
