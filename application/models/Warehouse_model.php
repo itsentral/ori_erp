@@ -5331,7 +5331,7 @@ class Warehouse_model extends CI_Model {
 		);
 		history('View Product Stock');
 		$this->load->view('Warehouse/product_stock',$data);
-	} 
+	}
 
 
 }
