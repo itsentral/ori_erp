@@ -2255,8 +2255,8 @@ class Delivery extends CI_Controller
 			$Cutting_ke = '';
 
 			
-			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			
+
 			if ($value['sts'] == 'cut') {
 				$Cutting_ke = "." . $value['cutting_ke'];
 				$product_code = $IMPLODE[0] . '.' . $value['product_ke'] . $Cutting_ke;
@@ -2284,6 +2284,7 @@ class Delivery extends CI_Controller
 			$ArrInsert[$key]['no_drawing'] = $value['no_drawing'];
 			$ArrInsert[$key]['upload_date'] = $value['upload_date'];
 			$ArrInsert[$key]['sts'] = (empty($value['id_milik']))?'cut':$value['sts'];
+			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			//agus
 			$ArrInsert[$key]['nilai_cogs'] = $value['finish_good'];
 			$ArrInsert[$key]['updated_by'] = $username;
