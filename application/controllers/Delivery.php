@@ -2255,13 +2255,15 @@ class Delivery extends CI_Controller
 			$Cutting_ke = '';
 
 			
-			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
+			
 			
 			if ($value['sts'] == 'cut') {
 				$Cutting_ke = "." . $value['cutting_ke'];
 				$product_code = $IMPLODE[0] . '.' . $value['product_ke'] . $Cutting_ke;
 
 				$ArrInsert[$key]['sts_product'] = $value['sts'];
+			}else{
+				$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			}
 			if ($value['id_milik'] == null) {
 				$product_code = $value['dead_no_so'];
