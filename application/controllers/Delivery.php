@@ -527,7 +527,7 @@ class Delivery extends CI_Controller
 	/* loadDataSS */
 	public function loadDataSS($kode_delivery)
 	{
-		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL))->result_array();
+		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL, 'sts !=' => 'loose_dead'))->result_array();
 		$result_2 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts' => 'cut'))->result_array();
 		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
@@ -1540,7 +1540,7 @@ class Delivery extends CI_Controller
 			'akses_menu'		=> $Arr_Akses,
 			'tanki_model' 		=> $this->tanki_model
 		);
-		$this->load->view('Delivery/edit_delivery', $data);
+		$this->load->view('Delivery/edit_delivery', $data); 
 	}
 
 	public function view_delivery($kode_delivery)
