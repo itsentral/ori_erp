@@ -666,11 +666,17 @@ class Warehouse_model extends CI_Model {
 				$PRICE      = ($value['kurs'] * $value['unit_price']);
 				$stok_akhir = ($PRICE*$qtyIN)+($PRICE2*$stokjurnalakhir)+$BM; 
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
+
+				if($qtyakhir==0){
+				  $pembagi = 1;
+				}else{
+				  $pembagi = $qtyakhir;
+				}
 				
 				if($stok_akhir==0){
 					$PRICENEW = $PRICE2;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM))/($pembagi);
 		        }
 
 
