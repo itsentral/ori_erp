@@ -255,7 +255,12 @@ class Total_value_product extends CI_Controller {
             {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
-
+             
+			if($row['qty']==0){
+				$qty = 1;
+			} else {
+				$qty = $row['qty'];
+			}
 			
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
@@ -265,7 +270,7 @@ class Total_value_product extends CI_Controller {
 			$nestedData[]	= "<div align='left'>".strtoupper($row['product'])."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper($row['keterangan'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['qty'],4)."</div>";
-			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']/$row['qty'],2)."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip']/$qty,2)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_wip'],2)."</div>";
 			$nestedData[]	= "<div align='center'>
 								<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-no_so='".strtoupper($row['no_so'])."' data-no_spk='".$row['no_spk']."' data-product='".$row['product']."' data-kode_trans='".$row['kode_trans']."'><i class='fa fa-history'></i></button>
