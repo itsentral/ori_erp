@@ -4759,7 +4759,7 @@ function jurnalIntoFG($kode){
 		$idtrans = str_replace('-','',$kode);
 
 		
-		$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+		$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit, qty as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
 		
 		$totalfg =0;
 			
@@ -4776,7 +4776,7 @@ function jurnalIntoFG($kode){
 			$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 			$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 			$id          = $data->id_trans;
-			$noso 		 = ','.$data->no_so;
+			$noso 		 = $data->no_so;
 			$no_request  = $data->no_spk;	
 			
 			$wip           	= $data->wip;
