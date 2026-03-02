@@ -2711,7 +2711,7 @@ class Ppic extends CI_Controller {
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
+				$noso 		 = $data->no_so;
                	$no_request  = $data->no_spk;	
 				
 				$wip           	= $data->wip;
@@ -2752,10 +2752,12 @@ class Ppic extends CI_Controller {
 					$nospk      = $data->no_spk;
 					$qty        = $data->qty;
 
-					$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-			        $qty_n++;
+					 $qty_n++;
 				
 			}
+              
+			$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			       
 
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
