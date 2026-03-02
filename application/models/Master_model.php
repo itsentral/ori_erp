@@ -438,7 +438,7 @@ class Master_model extends CI_Model {
 			$kode_trans = $kodetrans."/".$kodetrans3;
 		}else{
 			$gudang      = $this->uri->segment(7);
-			$kode_trans = $kodetrans
+			$kode_trans = $kodetrans;
 		}
 		
 
