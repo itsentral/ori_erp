@@ -24,6 +24,19 @@ if(!empty($data_request)){
 	<td colspan=9 align=center>Nomor Request : <?=$nomorreq?><br />
 	Tanggal Request : <?=$tglreq?><br /><br /></td>
 </tr>
+<?php
+	$i=0;
+	if(!empty($data_request)){
+		foreach($data_request AS $bank){?>
+<tr>
+	<td colspan=9 align=center>Bank : <?=$bank->bank_id?><br />
+	No rek : <?=$bank->accnumber?><br /> A.n : <?=$bank->accname?><br /><br /></td>
+</tr>
+
+<?php }
+
+}?>
+
 <tr>
 	<td colspan=9>
 	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
@@ -36,6 +49,7 @@ if(!empty($data_request)){
 			<th>Tipe</th>
 			<th>Nilai Pengajuan</th>
 			<th>Tanggal Pembayaran</th>
+		
 		</tr>
 	<?php
 	$i=0;
@@ -50,18 +64,54 @@ if(!empty($data_request)){
 			<td><?= strtoupper($record->tipe) ?></td>
 			<td align=right><?= number_format($record->jumlah) ?></td>
 			<td><?= tgl_indo($record->tanggal) ?></td>
+			
 		</tr>
 		<?php
 		}
 	}
-?>
+	?>
 	</table>
-	</td>
-</tr>
-</table>
-<br>
-		<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
-		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
+
+	<br>
+	<br>
+
+	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
+		<tr>
+			<th width="5">#</th>
+			<th>Tanggal</th>
+			<th>Deskripsi</th>
+			<th>Qty</th>
+			<th>Harga</th>
+			<th>Total Harga</th>
+			<th>Keterangan</th>
+		</tr>
+	<?php
+	$i=0;
+	if(!empty($data_detail)){
+		foreach($data_detail AS $rec){ $i++;?>
+		<tr>
+			<td><?=$i;?></td>
+			<td><?= $rec->tanggal ?></td>
+			<td><?= $rec->deskripsi ?></td>
+			<td align=right><?= number_format($rec->qty) ?></td>
+			<td align=right><?= number_format($rec->harga) ?></td>
+			<td align=right><?= number_format($rec->total_harga) ?></td>
+			<td><?= $rec->keterangan ?></td>
+		</tr>
+		<?php
+		}
+	}
+	?>
+	</table>
+
+	
+
+	<br>
+	<br>
+	<br>
+
+	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
+	<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
 		<tr><th width=100><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th>
 		<th width=120><br><br><br><br><br></th>
@@ -70,7 +120,10 @@ if(!empty($data_request)){
 		<th width=90><br><br><br><br><br></th>
 		<th width=90><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th></tr>
-		</table>
+	</table>
+    </td>
+	</tr>
+</table>
  <script type="text/javascript">
   <!--
   window.print();

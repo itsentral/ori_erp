@@ -130,8 +130,21 @@ class Request_payment extends CI_Controller {
 	}
 	function print_req($id){
 		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result();
+		$req = $this->db->query("select * from request_payment where no_request='".$id."'")->row();
+		$notr  = $req->no_doc;
+		$tipe  = $req->tipe;
+
+		if($tipe=='expense'){
+			$data_expense = $this->db->query("select * from tr_expense_detail where no_doc='".$notr."'")->result();
+		}elseif($tipe=='kasbon'){
+            $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, '' as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_kasbon where no_doc='".$notr."'")->result();
+		}elseif($tipe=='transportasi'){
+          $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, rute as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_transport where no_doc='".$notr."'")->result();
+		}
+        
 		$data = array(
 			'data_request'	=> $data_request,
+			'data_detail'   => $data_expense,
 		);
 
 		$this->load->view('Request_payment/request_print',$data);
