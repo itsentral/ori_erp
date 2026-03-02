@@ -4830,7 +4830,7 @@ function jurnalIntoFG($kode){
 					$nospk      = $data->no_spk;
 				
 
-					$this->db->query("UPDATE  warehouse_stock_wipx SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_spool ='".$kode."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_spool ='".$kode."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 			   $qty_n++;
 			
 		}
