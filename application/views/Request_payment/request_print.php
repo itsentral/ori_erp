@@ -126,7 +126,7 @@ if(!empty($data_request)){
 			foreach($data_detail AS $record){ $i++;?>
 			<tr>
 				<td valign="top"><?=$i;?></td>
-				<td valign="top"><?=tgl_indo($record->tanggal);?></td>
+				<td valign="top"><?=tgl_indo($data->tgl_doc);?></td>
 				<td valign="top"><?php
 				echo $record->coa;
 				$dtcoa=$this->db->query("SELECT * FROM ".DBACC.".coa_master where no_perkiraan='".$record->coa."'")->row();
