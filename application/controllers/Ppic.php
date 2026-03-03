@@ -2844,6 +2844,7 @@ class Ppic extends CI_Controller {
 									'created_by' => $vals->created_by,
 									'created_date' => $vals->created_date,
 									'id_trans' => $vals->id_trans,
+									'kode_spool' => $kode,
 									);
 
 						$this->db->insert('warehouse_stock_wip',$datastokwip);
