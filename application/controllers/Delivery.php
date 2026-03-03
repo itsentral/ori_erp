@@ -5884,7 +5884,7 @@ class Delivery extends CI_Controller
         
 		}
 			
-		    print_r($ArrGroupSpool);
+		    print_r($ArrProSpool);
 			exit;
 
 			if(!empty($ArrGroup)){
