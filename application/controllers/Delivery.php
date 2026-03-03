@@ -5811,7 +5811,7 @@ class Delivery extends CI_Controller
 				}
 			}
 		
-
+		}
 			//DATA SPOOL
 			//GROUP DATA
 			$ArrGroupSpool = []; 
@@ -5882,7 +5882,7 @@ class Delivery extends CI_Controller
 				}
 			}
         
-		}
+		
 			
 		    print_r($ArrProSpool);
 			exit;
