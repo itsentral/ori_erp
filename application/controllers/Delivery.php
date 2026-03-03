@@ -5822,10 +5822,6 @@ class Delivery extends CI_Controller
 				$ArrSpool[] = $value['spool_induk'];
 			}
 
-			print_r($ArrSpool);
-			exit;
-
-
 			if(!empty($ArrSpool)){
 				$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
 				if(!empty($getAllSpool)){
@@ -5888,6 +5884,8 @@ class Delivery extends CI_Controller
         
 		}
 			
+		    print_r($ArrGroupSpool);
+			exit;
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
