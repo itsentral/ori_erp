@@ -148,7 +148,7 @@ class Material_planning_model extends CI_Model {
 						$ArrDetAcc[$val]['satuan']    		= $valx['satuan'];
 						$ArrDetAcc[$val]['created_by']    	= $data_session['ORI_User']['username'];
 						$ArrDetAcc[$val]['created_date']    = date('Y-m-d H:i:s');
-						$ArrDetAcc[$val]['in_gudang']    	= 'indirect';
+						// $ArrDetAcc[$val]['in_gudang']    	= 'indirect';
 						// $ArrDetAcc[$val]['in_gudang']    	= 'project';
 					}
 				}
