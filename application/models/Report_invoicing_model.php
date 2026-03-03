@@ -325,9 +325,12 @@ class Report_invoicing_model extends CI_Model {
 	}
 
 	public function modal_detail_invoice(){
+
 		$id = $this->uri->segment(3);
 
-		$dv = array_filter(array_map('trim', explode(',', $id)));
+		$product 		= str_replace("_", ",", $id); 
+
+		$dv = array_filter(array_map('trim', explode(',', $product)));
 
 		$getDetail = $this->db
 			->select('no_spk,id_trans,kode_trans,kode_delivery,nilai_unit,product,material,wip_direct,wip_indirect,wip_consumable,wip_foh')
