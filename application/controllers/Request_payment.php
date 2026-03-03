@@ -145,6 +145,7 @@ class Request_payment extends CI_Controller {
 		$data = array(
 			'data_request'	=> $data_request,
 			'data_detail'   => $data_expense,
+			'data'			=> $id,
 		);
 
 		$this->load->view('Request_payment/request_print',$data);
