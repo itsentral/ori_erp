@@ -5884,8 +5884,7 @@ class Delivery extends CI_Controller
         
 		
 			
-		    print_r($ArrProSpool);
-			exit;
+		    
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
