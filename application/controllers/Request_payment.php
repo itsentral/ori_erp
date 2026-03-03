@@ -139,8 +139,10 @@ class Request_payment extends CI_Controller {
 			$response = $this->db->query("select * from tr_expense where no_doc='".$notr."'")->row();
 		}elseif($tipe=='kasbon'){
             $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, '' as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_kasbon where no_doc='".$notr."'")->result();
+		    $response ='';
 		}elseif($tipe=='transportasi'){
           $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, rute as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_transport where no_doc='".$notr."'")->result();
+		  $response ='';
 		}
         
 		$data = array(

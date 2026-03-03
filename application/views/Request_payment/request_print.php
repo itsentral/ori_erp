@@ -75,40 +75,9 @@ if(!empty($data_request)){
 	<br>
 	<br>
 
-	<?php if($data_request[0]->tipe=='kasbon') { ?>
+	<?php if($data_request[0]->tipe=='expense') { ?>
 
 	<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
-		<tr>
-			<th width="5">#</th>
-			<th>Tanggal</th>
-			<th>Deskripsi</th>
-			<th>Qty</th>
-			<th>Harga</th>
-			<th>Total Harga</th>
-			<th>Keterangan</th>
-		</tr>
-	<?php
-	$i=0;
-	if(!empty($data_detail)){
-		foreach($data_detail AS $rec){ $i++;?>
-		<tr>
-			<td><?=$i;?></td>
-			<td><?= $rec->tanggal ?></td>
-			<td><?= $rec->deskripsi ?></td>
-			<td align=right><?= number_format($rec->qty) ?></td>
-			<td align=right><?= number_format($rec->harga) ?></td>
-			<td align=right><?= number_format($rec->total_harga) ?></td>
-			<td><?= $rec->keterangan ?></td>
-		</tr>
-		<?php
-		}
-	}
-	?>
-	</table>
-
-	<?php } else {?>
-
-   <table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
 		<tr>
 		<th nowrap>No</th>
 		<th nowrap>Tgl Pengajuan</th>
@@ -228,6 +197,37 @@ if(!empty($data_request)){
 		</table><br />
 		</td>
 	</tr>
+	</table>
+
+	<?php } else {?>
+
+   <table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
+		<tr>
+			<th width="5">#</th>
+			<th>Tanggal</th>
+			<th>Deskripsi</th>
+			<th>Qty</th>
+			<th>Harga</th>
+			<th>Total Harga</th>
+			<th>Keterangan</th>
+		</tr>
+	<?php
+	$i=0;
+	if(!empty($data_detail)){
+		foreach($data_detail AS $rec){ $i++;?>
+		<tr>
+			<td><?=$i;?></td>
+			<td><?= $rec->tanggal ?></td>
+			<td><?= $rec->deskripsi ?></td>
+			<td align=right><?= number_format($rec->qty) ?></td>
+			<td align=right><?= number_format($rec->harga) ?></td>
+			<td align=right><?= number_format($rec->total_harga) ?></td>
+			<td><?= $rec->keterangan ?></td>
+		</tr>
+		<?php
+		}
+	}
+	?>
 	</table>
 
 
