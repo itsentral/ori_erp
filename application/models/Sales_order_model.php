@@ -2145,6 +2145,8 @@ class Sales_order_model extends CI_Model {
 								a.diameter_2,
 								a.series,
 								a.id_product,
+								b.price_total,
+								c.qty as cqty,
 								(b.price_total / c.qty) * a.qty AS cost,
 								d.total_deal_usd AS deal_usd
 							FROM
