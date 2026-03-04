@@ -2145,8 +2145,6 @@ class Sales_order_model extends CI_Model {
 								a.diameter_2,
 								a.series,
 								a.id_product,
-								b.price_total,
-								c.qty as cqty,
 								(b.price_total / c.qty) * a.qty AS cost,
 								d.total_deal_usd AS deal_usd
 							FROM
@@ -2218,10 +2216,6 @@ class Sales_order_model extends CI_Model {
 			$data_top = $this->db->query("SELECT * FROM billing_top WHERE category = 'penjualan' AND no_po = '".$ipp."' ")->result_array();
 			
 			$non_frp_delivery = $this->db->order_by('category','asc')->get_where('so_bf_acc_and_mat', array('id_bq'=>$id_bq))->result_array();
-			
-			print_r($rest_product);
-			exit;
-
 			$data = array(
 				'title'			=> 'Deal Project',
 				'action'		=> 'deal',
