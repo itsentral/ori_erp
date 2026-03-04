@@ -197,16 +197,23 @@ class Purchase_request_model extends CI_Model {
 		if($tanda == 'P'){
 			$no_ipp2 = "Re-Order Point ".date('d-m-Y', strtotime($no_ipp));
 			$kebutuhan = "Pemenuhan Stock Material";
-			$sql		= "	SELECT 
-								a.*, 
-								SUM(a.purchase) AS qty_request, 
-								MAX(a.moq) AS moq_m,
+			$sql		= "SELECT
+								a.*,
+								SUM(a.purchase) OVER (PARTITION BY a.id_material) AS qty_request,
 								c.qty_stock,
 								c.qty_booking
-							FROM 
-								warehouse_planning_detailX a 
-								LEFT JOIN warehouse_planning_header b ON a.no_ipp=b.no_ipp 
-								LEFT JOIN warehouse_stock c ON a.id_material = c.id_material
+							FROM warehouse_planning_detail a
+							LEFT JOIN warehouse_planning_header b ON a.no_ipp=b.no_ipp 
+							LEFT JOIN (
+								SELECT
+									id_material,
+									SUM(qty_stock) AS qty_stock,
+									SUM(qty_booking) AS qty_booking
+								FROM warehouse_stock
+								WHERE id_gudang IN ('1','2')
+								GROUP BY id_material
+							) c ON a.id_material = c.id_material
+
 							WHERE 
 								a.no_ipp LIKE '".$tanda."%' 
 								AND DATE(b.created_date) = '".date('Y-m-d', strtotime($no_ipp))."' 
