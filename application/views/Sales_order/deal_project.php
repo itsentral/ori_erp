@@ -147,7 +147,7 @@ $kurs_usd_dipakai = (!empty($restSO))?$restSO[0]->kurs_usd_dipakai:get_kurs('USD
 									echo "<td align='center'>".substr($valx['series'],6,5)."</td>";
 									echo "<td align='center'>".substr($valx['series'],3,2)."</td>";
 									echo "<td align='left'>".spec_bq($valx['id_milik'])."</td>";
-									echo "<td align='right'>".number_format($dataSum / $valx['qty'],2)."</td>";
+									echo "<td align='right'>".number_format($dataSum / $valx['qty'],3)."</td>";
 									echo "<td align='center'>".$valx['qty']."</td>";
 									echo "<td align='center'>".$unitT."</td>";
 									echo "<td align='right'><div id='product_usdori_".$no."'>".number_format($dataSum,2)."</div></td>";
