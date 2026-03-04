@@ -1863,7 +1863,7 @@ class Sales_order_model extends CI_Model {
 					$ArrDetailProduct[$val]['dim2'] 			= $valx['dim2'];
 					$ArrDetailProduct[$val]['liner'] 			= $valx['liner'];
 					$ArrDetailProduct[$val]['pressure'] 		= $valx['pressure'];
-					$ArrDetailProduct[$val]['spec'] 			= $valx['spec'];
+					$ArrDetailProduct[$val]['spec'] 			= $valx['spec']; 
 					$ArrDetailProduct[$val]['qty'] 				= $valx['qty'];
 					$ArrDetailProduct[$val]['unit'] 			= $valx['unit'];
 					$ArrDetailProduct[$val]['price_satuan'] 	= str_replace(',','',$valx['price_satuan']);
@@ -2216,6 +2216,10 @@ class Sales_order_model extends CI_Model {
 			$data_top = $this->db->query("SELECT * FROM billing_top WHERE category = 'penjualan' AND no_po = '".$ipp."' ")->result_array();
 			
 			$non_frp_delivery = $this->db->order_by('category','asc')->get_where('so_bf_acc_and_mat', array('id_bq'=>$id_bq))->result_array();
+			
+			print_r($rest_product);
+			exit;
+
 			$data = array(
 				'title'			=> 'Deal Project',
 				'action'		=> 'deal',
