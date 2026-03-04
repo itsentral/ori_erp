@@ -667,7 +667,7 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
         });
     });
 
-    $(document).on('keyup', '.changeOB', function(e){
+    $(document).on('blur', '.changeOB', function(e){
         let parentHTML = $(this).parent().parent()
         // let budget = parentHTML.find('.budget_over_value').html()
         // let splitHTML = budget.split(" / ")
