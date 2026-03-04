@@ -200,6 +200,7 @@ class Purchase_request_model extends CI_Model {
 			$sql		= "SELECT
 								a.*,
 								SUM(a.purchase) OVER (PARTITION BY a.id_material) AS qty_request,
+								MAX(a.moq) AS moq_m,
 								c.qty_stock,
 								c.qty_booking
 							FROM warehouse_planning_detail a
