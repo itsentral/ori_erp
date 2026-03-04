@@ -1,7 +1,7 @@
 <?php
 class Purchase_request_model extends CI_Model {
 
-	public function __construct() {
+	public function __construct() { 
 		parent::__construct();
 	}
 
@@ -204,7 +204,7 @@ class Purchase_request_model extends CI_Model {
 								c.qty_stock,
 								c.qty_booking
 							FROM 
-								warehouse_planning_detail a 
+								warehouse_planning_detailX a 
 								LEFT JOIN warehouse_planning_header b ON a.no_ipp=b.no_ipp 
 								LEFT JOIN warehouse_stock c ON a.id_material = c.id_material
 							WHERE 
