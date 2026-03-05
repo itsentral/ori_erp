@@ -3276,7 +3276,7 @@
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
+				$noso 		 = $data->no_so;
                	$no_request  = $data->no_spk;	
 				$idtrans = $data->id_trans;
 				
