@@ -3314,7 +3314,7 @@
 					 ); 
 					 
 					 
-				    $kode_trans = substr($data->kode_trans, 0, -1);
+				    $kode_trans = $data->kode_trans;
 					$nospk      = $data->no_spk;
 					$qty        = $data->qty;
 
