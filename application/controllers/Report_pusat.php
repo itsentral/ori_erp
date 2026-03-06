@@ -147,7 +147,7 @@ class Report_pusat extends CI_Controller {
 					b.id_gudang_ke,
 					b.category AS category_type,
 					a.unit_price_idr AS price_incoming,
-                    (SELECT z.price_book FROM price_book z WHERE z.id_material=a.id_material and z.updated_date <= a.update_date ORDER BY z.id DESC LIMIT 1) AS cost_book 
+                    (SELECT z.harga FROM tran_warehouse_jurnal_detail z WHERE z.id_material=a.id_material and id_gudang='2' and z.tgl_trans <= a.update_date ORDER BY z.id DESC LIMIT 1) AS cost_book 
                 FROM
                     warehouse_adjustment_check a 
                     LEFT JOIN warehouse_adjustment b ON a.kode_trans=b.kode_trans
@@ -223,7 +223,7 @@ class Report_pusat extends CI_Controller {
                     a.qty_oke AS qty,
 					b.id_gudang_dari,
 					b.id_gudang_ke,
-                    (SELECT z.price_book FROM price_book z WHERE z.id_material=a.id_material and z.updated_date <= a.update_date ORDER BY z.id DESC LIMIT 1) AS cost_book 
+                    (SELECT z.harga FROM tran_warehouse_jurnal_detail z WHERE z.id_material=a.id_material and id_gudang='3' and z.tgl_trans <= a.update_date ORDER BY z.id DESC LIMIT 1) AS cost_book 
                 FROM
                     warehouse_adjustment_check a 
                     LEFT JOIN warehouse_adjustment b ON a.kode_trans=b.kode_trans

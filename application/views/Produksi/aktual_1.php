@@ -416,7 +416,7 @@ $FLAG = get_name('production_spk','spk1','kode_spk',$kode_spk);
 		if(date_produksi == ''){
 			swal({
 				title	: "Notification Message !",
-				text	: 'Tanggal selesai produksi belum dipilih',						
+				text	: 'Tanggal selesai produksi belum dipilih', 					
 				type	: "warning"
 			});
 			$(this).prop('disabled',false);

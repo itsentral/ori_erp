@@ -123,14 +123,32 @@ class Request_payment extends CI_Controller {
 			$result = true;
 		}
 		$param = array(
-			'save' => $result
+			'save' => $result,
+			'noreq' => $no_request
 		);
 		echo json_encode($param);
 	}
 	function print_req($id){
 		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result();
+		$req = $this->db->query("select * from request_payment where no_request='".$id."'")->row();
+		$notr  = $req->no_doc;
+		$tipe  = $req->tipe;
+
+		if($tipe=='expense'){
+			$data_expense = $this->db->query("select * from tr_expense_detail where no_doc='".$notr."'")->result();
+			$response = $this->db->query("select * from tr_expense where no_doc='".$notr."'")->row();
+		}elseif($tipe=='kasbon'){
+            $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, '' as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_kasbon where no_doc='".$notr."'")->result();
+		    $response ='';
+		}elseif($tipe=='transportasi'){
+          $data_expense = $this->db->query("select tgl_doc as tanggal, 1 as qty, keperluan as deskripsi, rute as keterangan, jumlah_kasbon as harga, jumlah_kasbon as total_harga from tr_transport where no_doc='".$notr."'")->result();
+		  $response ='';
+		}
+        
 		$data = array(
 			'data_request'	=> $data_request,
+			'data_detail'   => $data_expense,
+			'data'			=> $response,
 		);
 
 		$this->load->view('Request_payment/request_print',$data);

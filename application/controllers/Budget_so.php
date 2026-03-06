@@ -630,19 +630,28 @@ class Budget_so extends CI_Controller {
 		$sheet->mergeCells('Y'.$NewRow.':Y'.$NextRow);
 		$sheet->getColumnDimension('Y')->setAutoSize(true);
 
-		$sheet->setCellValue('Z'.$NewRow, 'Budget');
-		$sheet->mergeCells('Z'.$NewRow.':AB'.$NewRow);
+		$sheet->setCellValue('Z'.$NewRow, 'Others');
 		$sheet->getStyle('Z'.$NewRow.':Z'.$NextRow)->applyFromArray($style_header);
-		$sheet->setCellValue('Z'.$NextRow, 'Packing');
+		$sheet->mergeCells('Z'.$NewRow.':Z'.$NextRow);
 		$sheet->getColumnDimension('Z')->setAutoSize(true);
 
+		$sheet->setCellValue('AA'.$NewRow, 'Budget');
+		$sheet->mergeCells('AA'.$NewRow.':AD'.$NewRow);
 		$sheet->getStyle('AA'.$NewRow.':AA'.$NextRow)->applyFromArray($style_header);
-		$sheet->setCellValue('AA'.$NextRow, 'Enggenering');
+		$sheet->setCellValue('AA'.$NextRow, 'Packing');
 		$sheet->getColumnDimension('AA')->setAutoSize(true);
 
 		$sheet->getStyle('AB'.$NewRow.':AB'.$NextRow)->applyFromArray($style_header);
-		$sheet->setCellValue('AB'.$NextRow, 'Trucking');
+		$sheet->setCellValue('AB'.$NextRow, 'Enggenering');
 		$sheet->getColumnDimension('AB')->setAutoSize(true);
+
+		$sheet->getStyle('AC'.$NewRow.':AC'.$NextRow)->applyFromArray($style_header);
+		$sheet->setCellValue('AC'.$NextRow, 'Trucking');
+		$sheet->getColumnDimension('AC')->setAutoSize(true);
+
+		$sheet->getStyle('AD'.$NewRow.':AD'.$NextRow)->applyFromArray($style_header);
+		$sheet->setCellValue('AD'.$NextRow, 'Others');
+		$sheet->getColumnDimension('AD')->setAutoSize(true);
 
 		$GET_DET_IPP 	= get_detail_ipp();
 		$GET_SPEC 		= get_detail_sales_order();
@@ -653,6 +662,7 @@ class Budget_so extends CI_Controller {
 		$GetDealTotal 	= $this->db->get_where('billing_so_total',array('no_ipp'=>$NO_IPP))->result_array();
 		$non_frp		= get_DealSONonFRP($id_bq);
 		$material		= get_DealSOMaterial($id_bq);
+		$sumOthers		= $this->db->select('SUM(total_deal_usd) AS sum_others')->get_where('billing_so_add',array('no_ipp'=>$NO_IPP,'category'=>'other'))->result_array();
 		
 		$awal_row	= $NextRow;
 		$no=0;
@@ -975,21 +985,31 @@ class Budget_so extends CI_Controller {
 			$sheet->getStyle("Y".$Colsw.":Y".$Colsw."")->applyFromArray($styleArray4);
 			$sheet->mergeCells("Y".$Colsw.":Y".$Colsw."");
 			$sheet->getColumnDimension('Y')->setAutoSize(true);
-			// AGUS PLANNING DATA
-			$sheet->setCellValue("Z".$Colsw."", $GetDealTotal[0]['pack_awal']);
+			
+			$sheet->setCellValue("Z".$Colsw."", $sumOthers[0]['sum_others']);
 			$sheet->getStyle("Z".$Colsw.":Z".$Colsw."")->applyFromArray($styleArray4);
 			$sheet->mergeCells("Z".$Colsw.":Z".$Colsw."");
 			$sheet->getColumnDimension('Z')->setAutoSize(true);
-
+			// AGUS PLANNING DATA
 			$sheet->setCellValue("AA".$Colsw."", $GetDealTotal[0]['eng_awal']);
 			$sheet->getStyle("AA".$Colsw.":AA".$Colsw."")->applyFromArray($styleArray4);
 			$sheet->mergeCells("AA".$Colsw.":AA".$Colsw."");
 			$sheet->getColumnDimension('AA')->setAutoSize(true);
 
-			$sheet->setCellValue("AB".$Colsw."", $GetDealTotal[0]['ship_awal']);
+			$sheet->setCellValue("AB".$Colsw."", $GetDealTotal[0]['pack_awal']);
 			$sheet->getStyle("AB".$Colsw.":AB".$Colsw."")->applyFromArray($styleArray4);
 			$sheet->mergeCells("AB".$Colsw.":AB".$Colsw."");
 			$sheet->getColumnDimension('AB')->setAutoSize(true);
+
+			$sheet->setCellValue("AC".$Colsw."", $GetDealTotal[0]['eng_awal']);
+			$sheet->getStyle("AC".$Colsw.":AC".$Colsw."")->applyFromArray($styleArray4);
+			$sheet->mergeCells("AC".$Colsw.":AC".$Colsw."");
+			$sheet->getColumnDimension('AC')->setAutoSize(true);
+
+			$sheet->setCellValue("AD".$Colsw."", $sumOthers[0]['sum_others']);
+			$sheet->getStyle("AD".$Colsw.":AD".$Colsw."")->applyFromArray($styleArray4);
+			$sheet->mergeCells("AD".$Colsw.":AD".$Colsw."");
+			$sheet->getColumnDimension('AD')->setAutoSize(true);
 
 			// $awal_col+1;
 			// $SumNox	= $SumNo;
@@ -1398,20 +1418,40 @@ class Budget_so extends CI_Controller {
 				
 		$get_product	= $this->db->get_where('billing_so_product',array('no_ipp'=>$ipp,'product <>'=>'product kosong'))->result_array();
 
-		$sql_engginering 	= "SELECT b.* FROM billing_so_add b WHERE b.category='eng' AND b.no_ipp = '".$ipp."'";
-		$get_engginering	= $this->db->query($sql_engginering)->result_array();
+		// $sql_engginering 	= "SELECT b.* FROM billing_so_add b WHERE b.category='eng' AND b.no_ipp = '".$ipp."'";
+		// $get_engginering	= $this->db->query($sql_engginering)->result_array();
 
-		$sql_packing 	= "SELECT b.* FROM billing_so_add b WHERE b.category='pack' AND b.no_ipp = '".$ipp."'";
-		$get_packing	= $this->db->query($sql_packing)->result_array();
+		// $sql_packing 	= "SELECT b.* FROM billing_so_add b WHERE b.category='pack' AND b.no_ipp = '".$ipp."'";
+		// $get_packing	= $this->db->query($sql_packing)->result_array();
 	
-		$sql_shipping 	= "SELECT b.* FROM billing_so_add b WHERE b.category='ship' AND b.no_ipp = '".$ipp."'";
-		$get_shipping	= $this->db->query($sql_shipping)->result_array();
+		// $sql_shipping 	= "SELECT b.* FROM billing_so_add b WHERE b.category='ship' AND b.no_ipp = '".$ipp."'";
+		// $get_shipping	= $this->db->query($sql_shipping)->result_array();
 		
-		$sql_non_frp 	= "SELECT b.* FROM billing_so_add b WHERE (b.category='baut' OR b.category='plate' OR b.category='gasket' OR b.category='lainnya') AND b.no_ipp = '".$ipp."'";
-		$get_non_frp	= $this->db->query($sql_non_frp)->result_array();
+		// $sql_non_frp 	= "SELECT b.* FROM billing_so_add b WHERE (b.category='baut' OR b.category='plate' OR b.category='gasket' OR b.category='lainnya') AND b.no_ipp = '".$ipp."'";
+		// $get_non_frp	= $this->db->query($sql_non_frp)->result_array();
 		
-		$sql_material 	= "SELECT b.* FROM billing_so_add b WHERE b.category='mat' AND b.no_ipp = '".$ipp."'";
-		$get_material	= $this->db->query($sql_material)->result_array();
+		// $sql_material 	= "SELECT b.* FROM billing_so_add b WHERE b.category='mat' AND b.no_ipp = '".$ipp."'";
+		// $get_material	= $this->db->query($sql_material)->result_array();
+
+		$categories_bq = ['eng', 'pack', 'ship', 'plate', 'gasket', 'lainnya', 'baut', 'mat', 'other'];
+		$all_details = $this->db->get_where('billing_so_add',array('no_ipp'=>$ipp))->result_array();
+
+		$get_engginering = $get_packing = $get_shipping = $get_non_frp1 = $get_non_frp2 = $get_non_frp3 = $get_non_frp4 = $get_material= $get_other = array();
+		foreach ($all_details as $item) {
+			switch ($item['category']) {
+				case 'eng':     $get_engginering[] = $item; break;
+				case 'pack':     $get_packing[] = $item; break;
+				case 'ship':    $get_shipping[] = $item; break;
+				case 'plate':   $get_non_frp1[] = $item; break;
+				case 'gasket':  $get_non_frp2[] = $item; break;
+				case 'lainnya': $get_non_frp3[] = $item; break;
+				case 'baut': $get_non_frp4[] = $item; break;
+				case 'mat': $get_material[] = $item; break;
+				case 'other': $get_other[] = $item; break;
+			}
+		}
+
+		$get_non_frp = array_merge($get_non_frp1,$get_non_frp2,$get_non_frp3,$get_non_frp4);
 		
 		$data = array(
 			'id_bq' => $id_bq,
@@ -1423,7 +1463,8 @@ class Budget_so extends CI_Controller {
 			'getPackCost' => $get_packing,
 			'getTruck' => $get_shipping,
 			'non_frp'		=> $get_non_frp,
-			'material'		=> $get_material
+			'material'		=> $get_material,
+			'other'		=> $get_other
 		);
 		
 		$this->load->view('Budget_so/modal_detail_so', $data);

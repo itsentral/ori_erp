@@ -284,12 +284,57 @@
 	</tbody>
 	<?php
 	}
+	$SUM5=0;
+	if(!empty($other)){
+	?>
+	<tbody>
+		<tr>
+			<td class="text-left headX HeaderHr" colspan='11'><b>OTHERS</b></td>
+		</tr>
+		<tr class='bg-bluexyz'>
+			<th class="text-center">Item Desc</th>
+			<th class="text-center" colspan='3'>Area</th>
+			<th class="text-center" colspan='2'>Tujuan</th>
+			<th class="text-center" colspan='2'>Kendaraan</th>
+			<th class="text-center">Qty</th>
+			<th class="text-center">Price</th>
+			<th class="text-center">Total Price</th>
+		</tr>
+	</tbody>
+	<tbody>
+		<?php
+		$no5=0;
+		$SUM5=0;
+		foreach($other AS $val => $valx){
+            $QTY            = $valx['qty'];
+			$UNIT_PRICE     = $valx['total_deal_usd'] / $QTY;
+			$TOTAL_PRICE    = $UNIT_PRICE * $QTY;
+
+			$SUM5 += $TOTAL_PRICE;
+
+            $CATEGORY_SUB   = $valx['desc'];
+			$no5++;
+			echo "<tr>";
+				echo "<td colspan='8'>".strtoupper($CATEGORY_SUB)."</td>";
+				echo "<td align='center'>".$QTY."</td>";
+				echo "<td align='right'>".number_format($UNIT_PRICE,2)."</td>";
+				echo "<td align='right'>".number_format($TOTAL_PRICE,2)."</td>";
+			echo "</tr>";
+		}
+		?>
+		<tr class='FootColor'>
+			<td colspan='10'><b>TOTAL OTHERS</b></td>
+			<td align='right'><b><?= number_format($SUM5,2);?></b></td>
+		</tr>
+	</tbody>
+	<?php
+	}
 	?>
 	<tfoot>
 		<tr class='HeaderHr'>
 			<th align='left' colspan='9'>TOTAL</th>
 			<th align='center' style='text-align:center;'>USD</th>
-			<th align='right' style='text-align:right;'><?=  number_format($SUM + $SUM2 + $SUM3 + $SUM4 + $SUM1 + $SUM_MAT + $SUM_NONFRP, 2);?></th>
+			<th align='right' style='text-align:right;'><?=  number_format($SUM + $SUM2 + $SUM3 + $SUM4 + $SUM1 + $SUM5 + $SUM_MAT + $SUM_NONFRP, 2);?></th>
 		</tr>
 		<?php
 			// if(!empty($non_frp)){

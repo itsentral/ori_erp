@@ -1863,7 +1863,7 @@ class Sales_order_model extends CI_Model {
 					$ArrDetailProduct[$val]['dim2'] 			= $valx['dim2'];
 					$ArrDetailProduct[$val]['liner'] 			= $valx['liner'];
 					$ArrDetailProduct[$val]['pressure'] 		= $valx['pressure'];
-					$ArrDetailProduct[$val]['spec'] 			= $valx['spec'];
+					$ArrDetailProduct[$val]['spec'] 			= $valx['spec']; 
 					$ArrDetailProduct[$val]['qty'] 				= $valx['qty'];
 					$ArrDetailProduct[$val]['unit'] 			= $valx['unit'];
 					$ArrDetailProduct[$val]['price_satuan'] 	= str_replace(',','',$valx['price_satuan']);

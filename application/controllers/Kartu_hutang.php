@@ -16,7 +16,7 @@ class Kartu_hutang extends CI_Controller {
     public function index() {
         $config['base_url'] = base_url('kartu_hutang/index');
         $config['total_rows'] = $this->Kartu_hutang_model->count_all();
-        $config['per_page'] = 10;
+        $config['per_page'] = 200;
         $config['uri_segment'] = 3;
         
         // Bootstrap 4 pagination styling
@@ -178,7 +178,7 @@ class Kartu_hutang extends CI_Controller {
     }
 
     // Delete record
-    public function delete($id) {
+    public function deleted($id) {
         if ($this->Kartu_hutang_model->delete($id)) {
             $this->session->set_flashdata('success', 'Data berhasil dihapus');
         } else {

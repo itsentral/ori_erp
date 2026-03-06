@@ -50,12 +50,12 @@ $this->load->view('include/side_menu');
 					<?php
 					$nilai_po_invoice=0;
 					if($info_payterm->matauang_receive_invoice=='IDR'){
-						$nilai_po_invoice=$info_payterm->invoice_total;
+						$nilai_po_invoice=$info_payterm->invoice_total - $info_payterm->nilai_ppn ;
 					}else{
 						$nilai_po_invoice=$info_payterm->invoice_total;						
 					}
 					?>
-					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required onchange="calculate_invoice()" readonly>
+					<input type="text" class="form-control divide" id="nilai_po_invoice" name="nilai_po_invoice" value="<?=$nilai_po_invoice?>" placeholder=0 required onchange="calculate_invoice()">
 					<label class="control-label">PPN</label>
 					<div class="input-group">
 					<div class="input-group-addon"><input type="checkbox" value="1" onclick="calculate_invoice()" name="ch_ppn" id="ch_ppn" <?php

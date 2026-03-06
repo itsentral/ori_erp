@@ -1857,6 +1857,9 @@ class Outgoing extends CI_Controller {
 				$tempx = [];
 				$no_ipp = null;
 				$nm_product = null;
+				if($typeSOMaterial == 'BQ'){
+					$no_ipp 	= str_replace('BQ-','',$tipe_out);
+				}
 				if(!empty($no_spk)){
 					$getDetSPK	= $this->db->get_where('so_detail_header',array('no_spk'=>$no_spk))->result_array();
 					$no_ipp 	= (!empty($getDetSPK[0]['id_bq']))?str_replace('BQ-','',$getDetSPK[0]['id_bq']):null;
