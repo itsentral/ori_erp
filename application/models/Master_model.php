@@ -425,7 +425,8 @@ class Master_model extends CI_Model {
 
 	public function modal_history(){
 		$no_so 	= $this->uri->segment(3);
-		$no_spk 		= $this->uri->segment(4);
+		$no_spk1 		= $this->uri->segment(4);
+		$no_spk 		= str_replace("_", " ", $no_spk1); 
 		$product1 		= $this->uri->segment(5);
 		$product 		= str_replace("_", " ", $product1); 
 		$kodetrans      = $this->uri->segment(6);
