@@ -527,7 +527,7 @@ class Delivery extends CI_Controller
 	/* loadDataSS */
 	public function loadDataSS($kode_delivery)
 	{
-		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL))->result_array();
+		$result_1 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => NULL, 'sts !=' => 'loose_dead'))->result_array();
 		$result_2 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts' => 'cut'))->result_array();
 		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
@@ -1540,7 +1540,7 @@ class Delivery extends CI_Controller
 			'akses_menu'		=> $Arr_Akses,
 			'tanki_model' 		=> $this->tanki_model
 		);
-		$this->load->view('Delivery/edit_delivery', $data);
+		$this->load->view('Delivery/edit_delivery', $data); 
 	}
 
 	public function view_delivery($kode_delivery)
@@ -2253,11 +2253,17 @@ class Delivery extends CI_Controller
 			$IMPLODE = explode('.', $value['product_code']);
 			$product_code = $IMPLODE[0] . '.' . $value['product_ke'];
 			$Cutting_ke = '';
+
+			
+			
+			
 			if ($value['sts'] == 'cut') {
 				$Cutting_ke = "." . $value['cutting_ke'];
 				$product_code = $IMPLODE[0] . '.' . $value['product_ke'] . $Cutting_ke;
 
 				$ArrInsert[$key]['sts_product'] = $value['sts'];
+			}else{
+				$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			}
 			if ($value['id_milik'] == null) {
 				$product_code = $value['dead_no_so'];
@@ -2280,7 +2286,6 @@ class Delivery extends CI_Controller
 			$ArrInsert[$key]['no_drawing'] = $value['no_drawing'];
 			$ArrInsert[$key]['upload_date'] = $value['upload_date'];
 			$ArrInsert[$key]['sts'] = (empty($value['id_milik']))?'cut':$value['sts'];
-			$ArrInsert[$key]['sts_product'] = (empty($value['id_milik']))?'cut deadstock':null;
 			//agus
 			$ArrInsert[$key]['nilai_cogs'] = $value['finish_good'];
 			$ArrInsert[$key]['updated_by'] = $username;
@@ -5806,7 +5811,7 @@ class Delivery extends CI_Controller
 				}
 			}
 		
-
+		}
 			//DATA SPOOL
 			//GROUP DATA
 			$ArrGroupSpool = []; 
@@ -5877,8 +5882,14 @@ class Delivery extends CI_Controller
 				}
 			}
         
+<<<<<<< HEAD
 		}
 			
+=======
+		
+			
+		    
+>>>>>>> dev_sam
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
@@ -6437,6 +6448,8 @@ class Delivery extends CI_Controller
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
+
+			$qty_n = 0;
 			  
 			foreach($wip AS $data){
 				
@@ -6512,7 +6525,7 @@ class Delivery extends CI_Controller
 				    }
 					
 					  	
-				
+				$qty_n++;
 				
 			}
 			
@@ -6595,7 +6608,11 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
+<<<<<<< HEAD
 				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+=======
+				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+>>>>>>> dev_sam
 				}
 			}else{
 			$datastokfg=array();
@@ -6608,7 +6625,11 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
+<<<<<<< HEAD
 							'qty' => 1,
+=======
+							'qty' => $qty_n,
+>>>>>>> dev_sam
 							'nilai_wip' => $vals->nilai_wip,
 							'material' => $vals->material,
 							'wip_direct' =>  $vals->wip_direct,
@@ -6645,7 +6666,7 @@ class Delivery extends CI_Controller
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
-			  
+			$qty_n = 0; 
 			foreach($wip AS $data){
 				
 				$nm_material = $data->product;	
@@ -6720,7 +6741,7 @@ class Delivery extends CI_Controller
                       $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
 				
-				
+				$qty_n++;
 			}
 			
 			        
@@ -6799,7 +6820,11 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
+<<<<<<< HEAD
 				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+=======
+				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+>>>>>>> dev_sam
 				}
 			}else{
 			$datastokfg=array();
@@ -6812,7 +6837,11 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
+<<<<<<< HEAD
 							'qty' => 1,
+=======
+							'qty' => $qty_n,
+>>>>>>> dev_sam
 							'nilai_wip' => $vals->nilai_wip,
 							'created_by' => $vals->created_by,
 							'created_date' => $vals->created_date,

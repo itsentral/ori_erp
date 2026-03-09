@@ -96,7 +96,11 @@
                                                class="btn btn-sm btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+<<<<<<< HEAD
                                             <!-- <a href="<?php // echo base_url('kartu_piutang/delete/'.$row->id); ?>" 
+=======
+                                            <!-- <a href="<?php //echo base_url('kartu_piutang/delete/'.$row->id); ?>" 
+>>>>>>> dev_sam
                                                class="btn btn-sm btn-danger" 
                                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" 
                                                title="Hapus">

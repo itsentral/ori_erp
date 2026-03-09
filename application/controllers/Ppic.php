@@ -705,7 +705,7 @@ class Ppic extends CI_Controller {
 			$nestedData[]	= "<div align='left'>
 									".$view."
 									".$edit."
-									".$print."
+									".$print." 
 									".$release."
 								</div>";
 			
@@ -1782,8 +1782,8 @@ class Ppic extends CI_Controller {
 			}
 		}
 
-		// print_r($ArrUpdateProduksi);
-		// print_r($ArrUpdateCutting);
+		// print_r($spool_induk);
+		// print_r($ArrReportFG);
 		// exit;
 		$this->db->trans_start();
 			if(!empty($ArrUpdateProduksi)){
@@ -2605,6 +2605,11 @@ class Ppic extends CI_Controller {
 				$ArrIN_WIP_Spool[0]['kode_spool'] =  $kode;
 			}
 
+			// print_r($ArrIN_WIP_Spool);
+			// echo"<br>";
+			// print_r($ArrIN_FG_MATERIAL);
+			// exit;
+
 			$this->db->trans_start();
 				if(!empty($ArrIN_WIP_Spool)){
 					$this->db->insert_batch('data_erp_wip_group',$ArrIN_WIP_Spool);
@@ -2691,10 +2696,10 @@ class Ppic extends CI_Controller {
 			}
 			
 		   
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty,nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
 			
 			
-			  
+			  $qty_n =0;
 			foreach($fg AS $data){
 				
 				$nm_material = $data->product;	
@@ -2706,7 +2711,7 @@ class Ppic extends CI_Controller {
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so; 
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
+				$noso 		 = $data->no_so;
                	$no_request  = $data->no_spk;	
 				
 				$wip           	= $data->wip;
@@ -2739,9 +2744,20 @@ class Ppic extends CI_Controller {
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					  
-					 ); 			
+					 ); 	
+					 
+					 
+
+					$kode_trans = $data->kode_trans;
+					$nospk      = $data->no_spk;
+					$qty        = $data->qty;
+
+					 $qty_n++;
 				
 			}
+              
+			$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			       
 
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood part to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
@@ -2771,6 +2787,68 @@ class Ppic extends CI_Controller {
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
+        $wipgroup =  $this->db->query("SELECT *  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool' limit 1")->row();
+		$kode_spool = $wipgroup->kode_spool;
+		$Date      = $wipgroup->tanggal;
+		$stokwip = $this->db->query("SELECT
+										`data_erp_wip_group`.`id` AS `id`,
+										`data_erp_wip_group`.`tanggal` AS `tanggal`,
+										`data_erp_wip_group`.`keterangan` AS `keterangan`,
+										`data_erp_wip_group`.`no_so` AS `no_so`,
+										`data_erp_wip_group`.`product` AS `product`,
+										`data_erp_wip_group`.`no_spk` AS `no_spk`,
+										`data_erp_wip_group`.`kode_trans` AS `kode_trans`,
+										`data_erp_wip_group`.`id_pro_det` AS `id_pro_det`,
+										sum(`data_erp_wip_group`.`qty`) AS `total`,
+										`data_erp_wip_group`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_wip_group`.`material` AS `material`,
+										`data_erp_wip_group`.`wip_direct` AS `wip_direct`,
+										`data_erp_wip_group`.`wip_indirect` AS `wip_indirect`,
+										`data_erp_wip_group`.`wip_consumable` AS `wip_consumable`,
+										`data_erp_wip_group`.`wip_foh` AS `wip_foh`,
+										`data_erp_wip_group`.`created_by` AS `created_by`,
+										`data_erp_wip_group`.`created_date` AS `created_date`,
+										`data_erp_wip_group`.`id_trans` AS `id_trans`,
+										`data_erp_wip_group`.`jenis` AS `jenis`,
+										`data_erp_wip_group`.`id_material` AS `id_material`,
+										`data_erp_wip_group`.`nm_material` AS `nm_material`,
+										`data_erp_wip_group`.`qty_mat` AS `qty_mat`,
+										`data_erp_wip_group`.`cost_book` AS `cost_book`,
+										`data_erp_wip_group`.`gudang` AS `gudang`,
+										`data_erp_wip_group`.`kode_spool` AS `kode_spool` 
+										FROM
+										`data_erp_wip_group` 
+										WHERE
+										(`data_erp_wip_group`.`kode_spool` = '".$kode."') 
+										AND (`data_erp_wip_group`.`jenis`='in spool')
+										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
+										GROUP BY kode_trans,no_spk,product,no_so")->result();
+        
+						$datastokwip=array();
+						foreach ($stokwip as $vals) {
+						$datastokwip = array(
+									'tanggal' => $tgl_voucher,
+									'keterangan' => 'Gudang produksi to WIP',
+									'no_so' => $vals->no_so,
+									'product' => $vals->product,
+									'no_spk' => $vals->no_spk,
+									'kode_trans' => $vals->kode_trans,
+									'id_pro_det' => $vals->id_pro_det,
+									'qty' => $vals->total,
+									'nilai_wip' => round($vals->nilai_wip/$vals->total,0),
+									'material' => $vals->material,
+									'wip_direct' =>  $vals->wip_direct,
+									'wip_indirect' =>  $vals->wip_indirect,
+									'wip_consumable' =>  $vals->wip_consumable,
+									'wip_foh' =>  $vals->wip_foh,
+									'created_by' => $vals->created_by,
+									'created_date' => $vals->created_date,
+									'id_trans' => $vals->id_trans,
+									'kode_spool' => $kode,
+									);
+
+						$this->db->insert('warehouse_stock_wip',$datastokwip);
+						}
 		  
 		}
 

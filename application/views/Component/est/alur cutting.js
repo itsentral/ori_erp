@@ -4,6 +4,10 @@ ppic->spk cutting-> isi split length save
 lock cutting
 konfirm di warehouse finishgood -> request pipe cutting -> konfirm
 gudang WIP pilih pipe untuk cutting -> closing
+<<<<<<< HEAD
+=======
+qc_pipe_cutting -> pindah dari wip ke fg
+>>>>>>> dev_sam
 
 
 pipa baru

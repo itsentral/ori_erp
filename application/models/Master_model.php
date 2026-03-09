@@ -425,14 +425,25 @@ class Master_model extends CI_Model {
 
 	public function modal_history(){
 		$no_so 	= $this->uri->segment(3);
-		$no_spk 		= $this->uri->segment(4);
+		$no_spk1 		= $this->uri->segment(4);
+		$no_spk 		= str_replace("_", ",", $no_spk1); 
 		$product1 		= $this->uri->segment(5);
 		$product 		= str_replace("_", " ", $product1); 
 		$kodetrans      = $this->uri->segment(6);
 		$kodetrans2      = $this->uri->segment(7);
 		$kodetrans3 		= str_replace("_", " ", $kodetrans2); 
-		$kode_trans = $kodetrans."/".$kodetrans3;
-		$gudang      = $this->uri->segment(8);
+		
+
+		if(!empty($this->uri->segment(8))){
+			$gudang      = $this->uri->segment(8);
+			$kode_trans = $kodetrans."/".$kodetrans3;
+		}else{
+			$gudang      = $this->uri->segment(7);
+			$kode_trans = $kodetrans;
+		}
+		
+
+
 
 		if($gudang == 'wip'){
 		$table1 ='data_erp_wip_group';

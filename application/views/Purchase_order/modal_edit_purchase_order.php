@@ -15,7 +15,7 @@
 			<select id='id_supplier' name='id_supplier' class='form-control input-sm chosen_select'>
 				<?php
 				foreach($listSupplier AS $val => $valx){
-					if($valx['id_supplier'] == $data[0]->id_supplier){
+					if($valx['id_supplier'] == $data[0]->id_supplier){ 
 					$sel = ($valx['id_supplier'] == $data[0]->id_supplier)?'selected':'';
 					echo "<option value='".$valx['id_supplier']."' ".$sel.">".strtoupper($valx['nm_supplier'])."</option>";
 					}
@@ -37,9 +37,9 @@
 			 echo form_input(array('id'=>'request_date','name'=>'request_date','class'=>'form-control input-md datepicker','placeholder'=>'Request Date','readonly'=>'readonly'), strtoupper($data[0]->tgl_dibutuhkan));
 			?>
 		</div>
-		<label class='label-control col-sm-1'><b>Harga Pembelian</b></label>
+		<label class='label-control col-sm-1'><b>Currency</b></label>
 		<div class='col-sm-3'>
-			<select id='current' name='current' class='form-control input-sm chosen_select'>
+			<select id='current1' name='current1' class='form-control input-sm chosen_select' disabled>
 				<?php
 				$kurs_mata_uang = (!empty($data[0]->mata_uang))?$data[0]->mata_uang:$data_rfq[0]->currency;
 				foreach(get_list_kurs2() AS $val => $valx){
@@ -48,6 +48,7 @@
 				}
 				?>
 			</select>
+			<input type="hidden" id="current" name="current" value='<?=$kurs_mata_uang?>''>
 			<input type='hidden' id='kurs' value='<?=$data_rfq[0]->kurs;?>'>
 		</div>
 	</div>
@@ -70,7 +71,8 @@
 		<div class='col-sm-3'>
 			<?php
 			$buyer = (!empty($data[0]->buyer))?strtoupper($data[0]->buyer):strtoupper(get_name('users','nm_lengkap','username',$data[0]->updated_by));
-			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer'), $buyer);
+			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer',
+        'readonly' => 'readonly'), $buyer);
 			?>
 		</div>
 		<label class='label-control col-sm-1'><b>Currency Amount Word</b></label>
@@ -102,7 +104,7 @@
 						$SUM += $qty_p * $valx['price_ref_sup'];
 						echo "<tr>";
 							echo "<td align='left'>
-									<input name='detail[".$no."][nm_material]' id='nm_material_".$no."' class='form-control input-md ' value='".strtoupper($valx['nm_material'])."' >
+									<input name='detail[".$no."][nm_material]' id='nm_material_".$no."' class='form-control input-md ' value='".strtoupper($valx['nm_material'])."' readonly >
 									<input type='hidden' name='detail[".$no."][id]' id='id_".$no."' value='".$valx['id']."'>
 									
 									</td>";
@@ -119,12 +121,12 @@
 					echo "</tr>";
 					*/
 					?>
-					<tr>
+					<tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid' width='25%'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='total_po'  name='total_po' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Total' readonly value='<?=$SUM;?>'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='discount' name='discount' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Discount (%)' value='<?=$data[0]->discount;?>'></td>
@@ -153,12 +155,12 @@
                         <td class='text-right mid'><b>NET PRICE + TAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='net_plus_tax' name='net_plus_tax' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Net Price + Tax' value='<?=$data[0]->net_plus_tax;?>'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid'><b>DELIVERY COST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='delivery_cost' name='delivery_cost' class='form-control input-sm text-right text-bold autoNumeric' placeholder='Delivery Cost' value='<?=$data[0]->delivery_cost;?>'></td>
                     </tr>
-                    <tr>
+                    <tr hidden>
                         <td colspan='2'></td>
                         <td class='text-right mid'><b>GRAND TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
                         <td class='mid'><input type="text" id='grand_total' name='grand_total' class='form-control input-sm text-right text-bold autoNumeric' readonly placeholder='Grand Total' value='<?=$data[0]->total_price;?>'></td>
@@ -174,7 +176,7 @@
 				<thead id='head_table'>
 					<tr class='bg-blue'>
 						<th class="text-center" width='5%'>Group TOP</th>
-						<th class="text-center" width='8%'>Progress (%)</th>
+						<th class="text-center" width='8%'>Percentase (%)</th>
 						<th class="text-center hidden" width='11%'>Value(USD)</th>
 						<th class="text-center" width='11%'>Value  <!--(IDR)--></th>
 						<th class="text-center" width='25%'>Keterangan</th>
@@ -200,8 +202,8 @@
 									echo "<input type='hidden' name='detail_po[".$id."][term]' class='form-control text-center input-md' value='".$valx['term']."'>"; 
 								echo "</td>";
 								echo "<td align='left'><input type='text' id='progress_".$id."' name='detail_po[".$id."][progress]' value='".number_format($valx['progress'])."' class='form-control input-md text-center maskM progress_term' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
-								echo "<td align='left' class='hidden'><input type='text' id='usd_".$id."' name='detail_po[".$id."][value_usd]' value='".number_format($valx['value_usd'],2)."' class='form-control input-md text-right maskM sum_tot_usd' tabindex='-1' readonly></td>";
-								echo "<td align='left'><input type='text' id='idr_".$id."' name='detail_po[".$id."][value_idr]' value='".number_format($valx['value_idr'])."' class='form-control input-md text-right maskM sum_tot_idr' tabindex='-1' readonly></td>";
+								echo "<td align='left' class='hidden'><input type='text' id='usd_".$id."' name='detail_po[".$id."][value_usd]' value='".$valx['value_usd']."' class='form-control input-md text-right maskM sum_tot_usd' tabindex='-1' readonly></td>";
+								echo "<td align='left'><input type='text' id='idr_".$id."' name='detail_po[".$id."][value_idr]' value='".$valx['value_idr']."' class='form-control input-md text-right maskM sum_tot_idr' tabindex='-1' readonly></td>";
 								echo "<td align='left'><input type='text' id='total_harga_".$id."' name='detail_po[".$id."][keterangan]' value='".strtoupper($valx['keterangan'])."' class='form-control input-md text-left'></td>";
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][jatuh_tempo]' value='".$valx['jatuh_tempo']."' class='form-control input-md text-center datepicker' readonly></td>";
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][syarat]' value='".strtoupper($valx['syarat'])."' class='form-control input-md'></td>";
@@ -403,10 +405,141 @@
 		change_kurs2();
 	}
 	
+
+	function term_value(a){
+		var total		= getNum($('#net_price').val().split(",").join(""));
+		var values 		= getNum($('#idr_'+a).val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();		
+		if(current == 'USD'){
+			var progress 	= (values*100) / total;
+		}		
+		if(current == 'IDR'){
+			var progress 	= (values*100) / total;
+		}		
+		$('#progress_'+a).val(number_format(progress,4));
+	}
+	
 	function term_process(a){
-		var total		= getNum($('#grand_total').val().split(",").join(""));
+		var total		= getNum($('#net_price').val().split(",").join(""));
 		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+
+		console.log(total);
+		console.log(progress);
+		console.log(kurs);
+
+		
+		if(current == 'USD'){
+			var tot_usd 	= (progress/100) * total;
+			var tot_idr 	= (progress/100) * (total * kurs);
+		}
+		
+		if(current == 'IDR'){
+			var tot_idr 	= (progress/100) * total;
+			var tot_usd 	= (progress/100) * (total * kurs);
+		}
+		
+		$('#usd_'+a).val(number_format(tot_usd,2));
+		$('#idr_'+a).val(number_format(tot_idr,2));
+	}
+	
+	function change_kurs(){
+		var total		= getNum($('#net_price').val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+		// alert(current);
+		$(".progress_term" ).each(function() {
+			var id 		= $(this).attr('id');
+			var det_id	= id.split('_');
+			var a		= det_id[1];
+			
+			var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+			// console.log(progress);
+			if(current == 'IDR'){
+				var tot_idr 	= (progress/100) * total;
+				var tot_usd 	= (progress/100) * (total * kurs);
+			}
+			
+			if(current == 'USD'){
+				var tot_usd 	= (progress/100) * total;
+				var tot_idr 	= (progress/100) * (total * kurs);
+			}
+			
+			$('#usd_'+a).val(number_format(tot_usd,2));
+			$('#idr_'+a).val(number_format(tot_idr,2));
+		});
+	}
+	
+	function change_kurs2(){
+		var total		= getNum($('#net_price').val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();
+		// alert(current);
+		$(".progress_term" ).each(function() {
+			var id 		= $(this).attr('id');
+			var det_id	= id.split('_');
+			var a		= det_id[1];
+			
+			var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
+			// console.log(progress);
+			if(current == 'USD'){
+				var tot_usd 	= (progress/100) * total;
+				var tot_idr 	= (progress/100) * (total * kurs);
+			}
+			
+			if(current == 'IDR'){
+				var tot_idr 	= (progress/100) * total;
+				var tot_usd 	= (progress/100) * (total * kurs);
+			}
+			
+			$('#usd_'+a).val(number_format(tot_usd,2));
+			$('#idr_'+a).val(number_format(tot_idr,2));
+		});
+	}
+	
+	function getNum(val) {
+	   if (isNaN(val) || val == '') {
+		 return 0;
+	   }
+	   return parseFloat(val);
+	}
+	
+	function number_format (number, decimals, dec_point, thousands_sep) {
+		// Strip all characters but numerical ones.
+		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+		var n = !isFinite(+number) ? 0 : +number,
+			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+			s = '',
+			toFixedFix = function (n, prec) {
+				var k = Math.pow(10, prec);
+				return '' + Math.round(n * k) / k;
+			};
+		// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+		if (s[0].length > 3) {
+			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+		}
+		if ((s[1] || '').length < prec) {
+			s[1] = s[1] || '';
+			s[1] += new Array(prec - s[1].length + 1).join('0');
+		}
+		return s.join(dec);
+	}
+
+
+	/*function term_process(a){
+		var total		= getNum($('#grand_total').val().split(",").join(""));
+		var progress 	= getNum($('#progress_'+a).val().split(",").join("")); 
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+
+
+		console.log(total);
+
+
 		var current  	= $('#current').val();
 		
 		if(current == 'USD'){
@@ -421,7 +554,6 @@
 		$('#usd_'+a).val(number_format(tot_usd,2));
 		$('#idr_'+a).val(number_format(tot_idr,2));
 	}
-	
 	function change_kurs(){
 		var total		= getNum($('#grand_total').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
@@ -505,5 +637,6 @@
 			s[1] += new Array(prec - s[1].length + 1).join('0');
 		}
 		return s.join(dec);
-	}
+	}*/
+	
 </script>

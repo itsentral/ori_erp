@@ -3044,7 +3044,8 @@
 			$length_cutting 	= $get_detProduksi[0]->length_split;
 			$length_full 		= $get_detProduksi[0]->length;
 			$no_ipp 			= str_replace('BQ-','',$id_bq);
-
+			$kode_trans1        = $getReportFG[0]['kode_trans'];
+            $kode_trans_new     = $kode_trans1.$nomor;
 			$keterangan 		= $product.'/'.$id_milik.'/'.$nomor_so.'.'.$product_ke.'/'.$no_spk.'/'.$kode_pro;
 
 			$ArrDetailNew[$nomor]['kode_trans'] 	= $kode_trans;
@@ -3081,7 +3082,7 @@
 				$ArrWIP_IN[$nomor]['no_so'] 	= (!empty($getReportFG[0]['no_so']))?$getReportFG[0]['no_so']:NULL;
 				$ArrWIP_IN[$nomor]['product'] = (!empty($getReportFG[0]['product']))?$getReportFG[0]['product']:NULL;
 				$ArrWIP_IN[$nomor]['no_spk'] = (!empty($getReportFG[0]['no_spk']))?$getReportFG[0]['no_spk']:NULL;
-				$ArrWIP_IN[$nomor]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$getReportFG[0]['kode_trans']:NULL;
+				$ArrWIP_IN[$nomor]['kode_trans'] = (!empty($getReportFG[0]['kode_trans']))?$kode_trans_new:NULL;
 				$ArrWIP_IN[$nomor]['id_pro_det'] = $id_pro;
 				$ArrWIP_IN[$nomor]['qty'] = 1;
 				$ArrWIP_IN[$nomor]['nilai_wip'] = $nilai_wip;
@@ -3261,10 +3262,10 @@
 			}
 			
 		   
-			$jurnalfg = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND created_date='".$DateTime."' AND jenis LIKE 'out%'")->result();
+			$jurnalfg = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND jenis LIKE 'out%'")->result();
 			
-			
-			  
+
+			$qty_n	= 0;	  
 			foreach($jurnalfg AS $data){
 				
 				$nm_material = $data->product;	
@@ -3276,7 +3277,7 @@
 				$keterangan1  = $fg_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$keterangan2  = $wip_txt.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so.$kode;
 				$id          = $data->id_trans;
-				$noso 		 = ','.$data->no_so;
+				$noso 		 = $data->no_so;
                	$no_request  = $data->no_spk;	
 				$idtrans = $data->id_trans;
 				
@@ -3310,10 +3311,21 @@
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					  
-					 ); 			
-				
+					 ); 
+					 
+					 
+				    $kode_trans = $data->kode_trans;
+					$kode_trans2 = substr($data->kode_trans,0,-1);
+					$nospk      = $data->no_spk;
+					$qty        = $data->qty;
+
+					 $qty_n++;
 			}
 
+			       $CI->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			       
+                   $CI->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans2."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+			      
 			 
 			
 				
@@ -3344,6 +3356,69 @@
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
+		
+		    $stokwip =$CI->db->query("SELECT
+										`data_erp_wip_group`.`id` AS `id`,
+										`data_erp_wip_group`.`tanggal` AS `tanggal`,
+										`data_erp_wip_group`.`keterangan` AS `keterangan`,
+										`data_erp_wip_group`.`no_so` AS `no_so`,
+										`data_erp_wip_group`.`product` AS `product`,
+										`data_erp_wip_group`.`no_spk` AS `no_spk`,
+										`data_erp_wip_group`.`kode_trans` AS `kode_trans`,
+										`data_erp_wip_group`.`id_pro_det` AS `id_pro_det`,
+										sum(`data_erp_wip_group`.`qty`) AS `total`,
+										`data_erp_wip_group`.`nilai_wip` AS `nilai_wip`,
+										`data_erp_wip_group`.`material` AS `material`,
+										`data_erp_wip_group`.`wip_direct` AS `wip_direct`,
+										`data_erp_wip_group`.`wip_indirect` AS `wip_indirect`,
+										`data_erp_wip_group`.`wip_consumable` AS `wip_consumable`,
+										`data_erp_wip_group`.`wip_foh` AS `wip_foh`,
+										`data_erp_wip_group`.`created_by` AS `created_by`,
+										`data_erp_wip_group`.`created_date` AS `created_date`,
+										`data_erp_wip_group`.`id_trans` AS `id_trans`,
+										`data_erp_wip_group`.`jenis` AS `jenis`,
+										`data_erp_wip_group`.`id_material` AS `id_material`,
+										`data_erp_wip_group`.`nm_material` AS `nm_material`,
+										`data_erp_wip_group`.`qty_mat` AS `qty_mat`,
+										`data_erp_wip_group`.`cost_book` AS `cost_book`,
+										`data_erp_wip_group`.`gudang` AS `gudang`,
+										`data_erp_wip_group`.`kode_spool` AS `kode_spool` 
+										FROM
+										`data_erp_wip_group` 
+										WHERE
+										(`data_erp_wip_group`.`id_pro_det` = '".$kode."')
+										AND (`data_erp_wip_group`.`jenis`='in cutting')
+										AND (`data_erp_wip_group`.`tanggal` = '".$Date."')
+										AND (`data_erp_wip_group`.`keterangan` = 'Finish Good to WIP (Cutting)')
+										GROUP BY kode_trans,no_spk,product,no_so")->result();
+        
+						$datastokwip=array();
+						foreach ($stokwip as $vals) {
+							$datastokwip = array(
+										'tanggal' => $tgl_voucher,
+										'keterangan' => 'Finish Good to WIP (Cutting)',
+										'no_so' => $vals->no_so,
+										'product' => $vals->product,
+										'no_spk' => $vals->no_spk,
+										'kode_trans' => $vals->kode_trans,
+										'id_pro_det' => $vals->id_pro_det,
+										'qty' => $vals->total,
+										'nilai_wip' => round($vals->nilai_wip/$vals->total,0),
+										'material' => $vals->material,
+										'wip_direct' =>  $vals->wip_direct,
+										'wip_indirect' =>  $vals->wip_indirect,
+										'wip_consumable' =>  $vals->wip_consumable,
+										'wip_foh' =>  $vals->wip_foh,
+										'created_by' => $vals->created_by,
+										'created_date' => $vals->created_date,
+										'id_trans' => $vals->id_trans,
+										);
+
+							$CI->db->insert('warehouse_stock_wip',$datastokwip);
+						}
+		
+		
+		
 		  
 	}
 

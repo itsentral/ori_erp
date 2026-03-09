@@ -1664,6 +1664,7 @@ class Purchase_order_model extends CI_Model {
 				'remarks' 		=> strtolower($data['remarks']),
 				'buyer' 		=> strtolower($data['buyer']),
 				'mata_uang' 	=> $data['current'],
+				'status' 	    => 'WAITING IN',
 				'amount_words' 	=> $data['amount_words'],
 				'updated_by' 	=> $data_session['ORI_User']['username'],
 				'updated_date' 	=> date('Y-m-d H:i:s')
@@ -1699,6 +1700,9 @@ class Purchase_order_model extends CI_Model {
 						$ArrEditPO[$val]['syarat'] 		= strtolower($valx['syarat']);
 						$ArrEditPO[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 						$ArrEditPO[$val]['created_date']= date('Y-m-d H:i:s');
+						$ArrEditPO[$val]['matauang_receive_invoice'] 		= $data['current'];
+						$ArrEditPO[$val]['kurs_receive_invoice'] 		= 1;
+
 					}
 				}
 			}
@@ -1720,6 +1724,8 @@ class Purchase_order_model extends CI_Model {
 					$ArrEditPOHist[$val]['created_date']= $valx['created_date'];
 					$ArrEditPOHist[$val]['hist_by'] 	= $data_session['ORI_User']['username'];
 					$ArrEditPOHist[$val]['hist_date']	= date('Y-m-d H:i:s');
+					$ArrEditPOHist[$val]['matauang_receive_invoice'] 		= $data['current'];
+					$ArrEditPOHist[$val]['kurs_receive_invoice'] 		= 1;
 				}
 			}
 			
@@ -2613,6 +2619,10 @@ class Purchase_order_model extends CI_Model {
 			$nestedData[]	= "<div align='left'>".get_name('users','nm_lengkap','username',$row['created_by'])."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y', strtotime($row['created_date']))."</div>";
 			$status_po=$row['status_po'];
+			if($row['status'] == 'DRAFT PO'){
+				$warna = 'bg-yellow';
+				$status = $row['status'];
+			}
 			if($row['status'] == 'COMPLETE'){
 				$warna = 'bg-green';
 				$status = $row['status'];
@@ -2632,7 +2642,14 @@ class Purchase_order_model extends CI_Model {
 
 			$span_bg = "<span class='badge ".$warna."'>".$status."</span>";
 
-			if(($row['status1'] == 'N' OR $row['status2'] == 'N') AND $row['deleted'] == 'N' AND $row['status'] == 'WAITING IN'){
+			if(($row['status1'] == 'N' OR $row['status2'] == 'N') AND $row['deleted'] == 'N' AND $row['status'] == 'DRAFT PO'){
+				if($row['status1'] == 'N'){
+					$warna = 'bg-yellow';
+					$status = 'DRAFT PO';
+				}
+					$span_bg = "<span class='badge ".$warna."'>".$status."</span>";
+
+			}elseif(($row['status1'] == 'N' OR $row['status2'] == 'N') AND $row['deleted'] == 'N' AND $row['status'] == 'WAITING IN'){
 				if($row['status1'] == 'N'){
 					$warna = 'bg-yellow';
 					$status = 'Waiting Approval';
@@ -2666,14 +2683,17 @@ class Purchase_order_model extends CI_Model {
 			$print_tnc="&nbsp;<a href='".base_url('purchase/print_po_tnc/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print T&C' data-role='qtip'><b>Print T&C</b></a>";
 
 			if($status_po==""){ 
+				if($row['status'] == 'DRAFT PO' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
+					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
+				}
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'Y' AND $row['status2'] == 'Y'){
-					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
+					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
 					$print_po = $print_old."&nbsp;<a href='".base_url('purchase/print_po3/'.$row['no_po'])."' target='_blank' class='btn btn-sm btn-default' title='Print PO' data-role='qtip'><b>Print Nilai PO</b></a>";				
 					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					// $delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 				}
 				if($row['status'] == 'WAITING IN' AND $row['status1'] == 'N' AND $row['status2'] == 'N'){
-					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Edit Print PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
+					$edit_print	= "&nbsp;<button type='button' class='btn btn-sm btn-warning edit_po' title='Create PO' data-no_po='".$row['no_po']."'><i class='fa fa-pencil'></i></button>";
 					// $edit_po	= "&nbsp;<button type='button' class='btn btn-sm btn-success edit_po_qty' title='Edit PO' data-no_po='".$row['no_po']."'><i class='fa fa-edit'></i></button>";
 					$delete_po	= "&nbsp;<button type='button' class='btn btn-sm btn-danger delete_po' title='Delete PO' data-no_po='".$row['no_po']."'><i class='fa fa-trash'></i></button>";
 					//$request_payment = "&nbsp;<button type='button' class='btn btn-sm btn-primary request_payment' title='Request Payment' data-no_po='".$row['no_po']."'><i class='fa fa-money'></i></button>";
@@ -2748,7 +2768,7 @@ class Purchase_order_model extends CI_Model {
 		$sql .= " ORDER BY a.updated_date DESC, ".$columns_order_by[$column_order]." ".$column_dir." ";
 		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
 
-		$data['query'] = $this->db->query($sql);
+		$data['query'] = $this->db->query($sql); 
 		return $data;
 	}
 	
@@ -2863,7 +2883,8 @@ class Purchase_order_model extends CI_Model {
 			$ArrHeader['top'] 				= $rfqheader->top;
 			$ArrHeader['remarks'] 			= $rfqheader->remarks;
 			$ArrHeader['mata_uang'] 		= $rfqheader->currency;
-
+            
+			$ArrHeader['status'] 		    = 'DRAFT PO';
 			$ArrHeader['created_by'] 		= $Username;
 			$ArrHeader['created_date'] 		= $dateTime;
 			$ArrHeader['updated_by'] 		= $Username;

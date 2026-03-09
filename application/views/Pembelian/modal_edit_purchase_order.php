@@ -39,9 +39,9 @@
 			echo form_input(array('id'=>'request_date','name'=>'request_date','class'=>'form-control input-md datepicker','placeholder'=>'Request Date','readonly'=>'readonly'), $REQ_DATE);
 			?>
 		</div>
-		<label class='label-control col-sm-1'><b>Harga Pembelian</b></label>
+		<label class='label-control col-sm-1'><b>Currency</b></label>
 		<div class='col-sm-2'>
-			<select id='current' name='current' class='form-control input-sm chosen_select'>
+			<select id='current' name='current' class='form-control input-sm chosen_select' onfocus="this.blur();" onchange="this.value = this.defaultValue;">
 				<?php
 				foreach(get_list_kurs2() AS $val => $valx){
 					$sel = ($valx['kode_dari'] == $data[0]->mata_uang)?'selected':'';
@@ -64,7 +64,7 @@
 		<label class='label-control col-sm-1'><b>Buyer</b></label>
 		<div class='col-sm-5'>
 			<?php
-			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer'), strtoupper($data[0]->buyer));
+			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer' readonly), strtoupper($data[0]->buyer));
 			?>
 		</div>
 		<label class='label-control col-sm-1'><b>Remarks</b></label>
@@ -110,8 +110,7 @@
 						$qty_p = (!empty($valx['qty_po']))?$valx['qty_po']:$valx['qty_purchase'];
 						$SUM += $qty_p * $valx['price_ref_sup'];
 						echo "<tr>";
-							echo "<td align='left'>".strtolower($valx['nm_barang'])."
-									<input type='hidden' name='detail[".$no."][nm_barang]' id='nm_barang_".$no."' class='form-control input-sm ' value='".strtoupper($valx['nm_barang'])."' readonly>
+							echo "<td align='left'><input type='text' name='detail[".$no."][nm_barang]' id='nm_barang_".$no."' class='form-control input-sm ' value='".strtoupper($valx['nm_barang'])."' readonly>
 									<input type='hidden' name='detail[".$no."][id]' id='id_".$no."' value='".$valx['id']."'>
 									</td>";
 							echo "<td align='left'>".strtolower($valx['spec'])."</td>";

@@ -153,6 +153,14 @@ class Request_payment extends CI_Controller {
 
 		$this->load->view('Request_payment/request_print',$data);
 	}
+	function print_request($id){
+		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result(); 
+		$data = array(
+			'data_request'	=> $data_request,
+		);
+
+		$this->load->view('Request_payment/print_request',$data);
+	}
 	public function list_approve()
 	{
 		$controller			= 'request_payment/list_approve';

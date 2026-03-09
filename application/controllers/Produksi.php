@@ -13651,7 +13651,7 @@ class Produksi extends CI_Controller {
 					'kode_trans' => $vals->kode_trans,
 					'id_pro_det' => $vals->id_pro_det,
 					'qty' => $vals->total,
-					'nilai_wip' => $vals->nilai_wip,
+					'nilai_wip' => round($vals->nilai_wip/$vals->total,0),
 					'material' => $vals->material,
 					'wip_direct' =>  $vals->wip_direct,
 					'wip_indirect' =>  $vals->wip_indirect,

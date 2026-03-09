@@ -114,7 +114,7 @@ $kurs=1;
 						<td class='text-right'><b>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
 						<td class='text-right mid text-bold'><?=number_format($data[0]->total_po,2);?></td>
 					</tr>
-					<tr>
+					<tr hidden>
 						<td align='left' colspan='2'></td>					
 						<td class='text-right'><b>DISCOUNT (%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
 						<td class='text-right mid text-bold'><?=number_format($data[0]->discount,2);?></td>
@@ -195,22 +195,32 @@ $kurs=1;
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][nilai_ppn]' value='".$valx['nilai_ppn']."' class='form-control input-md text-center datepicker' readonly></td>";
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][syarat]' value='".strtoupper($valx['syarat'])."' class='form-control input-md' ".$styledisabled."></td>";
 								echo "<td align='center' nowrap>";
-								if($styledisabled==""){
-									echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
+								if($styledisabled=="" && $valx['group_top']=='progress' && $data[0]->total_terima_barang_idr > 0){
+								   
+                                    //echo "<button type='button' class='btn btn-xs btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i> Delete</button>";
 									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
-									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';									
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';	
+																									
 								
-								}else{
-									echo '<a class="btn btn-xs btn-default" href="'.base_url('purchase/print_request/'.$valx['id']).'" title="Print Request" target="_blank"> <i class="fa fa-print"></i> Print Request</a>';
-								    echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';									
+								}elseif($styledisabled=="" && $valx['group_top']=='uang muka' && $data[0]->total_terima_barang_idr < 1){
 									
+									echo '<br /><a class="create1 btn btn-xs btn-primary" href="'.base_url('purchase/request_payment/'.$valx['id']).'" title="Request Payment"> <i class="fa fa-money"></i> Request Payment</a>';
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> Receive Invoice</a>';	
+									
+													
+								}elseif($styledisabled !="" && $valx['group_top']=='uang muka'){
+									echo '<a class="btn btn-xs btn-default" href="'.base_url('purchase/print_request/'.$valx['id']).'" title="Print Request" target="_blank"> <i class="fa fa-print"></i> Print Request</a>';
+								    echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> View Receive Inv</a>';									
+								}elseif($styledisabled !="" && $valx['group_top']=='progress' ){
+									echo '<a class="btn btn-xs btn-default" href="'.base_url('purchase/print_request/'.$valx['id']).'" title="Print Request" target="_blank"> <i class="fa fa-print"></i> Print Request</a>';
+									echo '<br /><a class="receive btn btn-xs btn-success" href="'.base_url('purchase/invoice_receive/'.$valx['id']).'" title="Receive Invoice"> <i class="fa fa-newspaper-o"></i> View Receive Inv</a>';				
 								}
 								echo "</td>";
 							echo "</tr>";
 						}
 					}
 					?>
-					<tr id='add_<?=$id;?>'>
+					<tr id='add_<?=$id;?>' hidden>
 						<td align='left'><button type='button' class='btn btn-sm btn-warning addPart' title='Add TOP'><i class='fa fa-plus'></i>&nbsp;&nbsp;Add TOP</button></td>
 						<td align='center' colspan='7'></td>
 					</tr>
@@ -218,7 +228,7 @@ $kurs=1;
 			</table>
 		</div>
 	</div>
-	<div class='form-group row'>
+	<div class='form-group row' hidden>
 		<label class='label-control col-sm-1'></label>
 		<div class='col-sm-11'><div id='alert-max' style="font-size: 17px;font-weight: bold;color: red;padding-bottom: 10px;">PROGRESS MELEBIHI 100% !!</div>
 			<?php
