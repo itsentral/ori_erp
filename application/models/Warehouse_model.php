@@ -666,11 +666,17 @@ class Warehouse_model extends CI_Model {
 				$PRICE      = ($value['kurs'] * $value['unit_price']);
 				$stok_akhir = ($PRICE*$qtyIN)+($PRICE2*$stokjurnalakhir)+$BM; 
 				$qtyakhir  =  $stokjurnalakhir+$qtyIN; 
+
+				if($qtyakhir==0){
+				  $pembagi = 1;
+				}else{
+				  $pembagi = $qtyakhir;
+				}
 				
 				if($stok_akhir==0){
 					$PRICENEW = $PRICE2;
 				} else{
-				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM))/($qtyIN+$stokjurnalakhir);
+				   $PRICENEW = ($nilaijurnalakhir+(( ($value['kurs'] * $value['unit_price'])*$qtyIN)+$BM))/($pembagi);
 		        }
 
 
@@ -5045,7 +5051,7 @@ class Warehouse_model extends CI_Model {
 				$plus2	= "";
 
 				$print	= "&nbsp;<a href='".base_url('warehouse/print_incoming2/'.$row['kode_trans'].'/check')."' target='_blank' class='btn btn-sm btn-warning' title='Print'><i class='fa fa-print'></i></a>";
-				if((int) $row['qty_cek'] < (int) $row['qty_req']){
+				if($row['checked'] != 'Y'){//if((int) $row['qty_cek'] < (int) $row['qty_req']){
 					// $plus	= "&nbsp;<button type='button' class='btn btn-sm btn-info check' title='Check Incoming' data-kode_trans='".$row['kode_trans']."' ><i class='fa fa-check'></i></button>";
 					$plus2	= "&nbsp;<button type='button' class='btn btn-sm btn-success checknew' title='Check Incoming' data-kode_trans='".$row['kode_trans']."' ><i class='fa fa-check'></i>&nbsp; New</button>";
 				}
