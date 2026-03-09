@@ -247,7 +247,7 @@ if(isset($data->status_rg_check)){
                     <input type="text" name="gtotal_price_us" id="gtotal_price_us" readonly class="form-control text-right divide" value="<?= $gtotal_price_us; ?>">
                   </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" hidden>
                   <label for="" class="col-md-5 control-label">Update Material</label>
                   <div class="col-md-5">
                     <input type="checkbox" name="status_rg_check" value="DONE" <?=$status_rg_check;?> <?=(($statusmaterial!='')?'style="pointer-events: none;"':'')?> />

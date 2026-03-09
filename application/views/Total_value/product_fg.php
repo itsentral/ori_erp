@@ -37,6 +37,7 @@ $gudang = $this->uri->segment(3);
 					<th class="text-center">#</th>
 					<th class="text-center">Nomor SO</th>
 					<th class="text-center">Nomor SPK</th>
+					<th class="text-center">No Trans</th>
 					<th class="text-center">Produk</th> 
 					<th class="text-center">Keterangan</th> 
 					<th class="text-center">Stock</th>
@@ -96,7 +97,7 @@ $gudang = $this->uri->segment(3);
 		dateFormat: 'yy-mm-dd',
 		changeMonth:true,
 		changeYear:true,
-		maxDate:'-1d',
+		//maxDate:'-1d',
 		showButtonPanel: true,
 		closeText: 'Clear',
 			onClose: function (dateText, inst) {
@@ -111,22 +112,15 @@ $gudang = $this->uri->segment(3);
 		}
 	});
 
-	$(document).on('click', '#download_excel', function(e){
+	$(document).on('click', '#download_excel2', function(e){
 		e.preventDefault();
-		var gudang = $('#gudang').val();
+		var gudang = $('#gudang1').val();
 		var date_filter = $('#date_filter').val();
 		var Links		= base_url + active_controller+'/ExcelGudang/'+gudang+'/'+date_filter;
 		window.open(Links,'_blank');
 	});
 	
-	$(document).on('click', '#download_excel2', function(e){
-		e.preventDefault();
-		var gudang = $('#gudang').val();
-		var date_filter = $('#date_filter').val();
-		var Links		= base_url + active_controller+'/ExcelGudangSubgudang/'+gudang+'/'+date_filter;
-		window.open(Links,'_blank');
-	});
-	
+		
 	$(document).on('click', '#download_excel3', function(e){
 		e.preventDefault();
 		var gudang = $('#gudang').val();
@@ -161,7 +155,7 @@ $gudang = $this->uri->segment(3);
             e.preventDefault();
             loading_spinner();
 			$("#head_title2").html("<b>History "+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('kode_trans')+'/'+$(this).data('product')+"</b>");
-            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk')+'/'+$(this).data('product').replace(" ", "_")+'/'+$(this).data('kode_trans').replace(" ", "_")+'/fg');
+            $("#view2").load(base_url + active_controller + '/modal_history/'+$(this).data('no_so')+'/'+$(this).data('no_spk').replace(",", "_")+'/'+$(this).data('product').replace(" ", "_")+'/'+$(this).data('kode_trans').replace(" ", "_")+'/fg');
             $("#ModalView2").modal();
         });
 

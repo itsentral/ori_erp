@@ -129,6 +129,7 @@ class Request_payment extends CI_Controller {
 		echo json_encode($param);
 	}
 	function print_req($id){
+<<<<<<< HEAD
 		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result();
 		$req = $this->db->query("select * from request_payment where no_request='".$id."'")->row();
 		$notr  = $req->no_doc;
@@ -145,6 +146,9 @@ class Request_payment extends CI_Controller {
 		  $response ='';
 		}
         
+=======
+		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result(); 
+>>>>>>> dev_sam
 		$data = array(
 			'data_request'	=> $data_request,
 			'data_detail'   => $data_expense,
@@ -152,6 +156,14 @@ class Request_payment extends CI_Controller {
 		);
 
 		$this->load->view('Request_payment/request_print',$data);
+	}
+	function print_request($id){
+		$data_request = $this->db->query("select * from request_payment where no_request='".$id."'")->result(); 
+		$data = array(
+			'data_request'	=> $data_request,
+		);
+
+		$this->load->view('Request_payment/print_request',$data);
 	}
 	public function list_approve()
 	{

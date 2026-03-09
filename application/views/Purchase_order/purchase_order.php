@@ -8,7 +8,7 @@ $this->load->view('include/side_menu');
 		<div class="box-tool pull-right">
 			<?php
 				if($akses_menu['create']=='1'){
-					echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Add PO','content'=>'Add PO','id'=>'addPO')).' ';
+					echo form_button(array('type'=>'button','class'=>'btn btn-sm btn-success','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','value'=>'Add PO','content'=>'Create Draft PO','id'=>'addPO')).' ';
 				}
 			?>
 		</div>
@@ -21,12 +21,12 @@ $this->load->view('include/side_menu');
 					<th class="text-center">#</th>
 					<th class="text-center">No PO</th> 
 					<th class="text-center">No Invoice</th> 
-					<th class="text-center">Suppier</th>
+					<th class="text-center">Supplier</th>
 					<th class="text-center">Material Name</th>
 					<!-- <th class="text-center">Qty</th> -->
-					<th class="text-center">Total PO</th>
-					<th class="text-center">By</th>
-					<th class="text-center">Dated</th>
+					<th class="text-center">Net Price + Tax</th>
+					<th class="text-center">Created By</th>
+					<th class="text-center">Tanggal Dibutuhkan</th>
 					<th class="text-center">Status</th>
 					<th class="text-center no-sort">Option</th>
 				</tr>
@@ -114,7 +114,7 @@ $this->load->view('include/side_menu');
 	$(document).on('click', '.edit_po', function(e){
 		e.preventDefault();
 		loading_spinner();
-		$("#head_title").html("<b>EDIT PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
+		$("#head_title").html("<b>CREATE PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/modal_edit_purchase_order/'+$(this).data('no_po'),
@@ -140,7 +140,7 @@ $this->load->view('include/side_menu');
 	$(document).on('click', '.edit_po_qty', function(e){
 		e.preventDefault();
 		loading_spinner();
-		$("#head_title2").html("<b>EDIT PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
+		$("#head_title2").html("<b>CREATE PURCHASE ORDER ["+$(this).data('no_po')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/edit_po_qty/'+$(this).data('no_po'),
@@ -721,7 +721,7 @@ $this->load->view('include/side_menu');
 			"iDisplayLength": 10,
 			"aLengthMenu": [[10, 20, 50, 100, 150, 1500], [10, 20, 50, 100, 150, 1500]],
 			"ajax":{
-				url : base_url + active_controller+'/server_side_purchase_order',
+				url : base_url + active_controller+'/server_side_purchase_order', 
 				type: "post",
 				data: function(d){
 					// d.kode_partner = $('#kode_partner').val()

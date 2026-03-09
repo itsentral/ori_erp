@@ -157,7 +157,7 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
  </div>
   <!-- /.box -->
 </form>
-<?php $this->load->view('include/footer'); ?>
+<?php $this->load->view('include/footer'); ?> 
 <style type="text/css">
     td{
         vertical-align  :middle !important;

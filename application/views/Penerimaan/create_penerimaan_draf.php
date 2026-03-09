@@ -561,6 +561,17 @@ $this->load->view('include/side_menu');
             allowOutsideClick	: false
           });
         }
+		else if ($('.tipe_bayar').val() == "") {
+          swal({
+            title	: "TIPE TIDAK BOLEH KOSONG!",
+            text	: "ISI TIPE BAYAR!",
+            type	: "warning",
+            timer	: 3000,
+            showCancelButton	: false,
+            showConfirmButton	: false,
+            allowOutsideClick	: false
+          });
+        }
 		else if ($('#total_bank').val() != $('#total_terima').val()) {
           swal({
             title	: "JUMLAH BAYAR DAN PENERIMAAN BANK TIDAK SAMA!",

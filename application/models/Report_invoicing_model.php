@@ -202,6 +202,7 @@ class Report_invoicing_model extends CI_Model {
         $urut2  = 0;
 		foreach($query->result_array() as $row)
 		{
+<<<<<<< HEAD
 			
 			$string = $row['delivery_no'];
 			$dv = array_map('trim', explode(',', $string));
@@ -217,6 +218,11 @@ class Report_invoicing_model extends CI_Model {
 							->where_in('kode_delivery', $dv)
 							->get()
 							->row();
+=======
+			$dv             = $row['delivery_no'];
+			$cogs           = $this->db->query("SELECT sum(material)as material, sum(wip_direct)as wip_direct, sum(wip_indirect)as wip_indirect, sum(wip_consumable)as wip_consumable, sum(wip_foh)as wip_foh FROM view_incustomer_cogs 
+							WHERE kode_delivery = $dv")->row();
+>>>>>>> dev_sam
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
             $asc_desc       = $requestData['order'][0]['dir'];
@@ -235,9 +241,15 @@ class Report_invoicing_model extends CI_Model {
 			$nestedData[]	= "<div align='center'>".$row['no_invoice']."</div>";
 			$nestedData[]	= "<div align='center'>".$row['so_number']."</div>";
 			$nestedData[]	= "<div align='left'>".$row['nm_customer']."</div>";
+<<<<<<< HEAD
 			$nestedData[]	= "<div align='right'>".number_format($row['total_gab_product_idr'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_cogs'])."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['total_gab_product_idr']-$row['total_cogs'])."</div>";
+=======
+			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_cogs'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['total_invoice_idr']-$row['total_cogs'])."</div>";
+>>>>>>> dev_sam
             $nestedData[]	= "<div align='right'>".number_format($cogs->material)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_direct)."</div>";
 			$nestedData[]	= "<div align='right'>".number_format($cogs->wip_indirect)."</div>";
@@ -252,7 +264,11 @@ class Report_invoicing_model extends CI_Model {
 
 				
 
+<<<<<<< HEAD
 				$detail		= "<button class='btn btn-sm btn-warning detail' title='View History' data-no_invoice='".$row['delivery_no']."'><i class='fa fa-eye'></i></button>";
+=======
+				$detail		= "<button class='btn btn-sm btn-warning detail' title='View History' data-no_invoice='".$row['id_invoice']."'><i class='fa fa-eye'></i></button>";
+>>>>>>> dev_sam
 				
 			$nestedData[]	= "<div align='left'>
 									".$detail."
@@ -295,7 +311,11 @@ class Report_invoicing_model extends CI_Model {
 				tr_invoice_header a 
 				INNER JOIN penagihan b ON b.id=a.id_penagihan,
 				(SELECT @row:=0) r
+<<<<<<< HEAD
 		    WHERE 1=1 ".$where_no_so." ".$where_cust." AND a.jenis_invoice='progress'
+=======
+		    WHERE 1=1 ".$where_no_so." ".$where_cust."
+>>>>>>> dev_sam
 				AND (
 				a.no_invoice LIKE '%".$this->db->escape_like_str($like_value)."%'
 				OR a.so_number LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -324,6 +344,7 @@ class Report_invoicing_model extends CI_Model {
 		return $data;
 	}
 
+<<<<<<< HEAD
 	public function modal_detail_invoice(){
 
 		$id = $this->uri->segment(3);
@@ -348,5 +369,7 @@ class Report_invoicing_model extends CI_Model {
 		
 	}
 
+=======
+>>>>>>> dev_sam
 }
 ?>

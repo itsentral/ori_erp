@@ -1190,7 +1190,7 @@ class Outgoing extends CI_Controller {
 		echo json_encode($Arr_Data);
 	}
 
-	public function process_fg_material_sub(){
+	public function process_fg_material_sub(){ 
 		$data 			= $this->input->post();
 		$data_session	= $this->session->userdata;
 		$dateTime		= date('Y-m-d H:i:s');
@@ -2010,7 +2010,8 @@ class Outgoing extends CI_Controller {
 							$ArrFinishGood[$value['id']]['created_date'] 	= $DateTime;
 							$ArrFinishGood[$value['id']]['gudang'] 			= $gudang_ke;
 							$ArrFinishGood[$value['id']]['nilai_wip'] 		= $PRICE*$QTY_OKE;
-
+                            $total_harga  = $PRICE*$QTY_OKE;
+						   
 
 							$tempMaterialIn[$value['id']]['tanggal'] 		= $DateTime;
 							$tempMaterialIn[$value['id']]['keterangan'] 	= null;
@@ -2028,10 +2029,53 @@ class Outgoing extends CI_Controller {
 							$tempMaterialIn[$value['id']]['gudang'] 		= $gudang_ke;
 							$tempMaterialIn[$value['id']]['gudang_dari'] 	= $id_gudang;
 							$tempMaterialIn[$value['id']]['gudng_ke'] 		= $gudang_ke;
+
+
+							 $TotalPriceBook += $total_harga;
 							
 						}
+						    //=======NEW=============
+							$ArrFinishGoodProduct = [];
+							if($field_joint == 'yes'){
+								$qty = str_replace(',','',$data['qty_kit']);
+								$ArrFinishGoodProduct = array(
+									'tanggal' 			=> date('Y-m-d'),
+									'keterangan' 		=> 'Field Join to Finish Good',
+									'no_so' 			=> $no_ipp,
+									'product' 			=> $nm_product,
+									'no_spk' 			=> $no_spk,
+									'kode_trans' 		=> $kode_trans,									
+									'nilai_wip' 		=> $TotalPriceBook,
+									'nilai_unit' 		=> $TotalPriceBook/$qty,
+									'qty' 				=> str_replace(',','',$data['qty_kit']),
+									'created_by' 		=> $data_session['ORI_User']['username'],
+									'created_date' 		=> $dateTime
+								);
+
+								$datastokfg = array(
+									'tanggal' => date('Y-m-d'),
+									'keterangan' => 'Field Join to Finish Good',
+									'no_so' => $no_ipp,
+									'product' => $nm_product,
+									'no_spk' => $no_spk,
+									'kode_trans' => $kode_trans,
+									'id_pro_det' =>'',
+									'qty' => str_replace(',','',$data['qty_kit']),
+									'nilai_wip' => $TotalPriceBook/$qty,
+									'material' =>'',
+									'wip_direct' =>'',
+									'wip_indirect' => '',
+									'wip_consumable' => '',
+									'wip_foh' => '',
+									'created_by' => $data_session['ORI_User']['username'],
+									'created_date' => $dateTime,
+									'id_trans' =>'',
+								);
+							}
+							
 						
-						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans);
+
+						move_warehouse($grouping_tempGudang,$key,$gudang_ke,$kode_trans); 
 
 						//insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
 						if(!empty($grouping_temp)){
@@ -2046,6 +2090,12 @@ class Outgoing extends CI_Controller {
 						}
 						if(!empty($ArrFinishGood)){
 							$this->db->insert_batch('data_erp_fg', $ArrFinishGood);
+						}
+						if(!empty($ArrFinishGoodProduct)){
+							$this->db->insert('data_erp_fg', $ArrFinishGoodProduct);
+						}
+						if(!empty($datastokfg)){
+						$this->db->insert('warehouse_stock_fg',$datastokfg);
 						}
 					}
 				}

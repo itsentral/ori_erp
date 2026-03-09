@@ -1,10 +1,24 @@
 <?php
 $this->load->view('include/side_menu');
+    if($mata_uang =='IDR'){	
+	$nilainet = isset($results) ? $results->value_idr:0;	   
+	$ppn      = ($tax*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet);
+	}elseif($mata_uang =='USD'){ 
+	$nilainet = isset($results) ? $results->value_usd:0;
+	$ppn      = ($tax*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet); 
+	}
+
+	
 ?>
 <?=form_open('purchase/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
 <input type="hidden" name="group_top" id="group_top" value="<?php echo (isset($results) ? $results->group_top: ''); ?>" />
 <input type="hidden" name="no_po" id="no_po" value="<?php echo (isset($results) ? $results->no_po: ''); ?>" />
+<input type="hidden" name="tax" id="tax" value="<?php echo (isset($tax) ? $tax: ''); ?>" />
 <div class="tab-content">
 	<div class="tab-pane active">
 		<div class="box box-primary">
@@ -23,17 +37,19 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
-                            <select id="matauang2" name="matauang2" class="form-control"> 
+						  <input type="text" name="matauang2" id="matauang2" value="<?= $mata_uang ?>" class="form-control" required readonly>
+					
+                           <!-- <select id="matauang2" name="matauang2" class="form-control" readonly> 
 							
 							<?php						
-							$matauang = $results->matauang_receive_invoice;		
-							if($matauang =='IDR'){
+							//$matauang = $results->matauang_receive_invoice;		
+							if($mata_uang =='IDR'){
 								echo "<option value=''>Pilih Matauang</option>";
 								echo "<option value ='IDR' selected >IDR</option>";
 								echo "<option value ='USD' >USD</option>";	
-							 }elseif($matauang =='USD'){ 
+							 }elseif($mata_uang =='USD'){ 
 								echo "<option value=''>Pilih Matauang</option>";
-								echo "<option value ='IDR' >IDR</option>";
+								echo "<option value ='IDR' >IDR</option>"; 
 								echo "<option value ='USD' selected >USD</option>";	
 							 }else{ 
 								echo "<option value=''>Pilih Matauang</option>";
@@ -45,21 +61,63 @@ $this->load->view('include/side_menu');
 							
 							
 							
-							</select>
+							</select>-->
                    </div>
                    <div class="col-sm-6">
 					<label for="tgl_bayar" class="control-label">Kurs :</label>
                      <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
 					</div>
-                          
+				  <div class="col-md-6" >
+					<label class="control-label">Net Price + Tax</label>
+					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_harga)?$total_harga:""); ?>"  readonly>
+				  </div>
+                  <div class="col-md-6">
+					<label class="control-label">Net</label>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $total_price; ?>" required readonly>
+				  </div>
+				  <div class="col-md-6"hidden>
+					<label class="control-label">Price Before Tax</label>
+					<input type="text" class="form-control divide" id="price_before_tax" name="price_before_tax" value="<?= $total_price; ?>" required readonly>
+				  </div>
+				  <?php if($results->group_top != 'progress' ) { ?>     
+				  <div class="col-md-6">
+					<label class="control-label">DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
+				  </div>   
+				   <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
+				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
-					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Total Invoice</label>
-					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= (isset($results)?$results->invoice_total:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
+				   <?php } else {?>
+				  <div class="col-md-6" hidden>
+					<label class="control-label">Nilai Potongan DP</label>
+					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
+				  </div>
+				   <div class="col-md-6">
+					<label class="control-label">DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
+				  </div> 
+				   <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
+				  </div>  
+				  <div class="col-md-6">
+					<label class="control-label">Nilai PPN</label>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value=<?= (isset($results)?$results->nilai_ppn:"0"); ?> required readonly>
+				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Total Invoice</label>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value=<?= (isset($results)?$results->invoice_total:"0"); ?> required readonly>
+				  </div>
+				   <?php } ?>
 				  <div class="col-md-6">
 					<label class="control-label">Nomor Faktur Pajak</label>
 					<input type="text" id="faktur_pajak" name="faktur_pajak" value="<?= (isset($results)?$results->faktur_pajak:""); ?>" class="form-control">
@@ -72,11 +130,9 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
 				  </div>
-				  <div class="col-md-6">
-					<label class="control-label">Nilai PO</label>
-					<input type="text" id="nilai_po" name="nilai_po" value="<?= (isset($total_price)?$total_price:""); ?>" class="form-control" readonly>
-				  </div>
+				  
 				</div>
+				<?php if($results->group_top =='progress') {?>
 				<div class="row">
 				  <div class="col-md-12">
 					<h4>Dokumen Incoming </h4>
@@ -96,11 +152,11 @@ $this->load->view('include/side_menu');
 							foreach($dt_incoming AS $record){ 
 								echo "<tr>";
 									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
-									echo "<td align='left'>".$record->tanggal."</td>";
+									echo "<td align='left'>".$record->created_date."</td>";
 									echo "<td align='left'>".$record->pic."</td>";
-									echo "<td align='left'>".$record->total_harga_product."</td>";
-									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
-								echo "</tr>";
+									echo "<td align='left' class='total_harga'>".$record->total."</td>";
+									echo "<td align='left'><input type='checkbox' class='chk_personal check_pr' data-nomor='".$record->kode_trans."' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
+									echo "</tr>";
 							}
 						}
 						?>
@@ -108,6 +164,8 @@ $this->load->view('include/side_menu');
 					</table>
 				  </div>
 				</div>
+
+				<?php } ?>
 			</div>
 
 			<div class="box-footer">
@@ -252,4 +310,33 @@ if($results->invoice_no!="") {
 	$(".stsview").addClass("hidden");';
 }
 ?>
+
+ 	$(document).on('click', '.check_pr', function(){
+		sumTotal();
+	});
+
+    
+	let sumTotal = () => {
+        let discount        =  getNum($('#discount').val())
+        let tax             =  getNum($('#tax').val())
+        let delivery_cost   =  getNum($('#delivery_cost').val())
+		let dpp_cek             =  getNum($('#nilai_top').val())
+
+		let sum_total = 0
+        let total
+        $(".check_pr" ).each(function() {
+            if ($(this).is(':checked')) {
+                total = getNum($(this).parent().parent().parent().find('.total_harga').html())
+                sum_total += Number(total);
+            }
+        });
+		let dpp = (11/12)*dpp_cek;
+        $('#nilai_dpp').val(number_format(dpp,2))
+        let ppn = (dpp_cek * tax) / 100
+        $('#nilai_ppn').val(number_format(ppn,2))
+        let net_plus_tax = dpp_cek + ppn
+        $('#invoice_total').val(number_format(net_plus_tax,2))
+       
+	}
+
 </script>
