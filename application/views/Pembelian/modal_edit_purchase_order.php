@@ -64,7 +64,7 @@
 		<label class='label-control col-sm-1'><b>Buyer</b></label>
 		<div class='col-sm-5'>
 			<?php
-			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer' readonly), strtoupper($data[0]->buyer));
+			 echo form_input(array('id'=>'buyer','name'=>'buyer','class'=>'form-control input-md','placeholder'=>'Buyer' ,'readonly'=>'readonly'), strtoupper($data[0]->buyer));
 			?>
 		</div>
 		<label class='label-control col-sm-1'><b>Remarks</b></label>
