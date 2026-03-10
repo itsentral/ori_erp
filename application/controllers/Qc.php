@@ -4338,11 +4338,7 @@ class Qc extends CI_Controller
 
 		if(!empty($ArrGroup)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroup);
-<<<<<<< HEAD
-			$this->jurnalFG($id_trans,$datetime);
-=======
 			
->>>>>>> dev_sam
 		}
 		if(!empty($ArrOutWIP)){
 			$this->db->insert_batch('data_erp_wip_group',$ArrOutWIP);
@@ -4539,11 +4535,7 @@ class Qc extends CI_Controller
 					 $qty        = $data->qty;
 				
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-<<<<<<< HEAD
-			
-=======
 			   $qty_n++;
->>>>>>> dev_sam
 			}
 			
 				
@@ -4632,11 +4624,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-<<<<<<< HEAD
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
-=======
             $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
->>>>>>> dev_sam
 			}
 			}else{
 			$datastokfg=array();
