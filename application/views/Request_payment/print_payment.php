@@ -72,11 +72,7 @@ table.garis {
 </table>
 <br>
 		<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
-<<<<<<< HEAD
 		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENGELUARAN</th></tr>
-=======
-		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
->>>>>>> dev_sam
 		<tr><th width=100><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th>
 		<th width=120><br><br><br><br><br></th>
@@ -86,10 +82,6 @@ table.garis {
 		<th width=90><br><br><br><br><br></th>
 		<th width=100><br><br><br><br><br></th></tr>
 		</table>
-<<<<<<< HEAD
-=======
-
->>>>>>> dev_sam
   <script type="text/javascript">
   <!--
   window.print();

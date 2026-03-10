@@ -251,24 +251,7 @@ if(!empty($data_request)){
     </td>
 	</tr>
 </table>
-<<<<<<< HEAD
  <script type="text/javascript">
-=======
-<br>
-		<table valign="top" width="800" border=1 cellpadding=1 cellspacing=0>
-		<tr><th>DIBUAT</th><th>DIPERIKSA</th><th>DIBUKUKAN ACCT</th><th colspan=4>DISETUJUI OLEH</th><th>PENERIMA</th></tr>
-		<tr><th width=100><br><br><br><br><br></th>
-		<th width=100><br><br><br><br><br></th>
-		<th width=120><br><br><br><br><br></th>
-		<th width=90><br><br><br><br><br></th>
-		<th width=90><br><br><br><br><br></th>
-		<th width=90><br><br><br><br><br></th>
-		<th width=90><br><br><br><br><br></th>
-		<th width=100><br><br><br><br><br></th></tr>
-		</table>
-		
-<script type="text/javascript">
->>>>>>> dev_sam
   <!--
   window.print();
   //-->
