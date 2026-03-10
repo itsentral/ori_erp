@@ -154,6 +154,11 @@ $this->load->view('include/side_menu');
 			$(this).val(number_format(stock,4))
 			$('#cstk_'+nomor+'_'+nomor2).val(stock*konversi)
 			// console.log('1')
+			 swal({
+                title	: "Notification Message !",
+                text	: 'Stock Tidak mencukupi',						
+                type	: "warning"
+            });
 		}
 		if(stock >= request && stock > 0){
 			$('#cstk_'+nomor+'_'+nomor2).val(request*konversi)
@@ -162,6 +167,11 @@ $this->load->view('include/side_menu');
 		if(stock < 0){
 			$(this).val(0)
 			$('#cstk_'+nomor+'_'+nomor2).val(0)
+			 swal({
+                title	: "Notification Message !",
+                text	: 'Stock Tidak mencukupi',						
+                type	: "warning"
+            });
 			// console.log('3s')
 		}
 		
