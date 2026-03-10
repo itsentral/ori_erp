@@ -5882,14 +5882,9 @@ class Delivery extends CI_Controller
 				}
 			}
         
-<<<<<<< HEAD
-		}
-			
-=======
 		
 			
 		    
->>>>>>> dev_sam
 
 			if(!empty($ArrGroup)){
 				$this->db->insert_batch('data_erp_in_transit',$ArrGroup);
@@ -6608,11 +6603,7 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-<<<<<<< HEAD
-				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = $qty  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
-=======
 				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
->>>>>>> dev_sam
 				}
 			}else{
 			$datastokfg=array();
@@ -6625,11 +6616,7 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-<<<<<<< HEAD
-							'qty' => 1,
-=======
 							'qty' => $qty_n,
->>>>>>> dev_sam
 							'nilai_wip' => $vals->nilai_wip,
 							'material' => $vals->material,
 							'wip_direct' =>  $vals->wip_direct,
@@ -6820,11 +6807,7 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-<<<<<<< HEAD
-				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+1  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
-=======
 				$this->db->query("UPDATE  warehouse_stock_incustomer SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
->>>>>>> dev_sam
 				}
 			}else{
 			$datastokfg=array();
@@ -6837,11 +6820,7 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-<<<<<<< HEAD
-							'qty' => 1,
-=======
 							'qty' => $qty_n,
->>>>>>> dev_sam
 							'nilai_wip' => $vals->nilai_wip,
 							'created_by' => $vals->created_by,
 							'created_date' => $vals->created_date,
