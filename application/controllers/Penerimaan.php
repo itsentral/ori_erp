@@ -474,11 +474,7 @@ class Penerimaan extends CI_Controller {
 					'pesan'			=> 'Save Process Failed. Please Try Again...' 
 			   );
 		}else{
-<<<<<<< HEAD
 			 $this->db->trans_commit();
-=======
-			 $this->db->trans_commit();			 
->>>>>>> dev_sam
 			 $Arr_Return		= array(
 				'status'		=> 1,
 				'nomor'		    => $kd_bayar,

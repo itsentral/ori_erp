@@ -43,21 +43,13 @@ foreach($ListIPP AS $val => $valx){
 						<th class="text-center" width='12%'>Total Invoice</th>
 						<th class="text-center" width='12%'>Total COGS</th>
 						<th class="text-center" width='12%'>Gross Profit</th>
-<<<<<<< HEAD
-=======
-						<th class="text-center" width='10%'>No Delivery</th>
-                        <th class="text-center" width='10%'>Jenis Inv</th>
->>>>>>> dev_sam
 						<th class="text-center" width='12%'>Material</th>
 						<th class="text-center" width='12%'>Direct</th>
 						<th class="text-center" width='12%'>Indirect</th>
 						<th class="text-center" width='12%'>Consumable</th>
 						<th class="text-center" width='12%'>FOH</th>
-<<<<<<< HEAD
 						<th class="text-center" width='10%'>No Delivery</th>
                         <th class="text-center" width='10%'>Jenis Inv</th>
-=======
->>>>>>> dev_sam
 						<th class="text-center no-sort" width='16%'>Option</th>
 					</tr>
 				</thead>
@@ -91,11 +83,7 @@ foreach($ListIPP AS $val => $valx){
 </form>
 <!-- modal -->
 <div class="modal fade" id="ModalUpload">
-<<<<<<< HEAD
 <form action="<?=base_url('invoicing/uploadfile')?>" method="POST" id="form_upload" enctype="multipart/form-data"> 
-=======
-<form action="<?=base_url('invoicing/uploadfile')?>" method="POST" id="form_upload" enctype="multipart/form-data">
->>>>>>> dev_sam
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -149,18 +137,10 @@ foreach($ListIPP AS $val => $valx){
 
 	$(document).on('click', '.detail', function(e){
 		e.preventDefault();
-<<<<<<< HEAD
 		$("#head_title").html("<b>VIEW DETAIL PRODUCT ["+$(this).data('no_invoice')+"]</b>");
 		$.ajax({
 			type:'POST',
 			url: base_url + active_controller+'/modal_detail_invoice/'+$(this).data('no_invoice').replace(",", "_"),
-=======
-		loading_spinner();
-		$("#head_title").html("<b>VIEW INVOICE ["+$(this).data('no_invoice')+"]</b>");
-		$.ajax({
-			type:'POST',
-			url: base_url + active_controller+'/modal_detail_invoice/'+$(this).data('no_invoice'),
->>>>>>> dev_sam
 			success:function(data){
 				$("#ModalView").modal();
 				$("#view").html(data);
