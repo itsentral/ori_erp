@@ -682,6 +682,11 @@ $FLAG = get_name('production_spk','spk2','kode_spk',$kode_spk);
         // console.log(beratTot)
         
         if(beratTot > beratEst){
+             swal({
+                title	: "Notification Message !",
+                text	: 'Stock Tidak mencukupi',						
+                type	: "warning"
+            });
             parentHTML.find('.budget_over').show()
         }
         else{
