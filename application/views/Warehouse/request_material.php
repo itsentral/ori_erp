@@ -141,11 +141,11 @@ $this->load->view('include/side_menu');
 		
 	});
 
-	$(document).on('keyup', '.checkRequest', function(e){
+	$(document).on('blur', '.checkRequest', function(e){
 		var nomor 	= $(this).data('no');
 		var nomor2 	= $(this).data('no2');
 		var request 	= getNum($(this).val().split(",").join(""))
-		var stock 		= getNum($('#stock_'+nomor).vals().split(",").join(""))
+		var stock 		= getNum($('#stock_'+nomor).val().split(",").join(""))
 		var konversi 	= getNum($('#konversi_'+nomor).val().split(",").join(""))
 		// console.log(request)
 		// console.log(stock)
