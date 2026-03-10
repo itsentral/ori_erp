@@ -141,7 +141,7 @@ $this->load->view('include/side_menu');
 		
 	});
 
-	$(document).on('keyup', '.checkRequest', function(e){
+	$(document).on('blur', '.checkRequest', function(e){
 		var nomor 	= $(this).data('no');
 		var nomor2 	= $(this).data('no2');
 		var request 	= getNum($(this).val().split(",").join(""))
