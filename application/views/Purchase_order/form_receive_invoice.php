@@ -320,7 +320,7 @@ if($results->invoice_no!="") {
         let discount        =  getNum($('#discount').val())
         let tax             =  getNum($('#tax').val())
         let delivery_cost   =  getNum($('#delivery_cost').val())
-		let dpp_cek             =  getNum($('#nilai_top').val())
+		let dpp_cek             =  getNum($('#nilai_net').val())
 
 		let sum_total = 0
         let total
