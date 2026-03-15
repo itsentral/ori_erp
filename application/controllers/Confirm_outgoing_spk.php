@@ -339,9 +339,9 @@ class Confirm_outgoing_spk extends CI_Controller {
 							
 				if($QTY_OKE+$stokjurnalakhir2 != 0){}
 				$PRICENEW = round(($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
-			    }else(
+			    }else{
 				$PRICENEW = round(($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/1;	
-				)
+				}
 				$in   = 'pindah gudang in';
 				$ket  = $in.$id_gudang_dari.$id_tujuan;
 				
