@@ -6346,6 +6346,12 @@
 				
 				$PRICENEW = round(($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
 
+				if($value+$stokjurnalakhir2 != 0){}
+				$PRICENEW = round(($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
+			    }else(
+				$PRICENEW = round(($PRICE*$value) + ($PRICE2*$stokjurnalakhir2)) + ($PRICE2*$stokjurnalakhir2))/1;	
+				)
+
 
 				if(!empty($rest_pusat)){
 					$ArrStock2[$key]['id'] 			= $rest_pusat[0]->id;
