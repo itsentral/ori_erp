@@ -6337,7 +6337,7 @@
 				$PRICENEW = ($PRICE2);
 				}
 
-                $costbook2 = $this->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
+                $costbook2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
 				
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
@@ -6477,7 +6477,7 @@
 		if(!empty($ArrHist)){
 			$CI->db->insert_batch('warehouse_history', $ArrHist);
 
-			$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+			$CI->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 
 		}
 
@@ -6494,7 +6494,7 @@
 		if(!empty($ArrHist2)){
 			$CI->db->insert_batch('warehouse_history', $ArrHist2);
 				
-			$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
+			$CI->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 		}
 
 		if(!empty($ArrStockInsert2)){
