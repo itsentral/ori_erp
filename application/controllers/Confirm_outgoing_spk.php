@@ -303,7 +303,7 @@ class Confirm_outgoing_spk extends CI_Controller {
 				$ArrJurnalNew[$key]['id_gudang_ke'] 		= $id_tujuan;
 				$ArrJurnalNew[$key]['kd_gudang_ke'] 		= get_name('warehouse', 'kd_gudang', 'id', $id_tujuan);
 				$ArrJurnalNew[$key]['qty_stock_awal'] 		= $stokjurnalakhir;
-				$ArrJurnalNew[$key]['qty_stock_akhir'] 	= $stokjurnalakhir-$QTY_OKE;
+				$ArrJurnalNew[$key]['qty_stock_akhir'] 	    = $stokjurnalakhir-$QTY_OKE;
 				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
 				$ArrJurnalNew[$key]['tgl_trans'] 			= $DateTime;
 				$ArrJurnalNew[$key]['qty_out'] 			= $QTY_OKE;
@@ -414,12 +414,12 @@ class Confirm_outgoing_spk extends CI_Controller {
 
 			$this->db->trans_start();
                 if(!empty($ArrUpdateStock)){
-                    move_warehouse($ArrUpdateStock,$id_gudang_dari,$id_tujuan,$kode_trans);
+                    move_warehouse($ArrUpdateStock,$id_gudang_dari,$id_tujuan,$kode_trans); 
                 }
 
-				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+				// $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				
-				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
+				// $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 
                 if(!empty($grouping_temp)){
                     insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
