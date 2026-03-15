@@ -6337,14 +6337,14 @@
 				$PRICENEW = ($PRICE2);
 				}
 
-                $costbook2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_tujuan, 'id_material'=>$key2),1)->row();
+                $costbook2 = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
 				
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
 				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
 				
-				$PRICENEW = round(($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
+				$PRICENEW = round(($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
 
 
 				if(!empty($rest_pusat)){
@@ -6385,7 +6385,7 @@
 					$ArrHist2[$key]['harga_baru'] 		= $PRICENEW;
 
 					$in   = 'pindah gudang in';
-					$ket  = $in.$id_gudang_dari.$id_tujuan;
+					$ket  = $in.$id_gudang_dari.$id_gudang_ke;
 
 					$ArrJurnalNew2[$key]['id_material'] 		= $key;
 					$ArrJurnalNew2[$key]['idmaterial'] 		    = $rest_pusat[0]->idmaterial;
