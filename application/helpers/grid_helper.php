@@ -6197,7 +6197,7 @@
 				$tanggal		= date('Y-m-d');
 				$Bln 			= substr($tanggal,5,2);
 				$Thn 			= substr($tanggal,0,4);
-				$Nojurnal      = $this->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
+				$Nojurnal      = $CI->Jurnal_model->get_Nomor_Jurnal_Sales_pre('101', $tanggal);
 				
 
 				
