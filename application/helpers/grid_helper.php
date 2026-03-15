@@ -6171,7 +6171,7 @@
 			//PENGURANGAN GUDANG
 			$rest_pusat = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key))->result();
 			
-			$coa_1    = $this->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
+			$coa_1    = $CI->db->get_where('warehouse', array('id'=>$id_gudang_dari))->row();
 			$coa_gudang = $coa_1->coa_1;
 			
 			
@@ -6319,7 +6319,7 @@
 				$rest_pusat = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key))->result();
 
 				
-				$coa_2    = $this->db->get_where('warehouse', array('id'=>$id_gudang_ke))->row();
+				$coa_2    = $CI->db->get_where('warehouse', array('id'=>$id_gudang_ke))->row();
 				$coa_gudang2 = $coa_2->coa_1;
                 
 				$qty_akhir2 = $CI->db->get_where('warehouse_stock',array('id_gudang'=>$id_gudang_ke, 'id_material'=>$key),1)->row();
