@@ -2650,9 +2650,9 @@ class Warehouse_model extends CI_Model {
 
 			$this->db->trans_start();
 
-				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+				//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				
-				$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
+				//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 
 				if($type_gudang == 'pusat'){
 					insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');

@@ -1766,10 +1766,10 @@ class Warehouse extends CI_Controller {
 			$this->db->where('kode_trans', $kode_trans);
 			$this->db->update('warehouse_adjustment', $ArrUpdateHeadAjudtment);
 			
-			$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+			//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				 
 			 if(!empty($ArrJurnalNew2)){
-				 $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
+				// $this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 			}
 
 			if(!empty($ArrDeatil)){
