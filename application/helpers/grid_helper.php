@@ -6255,7 +6255,7 @@
 				$ArrJurnalNew[$key]['kode_trans'] 			= $kode_trans;
 				$ArrJurnalNew[$key]['tgl_trans'] 			= $dateTime;
 				$ArrJurnalNew[$key]['qty_out'] 			= $value;
-				$ArrJurnalNew[$key]['ket'] 				= 'pindah gudang out';
+				$ArrJurnalNew[$key]['ket'] 				= 'pengurangan gudang';
 				$ArrJurnalNew[$key]['harga'] 			= $PRICE;
 				$ArrJurnalNew[$key]['harga_bm'] 		= 0;
 				$ArrJurnalNew[$key]['nilai_awal_rp']	= $rest_pusat[0]->qty_stock*$PRICE;
@@ -6390,7 +6390,7 @@
 					$ArrHist2[$key]['saldo_akhir']		= ($rest_pusat[0]->qty_stock + $value)*$PRICENEW;
 					$ArrHist2[$key]['harga_baru'] 		= $PRICENEW;
 
-					$in   = 'pindah gudang in';
+					$in   = 'penambahan gudang';
 					$ket  = $in.$id_gudang_dari.$id_gudang_ke;
 
 					$ArrJurnalNew2[$key]['id_material'] 		= $key;
