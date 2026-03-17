@@ -2080,7 +2080,7 @@ class Outgoing extends CI_Controller {
 						//insertDataGroupReport($grouping_tempGudang, $key, $gudang_ke, $kode_trans, $no_ipp, $no_spk, $nm_product);
 						if(!empty($grouping_temp)){
 							insert_jurnal($grouping_temp,$key,15,$kode_trans,'material to FG','pengurangan subgudang','penambahan gudang finish good');
-							$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
+							//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 						}
                         if(!empty($tempMaterial)){
 							$this->db->insert_batch('erp_data_subgudang', $tempMaterial);
