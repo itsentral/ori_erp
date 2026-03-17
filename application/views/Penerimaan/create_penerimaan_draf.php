@@ -16,7 +16,7 @@ $this->load->view('include/side_menu');
                             <?php
                             $tglinv=date('Y-m-d');
                             ?>
-                            <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Bayar :</label>
+                            <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Bayar :</label> 
                             <div class="col-sm-6">
                                 <input type="hidden" name="no_invoice" id="no_invoice"  class="form-control input-sm" readonly>
                                 <input type="hidden" name="tgl_invoice" id="tgl_invoice"  class="form-control input-sm" readonly>
@@ -222,10 +222,10 @@ $this->load->view('include/side_menu');
 				$tipe = $dt->tipe_bayar;
 				?>
 							
-				<option value="">Pilih Tipe</option>
-				
+				<option value="">Pilih Tipe</option>				
 				<option value="PROGRESS" <?php echo ($tipe == 'PROGRESS') ? "selected": "" ?>>PROGRESS</option>
-				<option value="RETENSI" <?php echo ($tipe == 'RETENSI') ? "selected": "" ?> >RETENSI</option>
+				<option value="RETENSI" <?php echo ($tipe == 'RETENSI') ? "selected": "" ?> >RETENSI TANPA PPN</option>
+				<option value="RETENSI PPN" <?php echo ($tipe == 'RETENSI PPN') ? "selected": "" ?> >RETENSI DENGAN PPN</option>
 				</select>
 				</td>
 				

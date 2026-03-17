@@ -511,7 +511,7 @@ $this->load->view('include/side_menu');
 					success: function(data){
 						if(data.status == 1){
 						swal({
-						  title	: "Save Success!",
+						  title	: "Save Success!", 
 						  text	: data.pesan,
 						  type	: "success",
 						  timer	: 15000,
@@ -783,7 +783,11 @@ $this->load->view('include/side_menu');
 				+ '<td style="padding:3px;"><input type="text" class="form-control input-sm" name="sisa_invoice[]" id="sisa_invoice'+Urut+'" style="text-align:center;" readonly value="'+real2+'"></td>'
 				+ '<td style="padding:3px;"><input type="text" class="form-control input-sm" name="sisa_retensi[]" id="sisa_retensi'+Urut+'" style="text-align:center;" readonly value="'+ret2+'"></td>'
 				+ '<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_bayar divide" name="jml_bayar[]" id="jml_bayar'+Urut+'" style="text-align:right;" value="'+number_format(tot)+'" onchange="cekall()" ></td>'
-				+ '<td style="padding:3px;"><select class="form-control input-sm tipe_bayar" name="tipe_bayar[]" id="tipe_bayar'+Urut+'"><option value="">Pilih Tipe</option><option value="PROGRESS">PROGRESS</option><option value="RETENSI">RETENSI</option></select></td>'
+				+ '<td style="padding:3px;"><select class="form-control input-sm tipe_bayar" name="tipe_bayar[]" id="tipe_bayar'+Urut+'"><option value="">Pilih Tipe</option>
+				<option value="PROGRESS">PROGRESS</option>
+				<option value="RETENSI">RETENSI TANPA PPN</option>
+				<option value="RETENSI PPN">RETENSI DENGAN PPN</option>		
+				</select></td>'
 				+ '<td style="padding:3px;"><select class="form-control input-sm" name="jenis_pph2[]" id="jenis_pph2'+Urut+'"><option value="">Pilih PPH</option><option value="1106-01-04">PREPAID TAX - PPH 22</option><option value="1106-01-03">PREPAID TAX - PPH 23</option><option value="1106-01-06">PREPAID TAX - PPH PSL 4 (2)</option></select></td>'
 				+ '<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_pph divide" name="pph[]" id="pph'+Urut+'" style="text-align:right;" onchange="cekall()"></td>'
 				+ '<td style="padding:3px;"><center><div class="btn-group" style="margin:0px;">'

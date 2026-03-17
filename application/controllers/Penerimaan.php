@@ -221,7 +221,7 @@ class Penerimaan extends CI_Controller {
 						'id_customer'=>$idcs,
 						'nm_customer'=>$nmcs,
 						'lebih_bayar'=>str_replace(",","",$this->input->post('pakai_lebih_bayar')),
-						'tambah_lebih_bayar'=>str_replace(",","",$this->input->post('tambah_lebih_bayar')),
+						'tambah_lebih_bayar'=>str_replace(",","",$this->input->post('tambah_lebih_bayar')), 
 
 					);
 					
@@ -749,6 +749,23 @@ class Penerimaan extends CI_Controller {
 					          'created_by'         => $created_by,
 							); 
 							
+							}elseif($tipe=='RETENSI PPN'){
+								
+							 $det_Jurnaltes[] = array(
+							  'nomor'         => $Nomor_JV,
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'BUM',
+							  'no_perkiraan'  => '1102-01-02',
+							  'keterangan'    => $Keterangan_INV,
+							  'no_reff'       => $invoice2,
+							  'debet'         => 0,
+							  'kredit'        => $jmlinvoice,
+							  'nilai_valas_debet'         => 0,
+							  'nilai_valas_kredit'        => $jmlbayarusd,
+							  'created_on'         => $created_on,
+					          'created_by'         => $created_by,
+							); 
+							
 							}
 							
 						
@@ -780,6 +797,23 @@ class Penerimaan extends CI_Controller {
 							  'tanggal'       => $tgl_voucher,
 							  'tipe'          => 'BUM',
 							  'no_perkiraan'  => '1102-01-03',
+							  'keterangan'    => $Keterangan_INV,
+							  'no_reff'       => $invoice2,
+							  'debet'         => 0,
+							  'kredit'        => $jmlbayar,
+							  'nilai_valas_debet'         => 0,
+							  'nilai_valas_kredit'        => 0,
+							  'created_on'         => $created_on,
+							  'created_by'         => $created_by,
+							);
+							
+							}elseif($tipe=='RETENSI PPN'){
+								
+							$det_Jurnaltes[] = array(
+							  'nomor'         => $Nomor_JV,
+							  'tanggal'       => $tgl_voucher,
+							  'tipe'          => 'BUM',
+							  'no_perkiraan'  => '1102-01-01',
 							  'keterangan'    => $Keterangan_INV,
 							  'no_reff'       => $invoice2,
 							  'debet'         => 0,
@@ -824,6 +858,9 @@ class Penerimaan extends CI_Controller {
 
 					}elseif($tipe2=='RETENSI'){
 					$noperkiraan = '1102-01-04';
+
+					}elseif($tipe2=='RETENSI PPN'){
+					$noperkiraan = '1102-01-02';
 					}
 		
 			   } else {
@@ -835,6 +872,10 @@ class Penerimaan extends CI_Controller {
 					}elseif($tipe2=='RETENSI'){
 						
 						$noperkiraan = '1102-01-03';
+						
+					}elseif($tipe2=='RETENSI PPN'){
+						
+						$noperkiraan = '1102-01-01';
 						
 					}
 					
