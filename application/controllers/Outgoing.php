@@ -1871,6 +1871,8 @@ class Outgoing extends CI_Controller {
 						$grouping_temp = [];
 						$grouping_tempGudang = [];
 						$temp = [];
+
+						$TotalPriceBook = 0;
 						foreach($valueParent as $value) {
 							if(!array_key_exists($value['id'], $temp)) {
 								$temp[$value['id']]['good'] = 0;
