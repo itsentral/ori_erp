@@ -5,7 +5,7 @@ $this->load->view('include/side_menu');
 <form action="#" method="POST" id="form_proses_bro" autocomplete='off'>
 	<div class="box box-primary">
 		<div class="box-header">
-			<h3 class="box-title"><?php echo $title;?></h3>
+			<h3 class="box-title"><?php echo $title;?></h3> 
 		</div>
 		<!-- /.box-header -->
 		<div class="box-body">
@@ -158,6 +158,34 @@ $this->load->view('include/side_menu');
 						$SUM	 += (($HrgTot) + ($HrgTot * ($allow/100)));
 						$SUM_KG += $TotalBerat;
 						
+						echo "<br> total berat";
+						print_r($TotalBerat);
+						echo "<br total harga>";
+						print_r($TotalPrice);
+						echo "<br>";
+						print_r($direct_labour);
+						echo "<br>";
+						print_r($indirect_labour );
+						echo "<br>";
+						print_r($machine);
+						echo "<br>";
+						print_r($mould_mandrill);
+						echo "<br>";
+						print_r($consumable);
+						echo "<br> cost proses";
+						print_r($cost_process);
+						echo "<br>";
+						print_r($foh_consumable);
+						echo "<br>";
+						print_r($foh_depresiasi);
+						echo "<br>";
+						print_r($biaya_gaji_non_produksi);
+						echo "<br>";
+						print_r($biaya_non_produksi);
+						echo "<br>";
+						print_r($biaya_rutin_bulanan);
+						echo "<br>";
+
 						echo "<tr>";
 							echo "<td align='center'>".$no."</td>";
 							echo "<td>".strtoupper($id_category)."</td>";
