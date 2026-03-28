@@ -109,7 +109,7 @@ class Total_value_product extends CI_Controller {
         $row++;
     }
 
-    $filename = 'wip_'.$gudang.'_'.(!empty($date_filter)?$date_filter:date('Y-m-d')).'.xls';
+    $filename = 'Stock_'.$gudang.'_'.(!empty($date_filter)?$date_filter:date('Y-m-d')).'.xls';
 
     header("Content-Type: application/vnd.ms-excel");
     header("Content-Disposition: attachment;filename=".$filename);
