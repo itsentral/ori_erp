@@ -47,6 +47,115 @@ class Total_value_product extends CI_Controller {
 	}
 
 
+	public function ExcelGudang(){
+
+    set_time_limit(0);
+    ini_set('memory_limit','1024M');
+
+    $gudang = $this->uri->segment(3);
+    $date_filter = $this->uri->segment(4);
+
+    // kalau '0' dari JS → anggap kosong
+    if($date_filter == '0'){
+        $date_filter = null;
+    }
+
+    $this->load->library("PHPExcel");
+    $objPHPExcel = new PHPExcel();
+
+    $sheet = $objPHPExcel->getActiveSheet();
+
+    // 🔥 ambil data dari function central
+    $data = $this->getDataWIP($gudang, $date_filter);
+
+    $nm_gudang = strtoupper($gudang);
+    $tanggal_update = (!empty($date_filter))
+        ? " (".date('d F Y', strtotime($date_filter)).")"
+        : " (".date('d F Y').")";
+
+    // HEADER
+    $sheet->setCellValue('A1', 'TOTAL VALUE PRODUCT - '.$nm_gudang.$tanggal_update);
+    $sheet->mergeCells('A1:I1');
+
+    // TABLE HEADER
+    $sheet->setCellValue('A3', '#');
+    $sheet->setCellValue('B3', 'Nomor SO');
+    $sheet->setCellValue('C3', 'Nomor SPK');
+    $sheet->setCellValue('D3', 'No Trans');
+    $sheet->setCellValue('E3', 'Produk');
+    $sheet->setCellValue('F3', 'Keterangan');
+    $sheet->setCellValue('G3', 'Stock');
+    $sheet->setCellValue('H3', 'Nilai per Unit');
+    $sheet->setCellValue('I3', 'Total Value');
+
+    // ISI DATA
+    $row = 4;
+    $no  = 1;
+
+    foreach($data as $val){
+
+        $qty = ($val['qty']==0) ? 1 : $val['qty'];
+
+        $sheet->setCellValue('A'.$row, $no++);
+        $sheet->setCellValue('B'.$row, $val['no_so']);
+        $sheet->setCellValue('C'.$row, $val['no_spk']);
+        $sheet->setCellValue('D'.$row, $val['kode_trans']);
+        $sheet->setCellValue('E'.$row, $val['product']);
+        $sheet->setCellValue('F'.$row, $val['keterangan']);
+        $sheet->setCellValue('G'.$row, $val['qty']);
+        $sheet->setCellValue('H'.$row, $val['nilai_wip'] / $qty);
+        $sheet->setCellValue('I'.$row, $val['nilai_wip']);
+
+        $row++;
+    }
+
+    $filename = 'wip_'.$gudang.'_'.(!empty($date_filter)?$date_filter:date('Y-m-d')).'.xls';
+
+    header("Content-Type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment;filename=".$filename);
+    header("Cache-Control: max-age=0");
+
+    $writer = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $writer->save('php://output');
+}
+
+
+private function getDataWIP($gudang, $date_filter = null){
+
+    // tentukan tabel
+    if(!empty($date_filter)){
+        if($gudang=='wip'){
+            $table = "warehouse_stock_wip_per_day";
+        }elseif($gudang=='fg'){
+            $table = "warehouse_stock_fg_per_day";
+        }elseif($gudang=='intransit'){
+            $table = "warehouse_stock_intransit_per_day";
+        }elseif($gudang=='incustomer'){
+            $table = "warehouse_stock_incustomer_per_day";
+        }
+    }else{
+        if($gudang=='wip'){
+            $table = "warehouse_stock_wip";
+        }elseif($gudang=='fg'){
+            $table = "warehouse_stock_fg";
+        }elseif($gudang=='intransit'){
+            $table = "warehouse_stock_intransit";
+        }elseif($gudang=='incustomer'){
+            $table = "warehouse_stock_incustomer";
+        }
+    }
+
+    $this->db->select('a.*');
+    $this->db->from($table.' a');
+
+    // filter tanggal
+    if(!empty($date_filter)){
+        $this->db->where('DATE(a.hist_date)', $date_filter);
+    }
+
+    return $this->db->get()->result_array();
+}
+
 	public function product_fg(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)).'/'.strtolower($this->uri->segment(3)));
 		$Arr_Akses			= getAcccesmenu($controller);
@@ -599,7 +708,7 @@ class Total_value_product extends CI_Controller {
 		return $data;
 	}
 
-    public function ExcelGudang(){
+    public function ExcelGudang2(){
 		//membuat objek PHPExcel
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
