@@ -429,7 +429,7 @@ class Pembayaran_material extends CI_Controller {
 			'results'		=> $results,
 		);
 		history('Form Payment');
-		$this->load->view('Pembayaran_material/form_payment_new.php',$data);
+		$this->load->view('Pembayaran_material/form_payment_new.php',$data); 
 	}
 	public function payment(){
 		$controller			= ucfirst(strtolower($this->uri->segment(1)).'/'.strtolower($this->uri->segment(2)));
@@ -623,10 +623,10 @@ class Pembayaran_material extends CI_Controller {
 				// ADMIN BANK
 				if($rec->parameter_no=="8"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $bank_coa, 'keterangan' => $rec->keterangan, 'no_request' => $no_payment, 'kredit' => $biaya_admin, 'debet' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $bank_coa, 'keterangan' => $rec->keterangan, 'no_request' => $no_payment, 'kredit' => $biaya_admin, 'debet' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => $biaya_admin_forex,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$id_supplier, 'stspos' => '1'
 					);
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $bank_coa, 'keterangan' => $rec->keterangan, 'no_request' => $no_payment, 'kredit' => $biaya_admin2, 'debet' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $bank_coa, 'keterangan' => $rec->keterangan, 'no_request' => $no_payment, 'kredit' => $biaya_admin2, 'debet' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => $biaya_admin_forex2,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$id_supplier, 'stspos' => '1'
 					);
 				}
 			}
