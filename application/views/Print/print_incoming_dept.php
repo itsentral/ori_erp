@@ -73,7 +73,7 @@ $TANGGAL = (!empty($rest_data[0]['tanggal']))?date('d F Y', strtotime($rest_data
             $keterangan 	= (!empty($valx['keterangan']))?ucfirst($valx['keterangan']):'-';
             $pemeriksa 	= (!empty($valx['ket_req_pro']))?ucfirst($valx['ket_req_pro']):'-';
             if($tanda == 'check' AND $checked == 'Y'){
-                $qty_oke 		= number_format($valx['check_qty_oke']);
+                $qty_oke 		= number_format($valx['check_qty_oke'],4);
                 $keterangan 	= (!empty($valx['check_keterangan']))?ucfirst($valx['check_keterangan']):'-';
                 $pemeriksa 	= (!empty($valx['ket_req_pro']))?ucfirst($valx['ket_req_pro']):'-';
             }
@@ -81,7 +81,7 @@ $TANGGAL = (!empty($rest_data[0]['tanggal']))?date('d F Y', strtotime($rest_data
             echo "<tr>";
                 echo "<td align='center'>".$No."</td>";
                 echo "<td>".strtoupper($valx['nm_material'])."</td>";
-                echo "<td align='center'>".number_format($qty_oke,4)."</td>";
+                echo "<td align='center'>".$qty_oke."</td>";
                 echo "<td>".$keterangan."</td>";
                 echo "<td>".$pemeriksa."</td>";
             echo "</tr>";
