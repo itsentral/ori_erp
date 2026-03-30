@@ -74,8 +74,8 @@
                         echo "<td>".strtoupper($dept)."</td>";
                         echo "<td>".strtoupper($nm_barang)."</td>";
                         echo "<td>".strtoupper($spec_barang)."</td>";
-                        echo "<td align='center'>".number_format($qty,2)."</td>";
-                        echo "<td align='center' class='belumDiterima'>".number_format($Qty_kurang,2)."</td>";
+                        echo "<td align='center'>".number_format($qty,4)."</td>";
+                        echo "<td align='center' class='belumDiterima'>".number_format($Qty_kurang,4)."</td>";
                         // echo "<td align='center'>".strtoupper($satuan)."</td>";
                     // echo "	<td>
                     //             <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
