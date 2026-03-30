@@ -81,7 +81,7 @@ $TANGGAL = (!empty($rest_data[0]['tanggal']))?date('d F Y', strtotime($rest_data
             echo "<tr>";
                 echo "<td align='center'>".$No."</td>";
                 echo "<td>".strtoupper($valx['nm_material'])."</td>";
-                echo "<td align='center'>".$qty_oke."</td>";
+                echo "<td align='center'>".number_format($qty_oke,4)."</td>";
                 echo "<td>".$keterangan."</td>";
                 echo "<td>".$pemeriksa."</td>";
             echo "</tr>";
