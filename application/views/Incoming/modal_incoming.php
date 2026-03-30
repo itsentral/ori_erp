@@ -111,7 +111,7 @@
 <script>
 	$(document).ready(function(){
         swal.close();
- 		$('.maskM').autoNumeric('init', {mDec: '2', aPad: false});
+ 		$('.maskM').autoNumeric('init', {mDec: '4', aPad: false});
     });
 
     $(document).on('keyup','.qtyDiterima',function(){
