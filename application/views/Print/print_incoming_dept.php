@@ -69,7 +69,7 @@ $TANGGAL = (!empty($rest_data[0]['tanggal']))?date('d F Y', strtotime($rest_data
 		<?php
 		$No=0;
 		foreach($rest_d AS $val => $valx){$No++;
-            $qty_oke 		= number_format($valx['qty_oke']);
+            $qty_oke 		= number_format($valx['qty_oke'],4);
             $keterangan 	= (!empty($valx['keterangan']))?ucfirst($valx['keterangan']):'-';
             $pemeriksa 	= (!empty($valx['ket_req_pro']))?ucfirst($valx['ket_req_pro']):'-';
             if($tanda == 'check' AND $checked == 'Y'){
