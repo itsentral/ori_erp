@@ -108,12 +108,14 @@ $tandaKg 	= ($category_req == 'request produksi')?'text':'hidden';
 						$REQUEST = $STOCK_PACK ;
 					}
 
-					if($STOCK_PACK  < 0){
+					if($STOCK_PACK  <= 0){
 						$REQUEST = 0;
 					}
 
+					$disabledPack = ($STOCK_PACK <= 0) ? 'disabled readonly' : '';
+
                     echo "<td align='center'>
-							<input type='".$tandaPack."' name='detail[".$No."][detail][1][qty_pack]' id='cstkpack_".$No."_1' data-no='$No' data-no2='1' class='form-control input-sm text-center autoNumeric4a checkRequest' value='".$REQUEST."'>
+							<input type='".$tandaPack."' name='detail[".$No."][detail][1][qty_pack]' id='cstkpack_".$No."_1' data-no='$No' data-no2='1' data-stock='".$STOCK_PACK."' class='form-control input-sm text-center autoNumeric4a checkRequest' value='".$REQUEST."' ".$disabledPack.">
 							<input type='".$tandaKg."' name='detail[".$No."][detail][1][qty_oke]' id='cstk_".$No."_1' data-no='$No' data-no2='1' class='form-control input-sm text-right autoNumeric4 checkRequest' value='".$REQUEST*$konversi."'>
 						</td>";
 					echo "<td align='center'>
@@ -165,6 +167,21 @@ $tandaKg 	= ($category_req == 'request produksi')?'text':'hidden';
 		$(".autoNumeric4").autoNumeric('init', {mDec: '4', aPad: false});
 		$(".autoNumeric4a").autoNumeric('init', {mDec: '4', aPad: false});
         swal.close();
+
+		// Validasi: jika stock 0, input confirm tidak boleh diisi
+		$(document).on('change keyup', '.checkRequest', function(){
+			var stock = parseFloat($(this).data('stock')) || 0;
+			if(stock <= 0){
+				$(this).val(0);
+				swal({
+					title: "Warning!",
+					text: "Stock kosong, tidak bisa input Confirm.",
+					type: "warning",
+					timer: 3000,
+					showConfirmButton: false
+				});
+			}
+		});
     });
 
 </script>
