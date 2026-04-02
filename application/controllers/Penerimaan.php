@@ -464,9 +464,6 @@ class Penerimaan extends CI_Controller {
 		  
 			
 		
-		$this->save_jurnal_BUM();
-		
-		
 	    if($this->db->trans_status() === FALSE){
 			 $this->db->trans_rollback(); 
 			 $Arr_Return		= array(
