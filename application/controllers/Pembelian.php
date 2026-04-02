@@ -1194,6 +1194,12 @@ class Pembelian extends CI_Controller {
 		$no_po=$data['no_po']; 
 
 		$datapo = $this->db->query("select * from tran_po_header where no_po='".$no_po."'")->row();
+
+		if(empty($datapo)){
+			$this->db->trans_complete();
+			echo json_encode(['pesan' => 'Data PO tidak ditemukan: '.$no_po, 'status' => 2, 'id' => $id]);
+			return;
+		}
 //		if($data->nilai_terima_barang_kurs>0){
 		if($total>0){
 			$totalunbill=0;
@@ -1211,7 +1217,7 @@ class Pembelian extends CI_Controller {
 			$det_Jurnaltes1=array();
 //			$total=($data->nilai_terima_barang_kurs);
 
-			if($total!=0) {
+			if($total!=0 && !empty($datajurnal1)) {
 			  foreach ($datajurnal1 as $rec) {
 				if($rec->parameter_no=="1"){
 				   
@@ -1438,7 +1444,6 @@ class Pembelian extends CI_Controller {
 			$Thn	= substr($tanggal,0,4);
 			$total	= 0;
 			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tanggal);
-			$det_Jurnaltes1=array();
 			foreach ($det_Jurnaltes1 as $vals) {
 				$datadetail = array(
 					'tipe'			=> 'JV',
