@@ -169,9 +169,11 @@ $tandaKg 	= ($category_req == 'request produksi')?'text':'hidden';
         swal.close();
 
 		// Validasi: jika stock 0, input confirm tidak boleh diisi
-		$(document).on('change keyup', '.checkRequest', function(){
-			var stock = parseFloat($(this).data('stock')) || 0;
-			if(stock <= 0){
+		$(document).on('keyup', '.checkRequest', function(){
+			// hanya validasi input yang punya data-stock (input Pack), bukan input Kg
+			if($(this).data('stock') === undefined) return;
+			var stock = parseFloat($(this).data('stock'));
+			if(!isNaN(stock) && stock <= 0){
 				$(this).val(0);
 				swal({
 					title: "Warning!",
