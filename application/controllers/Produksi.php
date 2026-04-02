@@ -8881,6 +8881,24 @@ class Produksi extends CI_Controller {
 											AND id_material <> 'MTL-1903000'
 										ORDER BY
 											id_detail DESC
+										)
+										UNION
+										(
+											SELECT
+												id_milik,
+												id_material,
+												nm_material,
+												id_category,
+												nm_category,
+												last_cost AS berat 
+											FROM
+												so_component_detail_add
+											WHERE
+												id_milik IN ".$IMPLODE_IN." 
+												AND detail_name = 'RESIN AND ADD' 
+												AND id_material <> 'MTL-1903000'
+											ORDER BY
+											id_detail 
 										)")->result_array();
 			$get_structure_mix = $this->db->query("(SELECT
 												id_milik,
