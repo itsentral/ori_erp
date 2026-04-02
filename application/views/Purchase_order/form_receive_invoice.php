@@ -197,6 +197,16 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		autoclose:true
 	});
 
+	// Auto-set kurs ke 1 jika IDR saat halaman load
+	$(document).ready(function(){
+		if ($('#matauang2').val() == 'IDR') {
+			var kursVal = parseFloat($('#kurs').val().split(',').join('')) || 0;
+			if (kursVal != 1) {
+				$('#kurs').val('1');
+			}
+		}
+	});
+
 	$(document).on('click', '.detailAjust', function(e){ 
 		e.preventDefault();
 		loading_spinner();
@@ -253,6 +263,21 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
 		  	d_error='Kurs Error!';
    			alert(d_error);
         }
+
+		// Validasi: jika IDR, kurs harus 1
+		if ($('#matauang2').val() == "IDR") {
+			var kursVal = parseFloat($('#kurs').val().split(',').join('')) || 0;
+			if (kursVal != 1) {
+				$('#kurs').val('1');
+				swal({
+					title: "Perhatian!",
+					text: "Mata uang IDR, kurs otomatis diset ke 1.",
+					type: "warning",
+					timer: 3000,
+					showConfirmButton: false
+				});
+			}
+		}
 
 		if(invoice_total > nilai_po){
    			d_error='Nilai Invoice Lebih Besar Dari Nilai PO ';
