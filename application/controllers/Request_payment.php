@@ -659,8 +659,14 @@ class Request_payment extends CI_Controller {
 		// exit;
 
 		if (!empty($status)) {
+			$processed_no_doc = []; // track no_doc yang sudah diproses
 			foreach ($status as $keys => $val) {
 				if ($bank_nilai[$keys] <> 0) {
+					// skip jika no_doc ini sudah diproses dalam loop yang sama
+					if (in_array($no_doc[$keys], $processed_no_doc)) {
+						continue;
+					}
+					$processed_no_doc[] = $no_doc[$keys];
 					$filenames = "";
 					if (!empty($_FILES['doc_file_' . $val]['name'])) {
 						$_FILES['file']['name'] = $_FILES['doc_file_' . $val]['name'];
