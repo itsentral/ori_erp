@@ -908,12 +908,21 @@ class Purchase extends CI_Controller {
 		$no_perkiraan='';
 		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
 
+		if(empty($datapo)){
+			$this->db->trans_complete();
+			echo json_encode(['pesan' => 'Data PO tidak ditemukan: '.$no_po, 'status' => 2, 'id' => $id]);
+			return;
+		}
+
 		$dataros = $this->db->query("select * from warehouse_adjustment where no_ipp='".$no_po."'")->row();
+		$noRos = '';
+		$selisihKurs = 0;
+		$selisihIDR = 0;
 		if(!empty($dataros)){
-        $noRos = $dataros->no_ros;
-		$kursRos = $dataros->kurs;
-		$selisihKurs = $kursInv - $kursRos;
-		$selisihIDR = $selisihKurs*$net;
+            $noRos = $dataros->no_ros;
+			$kursRos = $dataros->kurs;
+			$selisihKurs = $kursInv - $kursRos;
+			$selisihIDR = $selisihKurs*$net;
 		}
 
 		
@@ -928,7 +937,7 @@ class Purchase extends CI_Controller {
 			$nomor_jurnal=$jenis_jurnal.$no_po.rand(100,999);
 			$payment_date=$data['tgl_terima']; // date("Y-m-d")
 			$det_Jurnaltes1=array();
-			if($total!=0) {
+			if($total!=0 && !empty($datajurnal1)) {
 			  foreach ($datajurnal1 as $rec) { 
 				if($rec->parameter_no=="1"){
 					$det_Jurnaltes1[] = array(
