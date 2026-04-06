@@ -74,7 +74,7 @@
                         echo "<td>".strtoupper($nm_barang)."</td>";
                         echo "<td>".strtoupper($spec_barang)."</td>";
                         echo "<td align='center'>".number_format($qty,4)."</td>";
-                        echo "<td align='center' class='belumDiterima'>".number_format($Qty_kurang,4)."</td>";
+                        echo "<td align='center' class='belumDiterima' data-qty='".($qty)."'>".number_format($Qty_kurang,4)."</td>";
                         // echo "<td align='center'>".strtoupper($satuan)."</td>";
                     // echo "	<td>
                     //             <select name='addInMat[$No][status]' class='form-control input-md chosen_select'>
@@ -82,7 +82,7 @@
                     //                 <option value='2'>NO</option>
                     //             </select>
                     //         </td>";
-                    echo "<td align='center'><input type='text' name='addInMat[$No][qty_in]' data-no='$No' class='form-control input-sm text-center maskM qtyDiterima' value='0'></td>";
+                    echo "<td align='center'><input type='number' step='0.0001' min='0' name='addInMat[$No][qty_in]' data-no='$No' class='form-control input-sm text-center qtyDiterima' value='0'></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][keterangan]' data-no='$No' class='form-control input-sm text-left'></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][pemeriksa]' data-no='$No' class='form-control input-sm text-left'></td>";
                     // echo "<td align='center'><input type='file' name='upload_".$No."' data-no='$No' class='form-control input-sm text-left'></td>";
@@ -110,15 +110,18 @@
 <script>
 	$(document).ready(function(){
         swal.close();
- 		$('.maskM').autoNumeric('init', {mDec: '4', mInt: '10', aPad: false, vMin: '0'});
     });
 
-    $(document).on('keyup','.qtyDiterima',function(){
-		let belumDiterima 	= getNum($(this).parent().parent().find('.belumDiterima').text().split(',').join(''))
-		let qtyDiterima 	= getNum($(this).val().split(',').join(''))
+    $(document).on('change','.qtyDiterima',function(){
+		let $td           = $(this).closest('tr').find('.belumDiterima');
+		let belumDiterima = parseFloat($td.data('qty')) || 0;
+		let qtyDiterima   = parseFloat($(this).val()) || 0;
 
 		if(qtyDiterima > belumDiterima){
-			$(this).val(belumDiterima)
+			$(this).val(belumDiterima);
+		}
+		if(qtyDiterima < 0){
+			$(this).val(0);
 		}
 	})
 </script>
