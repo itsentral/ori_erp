@@ -38,12 +38,11 @@
                 $No=0;
                 foreach($result AS $val => $valx){
                     $No++;
+                    $cek_type = substr($no_po,0,3);
                     $EXPLODE = explode(' - ',$valx['nm_barang']);
                     if($cek_type != 'POX'){
-					    if(count($EXPLODE<1)) $EXPLODE[1]="";
+					    if(count($EXPLODE) < 2) $EXPLODE[1]="";
                     }
-
-                    $cek_type = substr($no_po,0,3);
 
                     
                     if($cek_type == 'NPO'){
@@ -83,7 +82,7 @@
                     //                 <option value='2'>NO</option>
                     //             </select>
                     //         </td>";
-                    echo "<td align='center'><input type='text' name='addInMat[$No][qty_in]' data-no='$No' class='form-control input-sm text-center maskM qtyDiterima' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
+                    echo "<td align='center'><input type='text' name='addInMat[$No][qty_in]' data-no='$No' class='form-control input-sm text-center maskM qtyDiterima' value='0'></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][keterangan]' data-no='$No' class='form-control input-sm text-left'></td>";
                     echo "<td align='center'><input type='text' name='addInMat[$No][pemeriksa]' data-no='$No' class='form-control input-sm text-left'></td>";
                     // echo "<td align='center'><input type='file' name='upload_".$No."' data-no='$No' class='form-control input-sm text-left'></td>";
@@ -111,7 +110,7 @@
 <script>
 	$(document).ready(function(){
         swal.close();
- 		$('.maskM').autoNumeric('init', {mDec: '4', aPad: false});
+ 		$('.maskM').autoNumeric('init', {mDec: '4', mInt: '10', aPad: false, vMin: '0'});
     });
 
     $(document).on('keyup','.qtyDiterima',function(){
