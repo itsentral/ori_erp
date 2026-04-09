@@ -280,7 +280,7 @@ class Invoicing_model extends CI_Model {
 		$data_session 		    = $this->session->userdata;
 
 		$no_ipp                 = $this->input->post('no_ipp');
-		$no_invoice 			= $this->invoicing_model->gen_invoice($no_ipp);
+    	$no_invoice 			= $this->invoicing_model->gen_invoice($no_ipp);
 		$id_customer			= $this->input->post('id_customer');
 		$nm_customer			= $this->input->post('nm_customer');
 		$no_bq                  = 'BQ-'.$no_ipp;
