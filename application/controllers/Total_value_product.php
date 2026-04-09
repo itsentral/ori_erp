@@ -103,8 +103,8 @@ class Total_value_product extends CI_Controller {
         $sheet->setCellValue('E'.$row, $val['product']);
         $sheet->setCellValue('F'.$row, $val['keterangan']);
         $sheet->setCellValue('G'.$row, $val['qty']);
-        $sheet->setCellValue('H'.$row, $val['nilai_wip'] / $qty);
-        $sheet->setCellValue('I'.$row, $val['nilai_wip']);
+        $sheet->setCellValue('H'.$row, $val['nilai_wip']);
+        $sheet->setCellValue('I'.$row, $val['nilai_wip'] * $qty);
 
         $row++;
     }
