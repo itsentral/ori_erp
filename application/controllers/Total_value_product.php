@@ -94,7 +94,7 @@ class Total_value_product extends CI_Controller {
 
     foreach($data as $val){
 
-        $qty = ($val['qty']==0) ? 1 : $val['qty'];
+        $qty = ($val['qty']==0) ? 0 : $val['qty'];
 
         $sheet->setCellValue('A'.$row, $no++);
         $sheet->setCellValue('B'.$row, $val['no_so']);
