@@ -59,6 +59,7 @@ class Penagihan extends CI_Controller {
 			$data_session	= $this->session->userdata;
 
 			$check = $data['check'];
+			$datadv = $data['dv'];
 
 			$dtListArray = [];
 			if(!empty($check)){
@@ -68,7 +69,9 @@ class Penagihan extends CI_Controller {
 				$dtImplode	= "('".implode("','", $dtListArray)."')";
 				$dtImplode2	= implode(",", $dtListArray);
 			}
-            $dv    = implode(",", $data['dv']);
+            if(!empty($datadv)){ 
+			    $dv    = implode(",", $data['dv'])
+			};
 			$result_data 	= $this->db->query("SELECT * FROM billing_so_gabung WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
 
 			$max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
@@ -2537,7 +2540,7 @@ if($base_cur=='USD'){
 				$retensi_FIX = $retensi_ppn;
 			}
 			if($retensi_ppn <= 0 ){
-				$retensi_FIX = $retensi_non_ppn;
+				$retensi_FIX = $retensi_non_ppn; 
 			}
 			$retensi				=  $retensi_FIX;
 			$retensi_idr		    =  $retensi_FIX * $kurs;
