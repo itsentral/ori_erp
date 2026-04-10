@@ -20,8 +20,8 @@
 						$nomor=0;
 						foreach($get_retensi AS $val => $valx){ 
 							$nomor++;
-							$harga_tot6			= number_format($valx['retensi_idr'],2);
-							$harga_tot6_hidden	= round($valx['retensi_idr'],2);
+							$harga_tot6			= number_format($valx['total_retensi_idr'],2);
+							$harga_tot6_hidden	= round($valx['total_retensi_idr'],2);
 							$SUM += $harga_tot6_hidden;
 							$material_name = ($valx['nomor_po']).' / RETENSI';
 							?>
