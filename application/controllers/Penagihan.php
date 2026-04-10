@@ -70,8 +70,8 @@ class Penagihan extends CI_Controller {
 				$dtImplode2	= implode(",", $dtListArray);
 			}
             if(!empty($datadv)){ 
-			    $dv    = implode(",", $data['dv'])
-			};
+			    $dv    = implode(",", $data['dv']);
+			}
 			$result_data 	= $this->db->query("SELECT * FROM billing_so_gabung WHERE id IN ".$dtImplode." ORDER BY id ")->result_array();
 
 			$max_num 		= $this->db->select('MAX(id) AS nomor_max')->get('penagihan')->result();
