@@ -1131,7 +1131,7 @@ class Qc_tanki extends CI_Controller
 						'kode_trans' => $vals->kode_trans,
 						'id_pro_det' => $vals->id_pro_det,
 						'qty' => $qty_n,
-						'nilai_wip' => $vals->nilai_wip,
+						'nilai_wip' => $vals->nilai_wip/$vals->total,
 						'material' => $vals->material,
 						'wip_direct' =>  $vals->wip_direct,
 						'wip_indirect' =>  $vals->wip_indirect,
