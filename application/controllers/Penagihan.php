@@ -2967,7 +2967,7 @@ if($base_cur=='USD'){
 						$harga_sat6       		 = 0;
 						$qty6                    = 0;
 						$unit6                   = $d6['unit6'];
-						$harga_tot6       		 = $d6['harga_tot6'];
+						$harga_tot6       		 = $d6['harga_tot6_hidden'];
 						$harga_tot6_ori			 = $harga_tot6;//$d6['harga_tot6_ori'];
 						$harga_tot6_sisa		 = 0;//$d6['harga_tot6_sisa'];
 						if($harga_tot6>0) $checked='1';
