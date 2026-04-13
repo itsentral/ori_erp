@@ -13603,6 +13603,9 @@ class Produksi extends CI_Controller {
 			$idlaporan = $id;
 			$Keterangan_INV = 'Jurnal Produksi - WIP';
 			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead2 = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '' , 'jenis_transaksi' => 'wip');
+			
+			
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
@@ -13618,6 +13621,10 @@ class Produksi extends CI_Controller {
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
+            
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$this->db->insert('gl_interface',$dataJVhead2);
+			
 			unset($det_Jurnaltes);unset($datadetail);
 
 
