@@ -5893,7 +5893,6 @@ class Delivery extends CI_Controller
 
 			if(!empty($ArrGroupOut)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOut);
-				$this->jurnalIntransit($kode_delivery);
 			}
 			
 			if(!empty($ArrGroupMaterial)){
@@ -5903,7 +5902,6 @@ class Delivery extends CI_Controller
 
 			if(!empty($ArrGroupOutMaterial)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOutMaterial);
-				$this->jurnalIntransit($kode_delivery);
 			}
 
 			if(!empty($ArrGroupSpool)){
@@ -5913,6 +5911,9 @@ class Delivery extends CI_Controller
 
 			if(!empty($ArrGroupOutSpool)){
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
+			}
+
+			if(!empty($ArrGroupOut) || !empty($ArrGroupOutMaterial) || !empty($ArrGroupOutSpool)){
 				$this->jurnalIntransit($kode_delivery);
 			}
 		
