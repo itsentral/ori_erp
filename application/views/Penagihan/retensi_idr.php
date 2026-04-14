@@ -20,11 +20,6 @@
 						$nomor=0;
 						foreach($get_retensi AS $val => $valx){ 
 							$nomor++;
-
-							print_r($approval);
-							exit;
-
-
 							if(!empty($approval)){
 							$harga_tot6			= number_format($valx['harga_total_idr'],2);
 							$harga_tot6_hidden	= round($valx['harga_total_idr'],2);
