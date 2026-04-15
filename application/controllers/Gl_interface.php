@@ -94,16 +94,19 @@ class Gl_interface extends CI_Controller {
             }
 
             $btn_detail = "<button class='btn btn-xs btn-info btn-detail' 
-                            data-id='".$row['id']."' title='Lihat Detail'>
+                            data-id='".$row['id']."' title='Lihat Detail Jurnal'>
                             <i class='fa fa-list'></i>
-                          </button>";
+                          </button> ";
+
+            // Tombol view transaksi di ERP berdasarkan jenis_transaksi
+            $btn_view = $this->_get_btn_view($row['jenis_transaksi'], $row['memo'], $row['nomor']);
 
             $error_info = '';
             if (!empty($row['error_msg'])) {
                 $error_info = "<br><small class='text-danger'>".htmlspecialchars(substr($row['error_msg'],0,80))."...</small>";
             }
 
-            $data[] = [
+            $data[] = array(
                 "<div align='center'>".$no."</div>",
                 "<div align='center'>".date('d-M-Y', strtotime($row['tgl']))."</div>",
                 "<div align='left'><b>".$row['nomor']."</b></div>",
@@ -113,8 +116,8 @@ class Gl_interface extends CI_Controller {
                 "<div align='center'>".$row['jml_detail']."</div>",
                 "<div align='center'>".$badge_status.$error_info."</div>",
                 "<div align='center'>".(!empty($row['posted_at']) ? date('d-M-Y H:i', strtotime($row['posted_at'])) : '-')."</div>",
-                "<div align='center'>".$btn_retry.$btn_detail."</div>",
-            ];
+                "<div align='center'>".$btn_retry.$btn_detail.$btn_view."</div>",
+            );
             $no++;
         }
 
@@ -332,5 +335,46 @@ class Gl_interface extends CI_Controller {
         $db2->trans_commit();
         $this->db->where('id', $id)->update('gl_interface', ['status' => 'posted', 'posted_at' => date('Y-m-d H:i:s'), 'error_msg' => NULL]);
         return json_encode(['status' => 1, 'pesan' => 'OK']);
+    }
+
+    // ─────────────────────────────────────────────
+    // PRIVATE helper: generate tombol view transaksi ERP
+    // ─────────────────────────────────────────────
+    private function _get_btn_view($jenis_transaksi, $memo, $nomor_jv) {
+        $url   = '';
+        $label = 'View';
+
+        switch ($jenis_transaksi) {
+            case 'wip':
+            case 'wip_deadstock':
+                $url   = site_url('produksi/detail_produksi/'.$memo);
+                $label = 'Produksi';
+                break;
+            case 'fg':
+                $url   = site_url('qc/detail/'.$memo);
+                $label = 'QC';
+                break;
+            case 'intransit':
+                $url   = site_url('delivery/detail/'.$memo);
+                $label = 'Delivery';
+                break;
+            case 'invoice_progress':
+            case 'invoice_retensi':
+            case 'invoice_um':
+                $url   = site_url('penagihan/detail/'.$memo);
+                $label = 'Invoice';
+                break;
+            default:
+                if (!empty($memo)) {
+                    return "<span class='label label-default' title='Ref: ".$memo."'>".$memo."</span>";
+                }
+                return '';
+        }
+
+        if (empty($url)) return '';
+
+        return "<a href='".$url."' target='_blank' class='btn btn-xs btn-success' title='Lihat Transaksi di ERP'>
+                    <i class='fa fa-external-link'></i> ".$label."
+                </a>";
     }
 }
