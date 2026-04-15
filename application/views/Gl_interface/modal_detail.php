@@ -1,7 +1,7 @@
 <?php
-$total_debet  = $total_debet  ?? 0;
-$total_kredit = $total_kredit ?? 0;
-$is_balance   = $is_balance   ?? false;
+$total_debet  = isset($total_debet)  ? $total_debet  : 0;
+$total_kredit = isset($total_kredit) ? $total_kredit : 0;
+$is_balance   = isset($is_balance)   ? $is_balance   : false;
 ?>
 
 <!-- Header info -->
