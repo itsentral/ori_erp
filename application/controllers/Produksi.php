@@ -13594,38 +13594,119 @@ class Produksi extends CI_Controller {
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='produksi wip' and no_reff ='$id'");
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
-			
-			
-			
-			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
-			$Bln	= substr($tgl_voucher,5,2);
-			$Thn	= substr($tgl_voucher,0,4);
-			$idlaporan = $id;
+
+			$Nomor_JV    = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln         = substr($tgl_voucher,5,2);
+			$Thn         = substr($tgl_voucher,0,4);
+			$idlaporan   = $id;
 			$Keterangan_INV = 'Jurnal Produksi - WIP';
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-			$dataJVhead2 = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '' , 'jenis_transaksi' => 'wip');
-			
-			
-			$this->db->insert(DBACC.'.javh',$dataJVhead);
-			$datadetail=array();
+
+			// ── 1. Simpan header ke gl_interface (status pending) ──────────────
+			$dataGLHeader = array(
+				'nomor'           => $Nomor_JV,
+				'tgl'             => $tgl_voucher,
+				'jml'             => $totalwip,
+				'koreksi_no'      => '-',
+				'kdcab'           => '101',
+				'jenis'           => 'JV',
+				'keterangan'      => $Keterangan_INV.$idlaporan.' No. Produksi'.$id,
+				'bulan'           => $Bln,
+				'tahun'           => $Thn,
+				'user_id'         => $UserName,
+				'memo'            => $id,
+				'tgl_jvkoreksi'   => $tgl_voucher,
+				'ho_valid'        => '',
+				'jenis_transaksi' => 'wip',
+				'status'          => 'pending',
+				'posted_at'       => NULL,
+				'error_msg'       => NULL,
+			);
+			$this->db->insert('gl_interface', $dataGLHeader);
+			$id_gl = $this->db->insert_id();
+
+			// ── 2. Simpan line items ke gl_interface_detail ────────────────────
+			$dataGLDetail = array();
 			foreach ($det_Jurnaltes as $vals) {
-				$datadetail = array(
-					'tipe'			=> 'JV',
-					'nomor'			=> $Nomor_JV,
-					'tanggal'		=> $tgl_voucher,
-					'no_perkiraan'	=> $vals['no_perkiraan'],
-					'keterangan'	=> $vals['keterangan'],
-					'no_reff'		=> $vals['no_reff'],
-					'debet'			=> $vals['debet'],
-					'kredit'		=> $vals['kredit'],
-					);
-				$this->db->insert(DBACC.'.jurnal',$datadetail);
+				$dataGLDetail[] = array(
+					'id_gl_interface' => $id_gl,
+					'no_batch'        => $Nomor_JV,
+					'tipe'            => 'JV',
+					'tanggal'         => $tgl_voucher,
+					'no_perkiraan'    => $vals['no_perkiraan'],
+					'keterangan'      => $vals['keterangan'],
+					'no_reff'         => $vals['no_reff'],
+					'debet'           => $vals['debet'],
+					'kredit'          => $vals['kredit'],
+					'jenis_jurnal'    => $vals['jenis_jurnal'],
+					'no_request'      => $vals['no_request'],
+				);
 			}
-            
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
-			$this->db->insert('gl_interface',$dataJVhead2);
-			
-			unset($det_Jurnaltes);unset($datadetail);
+			if (!empty($dataGLDetail)) {
+				$this->db->insert_batch('gl_interface_detail', $dataGLDetail);
+			}
+
+			// ── 3. Posting ke DBACC (accounting) ──────────────────────────────
+			$db2 = $this->load->database('accounting', TRUE);
+			$db2->trans_begin();
+			try {
+				$dataJVhead = array(
+					'nomor'         => $Nomor_JV,
+					'tgl'           => $tgl_voucher,
+					'jml'           => $totalwip,
+					'koreksi_no'    => '-',
+					'kdcab'         => '101',
+					'jenis'         => 'JV',
+					'keterangan'    => $Keterangan_INV.$idlaporan.' No. Produksi'.$id,
+					'bulan'         => $Bln,
+					'tahun'         => $Thn,
+					'user_id'       => $UserName,
+					'memo'          => $id,
+					'tgl_jvkoreksi' => $tgl_voucher,
+					'ho_valid'      => '',
+				);
+				$db2->insert('javh', $dataJVhead);
+
+				foreach ($dataGLDetail as $vals) {
+					$datadetail = array(
+						'tipe'         => $vals['tipe'],
+						'nomor'        => $Nomor_JV,
+						'tanggal'      => $vals['tanggal'],
+						'no_perkiraan' => $vals['no_perkiraan'],
+						'keterangan'   => $vals['keterangan'],
+						'no_reff'      => $vals['no_reff'],
+						'debet'        => $vals['debet'],
+						'kredit'       => $vals['kredit'],
+					);
+					$db2->insert('jurnal', $datadetail);
+				}
+
+				if ($db2->trans_status() === FALSE) {
+					$db2->trans_rollback();
+					// update gl_interface status error
+					$this->db->where('id', $id_gl);
+					$this->db->update('gl_interface', array(
+						'status'    => 'error',
+						'error_msg' => 'Trans rollback saat posting ke accounting',
+					));
+				} else {
+					$db2->trans_commit();
+					// update gl_interface status posted
+					$this->db->where('id', $id_gl);
+					$this->db->update('gl_interface', array(
+						'status'    => 'posted',
+						'posted_at' => date('Y-m-d H:i:s'),
+					));
+				}
+			} catch (Exception $e) {
+				$db2->trans_rollback();
+				$this->db->where('id', $id_gl);
+				$this->db->update('gl_interface', array(
+					'status'    => 'error',
+					'error_msg' => $e->getMessage(),
+				));
+			}
+
+			unset($det_Jurnaltes); unset($dataGLDetail); unset($datadetail);
 
 
 		$wipgroup = $this->db->query("SELECT * FROM data_erp_wip WHERE id_trans ='".$idtrans."' limit 1")->row();	
