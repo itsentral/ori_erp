@@ -37,11 +37,11 @@ class Gl_interface extends CI_Controller {
     // ─────────────────────────────────────────────
     public function server_side() {
         $requestData  = $_REQUEST;
-        $status       = $requestData['status']       ?? '';
-        $jenis        = $requestData['jenis']         ?? '';
-        $tgl_from     = $requestData['tgl_from']      ?? '';
-        $tgl_to       = $requestData['tgl_to']        ?? '';
-        $search       = $requestData['search']['value'] ?? '';
+        $status       = isset($requestData['status'])       ? $requestData['status']       : '';
+        $jenis        = isset($requestData['jenis'])         ? $requestData['jenis']         : '';
+        $tgl_from     = isset($requestData['tgl_from'])      ? $requestData['tgl_from']      : '';
+        $tgl_to       = isset($requestData['tgl_to'])        ? $requestData['tgl_to']        : '';
+        $search       = isset($requestData['search']['value']) ? $requestData['search']['value'] : '';
 
         $where  = "WHERE 1=1 ";
         if (!empty($status))   $where .= " AND a.status = '".$this->db->escape_str($status)."'";
@@ -56,13 +56,13 @@ class Gl_interface extends CI_Controller {
         $sql_count = "SELECT COUNT(*) as total FROM gl_interface a $where";
         $total     = $this->db->query($sql_count)->row()->total;
 
-        $order_col = $requestData['order'][0]['column'] ?? 0;
-        $order_dir = $requestData['order'][0]['dir']    ?? 'desc';
-        $cols      = ['a.id','a.tgl','a.nomor','a.jenis_transaksi','a.keterangan','a.jml','a.status','a.posted_at'];
+        $order_col = isset($requestData['order'][0]['column']) ? $requestData['order'][0]['column'] : 0;
+        $order_dir = isset($requestData['order'][0]['dir'])    ? $requestData['order'][0]['dir']    : 'desc';
+        $cols      = array('a.id','a.tgl','a.nomor','a.jenis_transaksi','a.keterangan','a.jml','a.status','a.posted_at');
         $order_by  = isset($cols[$order_col]) ? $cols[$order_col] : 'a.id';
 
-        $limit  = (int)($requestData['length'] ?? 10);
-        $offset = (int)($requestData['start']  ?? 0);
+        $limit  = (int)(isset($requestData['length']) ? $requestData['length'] : 10);
+        $offset = (int)(isset($requestData['start'])  ? $requestData['start']  : 0);
 
         $sql = "SELECT a.*, 
                     (SELECT COUNT(*) FROM gl_interface_detail d WHERE d.id_gl_interface=a.id) as jml_detail
@@ -76,11 +76,13 @@ class Gl_interface extends CI_Controller {
         $no    = $offset + 1;
 
         foreach ($rows as $row) {
-            $badge_status = match($row['status']) {
-                'posted'  => "<span class='label label-success'>POSTED</span>",
-                'error'   => "<span class='label label-danger'>ERROR</span>",
-                default   => "<span class='label label-warning'>PENDING</span>",
-            };
+            if ($row['status'] == 'posted') {
+                $badge_status = "<span class='label label-success'>POSTED</span>";
+            } elseif ($row['status'] == 'error') {
+                $badge_status = "<span class='label label-danger'>ERROR</span>";
+            } else {
+                $badge_status = "<span class='label label-warning'>PENDING</span>";
+            }
 
             $btn_retry = '';
             if ($row['status'] == 'error' || $row['status'] == 'pending') {
@@ -115,12 +117,12 @@ class Gl_interface extends CI_Controller {
             $no++;
         }
 
-        echo json_encode([
-            'draw'            => intval($requestData['draw'] ?? 1),
+        echo json_encode(array(
+            'draw'            => intval(isset($requestData['draw']) ? $requestData['draw'] : 1),
             'recordsTotal'    => intval($total),
             'recordsFiltered' => intval($total),
             'data'            => $data,
-        ]);
+        ));
     }
 
     // ─────────────────────────────────────────────
@@ -263,7 +265,8 @@ class Gl_interface extends CI_Controller {
     // RETRY BULK — retry semua yang error/pending
     // ─────────────────────────────────────────────
     public function retry_bulk() {
-        $jenis  = $this->input->post('jenis') ?? '';
+        $jenis  = $this->input->post('jenis');
+        $jenis  = $jenis ? $jenis : '';
         $where  = ['status' => 'error'];
         if (!empty($jenis)) $where['jenis_transaksi'] = $jenis;
 
