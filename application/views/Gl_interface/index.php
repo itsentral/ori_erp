@@ -1,21 +1,11 @@
 <?php
 $this->load->view('include/side_menu');
 ?>
-<div class="content-wrapper">
-    <section class="content-header">
-        <h1>GL Interface Monitor</h1>
-        <ol class="breadcrumb">
-            <li><a href="<?= site_url('dashboard') ?>"><i class="fa fa-dashboard"></i> Home</a></li>
-            <li class="active">GL Interface</li>
-        </ol>
-    </section>
-
-    <section class="content">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-exchange"></i> Daftar Transaksi GL Interface</h3>
-            </div>
-            <div class="box-body">
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-exchange"></i> Daftar Transaksi GL Interface</h3>
+    </div>
+    <div class="box-body">
 
                 <!-- Filter -->
                 <div class="row" style="margin-bottom:10px;">
@@ -75,8 +65,6 @@ $this->load->view('include/side_menu');
                 </table>
             </div>
         </div>
-    </section>
-</div>
 
 <!-- Modal Detail -->
 <div class="modal fade" id="ModalDetail" tabindex="-1" role="dialog">
