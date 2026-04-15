@@ -26,6 +26,7 @@ class Gl_interface extends CI_Controller {
 
         $data = array(
             'title'       => 'GL Interface Monitor',
+            'action'      => 'index',
             'akses_menu'  => $Arr_Akses,
             'jenis_list'  => $jenis_list,
         );
