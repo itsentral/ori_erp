@@ -13566,7 +13566,7 @@ class Produksi extends CI_Controller {
 					  'debet'         => $wiptotal,
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'produksi wip',
-					  'no_request'    => $no_request,
+					  'no_request'    => $id,
 					  'stspos'		  =>1
 					   );
 					
@@ -13582,7 +13582,7 @@ class Produksi extends CI_Controller {
 					  'debet'         => 0,
 					  'kredit'        => $kredit,
 					  'jenis_jurnal'  => 'produksi wip',
-					  'no_request'    => $no_request,
+					  'no_request'    => $id,
 					  'stspos'		  =>1
 					 );
 				}
