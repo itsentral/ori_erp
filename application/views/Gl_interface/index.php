@@ -1,6 +1,5 @@
 <?php
-$controller = ucfirst(strtolower($this->uri->segment(1)));
-$this->load->view('template/header', $data);
+$this->load->view('include/side_menu');
 ?>
 <div class="content-wrapper">
     <section class="content-header">
@@ -94,7 +93,7 @@ $this->load->view('template/header', $data);
     </div>
 </div>
 
-<?php $this->load->view('template/footer'); ?>
+<?php $this->load->view('include/footer'); ?>
 
 <script>
 var base_url    = '<?= site_url() ?>';
