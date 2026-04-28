@@ -130,23 +130,22 @@ $budgets=0;
 						</select>
 					</div>
 				</div>
-				<div class="hidden">
-				<h4>Transfer ke</h4>
 				<div class="form-group ">
-					<label class="col-md-1 control-label">Bank</label>
-					<div class="col-md-2">
-						<input type="text" class="form-control" id="bank_id" name="bank_id" value="<?php echo (isset($data->bank_id) ? $data->bank_id: $bank_id); ?>" placeholder="Bank">
+					<label class="col-sm-2 col-md-2 control-label">Bank</label>
+					<div class="col-sm-4 col-md-4">
+						<input type="text" class="form-control" id="bank_id" name="bank_id" value="<?php echo (isset($data->bank_id) ? $data->bank_id: $bank_id); ?>" placeholder="Nama Bank">
 					</div>
-					<label class="col-md-2 control-label">Nomor Rekening</label>
-					<div class="col-md-2">
+					<label class="col-sm-2 col-md-2 control-label">Nomor Rekening</label>
+					<div class="col-sm-4 col-md-4">
 						<input type="text" class="form-control" id="accnumber" name="accnumber" value="<?php echo (isset($data->accnumber) ? $data->accnumber: $accnumber); ?>" placeholder="Nomor Rekening">
 					</div>
-					<label class="col-md-2 control-label">Nama Rekening</label>
-					<div class="col-md-3">
-						<input type="text" class="form-control" id="accname" name="accname" value="<?php echo (isset($data->accname) ? $data->accname: $accname); ?>" placeholder="Nama Pemilik Rekening">
+				</div>
+				<div class="form-group ">
+					<label class="col-sm-2 col-md-2 control-label">A/N Rekening</label>
+					<div class="col-sm-4 col-md-4">
+						<input type="text" class="form-control" id="accname" name="accname" value="<?php echo (isset($data->accname) ? $data->accname: $accname); ?>" placeholder="Atas Nama Pemilik Rekening">
 					</div>
 				</div>
-			</div>
 			<div class="table-responsive">
 			<table class="table table-bordered table-striped" width="100%">
 				<thead>
