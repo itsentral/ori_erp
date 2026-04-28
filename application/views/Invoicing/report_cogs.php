@@ -82,7 +82,7 @@ foreach($ListIPP AS $val => $valx){
 		<!-- modal -->
 </form>
 <!-- modal -->
-<div class="modal fade" id="ModalUpload">
+<div class="modal fade" id="ModalUpload"> 
 <form action="<?=base_url('invoicing/uploadfile')?>" method="POST" id="form_upload" enctype="multipart/form-data"> 
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -140,7 +140,7 @@ foreach($ListIPP AS $val => $valx){
 		$("#head_title").html("<b>VIEW DETAIL PRODUCT ["+$(this).data('no_invoice')+"]</b>");
 		$.ajax({
 			type:'POST',
-			url: base_url + active_controller+'/modal_detail_invoice/'+$(this).data('no_invoice').replace(",", "_"),
+			url: base_url + active_controller+'/modal_detail_invoice/'+$(this).data('no_invoice').replace(/,/g, "_"),
 			success:function(data){
 				$("#ModalView").modal();
 				$("#view").html(data);
