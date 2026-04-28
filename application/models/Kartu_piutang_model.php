@@ -95,9 +95,6 @@ class Kartu_piutang_model extends CI_Model {
         return $this->db->update($this->table, $update_data);
     }
 
-    // Delete record
-  
-
     // Check if nomor exists
     public function check_nomor_exists($nomor, $exclude_id = null) {
         $this->db->where('nomor', $nomor);
