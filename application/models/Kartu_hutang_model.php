@@ -95,12 +95,6 @@ class Kartu_hutang_model extends CI_Model {
         return $this->db->update($this->table, $update_data);
     }
 
-    // Delete record
-    public function delete($id) {
-        $this->db->where($this->primary_key, $id);
-        return $this->db->delete($this->table);
-    }
-
     // Check if nomor exists
     public function check_nomor_exists($nomor, $exclude_id = null) {
         $this->db->where('nomor', $nomor);
