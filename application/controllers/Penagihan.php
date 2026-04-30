@@ -6298,7 +6298,25 @@ else
 			}
 			if($jenis_invoice=='retensi'){
 				foreach($get_bill_so AS $valx){$nox++;
-				  $perseninv=($valx->total_deal_usd/$totalinvoice);
+
+				 if($base_cur=='USD'){
+
+						if($valx->total_deal_usd < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_usd/$totalinvoice);
+						}
+
+					} elseif($base_cur=='IDR'||$base_cur==''){
+
+						if($valx->total_deal_idr < 1 || $totalinvoice < 1){
+							$perseninv=0;
+						}else{
+							$perseninv=($valx->total_deal_idr/$totalinvoice);
+						}
+
+					}
+
 				  if($gethd->ppnselect==0){
 					$this->db->query("update billing_so set
 					retensi=(retensi-".($gethd->total_dpp_usd*$perseninv)."),
