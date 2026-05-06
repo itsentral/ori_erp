@@ -574,6 +574,7 @@ class Pembayaran_material extends CI_Controller {
 		$this->db->trans_begin();
 		$jenis_jurnal='BUK20';
 		if($curs_header!='IDR') $jenis_jurnal='BUK21';
+
 	try {
 
 		$no_payment=$this->All_model->GetAutoGenerate('format_payment');
@@ -602,6 +603,8 @@ class Pembayaran_material extends CI_Controller {
 		);
 
 			$this->All_model->dataSave('purchase_order_request_payment_header', $dataheader);
+
+
 			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' and parameter_no in ('1','4','8') order by parameter_no")->result();
 			$det_Jurnaltes1=array();$total=0;
 			foreach ($datajurnal1 as $rec) {
@@ -630,20 +633,33 @@ class Pembayaran_material extends CI_Controller {
 					);
 				}
 			}
+
+
 		$tanggal= $payment_date;
 		$Bln	= substr($tanggal,5,2);
 		$Thn	= substr($tanggal,0,4);
 		$Nomor_JV = $this->Jurnal_model->get_no_buk('101', $tanggal);
+
 		foreach($id_req as $keys){
 			$this->All_model->DataUpdate('purchase_order_request_payment', array('status'=>'2','payment_date'=>$payment_date,'no_payment'=>$no_payment), array('id' => $keys));
+			
 			$data = $this->db->query("select * from purchase_order_request_payment where id='".$keys."'")->row();
 			$selisih_kurs=0;
 			$nilai_terima_barang_idr=0;
+			
 				$datapoheader = $this->db->query("select * from tran_material_po_header where no_po='".$data->no_po."'")->row();
-				
+				if($curs_header=='IDR'){
+					$kurs_hutang = 1;
+					$kurs_invoice = 1;
+				} else {
+
+					$kurs_hutang = $data->kurs_receive_invoice;
+					$kurs_invoice = $data->kurs_receive_invoice;
+				}
+
+
 				if($datapoheader->terima_barang_idr!=0) {
-                    $kurs_hutang = $data->kurs_receive_invoice;
-					
+                    		
 					if($kurs_hutang > 1){
 						$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice);
 					}else{
@@ -658,7 +674,6 @@ class Pembayaran_material extends CI_Controller {
 					
 				} else {
 					
-					$kurs_hutang = $data->kurs_receive_invoice;
 					if($kurs_hutang > 1){
 					$selisih_kurs=((($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-(($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice));
 					}else{
@@ -675,7 +690,6 @@ class Pembayaran_material extends CI_Controller {
 				
 			// update PO
 				$nilai_dp_kurs=0;
-				$kurs_invoice = $data->kurs_receive_invoice;
 				$addsql="";
 				if($data->tipe=='TR-01'){
 					$nilai_dp_kurs= ($data->nilai_po_invoice*$kurs_invoice);
