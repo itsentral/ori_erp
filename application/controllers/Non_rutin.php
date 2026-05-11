@@ -221,7 +221,7 @@ class Non_rutin extends CI_Controller {
 						$ArrDetailPR[$val]['category'] 		= 'non rutin';
 						$ArrDetailPR[$val]['tgl_pr'] 		= date('Y-m-d');
 						$ArrDetailPR[$val]['id_barang'] 	= $valx['id'];
-						$ArrDetailPR[$val]['nm_barang'] 	= strtolower($valx['nm_barang'].' - '.$valx['spec']);
+						$ArrDetailPR[$val]['nm_barang'] 	= strtolower($valx['nm_barang']);
 						$ArrDetailPR[$val]['qty'] 			= $qty;
 						$ArrDetailPR[$val]['nilai_pr'] 		= $harga;
 						$ArrDetailPR[$val]['tgl_dibutuhkan']= $valx['tanggal'];
