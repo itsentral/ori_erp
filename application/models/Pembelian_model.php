@@ -3807,7 +3807,7 @@ class Pembelian_model extends CI_Model {
 			$this->db->trans_start();
 				$this->db->where('no_po', $data['no_po']);
 				$this->db->where('proses_inv', '0');
-				$this->db->where('invoice_total', '0');
+				$this->db->where("(invoice_total = '0' OR invoice_total IS NULL OR invoice_no = '' OR invoice_no IS NULL)", NULL, FALSE);
 				$this->db->delete('billing_top');
 
 				if(!empty($ArrEditPO)){
