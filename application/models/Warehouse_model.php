@@ -4025,6 +4025,15 @@ class Warehouse_model extends CI_Model {
 			$ArrGetIPP[$value['id']] = $value['id_bq'];
 		}
 
+		// Lookup No SO dan No SPK untuk tipe DMF dari production_spk
+		$GET_DMF_DATA = $this->db->select('product_code_cut, product_code, no_spk')->get_where('production_spk', array('product_code_cut !='=>NULL))->result_array();
+		$ArrGetDMF_SO = [];
+		$ArrGetDMF_SPK = [];
+		foreach($GET_DMF_DATA AS $val => $value){
+			$ArrGetDMF_SO[$value['product_code_cut']] = $value['product_code'];
+			$ArrGetDMF_SPK[$value['product_code_cut']] = $value['no_spk'];
+		}
+
 		$data	= array();
 		$urut1  = 1;
         $urut2  = 0;
@@ -4048,8 +4057,19 @@ class Warehouse_model extends CI_Model {
 			if($row['no_ipp'] != 'resin mixing' AND $row['no_ipp'] != 'ancuran' AND $row['no_ipp'] != 'internal' AND $row['no_ipp'] != 'reqnonso'){
 				$SO_SEARCH = (!empty($ArrGetSO['BQ-'.$row['no_ipp']]))?$ArrGetSO['BQ-'.$row['no_ipp']]:$no_so_tanki;
 				$NO_SO = (!empty($row['no_so']))?$row['no_so']:$SO_SEARCH;
+				
+				// Untuk tipe DMF, ambil dari production_spk jika masih kosong
+				$DMF_CHECK = substr($row['no_ipp'], 0, 3);
+				if($DMF_CHECK == 'DMF' && empty($NO_SO)){
+					$NO_SO = (!empty($ArrGetDMF_SO[$row['no_ipp']]))?$ArrGetDMF_SO[$row['no_ipp']]:'';
+				}
 			}
 			$NO_SPK = $row['no_spk'];
+			// Untuk tipe DMF, ambil no_spk dari production_spk jika yang tersimpan adalah product_code_cut
+			$DMF_CHECK2 = substr($row['no_ipp'], 0, 3);
+			if($DMF_CHECK2 == 'DMF'){
+				$NO_SPK = (!empty($ArrGetDMF_SPK[$row['no_ipp']]))?$ArrGetDMF_SPK[$row['no_ipp']]:$row['no_spk'];
+			}
 			if($row['no_ipp'] == 'resin mixing'){
 				$get_detail_spk2 = $this->db
 								->select('a.id_milik')
@@ -4398,6 +4418,17 @@ class Warehouse_model extends CI_Model {
 		$keterangan		= strtolower($data['keterangan']);
 		$Ym 			= date('ym');
 
+		// Ambil no_so dan no_spk yang benar untuk tipe DMF
+		$no_so = NULL;
+		$DMF_TANDA = substr($no_ipp, 0, 3);
+		if($DMF_TANDA == 'DMF'){
+			$get_spk_data = $this->db->select('product_code, no_spk')->get_where('production_spk', array('product_code_cut'=>$no_ipp))->result();
+			if(!empty($get_spk_data)){
+				$no_so = $get_spk_data[0]->product_code;
+				$no_spk = $get_spk_data[0]->no_spk;
+			}
+		}
+
 		$UserName = $data_session['ORI_User']['username'];
 		$DateTime = date('Y-m-d H:i:s');
 		// print_r($data);
@@ -4523,6 +4554,7 @@ class Warehouse_model extends CI_Model {
 			'jumlah_mat' 		=> $SUM_MAT,
 			'no_ipp' 			=> $no_ipp,
 			'no_spk' 			=> $no_spk,
+			'no_so' 			=> $no_so,
 			'tanggal' 			=> $tanggal,
 			'qty_spk' 			=> $qty_spk,
 			'keterangan' 		=> $keterangan,
