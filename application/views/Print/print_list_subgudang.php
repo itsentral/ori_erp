@@ -20,10 +20,10 @@ $rest_d		= $this->db->get_where('warehouse_adjustment_detail',array('kode_trans'
 $NO_SPK 			= $rest_data[0]['no_spk'];
 $TGL_PLANNING_ 		= $rest_data[0]['tanggal'];
 
-$NO_SO = "";
+$NO_SO = = $rest_data[0]['no_so'];
 if($rest_data[0]['no_ipp'] != 'resin mixing'){
 $NO_SO = $ArrGetSO['BQ-'.$rest_data[0]['no_ipp']];
-}
+} 
 
 if($rest_data[0]['no_ipp'] == 'resin mixing'){
     $REST_SQL		= $this->db->get_where('production_spk_parsial',array('kode_spk'=>$rest_data[0]['kode_spk'],'created_date'=>$rest_data[0]['created_date'],'spk'=>'1'))->result_array();
@@ -54,6 +54,7 @@ if($tandaTanki == 'IPPT'){
     $nm_product = (!empty($getnameTanki[0]['id_product']))?$getnameTanki[0]['id_product']:'';
     $spec       = $tanki->get_spec($id_milik);
 }
+
 ?>
 
 <table class="gridtable2" border='1' width='100%' cellpadding='2'>
