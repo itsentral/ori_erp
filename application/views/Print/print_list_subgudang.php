@@ -20,7 +20,7 @@ $rest_d		= $this->db->get_where('warehouse_adjustment_detail',array('kode_trans'
 $NO_SPK 			= $rest_data[0]['no_spk'];
 $TGL_PLANNING_ 		= $rest_data[0]['tanggal'];
 
-$NO_SO = = $rest_data[0]['no_so'];
+$NO_SO = $rest_data[0]['no_so'];
 if($rest_data[0]['no_ipp'] != 'resin mixing'){
 $NO_SO = $ArrGetSO['BQ-'.$rest_data[0]['no_ipp']];
 } 
