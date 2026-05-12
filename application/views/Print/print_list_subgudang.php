@@ -20,7 +20,7 @@ $rest_d		= $this->db->get_where('warehouse_adjustment_detail',array('kode_trans'
 $NO_SPK 			= $rest_data[0]['no_spk'];
 $TGL_PLANNING_ 		= $rest_data[0]['tanggal'];
 
-$NO_SO = $rest_data[0]['no_so'];
+$NO_SO ="";
 if($rest_data[0]['no_ipp'] != 'resin mixing'){
 $NO_SO = $ArrGetSO['BQ-'.$rest_data[0]['no_ipp']];
 } 
@@ -55,6 +55,11 @@ if($tandaTanki == 'IPPT'){
     $spec       = $tanki->get_spec($id_milik);
 }
 
+$tandaDMF = substr($NOMOR_IPP,0,3);
+
+if($tandaDMF == 'DMF'){
+    $NO_SO      = $rest_data[0]['no_so'];
+}
 ?>
 
 <table class="gridtable2" border='1' width='100%' cellpadding='2'>
