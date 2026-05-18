@@ -355,6 +355,9 @@ if($results->invoice_no!="") {
                 sum_total += Number(total);
             }
         });
+
+		
+		$('#price_before_tax').val(sum_total)
 		let dpp = (11/12)*sum_total;
         $('#nilai_dpp').val(number_format(dpp,2))
         let ppn = (sum_total * tax) / 100

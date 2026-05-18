@@ -854,7 +854,8 @@ class Purchase extends CI_Controller {
 		$kursInv        = $data['kurs'];
 		$kursRos        = $kursInv;
 		$net            = $data['nilai_top'];
-
+		$barang         = $data['price_before_tax'];
+        
 		$id				= $data['id_top'];
 		if($data['group_top']=='progress'){
 		$ArrUpdate = [
@@ -922,7 +923,7 @@ class Purchase extends CI_Controller {
             $noRos = $dataros->no_ros;
 			$kursRos = $dataros->kurs;
 			$selisihKurs = $kursInv - $kursRos;
-			$selisihIDR = $selisihKurs*$net;
+			$selisihIDR = $selisihKurs*$barang;
 		}
 
 		
