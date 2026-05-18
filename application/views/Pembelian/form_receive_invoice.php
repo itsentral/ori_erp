@@ -54,7 +54,7 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
 				  </div>
 				  <div class="col-md-6">
-					<label class="control-label">Total Invoice</label>
+					<label class="control-label">Total Invoice (DPP + PPN)</label>
 					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= (isset($results)?$results->invoice_total:"0"); ?>">
 				  </div>
 				  <div class="col-md-6">
