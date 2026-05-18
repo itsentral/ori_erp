@@ -157,7 +157,7 @@ $kurs=1;
 						<th class="text-center" width='5%'>Group TOP</th>
 						<th class="text-center" width='8%'>Progress (%)</th>
 						<th class="text-center hidden" width='11%'>Value (USD)</th>
-						<th class="text-center" width='11%'>Value <!--(IDR)--></th>
+						<th class="text-center" width='11%'>DPP <!--(IDR)--></th>
 						<th class="text-center" width='25%'>Keterangan</th>
 						<th class="text-center" width='10%'>Est Jatuh Tempo</th>
 						<th class="text-center" width='10%'>Invoice</th>
