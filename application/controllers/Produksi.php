@@ -11720,8 +11720,8 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;
-							$SUM_DEADSTICK += $qtyValue * $cost_book;
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  round($qtyValue * $cost_book, 2);
+							$SUM_DEADSTICK += round($qtyValue * $cost_book, 2);
 						}
 
 
@@ -11735,6 +11735,7 @@ class Produksi extends CI_Controller {
 
 							$key_uniq = $key.'-'.$key2.'-Mix';
 							$qtyValue = $value2 / COUNT($getDetDeadStock);
+							
 
 							$ArrIN_WIP_MATERIAL[$key_uniq]['tanggal'] = date('Y-m-d');
 							$ArrIN_WIP_MATERIAL[$key_uniq]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
@@ -11760,10 +11761,10 @@ class Produksi extends CI_Controller {
 							$ArrIN_WIP_MATERIAL[$key_uniq]['berat'] =  $qtyValue;
 							$ArrIN_WIP_MATERIAL[$key_uniq]['costbook'] =  $cost_book;
 							// $ArrIN_WIP_MATERIAL[$key_uniq]['gudang'] =  $id_gudang;
-							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  $qtyValue * $cost_book;                            
+							$ArrIN_WIP_MATERIAL[$key_uniq]['total_price'] =  round($qtyValue * $cost_book, 2);                            
 							
 
-							$SUM_DEADSTICK += $qtyValue * $cost_book;
+							$SUM_DEADSTICK += round($qtyValue * $cost_book, 2);
 						}
 					}
 
