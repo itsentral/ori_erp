@@ -355,11 +355,11 @@ if($results->invoice_no!="") {
                 sum_total += Number(total);
             }
         });
-		let dpp = (11/12)*dpp_cek;
+		let dpp = (11/12)*sum_total;
         $('#nilai_dpp').val(number_format(dpp,2))
-        let ppn = (dpp_cek * tax) / 100
+        let ppn = (sum_total * tax) / 100
         $('#nilai_ppn').val(number_format(ppn,2))
-        let net_plus_tax = dpp_cek + ppn
+        let net_plus_tax = sum_total + ppn
         $('#invoice_total').val(number_format(net_plus_tax,2))
        
 	}
