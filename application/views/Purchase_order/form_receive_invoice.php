@@ -79,15 +79,15 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Price Before Tax</label>
 					<input type="text" class="form-control divide" id="price_before_tax" name="price_before_tax" value="<?= $total_price; ?>" required readonly>
 				  </div>
-				  <?php if($results->group_top != 'progress' ) { ?>     
+				  <?php if($results->group_top != 'progress' ) { ?>  
+				  <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
+				  </div>   
 				  <div class="col-md-6">
 					<label class="control-label">DPP</label>
 					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
 				  </div>   
-				   <div class="col-md-6">
-					<label class="control-label">Nilai TOP</label>
-					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
-				  </div>
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
@@ -102,13 +102,13 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
 				  </div>
 				   <div class="col-md-6">
-					<label class="control-label">DPP</label>
-					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
-				  </div> 
-				   <div class="col-md-6">
 					<label class="control-label">Nilai TOP</label>
 					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
 				  </div>  
+				   <div class="col-md-6">
+					<label class="control-label">DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
+				  </div> 
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
 					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value=<?= (isset($results)?$results->nilai_ppn:"0"); ?> required readonly>
