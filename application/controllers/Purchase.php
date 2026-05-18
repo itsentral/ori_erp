@@ -813,10 +813,10 @@ class Purchase extends CI_Controller {
 		if($info_payterm->invoice_no!=""){
 			$dt_incoming=$this->db->query("select a.*, sum(b.harga*b.check_qty_oke) as total from warehouse_adjustment a 
 			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans
-			where a.no_ipp='".$info_payterm->no_po."'")->result();
+			where a.no_ipp='".$info_payterm->no_po."' GROUP BY a.kode_trans")->result();
 		}else{
 			$dt_incoming=$this->db->query("select a.*, sum(b.harga*b.check_qty_oke) as total from warehouse_adjustment a 
-			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans where a.no_ipp='".$info_payterm->no_po."' and (a.id_invoice is null or a.id_invoice = '')")->result();
+			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans where a.no_ipp='".$info_payterm->no_po."' and (a.id_invoice is null or a.id_invoice = '') GROUP BY a.kode_trans")->result();
 		}
         
 		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
