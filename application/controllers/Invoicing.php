@@ -1199,7 +1199,7 @@ if($gethd->base_cur=='IDR'){
 		);
 		$sheet->getStyle('N'.$NewRow.':P'.($NewRow+1))->applyFromArray($style_center_bold_italic);
 		$sheet->mergeCells('N'.$NewRow.':P'.($NewRow+1));
-		$sheet->setCellValue('N'.$NewRow, 'VINA ISABELLA');
+		$sheet->setCellValue('N'.$NewRow, 'YULIANA MONITA');
 		
 		$NewRow++;
 		$sheet->setCellValue('B'.$NewRow, '* Untuk tagihan USD yang akan dibayarkan dalam rupiah, ');
