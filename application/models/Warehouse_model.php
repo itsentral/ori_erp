@@ -2263,6 +2263,7 @@ class Warehouse_model extends CI_Model {
 						
 						}
 						
+				if($QTY_OKE > 0){
 				$key = $getDetMat[0]->id_material;
 				
 				//ambil saldo akhir 
@@ -2373,12 +2374,13 @@ class Warehouse_model extends CI_Model {
 				$ArrJurnalNew2[$val2]['update_date'] 		= $DateTime;
 				$ArrJurnalNew2[$val2]['no_jurnal'] 			= '-';
 				$ArrJurnalNew2[$val2]['coa_gudang'] 		= $coa_gudang2;
-					
-				}
-				$SUM_MAT 	+= $QTY_OKE;
 
 				$ArrUpdateStock[$val2]['harga_tujuan'] 	= $PRICE2;
 				$ArrUpdateStock[$val2]['harga_baru'] 	= $PRICENEW;
+					
+				} // tutup if($QTY_OKE > 0)
+				$SUM_MAT 	+= $QTY_OKE;
+
 			}
 
 			//PROCESS UPDATE STOCK
