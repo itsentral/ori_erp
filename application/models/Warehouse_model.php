@@ -2261,7 +2261,8 @@ class Warehouse_model extends CI_Model {
 							$ArrUpdateRequest[$val2.$val]['total_request'] 	= $getRequest[0]->total_request - ($getDetAjust[0]->qty_oke - $QTY_OKE);
 						}
 						
-						}
+						} // tutup if(qty_oke > 0)
+				} // tutup foreach inner loop
 						
 				if($QTY_OKE > 0){
 				$key = $getDetMat[0]->id_material;
