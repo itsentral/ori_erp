@@ -1607,7 +1607,7 @@ if($gethd->base_cur=='IDR'){
 		$sheet->setCellValue('F'.$NewRow, 'A/C : (USD)  0278.0001.6993');
 
 		$sheet->getStyle('C'.$NewRow.':C'.($NewRow))->applyFromArray($style_center_bold);
-		$sheet->setCellValue('C'.$NewRow, 'VINA ISABELLA');
+		$sheet->setCellValue('C'.$NewRow, 'YULIANA MONITA');
 }
 //		$sheet->setTitle('Invoice '.$nomordoc);
 		$objWriter		= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
