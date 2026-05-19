@@ -2655,15 +2655,13 @@ class Warehouse_model extends CI_Model {
 				
 				//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 
-				// insert_jurnal dihapus karena move_warehouse sudah insert ke tran_warehouse_jurnal_detail
-				// sehingga tidak dobel lagi
-				// jika ada masalah, kembalikan insert_jurnal di bawah ini:
-				// if($type_gudang == 'pusat'){
-				// 	insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
-				// }
-				// else{
-				// 	insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer subgudang - produksi','pengurangan subgudang','penambahan gudang produksi');
-				// }
+				// insert_jurnal: tetap dijalankan untuk insert ke tabel akuntansi (jurnaltras, javh, jurnal)
+				if($type_gudang == 'pusat'){
+					insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
+				}
+				else{
+					insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer subgudang - produksi','pengurangan subgudang','penambahan gudang produksi');
+				}
 				
 				$this->db->where('kode_trans', $kode_trans);
 				$this->db->update('warehouse_adjustment', $ArrUpdate);
