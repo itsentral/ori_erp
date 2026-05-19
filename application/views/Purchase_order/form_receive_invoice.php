@@ -352,6 +352,7 @@ if($results->invoice_no!="") {
         $(".check_pr" ).each(function() {
             if ($(this).is(':checked')) {
                 total = getNum($(this).parent().parent().parent().find('.total_harga').html())
+				console.log(total);
                 sum_total += Number(total);
             }
         });
