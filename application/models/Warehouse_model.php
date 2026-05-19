@@ -2398,8 +2398,6 @@ class Warehouse_model extends CI_Model {
 				}
 			}
 
-			move_warehouse($ArrUpdateStock,$id_gudang_dari,$id_tujuan,$kode_trans);
-
 			//Mengurangi Booking
 			$getDetailSPK 	= $this->db->get_where('warehouse_adjustment',array('kode_trans'=>$kode_trans))->result();
 			$no_ipp 		= (!empty($getDetailSPK[0]->no_ipp))?$getDetailSPK[0]->no_ipp:0;
@@ -2650,16 +2648,22 @@ class Warehouse_model extends CI_Model {
 
 			$this->db->trans_start();
 
+				// Pindahkan move_warehouse ke dalam transaksi agar rollback jika timeout
+				move_warehouse($ArrUpdateStock,$id_gudang_dari,$id_tujuan,$kode_trans);
+
 				//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew);
 				
 				//$this->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNew2);
 
-				if($type_gudang == 'pusat'){
-					insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
-				}
-				else{
-					insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer subgudang - produksi','pengurangan subgudang','penambahan gudang produksi');
-				}
+				// insert_jurnal dihapus karena move_warehouse sudah insert ke tran_warehouse_jurnal_detail
+				// sehingga tidak dobel lagi
+				// jika ada masalah, kembalikan insert_jurnal di bawah ini:
+				// if($type_gudang == 'pusat'){
+				// 	insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer pusat - subgudang','pengurangan gudang pusat','penambahan subgudang');
+				// }
+				// else{
+				// 	insert_jurnal($grouping_temp,$id_gudang_dari,$id_tujuan,$kode_trans,'transfer subgudang - produksi','pengurangan subgudang','penambahan gudang produksi');
+				// }
 				
 				$this->db->where('kode_trans', $kode_trans);
 				$this->db->update('warehouse_adjustment', $ArrUpdate);
