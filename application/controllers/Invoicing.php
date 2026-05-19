@@ -493,7 +493,7 @@ class Invoicing extends CI_Controller {
 			<tr>
                  <td style="font-size:8pt !important;vertical-align:top" rowspan="3"><b>Alamat</b></td>
                  <td style="font-size:8pt !important;vertical-align:top" rowspan="3"><b>:</b></td>
-				 <td style="font-size:8pt !important;vertical-align:top" rowspan="3"><b>' .@$alamat_cust->alamat.'</b></td>
+				 <td style="font-size:7pt !important;vertical-align:top;word-wrap:break-word;overflow:hidden;" rowspan="3"><b>' .@$alamat_cust->alamat.'</b></td>
 				 <td style="font-size:8pt !important;vertical-align:top"><b>F. Pajak No.</b></td>
                  <td style="font-size:8pt !important;vertical-align:top"><b>:</b></td>
 				 <td style="font-size:8pt !important;vertical-align:top"><b>' .@$val->no_pajak.'</b></td>
