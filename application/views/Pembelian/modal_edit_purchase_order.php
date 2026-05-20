@@ -496,6 +496,42 @@
 			$('#idr_'+a).val(number_format(tot_idr));
 		});
 	}
+
+	$(document).on('keyup', '.sum_tot_idr', function(){
+		var id 		= $(this).attr('id');
+		var det_id	= id.split('_');
+		var a		= det_id[1];
+		term_value(a);
+		
+		var progress = 0;
+		$(".progress_term" ).each(function() {
+			progress 	+= getNum($(this).val().split(",").join(""));
+		});
+		
+		if(progress > 100.0001){
+			$('#save_term').hide();
+			alert(progress);
+			$('#alert-max').show();
+		}
+		else{
+			$('#save_term').show();
+			$('#alert-max').hide();
+		}
+	});
+
+	function term_value(a){
+		var total		= getNum($('#total_po').val().split(",").join(""));
+		var values 		= getNum($('#idr_'+a).val().split(",").join(""));
+		var kurs		= getNum($('#kurs').val().split(",").join(""));
+		var current  	= $('#current').val();		
+		if(current == 'USD'){
+			var progress 	= (values*100) / total;
+		}		
+		if(current == 'IDR'){
+			var progress 	= (values*100) / total;
+		}		
+		$('#progress_'+a).val(number_format(progress,4));
+	}
 	
 	function getNum(val) {
 	   if (isNaN(val) || val == '') {
