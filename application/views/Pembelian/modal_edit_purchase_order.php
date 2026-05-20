@@ -26,7 +26,7 @@
 		</div>
 	</div>
 	<div class='form-group row'>
-		<label class='label-control col-sm-1'><b>Incoterms</b></label>
+		<label class='label-control col-sm-1'><b>Incoterms</b></label> 
 		<div class='col-sm-5'>
 			<?php
 			 echo form_input(array('id'=>'incoterms','name'=>'incoterms','class'=>'form-control input-md','placeholder'=>'Incoterms'), strtoupper($data[0]->tgl_dibutuhkan));
@@ -425,7 +425,7 @@
 	}
 	
 	function term_process(a){
-		var total		= getNum($('#grand_total').val().split(",").join(""));
+		var total		= getNum($('#total_po').val().split(",").join(""));
 		var progress 	= getNum($('#progress_'+a).val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
@@ -445,7 +445,7 @@
 	}
 	
 	function change_kurs(){
-		var total		= getNum($('#grand_total').val().split(",").join(""));
+		var total		= getNum($('#total_po').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);
@@ -472,7 +472,7 @@
 	}
 	
 	function change_kurs2(){
-		var total		= getNum($('#grand_total').val().split(",").join(""));
+		var total		= getNum($('#total_po').val().split(",").join(""));
 		var kurs		= getNum($('#kurs').val().split(",").join(""));
 		var current  	= $('#current').val();
 		// alert(current);
