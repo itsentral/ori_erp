@@ -176,8 +176,7 @@
 					<tr class='bg-blue'>
 						<th class="text-center" width='5%'>Group TOP</th>
 						<th class="text-center" width='8%'>Progress (%)</th>
-						<th class="text-center" width='11%'>Value (USD)</th>
-						<th class="text-center" width='11%'>Value (IDR)</th>
+						<th class="text-center" width='11%'>DPP</th>
 						<th class="text-center" width='25%'>Keterangan</th>
 						<th class="text-center" width='10%'>Est Jatuh Tempo</th>
 						<th class="text-center" width='25%'>Persyaratan</th>
@@ -201,7 +200,7 @@
 									echo "<input type='hidden' name='detail_po[".$id."][term]' class='form-control text-center input-md' value='".$valx['term']."'>"; 
 								echo "</td>";
 								echo "<td align='left'><input type='text' id='progress_".$id."' name='detail_po[".$id."][progress]' value='".$valx['progress']."' class='form-control input-md text-center maskM progress_term'></td>";
-								echo "<td align='left'><input type='text' id='usd_".$id."' name='detail_po[".$id."][value_usd]' value='".$valx['value_usd']."' class='form-control input-md text-right maskM sum_tot_usd' readonly></td>";
+								echo "<td align='left' class='hidden'><input type='text' id='usd_".$id."' name='detail_po[".$id."][value_usd]' value='".$valx['value_usd']."' class='form-control input-md text-right maskM sum_tot_usd' readonly></td>";
 								echo "<td align='left'><input type='text' id='idr_".$id."' name='detail_po[".$id."][value_idr]' value='".$valx['value_idr']."' class='form-control input-md text-right maskM sum_tot_idr' readonly></td>";
 								echo "<td align='left'><input type='text' id='total_harga_".$id."' name='detail_po[".$id."][keterangan]' value='".strtoupper($valx['keterangan'])."' class='form-control input-md text-left'></td>";
 								echo "<td align='left'><input type='text' name='detail_po[".$id."][jatuh_tempo]' value='".$valx['jatuh_tempo']."' class='form-control input-md text-center datepicker' readonly></td>";
