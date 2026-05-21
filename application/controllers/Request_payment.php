@@ -667,12 +667,6 @@ class Request_payment extends CI_Controller {
 						continue;
 					}
 
-					// Cek & lock: pastikan belum diproses (status != 2)
-					$check = $this->db->query("SELECT id, status FROM " . DBERP . ".payment_approve WHERE id = '" . intval($val) . "' AND status != 2 FOR UPDATE")->row();
-					if (!$check) {
-						continue; // sudah diproses sebelumnya, skip
-					}
-
 					$processed_no_doc[] = $no_doc[$keys];
 					$filenames = "";
 					if (!empty($_FILES['doc_file_' . $val]['name'])) {
@@ -842,9 +836,7 @@ class Request_payment extends CI_Controller {
 			// print_r($det_Jurnaltes1);
 			// exit;
 			
-			if(!empty($det_Jurnaltes1)){
 			$this->db->insert_batch(DBERP . '.jurnaltras', $det_Jurnaltes1);
-			}
 			if(!empty($dat_nomor_jurnal)){
 			  foreach($dat_nomor_jurnal as $nosj){
 				//autojurnal
