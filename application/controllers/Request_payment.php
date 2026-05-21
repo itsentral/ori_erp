@@ -842,7 +842,9 @@ class Request_payment extends CI_Controller {
 			// print_r($det_Jurnaltes1);
 			// exit;
 			
+			if(!empty($det_Jurnaltes1)){
 			$this->db->insert_batch(DBERP . '.jurnaltras', $det_Jurnaltes1);
+			}
 			if(!empty($dat_nomor_jurnal)){
 			  foreach($dat_nomor_jurnal as $nosj){
 				//autojurnal
