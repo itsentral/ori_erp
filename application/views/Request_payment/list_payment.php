@@ -177,6 +177,9 @@ $this->load->view('include/side_menu');
 		},
 		function(isConfirm){
 		  if (isConfirm) {
+			// Disable tombol SweetAlert agar tidak bisa diklik ulang
+			$(".confirm").prop("disabled", true);
+			$(".confirm").text("Memproses...");
 			var formdata = new FormData($('#frm_data')[0]);
 			$.ajax({
 				url: url_save,
@@ -203,6 +206,9 @@ $this->load->view('include/side_menu');
 							timer: 1500,
 							showConfirmButton: false
 						});
+						$("#submit").show();
+						$(".confirm").prop("disabled", false);
+						$(".confirm").text("Ya, Update!");
 					};
 					console.log(msg);
 				},
@@ -214,9 +220,14 @@ $this->load->view('include/side_menu');
 						timer: 1500,
 						showConfirmButton: false
 					});
+					$("#submit").show();
+					$(".confirm").prop("disabled", false);
+					$(".confirm").text("Ya, Update!");
 					console.log(msg);
 				}
 			});
+		  } else {
+			$("#submit").show();
 		  }
 		});
 		}else{

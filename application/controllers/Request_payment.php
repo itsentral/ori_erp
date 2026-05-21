@@ -666,6 +666,13 @@ class Request_payment extends CI_Controller {
 					if (in_array($no_doc[$keys], $processed_no_doc)) {
 						continue;
 					}
+
+					// Cek & lock: pastikan belum diproses (status != 2)
+					$check = $this->db->query("SELECT id, status FROM " . DBERP . ".payment_approve WHERE id = '" . intval($val) . "' AND status != 2 FOR UPDATE")->row();
+					if (!$check) {
+						continue; // sudah diproses sebelumnya, skip
+					}
+
 					$processed_no_doc[] = $no_doc[$keys];
 					$filenames = "";
 					if (!empty($_FILES['doc_file_' . $val]['name'])) {
@@ -812,7 +819,7 @@ class Request_payment extends CI_Controller {
 						}
 					}
 					
-					if($matauang=='IDR'){
+					if($matauang[$keys]=='IDR'){
 					//bank coa
 					$det_Jurnaltes1[] = array(
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $bank_coa, 'keterangan' => $keterangan[$keys], 'no_request' => $no_doc[$keys], 'debet' => ($bank_nilai[$keys] < 0 ? ($bank_nilai[$keys] * -1) : 0), 'kredit' => ($bank_nilai[$keys] >= 0 ? $bank_nilai[$keys] : 0),'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' =>  $no_doc[$keys], 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $nama[$keys], 'stspos' => '1'
