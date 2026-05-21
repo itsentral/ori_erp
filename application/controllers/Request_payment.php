@@ -667,6 +667,12 @@ class Request_payment extends CI_Controller {
 						continue;
 					}
 
+					// Cegah duplikasi: skip jika payment sudah status 2
+					$cek_status = $this->db->query("SELECT status FROM " . DBERP . ".payment_approve WHERE id = " . $this->db->escape($val))->row();
+					if (!$cek_status || $cek_status->status == '2') {
+						continue;
+					}
+
 					$processed_no_doc[] = $no_doc[$keys];
 					$filenames = "";
 					if (!empty($_FILES['doc_file_' . $val]['name'])) {
