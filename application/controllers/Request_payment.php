@@ -698,11 +698,11 @@ class Request_payment extends CI_Controller {
 						'pay_on' => date("Y-m-d h:i:s"),
 					);
 
-					$this->All_model->dataUpdate(DBERP . '.payment_approve', $data, array('id' => $val));
+					$this->All_model->dataUpdate('payment_approve', $data, array('id' => $val));
 
 					if ($tipe[$keys] == 'transportasi') {
 //						$rec = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='". $jenis_jurnal."' and menu='".$tipe[$keys]."'")->row();
-						$rec = $this->db->query("select coa from ".DBERP.".tr_transport_req where no_doc='".$no_doc[$keys]."'")->row();
+						$rec = $this->db->query("select coa from tr_transport_req where no_doc='".$no_doc[$keys]."'")->row();
 						$det_Jurnaltes1[] = array(
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->coa, 'keterangan' => $keterangan[$keys], 'no_request' => $no_doc[$keys], 'debet' => $bank_nilai[$keys], 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' =>  $no_doc[$keys], 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $nama[$keys], 'stspos' => '1'
 						);
@@ -800,7 +800,7 @@ class Request_payment extends CI_Controller {
 					}
 
 					if ($tipe[$keys] == 'periodik') {
-						$rec = $this->db->query("select coa from " . DBERP . ".tr_pengajuan_rutin_detail where id='" . $ids[$keys] . "' and no_doc='" . $no_doc[$keys] . "'")->row();
+						$rec = $this->db->query("select coa from tr_pengajuan_rutin_detail where id='" . $ids[$keys] . "' and no_doc='" . $no_doc[$keys] . "'")->row();
 						$det_Jurnaltes1[] = array(
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->coa, 'keterangan' => $keterangan[$keys], 'no_request' => $no_doc[$keys], 'debet' => $bank_nilai[$keys], 'kredit' => 0,'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' =>  $no_doc[$keys], 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $nama[$keys], 'stspos' => '1'
 						);
@@ -835,11 +835,11 @@ class Request_payment extends CI_Controller {
 			// print_r($det_Jurnaltes1);
 			// exit;
 			
-			$this->db->insert_batch(DBERP . '.jurnaltras', $det_Jurnaltes1);
+			$this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
 			if(!empty($dat_nomor_jurnal)){
 			  foreach($dat_nomor_jurnal as $nosj){
 				//autojurnal
-				$dataJURNAL = $this->db->query("select * from ".DBERP.".jurnaltras where nomor ='".$nosj."' order by kredit,debet,no_perkiraan")->result();
+				$dataJURNAL = $this->db->query("select * from jurnaltras where nomor ='".$nosj."' order by kredit,debet,no_perkiraan")->result();
 				$Bln = substr($payment_date, 5, 2);
 				$Thn = substr($payment_date, 0, 4);
 				$Nomor_JV=$this->Jurnal_model->get_no_buk('101');
@@ -952,7 +952,7 @@ class Request_payment extends CI_Controller {
 			redirect(site_url('dashboard'));
 		}
 		$data_session			= $this->session->userdata;
-		$data = $this->db->query("select * from " . DBERP . ".jurnaltras where nomor='" . $id . "' order by kredit,debet,no_perkiraan")->result();
+		$data = $this->db->query("select * from jurnaltras where nomor='" . $id . "' order by kredit,debet,no_perkiraan")->result();
 		$data_coa = $this->All_model->GetCoaCombo();
 
 		$data = array(
@@ -974,7 +974,7 @@ class Request_payment extends CI_Controller {
 			redirect(site_url('dashboard'));
 		}
 		$data_session			= $this->session->userdata;
-		$data = $this->db->query("select * from " . DBERP . ".jurnaltras where nomor='" . $id . "' order by kredit,debet,no_perkiraan")->result();
+		$data = $this->db->query("select * from jurnaltras where nomor='" . $id . "' order by kredit,debet,no_perkiraan")->result();
 		$data_coa = $this->All_model->GetCoaCombo();
 
 		$data = array(
@@ -1023,7 +1023,7 @@ class Request_payment extends CI_Controller {
 				'kredit' => $kredit[$i]
 			);
 			$total = ($total + $debet[$i]);
-			$this->All_model->DataUpdate(DBERP . '.jurnaltras', $dataheader, array('id' => $id[$i]));
+			$this->All_model->DataUpdate('jurnaltras', $dataheader, array('id' => $id[$i]));
 
 			$datadetail = array(
 				'tipe'        	=> $tipe,
@@ -1070,7 +1070,7 @@ class Request_payment extends CI_Controller {
 		echo json_encode($param);
 	}
 	function print_payment($no_doc){
-		$results = $this->db->query("SELECT a.*, b.nama as namabank FROM " . DBERP . ".payment_approve a left join " . DBACC . ".coa_master as b on a.bank_coa=b.no_perkiraan WHERE a.no_doc='".$no_doc."'")->row();
+		$results = $this->db->query("SELECT a.*, b.nama as namabank FROM payment_approve a left join " . DBACC . ".coa_master as b on a.bank_coa=b.no_perkiraan WHERE a.no_doc='".$no_doc."'")->row();
 		$data = array(
 			'results'		=> $results,
 		);
