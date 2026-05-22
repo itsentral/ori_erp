@@ -127,6 +127,9 @@
 			$no = 0;
 			$HPP_Tot = 0;
 			foreach($result1BTS AS $val => $valx){
+				if($valx['id_category'] == 'pipe slongsong' || $valx['id_category'] == 'product kosong'){
+					continue;
+				}
 				$no++;
 				$persen 	= (!empty($valx['persen']))?$valx['persen']:0;
 				$extra 		= (!empty($valx['extra']))?$valx['extra']:0; 
