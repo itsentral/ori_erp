@@ -7001,7 +7001,7 @@ else
 			'in_so'			=> implode(',',$in_so),
 			'arr_in_ipp'	=> $in_ipp,
 			'penagihan'		=> $penagihan,
-			'kurs'			=> $get_kurs[0]->kurs,
+			'kurs'			=> (!empty($get_kurs)) ? $get_kurs[0]->kurs : 0,
 			'uang_muka_persen'	=> $uang_muka_persen, 
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,
