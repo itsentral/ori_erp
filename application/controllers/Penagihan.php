@@ -6821,7 +6821,7 @@ else
 			$list_top	= $this->db->get_where('list_help', array('group_by'=>'top invoice'))->result_array();
 			$getDetailcut	='';
 			//$get_kurs	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
-			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
+			$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customery where nomor_po ='".$penagihan[0]->no_po."'")->result();
 			    $sisa_um   = (!empty($get_kurs))?$get_kurs[0]->sisa_um:0;
 				$uang_muka_persen = (!empty($get_kurs))?$get_kurs[0]->uang_muka_persen:0; 
 				$sisa_um_idr   = (!empty($get_kurs))?$get_kurs[0]->sisa_um_idr:0;
@@ -7001,7 +7001,7 @@ else
 			'in_so'			=> implode(',',$in_so),
 			'arr_in_ipp'	=> $in_ipp,
 			'penagihan'		=> $penagihan,
-			'kurs'			=> (!empty($get_kurs)) ? $get_kurs[0]->kurs : 0,
+			'kurs'			=> $get_kurs[0]->kurs,
 			'uang_muka_persen'	=> $uang_muka_persen, 
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,
