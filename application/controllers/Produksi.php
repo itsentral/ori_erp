@@ -12667,24 +12667,25 @@ class Produksi extends CI_Controller {
 		
 		$ArrUpdatePro = [];
 		$nomor = 1;
-		$SUM_MAX = $DETAIL_SUM[0]['jumlah'];
 		foreach ($DETAIL as $key => $value) {
-			for ($i=1; $i <= $value['qty_booking']; $i++) { 
-				$ArrUpdatePro[$nomor]['id_product_deadstok'] = $value['id_product'];
+			// Ambil production_detail yang sesuai dengan id_milik dari booking ini
+			$DETAILUPDATE_FILTERED = $this->db->get_where('production_detail', array(
+				'id_produksi' => 'PRO-'.$no_ipp,
+				'id_milik' => $value['id_milik'],
+				'kode_spk' => NULL
+			))->result_array();
 
-				$nomor++;
-			}
-		}
-		// echo $SUM_MAX;
-		$nomor = 1;
-		foreach ($DETAILUPDATE as $key => $value) { 
-			if($nomor <= $SUM_MAX){ 
-				$ArrUpdatePro[$nomor]['id'] = $value['id'];
-				$ArrUpdatePro[$nomor]['booking_by'] = $username;
-				$ArrUpdatePro[$nomor]['booking_date'] = $datetime;
-				$ArrUpdatePro[$nomor]['kode_booking_deadstok'] = $kode_booking_deadstok;
-
-				$nomor++;
+			$count = 0;
+			foreach ($DETAILUPDATE_FILTERED as $v) {
+				if ($count < $value['qty_booking']) {
+					$ArrUpdatePro[$nomor]['id'] = $v['id'];
+					$ArrUpdatePro[$nomor]['id_product_deadstok'] = $value['id_product'];
+					$ArrUpdatePro[$nomor]['booking_by'] = $username;
+					$ArrUpdatePro[$nomor]['booking_date'] = $datetime;
+					$ArrUpdatePro[$nomor]['kode_booking_deadstok'] = $kode_booking_deadstok;
+					$nomor++;
+					$count++;
+				}
 			}
 		}
 

@@ -131,7 +131,7 @@ class Approval_est_deadstok extends CI_Controller {
 					OR d.customer LIKE '%".$this->db->escape_like_str($like_value)."%'
 					OR d.project LIKE '%".$this->db->escape_like_str($like_value)."%'
 				)
-				GROUP BY a.created_date
+				GROUP BY a.kode
 		";
 		// echo $sql; exit;
 
