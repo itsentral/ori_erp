@@ -2028,7 +2028,7 @@ class Delivery extends CI_Controller
 		//SAMPAI SINI
 		// print_r($ArrKeyJurnal);
 		// exit;
-		$this->db->trans_start();
+		$this->db->trans_begin();
 		if (!empty($ArrKeyJurnal)) {
 			insert_jurnal_delivery($ArrKeyJurnal, $kode_delivery);
 		}
@@ -2047,7 +2047,6 @@ class Delivery extends CI_Controller
 
 		$this->db->where('kode_delivery', $kode_delivery);
 		$this->db->update('deadstok', $ArrUpdate);
-		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
