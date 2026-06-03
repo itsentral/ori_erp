@@ -22,6 +22,7 @@
 							$nomor++;
 							$harga_tot6			= number_format($valx['retensi'],2);
 							$harga_tot6_hidden	= round($valx['retensi'],2);
+							$SUM += $valx['retensi'];
 							$material_name = get_nomor_so($valx['no_ipp']).' / RETENSI';
 							?>
 							<tr id='tr5_<?= $nomor;?>' >

@@ -2523,18 +2523,18 @@ else{
 			
 			
 if($base_cur=='USD'){
-			$total_invoice          = $this->input->post('total_invoice');
-			$total_invoice_idr      = $this->input->post('total_invoice')*$kurs;
-			$total_um               = $this->input->post('down_payment');
-			$total_um_idr           = $this->input->post('down_payment')*$kurs;
+			$total_invoice          = str_replace(',','',$this->input->post('total_invoice'));
+			$total_invoice_idr      = str_replace(',','',$this->input->post('total_invoice'))*$kurs;
+			$total_um               = str_replace(',','',$this->input->post('down_payment'));
+			$total_um_idr           = str_replace(',','',$this->input->post('down_payment'))*$kurs;
 			$um_persen				= str_replace(',','',$this->input->post('um_persen'));
-			$total_gab_product      = ($this->input->post('tot_product'))+($this->input->post('total_material'))+($this->input->post('total_bq_nf'));
-			$total_gab_product_idr  = ($this->input->post('tot_product')*$kurs)+($this->input->post('total_material')*$kurs)+($this->input->post('total_bq_nf')*$kurs);
+			$total_gab_product      = str_replace(',','',$this->input->post('tot_product'))+str_replace(',','',$this->input->post('total_material'))+str_replace(',','',$this->input->post('total_bq_nf'));
+			$total_gab_product_idr  = (str_replace(',','',$this->input->post('tot_product'))*$kurs)+(str_replace(',','',$this->input->post('total_material'))*$kurs)+(str_replace(',','',$this->input->post('total_bq_nf'))*$kurs);
 
 			$retensi_non_ppn 	= str_replace(',','',$this->input->post('potongan_retensi'));
 			$retensi_ppn 		= str_replace(',','',$this->input->post('potongan_retensi2'));
 
-			$diskon = (!empty($this->input->post('diskon')))?$this->input->post('diskon'):str_replace(',','',$this->input->post('diskon'));
+			$diskon = str_replace(',','',$this->input->post('diskon'));
 			$retensi_FIX = 0;
 			if($retensi_non_ppn <= 0 ){
 				$retensi_FIX = $retensi_ppn;
@@ -2556,16 +2556,27 @@ if($base_cur=='USD'){
 			$totaluangmuka2 = 0;
 			$totaluangmuka2_idr = 0;
 			if($jenis_invoice=='uang muka' && $um_persen2 != 0){
-				$totaluangmuka2 = $this->input->post('grand_total') - $this->input->post('down_payment');
+				$totaluangmuka2 = $grand_total - str_replace(',','',$this->input->post('down_payment'));
 				$totaluangmuka2_idr = $totaluangmuka2*$kurs;
 			}
 			if($jenis_invoice=='progress' && $um_persen2 != 0){
-				$totaluangmuka2 = $this->input->post('down_payment2');
+				$totaluangmuka2 = str_replace(',','',$this->input->post('down_payment2'));
 				$totaluangmuka2_idr = $totaluangmuka2*$kurs;
 			}
 			
 			
 			//INSERT DATABASE TR INVOICE HEADER
+			$tot_product_clean		= str_replace(',','',$this->input->post('tot_product'));
+			$total_material_clean	= str_replace(',','',$this->input->post('total_material'));
+			$total_bq_nf_clean		= str_replace(',','',$this->input->post('total_bq_nf'));
+			$total_enginering_clean	= str_replace(',','',$this->input->post('total_enginering'));
+			$total_packing_clean	= str_replace(',','',$this->input->post('total_packing'));
+			$total_trucking_clean	= str_replace(',','',$this->input->post('total_trucking'));
+			$potongan_retensi_clean	= str_replace(',','',$this->input->post('potongan_retensi'));
+			$ppn_clean				= str_replace(',','',$this->input->post('ppn'));
+			$total_invoice_clean	= str_replace(',','',$this->input->post('total_invoice'));
+			$down_payment_clean		= str_replace(',','',$this->input->post('down_payment'));
+
 			$headerinv = [
 				'keterangan'				=> $this->input->post('keterangan'),
 				'ppnselect' 		     	=> $ppnselect,
@@ -2578,32 +2589,32 @@ if($base_cur=='USD'){
 				'nm_customer' 		      	=> $nm_customer,
 				'persentase' 		        => $progress,
 				'progress_persen' 			=> $this->input->post('persen'),
-				'total_product'	         	=> $this->input->post('tot_product'),
-				'total_product_idr'	        => $this->input->post('tot_product')*$kurs,
+				'total_product'	         	=> $tot_product_clean,
+				'total_product_idr'	        => $tot_product_clean*$kurs,
 				'total_gab_product'	        => $total_gab_product,
 				'total_gab_product_idr'	    => $total_gab_product_idr,
-				'total_material'	        => $this->input->post('total_material'),
-				'total_material_idr'	    => $this->input->post('total_material')*$kurs,
-				'total_bq'	                => $this->input->post('total_bq_nf'),
-				'total_bq_idr'	            => $this->input->post('total_bq_nf')*$kurs,
-				'total_enginering'	        => $this->input->post('total_enginering'),
-				'total_enginering_idr'	    => $this->input->post('total_enginering')*$kurs,
-				'total_packing'	            => $this->input->post('total_packing'),
-				'total_packing_idr'	        => $this->input->post('total_packing')*$kurs,
-				'total_trucking'	        => $this->input->post('total_trucking'),
-				'total_trucking_idr'	    => $this->input->post('total_trucking')*$kurs,
-				'total_dpp_usd'	            => $this->input->post('grand_total'),
-				'total_dpp_rp'	            => $this->input->post('grand_total')*$kurs,
+				'total_material'	        => $total_material_clean,
+				'total_material_idr'	    => $total_material_clean*$kurs,
+				'total_bq'	                => $total_bq_nf_clean,
+				'total_bq_idr'	            => $total_bq_nf_clean*$kurs,
+				'total_enginering'	        => $total_enginering_clean,
+				'total_enginering_idr'	    => $total_enginering_clean*$kurs,
+				'total_packing'	            => $total_packing_clean,
+				'total_packing_idr'	        => $total_packing_clean*$kurs,
+				'total_trucking'	        => $total_trucking_clean,
+				'total_trucking_idr'	    => $total_trucking_clean*$kurs,
+				'total_dpp_usd'	            => $grand_total,
+				'total_dpp_rp'	            => $grand_total*$kurs,
 				'total_diskon'	            => $diskon,
 				'total_diskon_idr'	        => $diskon * $kurs,
-				'total_retensi'	            => $this->input->post('potongan_retensi'),
-				'total_retensi_idr'	        => $this->input->post('potongan_retensi')*$kurs,
-				'total_ppn'	                => $this->input->post('ppn'),
-				'total_ppn_idr'	            => $this->input->post('ppn')*$kurs,
-				'total_invoice'	            => $this->input->post('total_invoice'),
-				'total_invoice_idr'	        => $this->input->post('total_invoice')*$kurs,
-				'total_um'	                => $this->input->post('down_payment'),
-				'total_um_idr'	            => $this->input->post('down_payment')*$kurs,
+				'total_retensi'	            => $potongan_retensi_clean,
+				'total_retensi_idr'	        => $potongan_retensi_clean*$kurs,
+				'total_ppn'	                => $ppn_clean,
+				'total_ppn_idr'	            => $ppn_clean*$kurs,
+				'total_invoice'	            => $total_invoice_clean,
+				'total_invoice_idr'	        => $total_invoice_clean*$kurs,
+				'total_um'	                => $down_payment_clean,
+				'total_um_idr'	            => $down_payment_clean*$kurs,
 				'kurs_jual'	                => $kurs,
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
@@ -2617,8 +2628,8 @@ if($base_cur=='USD'){
 				'base_cur'					=> $base_cur,
 				'total_retensi2'			=> $retensi_ppn,
 				'total_retensi2_idr'		=> $retensi_ppn*$kurs,
-				'sisa_invoice'	        	=> $this->input->post('total_invoice'),
-				'sisa_invoice_idr'	        => $this->input->post('total_invoice')*$kurs,
+				'sisa_invoice'	        	=> $total_invoice_clean,
+				'sisa_invoice_idr'	        => $total_invoice_clean*$kurs,
 				'so_number'					=> $so_number
 			];
 			
@@ -3068,25 +3079,25 @@ if($base_cur=='USD'){
 				'progress_persen' => $progress_pex,
 				'grand_total' => $grand_total,
 				'status'	=> $stsx,
-				'real_tagih_usd'	=> $this->input->post('total_invoice') ,
-				'real_tagih_idr'	=> $this->input->post('total_invoice') * $kurs
+				'real_tagih_usd'	=> $total_invoice_clean,
+				'real_tagih_idr'	=> $total_invoice_clean * $kurs
 			];
 }
 else
 {
 //	BASE_CUR=IDR
-			$total_invoice          = $this->input->post('total_invoice')/$kurs;
-			$total_invoice_idr      = $this->input->post('total_invoice');
-			$total_um               = $this->input->post('down_payment')/$kurs;
-			$total_um_idr           = $this->input->post('down_payment');
+			$total_invoice          = str_replace(',','',$this->input->post('total_invoice'))/$kurs;
+			$total_invoice_idr      = str_replace(',','',$this->input->post('total_invoice'));
+			$total_um               = str_replace(',','',$this->input->post('down_payment'))/$kurs;
+			$total_um_idr           = str_replace(',','',$this->input->post('down_payment'));
 			$um_persen				= str_replace(',','',$this->input->post('um_persen'));
-			$total_gab_product      = ($this->input->post('tot_product')/$kurs)+($this->input->post('total_material')/$kurs)+($this->input->post('total_bq_nf')/$kurs);
-			$total_gab_product_idr  = ($this->input->post('tot_product'))+($this->input->post('total_material'))+($this->input->post('total_bq_nf'));
+			$total_gab_product      = (str_replace(',','',$this->input->post('tot_product'))/$kurs)+(str_replace(',','',$this->input->post('total_material'))/$kurs)+(str_replace(',','',$this->input->post('total_bq_nf'))/$kurs);
+			$total_gab_product_idr  = str_replace(',','',$this->input->post('tot_product'))+str_replace(',','',$this->input->post('total_material'))+str_replace(',','',$this->input->post('total_bq_nf'));
 
 			$retensi_non_ppn 	= str_replace(',','',$this->input->post('potongan_retensi'));
 			$retensi_ppn 		= str_replace(',','',$this->input->post('potongan_retensi2'));
 
-			$diskon = (!empty($this->input->post('diskon')))?$this->input->post('diskon'):str_replace(',','',$this->input->post('diskon'));
+			$diskon = str_replace(',','',$this->input->post('diskon'));
 
 			$retensi_FIX = 0;
 
