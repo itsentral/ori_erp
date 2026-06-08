@@ -31,7 +31,9 @@ require_once(APPPATH.'libraries/MPDF57/mpdf.php');
 		echo "</tr>";
 		echo "<tr>";
 			echo "<td class='header_style_alamat' colspan='3'>".strtoupper($data_iden[0]->alamat_baris3)."</td>";
-            echo "<td class='header_style_alamat' colspan=3></td>";
+			echo "<td class='header_style_alamat'>Payment Date</td>";
+            echo "<td class='header_style_alamat'>:</td>";
+			echo "<td class='header_style_alamat'>".($datapo->payment_date ? date('d F Y',strtotime($datapo->payment_date)) : '-')."</td>";
 		echo "</tr>";
 
         echo "<tr>";
