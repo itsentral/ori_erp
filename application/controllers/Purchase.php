@@ -931,7 +931,11 @@ class Purchase extends CI_Controller {
 		if($data['group_top']=='uang muka'){			
 				$jenis_jurnal='JV053';
 			}else{
-				$jenis_jurnal='JV041';
+				if($datapo->mata_uang != 'IDR'){
+					$jenis_jurnal='JV083';
+				}else{
+					$jenis_jurnal='JV041';
+				}
 			}
 
 			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' order by parameter_no")->result();
