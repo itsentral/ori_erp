@@ -406,20 +406,37 @@ class Delivery extends CI_Controller
 				])->get('production_detail')->row();
 
 				if ($check2) {
-					$no_pro = $check2->id_produksi;
+					// OLD CODE - hanya update 1 id_produksi saja
+					// $no_pro = $check2->id_produksi;
+					// $this->db->update(
+					// 	'production_detail',
+					// 	[
+					// 		'kode_delivery' 	=> $kode_delivery,
+					// 		'delivery_by' 		=> $username,
+					// 		'delivery_date' 	=> $datetime,
+					// 	],
+					// 	[
+					// 		'spool_induk' 					=> $post['qr_code'],
+					// 		'id_produksi' 					=> $no_pro,
+					// 		// 'release_to_costing_date !=' 	=> NULL,
+					// 		'kode_delivery' 				=> NULL,
+					// 		'lock_delivery_date' 			=> NULL
+					// 	]
+					// );
+
+					// NEW CODE - update semua item spool yang id_produksi-nya ada di list_so
+					$this->db->where_in('id_produksi', $post['list_so']);
+					$this->db->where([
+						'spool_induk' 					=> $post['qr_code'],
+						'kode_delivery' 				=> NULL,
+						'lock_delivery_date' 			=> NULL
+					]);
 					$this->db->update(
 						'production_detail',
 						[
 							'kode_delivery' 	=> $kode_delivery,
 							'delivery_by' 		=> $username,
 							'delivery_date' 	=> $datetime,
-						],
-						[
-							'spool_induk' 					=> $post['qr_code'],
-							'id_produksi' 					=> $no_pro,
-							// 'release_to_costing_date !=' 	=> NULL,
-							'kode_delivery' 				=> NULL,
-							'lock_delivery_date' 			=> NULL
 						]
 					);
 				} else {
@@ -443,7 +460,23 @@ class Delivery extends CI_Controller
 				])->get('so_cutting_detail')->row();
 
 				if ($check3) {
-					$no_pro = $check3->id_bq;
+					// OLD CODE - hanya update 1 id_bq dan 1 kode_spool saja
+					// $no_pro = $check3->id_bq;
+					// $this->db->query("UPDATE 
+					// 					so_cutting_detail
+					// 				SET 
+					// 					kode_delivery='$kode_delivery',
+					// 					delivery_by='$username',
+					// 					delivery_date='$datetime'
+					// 				WHERE 
+					// 					spool_induk='" . $post['qr_code'] . "'
+					// 					AND id_bq= '" . str_replace('PRO-', 'BQ-', $no_pro) . "'
+					// 					AND kode_spool= '" . $check3->kode_spool . "'
+					// 					AND kode_delivery IS NULL
+					// 					AND lock_delivery_date IS NULL");
+
+					// NEW CODE - update semua item cutting dalam spool yang id_bq-nya ada di list SO
+					$arrSOStr = "'" . implode("','", $ArrSO) . "'";
 					$this->db->query("UPDATE 
 										so_cutting_detail
 									SET 
@@ -452,8 +485,7 @@ class Delivery extends CI_Controller
 										delivery_date='$datetime'
 									WHERE 
 										spool_induk='" . $post['qr_code'] . "'
-										AND id_bq= '" . str_replace('PRO-', 'BQ-', $no_pro) . "'
-										AND kode_spool= '" . $check3->kode_spool . "'
+										AND id_bq IN ($arrSOStr)
 										AND kode_delivery IS NULL
 										AND lock_delivery_date IS NULL");
 				}
