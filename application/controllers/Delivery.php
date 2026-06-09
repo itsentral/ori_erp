@@ -6546,9 +6546,16 @@ class Delivery extends CI_Controller
 					 }else{
 					 $qty=$qty1;	
 					 }
+
+					 // Cek apakah produk field joint
+					 $is_field_joint = $this->db->get_where('data_erp_fg', array('kode_trans' => $kode_trans, 'no_spk' => $nospk, 'keterangan' => 'Field Join to Finish Good'))->num_rows();
 				    
 					if (!empty($nm_material)){
-                      $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					  if ($is_field_joint > 0) {
+                      	$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-".$qty."  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					  } else {
+                      	$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					  }
 				    }
 					
 					  	
