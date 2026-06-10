@@ -3963,7 +3963,16 @@ else
 			$val1 			= $this->Acc_model->GetData($tabel1,$field1,$param1,$value_param1);
 			$nilaibayar1 	= $val1[0]->$field1;
 			$nokir1  = $rec->no_perkiraan;
-			
+
+			// Perlakuan revenue: jika retensi sebelum PPN, revenue = DPP - retensi
+			// Jika retensi setelah PPN, revenue = DPP penuh (tidak dikurangi)
+			if($field1 == 'total_dpp_rp' && $gethd->total_retensi_idr > 0 && $gethd->total_retensi2_idr <= 0){
+				$nilaibayar1 = $nilaibayar1 - $gethd->total_retensi_idr;
+			}
+			if($field1 == 'total_dpp_usd' && $gethd->total_retensi > 0 && $gethd->total_retensi2 <= 0){
+				$nilaibayar1 = $nilaibayar1 - $gethd->total_retensi;
+			}
+
 			if($nokir1=='1102-01-02' OR $nokir1=='2102-01-03' ){
 
 				if ($nilaibayar1 > 1) {
@@ -6078,6 +6087,16 @@ else
 			$val1 			= $this->Acc_model->GetData($tabel1,$field1,$param1,$value_param1);
 			$nilaibayar1 	= $val1[0]->$field1;
 			$nokir1  = $rec->no_perkiraan;
+
+			// Perlakuan revenue: jika retensi sebelum PPN, revenue = DPP - retensi
+			// Jika retensi setelah PPN, revenue = DPP penuh (tidak dikurangi)
+			if($field1 == 'total_dpp_rp' && $gethd->total_retensi_idr > 0 && $gethd->total_retensi2_idr <= 0){
+				$nilaibayar1 = $nilaibayar1 - $gethd->total_retensi_idr;
+			}
+			if($field1 == 'total_dpp_usd' && $gethd->total_retensi > 0 && $gethd->total_retensi2 <= 0){
+				$nilaibayar1 = $nilaibayar1 - $gethd->total_retensi;
+			}
+
 			if ($posisi1=='D'){
 				$det_Jurnaltes1[]  = array(
 					'nomor'         => $Nomor_JV,
