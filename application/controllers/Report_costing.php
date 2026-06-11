@@ -2340,18 +2340,11 @@ class Report_costing extends CI_Controller {
 		$berat_total = $berat_pipa + $berat_flange + $berat_fitting + $berat_bnw + $berat_field;
 		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
 				
-		// Override biaya_total jika source = budget (ambil dari budget_so_1 + aksesoris + hardware)
+				
+		// Override biaya_total jika source = budget (ambil dari budget_so_new)
 		if($source == 'budget'){
-			$get_budget = $this->db->query("SELECT est_harga FROM budget_so_1 WHERE id_bq = '".$id_bq."'")->result();
-			$est_harga_budget = (!empty($get_budget))?$get_budget[0]->est_harga : 0;
-			
-			$get_acc = $this->db->select('SUM(price_total) AS price_total')->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'aksesoris'))->result();
-			$sum_acc = (!empty($get_acc))?$get_acc[0]->price_total : 0;
-			
-			$get_hw = $this->db->select('SUM(price_total) AS price_total')->from('cost_project_detail')->where("id_bq = '".$id_bq."' AND (category = 'baut' OR category = 'gasket' OR category = 'plate' OR category = 'lainnya') ")->get()->result();
-			$sum_hw = (!empty($get_hw))?$get_hw[0]->price_total : 0;
-			
-			$biaya_total = $est_harga_budget + $sum_acc + $sum_hw;
+			$get_budget = $this->db->select('est_cost')->get_where('budget_so_new', array('id_bq'=>$id_bq))->result();
+			$biaya_total = (!empty($get_budget))?$get_budget[0]->est_cost : $biaya_total;
 		}
 
 		$biaya_total_mp = $biaya_pipa_mp + $biaya_flange_mp + $biaya_fitting_mp + $biaya_bnw_mp + $biaya_field_mp;
