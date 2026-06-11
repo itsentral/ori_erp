@@ -2338,7 +2338,21 @@ class Report_costing extends CI_Controller {
 		}
 	
 		$berat_total = $berat_pipa + $berat_flange + $berat_fitting + $berat_bnw + $berat_field;
-		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
+		// $biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
+		
+		// Biaya material termasuk aksesoris dan hardware (baut, gasket, plate, lainnya) agar sama dengan Est Cost di Budget SO
+		$get_acc_mat_price = $this->db->select('SUM(price_total) AS price_total')->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'aksesoris'))->result();
+		$sum_mat_price = (!empty($get_acc_mat_price))?$get_acc_mat_price[0]->price_total : 0;
+		
+		$get_acc_mat_price_acc = $this->db
+										->select('SUM(price_total) AS price_total')
+										->from('cost_project_detail')
+										->where("id_bq = '" . $id_bq . "' AND (category = 'baut' OR category = 'gasket' OR category = 'plate' OR category = 'lainnya') ")
+										->get()
+										->result();
+		$sum_mat_price_acc = (!empty($get_acc_mat_price_acc))?$get_acc_mat_price_acc[0]->price_total : 0;
+		
+		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field + $sum_mat_price + $sum_mat_price_acc;
 		$biaya_total_mp = $biaya_pipa_mp + $biaya_flange_mp + $biaya_fitting_mp + $biaya_bnw_mp + $biaya_field_mp;
 		$biaya_total_foh = $biaya_pipa_foh + $biaya_flange_foh + $biaya_fitting_foh + $biaya_bnw_foh + $biaya_field_foh;
 		$biaya_total_ga = $biaya_pipa_ga + $biaya_flange_ga + $biaya_fitting_ga + $biaya_bnw_ga + $biaya_field_ga;
@@ -3953,7 +3967,21 @@ class Report_costing extends CI_Controller {
 		}
 	
 		$berat_total = $berat_pipa + $berat_flange + $berat_fitting + $berat_bnw + $berat_field;
-		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
+		// $biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
+		
+		// Biaya material termasuk aksesoris dan hardware (baut, gasket, plate, lainnya) agar sama dengan Est Cost di Budget SO
+		$get_acc_mat_price = $this->db->select('SUM(price_total) AS price_total')->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'aksesoris'))->result();
+		$sum_mat_price = (!empty($get_acc_mat_price))?$get_acc_mat_price[0]->price_total : 0;
+		
+		$get_acc_mat_price_acc = $this->db
+										->select('SUM(price_total) AS price_total')
+										->from('cost_project_detail')
+										->where("id_bq = '" . $id_bq . "' AND (category = 'baut' OR category = 'gasket' OR category = 'plate' OR category = 'lainnya') ")
+										->get()
+										->result();
+		$sum_mat_price_acc = (!empty($get_acc_mat_price_acc))?$get_acc_mat_price_acc[0]->price_total : 0;
+		
+		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field + $sum_mat_price + $sum_mat_price_acc;
 		$biaya_total_mp = $biaya_pipa_mp + $biaya_flange_mp + $biaya_fitting_mp + $biaya_bnw_mp + $biaya_field_mp;
 		$biaya_total_foh = $biaya_pipa_foh + $biaya_flange_foh + $biaya_fitting_foh + $biaya_bnw_foh + $biaya_field_foh;
 		$biaya_total_ga = $biaya_pipa_ga + $biaya_flange_ga + $biaya_fitting_ga + $biaya_bnw_ga + $biaya_field_ga;
