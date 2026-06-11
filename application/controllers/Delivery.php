@@ -6642,7 +6642,7 @@ class Delivery extends CI_Controller
 			if(!empty($cekstok)){
 				foreach ($stokfg as $vals) {
 				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+".$vals->total."  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 				}
 			}else{
 			$datastokfg=array();
@@ -6655,7 +6655,7 @@ class Delivery extends CI_Controller
 							'no_spk' => $vals->no_spk,
 							'kode_trans' => $vals->kode_trans,
 							'id_pro_det' => $vals->id_pro_det,
-							'qty' => $qty_n,
+							'qty' => $vals->total,
 							'nilai_wip' => $vals->nilai_wip,
 							'material' => $vals->material,
 							'wip_direct' =>  $vals->wip_direct,
