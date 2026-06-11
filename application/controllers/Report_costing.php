@@ -5049,6 +5049,253 @@ class Report_costing extends CI_Controller {
 		$objWriter->save("php://output");
 	}
 	
+	public function excel_summary_costing_new(){
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+		$id_bq = $this->uri->segment(3);
+
+		// Ambil data dari budget_so_1 (view real-time, sama seperti Est Cost di Budget SO)
+		$get_budget = $this->db->query("SELECT * FROM budget_so_1 WHERE id_bq = '".$id_bq."'")->result();
+		
+		// Ambil aksesoris
+		$get_acc = $this->db->select('SUM(price_total) AS price_total')->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'aksesoris'))->result();
+		$sum_acc = (!empty($get_acc))?$get_acc[0]->price_total : 0;
+		
+		// Ambil hardware (baut, gasket, plate, lainnya)
+		$get_hw = $this->db
+						->select('SUM(price_total) AS price_total')
+						->from('cost_project_detail')
+						->where("id_bq = '".$id_bq."' AND (category = 'baut' OR category = 'gasket' OR category = 'plate' OR category = 'lainnya') ")
+						->get()
+						->result();
+		$sum_hw = (!empty($get_hw))?$get_hw[0]->price_total : 0;
+
+		// Est Cost = est_harga + aksesoris + hardware (sama dengan rumus di Budget SO)
+		$est_harga_budget = (!empty($get_budget))?$get_budget[0]->est_harga : 0;
+		$est_cost_total = $est_harga_budget + $sum_acc + $sum_hw;
+		
+		// Ambil revisi terakhir untuk breakdown per type
+		$get_revisi_max = $this->db->select('MAX(revised_no) AS revised_no')->get_where('laporan_revised_header',array('id_bq'=>$id_bq))->result();
+		$revised_no = (!empty($get_revisi_max))?$get_revisi_max[0]->revised_no:0;
+
+		$this->load->library("PHPExcel");
+		$objPHPExcel = new PHPExcel();
+		
+		$style_header = array(
+			'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb'=>'000000'))),
+			'font' => array('bold' => true),
+			'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER)
+		);
+		$style_header2 = array(	
+			'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb'=>'D9D9D9')),
+			'font' => array('bold' => true),
+			'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER)
+		);
+		$styleArray3 = array(					  
+			'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT),
+			'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb'=>'000000')))
+		);  
+		$styleArray4 = array(					  
+			'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT),
+			'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb'=>'000000')))
+		);
+
+		$sheet = $objPHPExcel->getActiveSheet();
+		
+		// Header
+		$Row = 1;
+		$NewRow = $Row+1;
+		$Col_Akhir = getColsChar(8);
+		$sheet->setCellValue('A'.$Row, 'REPORT COSTING PROJECT '.str_replace('BQ-','',$id_bq));
+		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
+		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
+		
+		$NewRow = $NewRow + 2;
+		$NextRow = $NewRow;
+
+		$sheet->setCellValue("A".$NewRow."", 'A. FRP');
+		$sheet->getStyle("A".$NewRow.":H".$NextRow."")->applyFromArray($style_header2);
+		$sheet->mergeCells("A".$NewRow.":H".$NextRow."");
+		
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Column headers
+		$headers = array('A'=>'Item','B'=>'Deskripsi','C'=>'Pipe','D'=>'Flange','E'=>'Fitting','F'=>'B&W','G'=>'Field Joint','H'=>'Total');
+		foreach($headers as $col => $title){
+			$sheet->setCellValue($col.$NewRow, $title);
+			$sheet->getStyle($col.$NewRow.':'.$col.$NextRow)->applyFromArray($style_header);
+			$sheet->mergeCells($col.$NewRow.':'.$col.$NextRow);
+			$sheet->getColumnDimension($col)->setAutoSize(true);
+		}
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Berat Material per type dari laporan_revised_detail
+		$types = array(
+			'pipa' => array('col'=>'C','label'=>'pipa'),
+			'flange' => array('col'=>'D','label'=>'flange'),
+			'fitting' => array('col'=>'E','label'=>NULL),
+			'bnw' => array('col'=>'F','label'=>'bw'),
+			'field' => array('col'=>'G','label'=>'field')
+		);
+		
+		$berat = array();
+		$biaya = array();
+		$biaya_mp = array();
+		$biaya_foh = array();
+		$biaya_ga = array();
+		
+		foreach($types as $key => $type){
+			$query = $this->db
+				->select('SUM(a.est_material) AS berat, SUM(a.est_harga) AS biaya,
+						  SUM(a.direct_labour + a.indirect_labour + a.machine + a.mould_mandrill + a.consumable) AS mp,
+						  SUM(a.foh_consumable + a.foh_depresiasi) AS foh,
+						  SUM(a.biaya_gaji_non_produksi + a.biaya_non_produksi + a.biaya_rutin_bulanan) AS ga')
+				->from('laporan_revised_detail a')
+				->join('product_parent b','a.product_parent=b.product_parent','left')
+				->where('b.type_costing', $type['label'])
+				->where('a.revised_no', $revised_no)
+				->where('a.id_bq', $id_bq)
+				->get()
+				->result();
+			$berat[$key] = (!empty($query))?$query[0]->berat:0;
+			$biaya[$key] = (!empty($query))?$query[0]->biaya:0;
+			$biaya_mp[$key] = (!empty($query))?$query[0]->mp:0;
+			$biaya_foh[$key] = (!empty($query))?$query[0]->foh:0;
+			$biaya_ga[$key] = (!empty($query))?$query[0]->ga:0;
+		}
+		
+		$berat_total = array_sum($berat);
+		$biaya_total_mp = array_sum($biaya_mp);
+		$biaya_total_foh = array_sum($biaya_foh);
+		$biaya_total_ga = array_sum($biaya_ga);
+
+		// Row: Berat Material
+		$sheet->setCellValue('A'.$NewRow, 'Berat Material');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, '');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('C'.$NewRow, $berat['pipa']);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('D'.$NewRow, $berat['flange']);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('E'.$NewRow, $berat['fitting']);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('F'.$NewRow, $berat['bnw']);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('G'.$NewRow, $berat['field']);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('H'.$NewRow, $berat_total);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Row: Biaya Material - TOTAL ambil dari budget_so_1 (est_cost)
+		$sheet->setCellValue('A'.$NewRow, 'Biaya Material');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, 'Biaya material sesuai dengan Est Cost di Budget SO.');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('C'.$NewRow, $biaya['pipa']);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('D'.$NewRow, $biaya['flange']);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('E'.$NewRow, $biaya['fitting']);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('F'.$NewRow, $biaya['bnw']);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('G'.$NewRow, $biaya['field']);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray4);
+		// Total = est_cost dari budget_so_1 (sama dengan Est Cost di tabel Budget SO)
+		$sheet->setCellValue('H'.$NewRow, $est_cost_total);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Row: Biaya MP & Utilities
+		$sheet->setCellValue('A'.$NewRow, 'Biaya MP & Utilities');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, 'Biaya direct labour dan indirect labour, depresiasi mesin, biaya mold mandrill dan consumable produksi');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('C'.$NewRow, $biaya_mp['pipa']);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('D'.$NewRow, $biaya_mp['flange']);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('E'.$NewRow, $biaya_mp['fitting']);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('F'.$NewRow, $biaya_mp['bnw']);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('G'.$NewRow, $biaya_mp['field']);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('H'.$NewRow, $biaya_total_mp);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Row: Biaya FOH
+		$sheet->setCellValue('A'.$NewRow, 'Biaya FOH');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, 'Biaya depresiasi FOH dan consumable FOH');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('C'.$NewRow, $biaya_foh['pipa']);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('D'.$NewRow, $biaya_foh['flange']);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('E'.$NewRow, $biaya_foh['fitting']);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('F'.$NewRow, $biaya_foh['bnw']);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('G'.$NewRow, $biaya_foh['field']);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('H'.$NewRow, $biaya_total_foh);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Row: Biaya General Admin
+		$sheet->setCellValue('A'.$NewRow, 'Biaya General Admin');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, 'Biaya gaji non produksi, biaya non produksi, biaya rutin bulanan');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('C'.$NewRow, $biaya_ga['pipa']);
+		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('D'.$NewRow, $biaya_ga['flange']);
+		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('E'.$NewRow, $biaya_ga['fitting']);
+		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('F'.$NewRow, $biaya_ga['bnw']);
+		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('G'.$NewRow, $biaya_ga['field']);
+		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($styleArray4);
+		$sheet->setCellValue('H'.$NewRow, $biaya_total_ga);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		$NewRow = $NewRow + 1;
+		$NextRow = $NewRow;
+
+		// Row: Biaya Dasar
+		$biaya_dasar_total = $est_cost_total + $biaya_total_mp + $biaya_total_foh + $biaya_total_ga;
+		$sheet->setCellValue('A'.$NewRow, 'Biaya Dasar');
+		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('B'.$NewRow, 'Total biaya material + MP & Utilities + FOH + General Admin');
+		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($styleArray3);
+		$sheet->setCellValue('H'.$NewRow, $biaya_dasar_total);
+		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($styleArray4);
+
+		// Download
+		$namaFile = "Summary_Costing_".str_replace('BQ-','',$id_bq)."_".date('Ymd_His').".xlsx";
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="'.$namaFile.'"');
+		header('Cache-Control: max-age=0');
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save("php://output");
+	}
+
 }
 
 ?>

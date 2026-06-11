@@ -97,7 +97,7 @@ class Budget_so extends CI_Controller {
 					$view_so	= "&nbsp;<button type='button' class='btn btn-sm btn-success ViewSO' title='Look Data' data-id_bq='".$row['id_bq']."'><i class='fa fa-eye'></i></button>";
 					$excel_deal	= "&nbsp;<button type='button' class='btn btn-sm btn-info download_excel' title='Download Data' data-id_bq='".$row['id_bq']."'><i class='fa fa-file-excel-o'></i></button>";
 					$excel_est	= "&nbsp;<button type='button' class='btn btn-sm btn-default download_excel_est' title='Download Data' data-id_bq='".$row['id_bq']."'><i class='fa fa-file-excel-o'></i></button>";
-					$excel_sum	= "&nbsp;<a href='".base_url('report_costing/excel_report_costing/'.$row['id_bq'])."' class='btn btn-sm btn-primary' title='Summary Costing'><i class='fa fa-file-excel-o'></i></a>";
+					$excel_sum	= "&nbsp;<a href='".base_url('report_costing/excel_summary_costing_new/'.$row['id_bq'])."' class='btn btn-sm btn-primary' title='Summary Costing'><i class='fa fa-file-excel-o'></i></a>";
 					
 					// if($row['sts_ipp'] == 'WAITING SALES ORDER'){
 						// $ApprvX	= "&nbsp;<button class='btn btn-sm btn-success' id='ApproveDT' title='Approve To Final Drawing' data-id_bq='".$row['id_bq']."'><i class='fa fa-check'></i></button>";
