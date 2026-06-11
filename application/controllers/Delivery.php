@@ -6594,13 +6594,6 @@ class Delivery extends CI_Controller
 			}
 			unset($det_Jurnaltes);unset($datadetail);
 
-			$wipgroup = $this->db->query("SELECT * FROM data_erp_in_transit WHERE kode_trans ='".$kode_trans."' AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();	
-			$kodetrans = $wipgroup->kode_trans;
-			$Date      = $wipgroup->tanggal;
-			$so        = $wipgroup->no_so;
-			$spk       = $wipgroup->no_spk;
-			$product   = $wipgroup->product;
-
 			$stokfg = $this->db->query("SELECT
 										`data_erp_fg`.`id` AS `id`,
 										`data_erp_fg`.`tanggal` AS `tanggal`,
@@ -6630,46 +6623,40 @@ class Delivery extends CI_Controller
 										FROM
 										`data_erp_fg` 
 										WHERE
-										(`data_erp_fg`.`kode_trans` = '".$kodetrans."') 
+										(`data_erp_fg`.`kode_trans` = '".$kode_trans."') 
 										AND (`data_erp_fg`.`jenis`='out')
-										AND (`data_erp_fg`.`tanggal` = '".$Date."')
+										AND (`data_erp_fg`.`tanggal` = '".$tgl_voucher."')
 										GROUP BY kode_trans,no_spk,product,no_so")->result();
 
-			$cekstok = $this->db->query("SELECT * FROM warehouse_stock_intransit WHERE kode_trans ='".$kodetrans."' 
-			AND no_so ='".$so."' AND no_spk ='".$spk."' AND product ='".$product."'")->row();
-		
+			foreach ($stokfg as $vals) {
+				$cekstok = $this->db->query("SELECT * FROM warehouse_stock_intransit WHERE kode_trans ='".$vals->kode_trans."' 
+				AND no_so ='".$vals->no_so."' AND no_spk ='".$vals->no_spk."' AND product ='".$vals->product."'")->row();
 
-			if(!empty($cekstok)){
-				foreach ($stokfg as $vals) {
-				$qty = 	$vals->total;
-				$this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty+".$vals->total."  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+				if(!empty($cekstok)){
+					$this->db->query("UPDATE warehouse_stock_intransit SET qty = qty+".$vals->total." WHERE no_so ='".$vals->no_so."' AND kode_trans ='".$vals->kode_trans."' AND no_spk ='".$vals->no_spk."' AND product ='".$vals->product."' ");
+				}else{
+					$datastokfg = array(
+								'tanggal' => $tgl_voucher,
+								'keterangan' => 'FG To Intransit',
+								'no_so' => $vals->no_so,
+								'product' => $vals->product,
+								'no_spk' => $vals->no_spk,
+								'kode_trans' => $vals->kode_trans,
+								'id_pro_det' => $vals->id_pro_det,
+								'qty' => $vals->total,
+								'nilai_wip' => $vals->nilai_wip,
+								'material' => $vals->material,
+								'wip_direct' =>  $vals->wip_direct,
+								'wip_indirect' =>  $vals->wip_indirect,
+								'wip_consumable' =>  $vals->wip_consumable,
+								'wip_foh' =>  $vals->wip_foh,
+								'created_by' => $vals->created_by,
+								'created_date' => $vals->created_date,
+								'id_trans' => $vals->id_trans,
+								);
+
+					$this->db->insert('warehouse_stock_intransit',$datastokfg);
 				}
-			}else{
-			$datastokfg=array();
-				foreach ($stokfg as $vals) {
-				$datastokfg = array(
-							'tanggal' => $tgl_voucher,
-							'keterangan' => 'FG To Intransit',
-							'no_so' => $vals->no_so,
-							'product' => $vals->product,
-							'no_spk' => $vals->no_spk,
-							'kode_trans' => $vals->kode_trans,
-							'id_pro_det' => $vals->id_pro_det,
-							'qty' => $vals->total,
-							'nilai_wip' => $vals->nilai_wip,
-							'material' => $vals->material,
-							'wip_direct' =>  $vals->wip_direct,
-							'wip_indirect' =>  $vals->wip_indirect,
-							'wip_consumable' =>  $vals->wip_consumable,
-							'wip_foh' =>  $vals->wip_foh,
-							'created_by' => $vals->created_by,
-							'created_date' => $vals->created_date,
-							'id_trans' => $vals->id_trans,
-							);
-
-				$this->db->insert('warehouse_stock_intransit',$datastokfg);
-				}
-
 			}
 		  
 	}
