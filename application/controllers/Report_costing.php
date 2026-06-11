@@ -2338,12 +2338,7 @@ class Report_costing extends CI_Controller {
 		}
 	
 		$berat_total = $berat_pipa + $berat_flange + $berat_fitting + $berat_bnw + $berat_field;
-		// $biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
-		
-		// Ambil biaya material dari tabel budget_so (est_cost) agar sama dengan nilai di tabel Budget SO
-		$get_est_cost = $this->db->select('est_cost')->get_where('budget_so', array('id_bq'=>$id_bq))->result();
-		$biaya_total = (!empty($get_est_cost))?$get_est_cost[0]->est_cost : ($biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field);
-
+		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
 		$biaya_total_mp = $biaya_pipa_mp + $biaya_flange_mp + $biaya_fitting_mp + $biaya_bnw_mp + $biaya_field_mp;
 		$biaya_total_foh = $biaya_pipa_foh + $biaya_flange_foh + $biaya_fitting_foh + $biaya_bnw_foh + $biaya_field_foh;
 		$biaya_total_ga = $biaya_pipa_ga + $biaya_flange_ga + $biaya_fitting_ga + $biaya_bnw_ga + $biaya_field_ga;
@@ -3958,11 +3953,7 @@ class Report_costing extends CI_Controller {
 		}
 	
 		$berat_total = $berat_pipa + $berat_flange + $berat_fitting + $berat_bnw + $berat_field;
-        // $biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
-		
-		// Ambil biaya material dari tabel budget_so (est_cost) agar sama dengan nilai di tabel Budget SO
-		$get_est_cost = $this->db->select('est_cost')->get_where('budget_so', array('id_bq'=>$id_bq))->result();
-		$biaya_total = (!empty($get_est_cost))?$get_est_cost[0]->est_cost : ($biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field);
+		$biaya_total = $biaya_pipa + $biaya_flange + $biaya_fitting + $biaya_bnw + $biaya_field;
 		$biaya_total_mp = $biaya_pipa_mp + $biaya_flange_mp + $biaya_fitting_mp + $biaya_bnw_mp + $biaya_field_mp;
 		$biaya_total_foh = $biaya_pipa_foh + $biaya_flange_foh + $biaya_fitting_foh + $biaya_bnw_foh + $biaya_field_foh;
 		$biaya_total_ga = $biaya_pipa_ga + $biaya_flange_ga + $biaya_fitting_ga + $biaya_bnw_ga + $biaya_field_ga;
