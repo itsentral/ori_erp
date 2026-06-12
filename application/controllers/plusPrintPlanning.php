@@ -100,23 +100,99 @@ function PrintSPKPlanning($Nama_APP, $id_bq, $koneksi, $printby){
 				<th width='20%'>Material Id</th>
 				<th>Material Name</th>
 				<th width='12%'>Qty</th>
+				<th width='8%'>Unit</th>
 				<th width='12%'>Lot/Batch Num</th>
 			</tr>
 		</thead>
 		<tbody>
 		<?php
-		$tDetailLiner	= "SELECT *  FROM warehouse_planning_detail WHERE no_ipp='".$no_ipp."' ORDER BY id ASC ";
+		// Query material dari estimasi_total (sama dengan download_excel type=pipe)
+		$tDetailLiner	= "SELECT
+								a.id_bq AS id_bq,
+								a.id_material AS id_material,
+								a.nm_material AS nm_material,
+								round( sum( ( a.last_cost * b.qty ) ), 3 ) AS last_cost 
+							FROM
+								( estimasi_total a LEFT JOIN so_bf_detail_header b ON ( ( a.id_milik = b.id_milik ) ) ) 
+							WHERE
+								( a.id_material <> '0' )  
+								AND a.id_bq='BQ-".$no_ipp."'
+							GROUP BY
+								a.id_material,
+								a.id_bq 
+							ORDER BY
+								a.nm_material";
 		$dDetailLiner	= mysqli_query($conn, $tDetailLiner);
-        // echo $tDetailLiner; exit;
         $no=0;
 		while($valx = mysqli_fetch_array($dDetailLiner)){
             $no++;
 			?>
 			<tr>
 				<td><?= $no;?></td>
-				<td><?= $valx['idmaterial'];?></td>
+				<td><?= $valx['id_material'];?></td>
 				<td><?= $valx['nm_material'];?></td>
-				<td align='right'><?= number_format($valx['use_stock'], 3);?> Kg</td>
+				<td align='right'><?= number_format($valx['last_cost'], 3);?></td>
+				<td align='center'>KG</td>
+				<td></td>
+			</tr>
+			<?php
+		}
+
+		// Query accessories (non_frp) dari so_acc_and_mat
+		$tNonFrp = "SELECT * FROM so_acc_and_mat WHERE category <> 'mat' AND id_bq='BQ-".$no_ipp."'";
+		$dNonFrp = mysqli_query($conn, $tNonFrp);
+		while($valx = mysqli_fetch_array($dNonFrp)){
+			$no++;
+			$qty = $valx['qty'];
+			$satuan = $valx['satuan'];
+			if($valx['category'] == 'plate'){
+				$qty = $valx['berat'];
+				$satuan = '1';
+			}
+			// Get accessory name
+			$qNm = "SELECT nm_acc FROM accessories WHERE id='".$valx['id_material']."' LIMIT 1";
+			$dNm = mysqli_query($conn, $qNm);
+			$rNm = mysqli_fetch_array($dNm);
+			$nm_acc = $rNm ? $rNm['nm_acc'] : '';
+			// Get unit name
+			$qUnit = "SELECT kode_satuan FROM raw_pieces WHERE id_satuan='".$satuan."' LIMIT 1";
+			$dUnit = mysqli_query($conn, $qUnit);
+			$rUnit = mysqli_fetch_array($dUnit);
+			$unit_name = $rUnit ? strtoupper($rUnit['kode_satuan']) : '';
+			?>
+			<tr>
+				<td><?= $no;?></td>
+				<td><?= $valx['id_material'];?></td>
+				<td><?= $nm_acc;?></td>
+				<td align='right'><?= number_format($qty, 3);?></td>
+				<td align='center'><?= $unit_name;?></td>
+				<td></td>
+			</tr>
+			<?php
+		}
+
+		// Query material tambahan dari so_acc_and_mat
+		$tMaterial = "SELECT * FROM so_acc_and_mat WHERE category = 'mat' AND id_bq='BQ-".$no_ipp."'";
+		$dMaterial = mysqli_query($conn, $tMaterial);
+		while($valx = mysqli_fetch_array($dMaterial)){
+			$no++;
+			// Get material name
+			$qNm = "SELECT nm_material FROM raw_materials WHERE id_material='".$valx['id_material']."' LIMIT 1";
+			$dNm = mysqli_query($conn, $qNm);
+			$rNm = mysqli_fetch_array($dNm);
+			$nm_mat = $rNm ? $rNm['nm_material'] : '';
+			// Get unit name
+			$qUnit = "SELECT kode_satuan FROM raw_pieces WHERE id_satuan='".$valx['satuan']."' LIMIT 1";
+			$dUnit = mysqli_query($conn, $qUnit);
+			$rUnit = mysqli_fetch_array($dUnit);
+			$unit_name = $rUnit ? strtoupper($rUnit['kode_satuan']) : '';
+			?>
+			<tr>
+				<td><?= $no;?></td>
+				<td><?= $valx['id_material'];?></td>
+				<td><?= $nm_mat;?></td>
+				<td align='right'><?= number_format($valx['qty'], 3);?></td>
+				<td align='center'><?= $unit_name;?></td>
 				<td></td>
 			</tr>
 			<?php
