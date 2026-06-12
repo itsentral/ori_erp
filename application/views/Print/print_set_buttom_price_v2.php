@@ -1,17 +1,21 @@
 <?php
 	
 	$sroot 		= $_SERVER['DOCUMENT_ROOT'];
+	// $sroot 		= $_SERVER['DOCUMENT_ROOT'].'/ori_dev_arwant';
 	include $sroot."/application/libraries/MPDF57/mpdf.php";
+	// $mpdf=new mPDF('utf-8','A4');
 	$mpdf=new mPDF('utf-8','A4-L');
 	
 	set_time_limit(0);
 	ini_set('memory_limit','1024M');
 
+	//Beginning Buffer to save PHP variables and HTML tags
 	ob_start();
 	date_default_timezone_set('Asia/Jakarta');
 	$today = date('l, d F Y [H:i:s]');
 	
 	echo "<htmlpageheader>";
+	// exit;
 	?>
 	<table class='header_style' border='0' width='100%' cellpadding='2'>
 		<thead>
@@ -37,22 +41,31 @@
 			<td style='vertical-align:top;'>Project</td>
 			<td style='vertical-align:top;'>:</td>
 			<td><?= strtoupper(strtolower($getHeader[0]->project)); ?></td>
+		
 		</tr>
 		<tr style='background-color: #ffffff;'>
 			<td>Customer</td>
 			<td>:</td>
 			<td><?= strtoupper(strtolower($getHeader[0]->nm_customer)); ?></td>
+		
 		</tr>
 		<tr style='background-color: #ffffff;'>
-			<td>&nbsp;</td><td></td><td></td>
+			<td>&nbsp;</td>
+			<td></td>
+			<td></td>
+		
 		</tr>
 		<tr style='background-color: #ffffff;'>
-			<td>&nbsp;</td><td></td><td></td>
+			<td>&nbsp;</td>
+			<td></td>
+			<td></td>
+		
 		</tr>
 		<tr style='background-color: #ffffff;'>
 			<td style='vertical-align:top;'>&nbsp;</td>
 			<td style='vertical-align:top;'></td> 
 			<td style='vertical-align:top;'></td>
+		
 		</tr>
 	</table>
 	<br>
@@ -216,11 +229,12 @@
 			echo "<tbody class='body_x'>";
 			
 			foreach($rest_baut AS $val => $valx){
+				
 				$get_detail = $this->db->get_where('accessories', array('id'=>$valx['id_material']))->result();
 				$radx = (!empty($get_detail[0]->radius) AND $get_detail[0]->radius > 0)?'x '.floatval($get_detail[0]->radius).' R':'';
 				
 				$persen = get_persen($id_bq, $valx['id_material'], $valx['id']);
-				$extra 	= get_extra($id_bq, $valx['id_material'], $valx['id']);
+				$extra 	= get_extra($id_bq,  $valx['id_material'], $valx['id']);
 				$price 			= $valx['total_price'] + ($valx['total_price'] * ($persen/100));
 				$price_total 	= $price + ($price * ($extra/100));
 
@@ -264,7 +278,7 @@
 			foreach($rest_plate AS $val => $valx){
 				$get_detail = $this->db->get_where('accessories', array('id'=>$valx['id_material']))->result();
 				$persen = get_persen($id_bq, $valx['id_material'], $valx['id']);
-				$extra 	= get_extra($id_bq, $valx['id_material'], $valx['id']);
+				$extra 	= get_extra($id_bq,  $valx['id_material'], $valx['id']);
 				$price 			= $valx['total_price'] + ($valx['total_price'] * ($persen/100));
 				$price_total 	= $price + ($price * ($extra/100));
 
@@ -309,9 +323,10 @@
 			echo "<tbody class='body_x'>";
 			
 			foreach($rest_gasket AS $val => $valx){
+				
 				$get_detail = $this->db->get_where('accessories', array('id'=>$valx['id_material']))->result();
 				$persen = get_persen($id_bq, $valx['id_material'], $valx['id']);
-				$extra 	= get_extra($id_bq, $valx['id_material'], $valx['id']);
+				$extra 	= get_extra($id_bq,  $valx['id_material'], $valx['id']);
 				$price 			= $valx['total_price'] + ($valx['total_price'] * ($persen/100));
 				$price_total 	= $price + ($price * ($extra/100));
 
@@ -356,7 +371,7 @@
 			foreach($rest_lainnya AS $val => $valx){
 				$get_detail = $this->db->select('nama, material, spesifikasi, standart, ukuran_standart, dimensi')->get_where('accessories', array('id'=>$valx['id_material']))->result();
 				$persen = get_persen($id_bq, $valx['id_material'], $valx['id']);
-				$extra 	= get_extra($id_bq, $valx['id_material'], $valx['id']);
+				$extra 	= get_extra($id_bq,  $valx['id_material'], $valx['id']);
 				$price 			= $valx['total_price'] + ($valx['total_price'] * ($persen/100));
 				$price_total 	= $price + ($price * ($extra/100));
 
@@ -400,7 +415,7 @@
 			
 			foreach($rest_mat AS $val => $valx){
 				$persen = get_persen($id_bq, $valx['id_material'], $valx['id']);
-				$extra 	= get_extra($id_bq, $valx['id_material'], $valx['id']);
+				$extra 	= get_extra($id_bq,  $valx['id_material'], $valx['id']);
 				$price 			= $valx['total_price'] + ($valx['total_price'] * ($persen/100));
 				$price_total 	= $price + ($price * ($extra/100));
 
@@ -423,8 +438,8 @@
 			echo "</tbody>";
 		}
 		?>
-
 		<?php
+		$SUM1=0;
 		if(!empty($getEngCost)){
 		?>
 		<tbody>
@@ -443,11 +458,10 @@
 		<tbody class='body_x'>
 			<?php
 			$no1=0;
-			$SUM1=0;
 			foreach($getEngCost AS $val => $valx){
 				$Qty1 	= (!empty($valx['qty']))?$valx['qty']:'-';
-				$Price1 = (!empty($valx['price']))?number_format($valx['price'],2):'-';
-				$TotalP1= (!empty($valx['price_total']))?number_format($valx['price_total'],2):'-';
+				$Price1 	= (!empty($valx['price']))?number_format($valx['price'],2):'-';
+				$TotalP1 	= (!empty($valx['price_total']))?number_format($valx['price_total'],2):'-';
 
 				$Opt 	= ($valx['option_type'] == 'Y')?'YES':'NO';
 				$SUM1 += $valx['price_total'];
@@ -455,10 +469,16 @@
 				echo "<tr>";
 					echo "<td colspan='11'>".strtoupper($valx['name'])."</td>";
 					echo "<td align='center'>".$Opt."</td>";
-					echo "<td align='right'>".$Price1."</td>";
+					echo "<td align='right'>";
+						echo "<div id='unit_".$no1."' class='unitEngCost'>".$Price1."</div>";
+					echo "</td>";
 					echo "<td align='center'>".$Qty1."</td>";
-					echo "<td align='center'>".$valx['unit']."</td>";
-					echo "<td align='right'>".$TotalP1."</td>";
+					echo "<td align='center'>";
+						echo "<div id='unit_".$no1."' class='unitEngCost'>".$valx['unit']."</div>";
+					echo "</td>";
+					echo "<td align='right'>";
+						echo "<div id='unit_".$no1."' class='unitEngCost'>".$TotalP1."</div>";
+					echo "</td>";
 				echo "</tr>";
 			}
 			?>
@@ -469,6 +489,7 @@
 		</tbody>
 		<?php
 		}
+		$SUM2=0;
 		if(!empty($getPackCost)){
 		?>
 		<tbody>
@@ -484,14 +505,16 @@
 		<tbody class='body_x'>
 			<?php
 			$no2=0;
-			$SUM2=0;
 			foreach($getPackCost AS $val => $valx){
 				$no2++;
 				$SUM2 += $valx['price_total'];
 				echo "<tr>";
-					echo "<td colspan='14'>".strtoupper($valx['name'])."</td>";
-					echo "<td align='center'>".strtoupper($valx['option_type'])."</td>";
-					echo "<td align='right'>".number_format($valx['price_total'],2)."</td>";
+					echo "<td colspan='14'>".strtoupper($valx['name']);
+					echo "</td>";
+					echo "<td align='center'>".strtoupper($valx['option_type']);
+					echo "</td>";
+					echo "<td align='right'>".number_format($valx['price_total'],2);
+					echo "</td>";
 				echo "</tr>";
 			}
 			?>
@@ -502,6 +525,7 @@
 		</tbody>
 		<?php
 		}
+		$SUM3=0;
 		if(!empty($getTruck)){
 		?>
 		<tbody>
@@ -519,14 +543,15 @@
 		<tbody class='body_x'>
 			<?php
 			$no3=0;
-			$SUM3=0;
 			foreach($getTruck AS $val => $valx){
 				$Qty3 	= (!empty($valx['qty']))?$valx['qty']:'-';
 				$SUM3 += $valx['price_total'];
 				$no3++;
 				echo "<tr>";
-					echo "<td colspan='8'>".strtoupper($valx['country_name'])."</td>";
+					echo "<td colspan='8'>".strtoupper($valx['country_name']);
+					echo "</td>";
 					echo "<td align='center' colspan='4'>".strtoupper($valx['caregory_sub'])."</td>";
+					
 					echo "<td align='center'>".$valx['option_type']."</td>";
 					echo "<td align='right'>".number_format($valx['price'],2)."</td>";
 					echo "<td align='center'>".$Qty3."</td>";
@@ -541,6 +566,7 @@
 		</tbody>
 		<?php
 		}
+		$SUM4=0;
 		if(!empty($getVia)){
 		?>
 		<tbody>
@@ -552,6 +578,7 @@
 				<th class="text-center" colspan='5'>Area</th>
 				<th class="text-center" colspan='3'>Destination</th>
 				<th class="text-center" colspan='4'>Vehicle</th>
+				
 				<th class="text-center">Price</th>
 				<th class="text-center">Qty</th>
 				<th class="text-center">Total Price</th>
@@ -560,17 +587,17 @@
 		<tbody class='body_x'>
 			<?php
 			$no4=0;
-			$SUM4=0;
 			foreach($getVia AS $val => $valx){
 				$SUM4 += $valx['price_total'];
 				$Areax = ($valx['area'] == '0')?'-':strtoupper($valx['area']);
 				$Tujuanx = ($valx['tujuan'] == '0')?'-':strtoupper($valx['tujuan']);
 				if(strtolower($valx['caregory_sub']) == 'via laut' || strtolower($valx['caregory_sub']) == 'via darat'){
 					$Kendaraanx = ($valx['nama_truck'] == '')?'-':strtoupper($valx['nama_truck']);
-				} else {
+				}
+				else{
 					$Kendaraanx = strtoupper($valx['kendaraan']);
 				}
-				$Qty4 = (!empty($valx['qty']))?$valx['qty']:'-';
+				$Qty4 	= (!empty($valx['qty']))?$valx['qty']:'-';
 				
 				$no4++;
 				echo "<tr>";
@@ -578,9 +605,14 @@
 					echo "<td style='vertical-align:top' align='left' colspan='5'>".$Areax."</td>";
 					echo "<td style='vertical-align:top' align='left' colspan='3'>".$Tujuanx."</td>";
 					echo "<td style='vertical-align:top' align='left' colspan='4'>".$Kendaraanx."</td>";
-					echo "<td style='vertical-align:top' align='right'>".number_format($valx['price'],2)."</td>";
+					
+					echo "<td style='vertical-align:top' align='right'>";
+						echo "<div id='unit_".$no1."' class='unitEngCost'>".number_format($valx['price'],2)."</div>";
+					echo "</td>";
 					echo "<td style='vertical-align:top' align='center'>".$Qty4."</td>";
-					echo "<td style='vertical-align:top' align='right'>".number_format($valx['price_total'],2)."</td>";
+					echo "<td style='vertical-align:top' align='right'>";
+						echo "<div id='unit_".$no1."' class='unitEngCost'>".number_format($valx['price_total'],2)."</div>";
+					echo "</td>";
 				echo "</tr>";
 			}
 			?>
@@ -593,6 +625,7 @@
 		}
 		?>
 		<?php
+		$SUM_OTHER = 0;
 		if(!empty($otherArray)){
 		?>
 		<tbody>
@@ -608,12 +641,11 @@
 		</tbody>
 		<tbody class='body_x'>
 			<?php
-			$SUM_OTHER = 0;
 			foreach($otherArray AS $val => $value){
 				$SUM_OTHER += $value['price_total'];
 				
 				echo "<tr>";
-					echo "<td style='vertical-align:top' align='left' colspan='13'>".strtoupper($value['caregory_sub'])."</td>";
+					echo "<td style='vertical-align:top' align='left'  colspan='13'>".strtoupper($value['caregory_sub'])."</td>";
 					echo "<td style='vertical-align:top' align='right'>".number_format($value['price'],2)."</td>";
 					echo "<td style='vertical-align:top' align='center'>".number_format($value['qty'],2)."</td>";
 					echo "<td style='vertical-align:top' align='right'>".number_format($value['price_total'],2)."</td>";
@@ -631,7 +663,164 @@
 		<tfoot>
 			<tr>
 				<th align='left' style='background-color: #0e5ca9; color:white; font-size:10px' colspan='15'>TOTAL QUOTATION</th>
-				<th align='right' style='background-color: #0e5ca9; color:white; font-size:10px'><?= number_format($SUM + $SUM2 + $SUM3 + $SUM4 + $SUM1 + $SUM_MAT + $SUM_BAUT + $SUM_PLATE + $SUM_GASKET + $SUM_LAINNYA + $SUM_OTHER, 2);?></th>
+				<th align='right' style='background-color: #0e5ca9; color:white; font-size:10px'><?=  number_format($SUM + $SUM2 + $SUM3 + $SUM4 + $SUM1 + $SUM_MAT + $SUM_BAUT + $SUM_PLATE + $SUM_GASKET + $SUM_LAINNYA + $SUM_OTHER, 2);?></th>
 			</tr>
 		</tfoot>
+		
+		
 	</table>
+	<style type="text/css">
+	@page {
+		margin-top: 0cm;
+		margin-left: 0cm;
+		margin-right: 0cm;
+		margin-bottom: 0cm;
+	}
+	
+	#header{
+		position:fixed;
+	}
+	p.foot1 {
+		font-family: verdana,arial,sans-serif;
+		font-size:10px;
+	}
+	.font{
+		font-family: verdana,arial,sans-serif;
+		font-size:14px;
+	}
+	.fontheader{
+		font-family: verdana,arial,sans-serif;
+		font-size:13px;
+		color:#333333;
+		border-width: 1px;
+		border-color: #ffffff;
+		border-collapse: collapse;
+	}
+	
+	.headX{
+		background-color: #0e5ca9 !important;
+		color: white;
+	}
+	
+	.header_style{
+		border-style: solid;
+		border-bottom-width: 5px;
+		border-bottom-color: #0e5ca9;
+		background-color: #ea572b;
+		padding: 15px;
+		color: white;
+	}
+	
+	.header_style2{
+		font-family: verdana,arial,sans-serif;
+		font-size:12px;
+		color:#333333;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #ffffff;
+		border-collapse: collapse;
+		margin-top: 0cm;
+		margin-left: 0.5cm;
+		margin-right: 0.5cm;
+		margin-bottom: 0cm;
+	}
+	
+	table.gridtable {
+		font-family: verdana,arial,sans-serif;
+		font-size:10px;
+		color:#333333;
+		border-width: 1px;
+		border-color: black;
+		border-collapse: collapse;
+		margin-top: 0cm;
+		margin-left: 0.5cm;
+		margin-right: 0.5cm;
+		margin-bottom: 0cm;
+	}
+	table.gridtable th {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #cccccc;
+	}
+	table.gridtable th.head {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #7f7f7f;
+		color: #ffffff;
+	}
+	table.gridtable td {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #f2f2f2;
+		
+	}
+	table.gridtable td.cols {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #f2f2f2;
+	}
+	
+	
+	table.gridtable2 {
+		font-family: verdana,arial,sans-serif;
+		font-size:10px;
+		color:#333333;
+		border-width: 1px;
+		border-color: #ffffff;
+		border-collapse: collapse;
+		margin-top: 0cm;
+		margin-left: 0.5cm;
+		margin-right: 0.5cm;
+		margin-bottom: 0cm;
+	}
+	
+	table.gridtable2 td {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #ffffff;
+		
+	}
+	table.gridtable2 td.cols {
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #ffffff;
+		background-color: #ffffff;
+	}
+	
+	#space{
+		padding: 3px;
+		width: 180px;
+		height: 1px;
+	}
+	p {
+		margin: 0 0 0 0;
+	}
+	
+	
+</style>
+
+	
+	<?php
+	$footer = "<p style='font-family: verdana,arial,sans-serif; font-size:10px;'><i>Printed by : ".ucfirst(strtolower($printby)).", ".$today."</i></p>";
+	
+	$html = ob_get_contents(); 
+	ob_end_clean(); 
+	
+	$mpdf->showWatermarkText = true;
+	$mpdf->SetTitle('Selling Price '.str_replace('BQ-', '', $id_bq));
+	// $mpdf->AddPage('L');
+	// $mpdf->SetDisplayMode('fullpage');
+	$mpdf->SetFooter($footer);
+	$mpdf->WriteHTML($html);
+	$mpdf->Output("SELLING PRICE ".str_replace('BQ-', '', $id_bq)." ".date('d/m/Y/H/i/s').".pdf" ,'I');
