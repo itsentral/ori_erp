@@ -1,7 +1,7 @@
 
 <?php 
 //EDIT INPUT MATERIAL
-$GET_STOCK_MAT = get_warehouseStockMaterial();
+$GET_STOCK_MAT = get_warehouseStockMaterial($id_gudang_from);
 $nomor2 = 0;
 if($hist_produksi != '0'){
     if(!empty($get_liner_utama)){ ?>

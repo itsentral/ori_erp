@@ -482,9 +482,13 @@ function get_warehouseStock() {
     return $ArrGetCategory;
 }
 
-function get_warehouseStockMaterial() {
+function get_warehouseStockMaterial($id_gudang = null) {
     $CI =& get_instance();
-    $listGetCategory = $CI->db->get('warehouse_stock')->result_array();
+    if ($id_gudang) {
+        $listGetCategory = $CI->db->get_where('warehouse_stock', array('id_gudang' => $id_gudang))->result_array();
+    } else {
+        $listGetCategory = $CI->db->get('warehouse_stock')->result_array();
+    }
     $ArrGetCategory = [];
     foreach ($listGetCategory as $key => $value) {
         $KEY = $value['id_material'].'-'.$value['id_gudang'];
