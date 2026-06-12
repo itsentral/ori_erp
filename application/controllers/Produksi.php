@@ -9726,7 +9726,6 @@ class Produksi extends CI_Controller {
 				'hist_produksi'			=> $hist_produksi,
 				'ArrMaterialAdd'		=> $ArrMaterialAdd,
 				'ArrGetCategory'		=> get_detail_material(),
-				'get_detail_final_drawing'=> get_detail_final_drawing(),
 				'get_material_by_category' => get_material_by_category()
 			);
 			
@@ -9786,7 +9785,6 @@ class Produksi extends CI_Controller {
 				'hist_produksi'			=> $hist_produksi,
 				'ArrMaterialAdd'		=> $ArrMaterialAdd,
 				'ArrGetCategory'		=> get_detail_material(),
-				'get_detail_final_drawing'=> get_detail_final_drawing(),
 				'get_material_by_category' => get_material_by_category()
 			);
 			
