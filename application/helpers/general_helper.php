@@ -30,6 +30,9 @@ function get_detail_unit() {
 }
 
 function get_detail_material() {
+    static $cache = null;
+    if ($cache !== null) return $cache;
+
     $CI =& get_instance();
     $listGetCategory = $CI->db->get('raw_materials')->result_array();
     $ArrGetCategory = [];
@@ -40,7 +43,8 @@ function get_detail_material() {
         $ArrGetCategory[$value['id_material']]['idmaterial'] = $value['idmaterial'];
         $ArrGetCategory[$value['id_material']]['id_accurate'] = $value['id_accurate'];
     }
-    return $ArrGetCategory;
+    $cache = $ArrGetCategory;
+    return $cache;
 }
 
 function get_detail_consumable() {
@@ -163,13 +167,17 @@ function get_detail_warehouse() {
 }
 
 function get_material_by_category() {
+    static $cache = null;
+    if ($cache !== null) return $cache;
+
     $CI =& get_instance();
     $listGetCategory = $CI->db->select('id_material,nm_material,id_category')->order_by('nm_material','asc')->get_where('raw_materials',array('delete'=>'N'))->result_array();
     $ArrGetCategory = [];
     foreach ($listGetCategory as $key => $value) {
         $ArrGetCategory[$value['id_category']][] = $value;
     }
-    return $ArrGetCategory;
+    $cache = $ArrGetCategory;
+    return $cache;
 }
 
 function getStatusPeriodik($char)
