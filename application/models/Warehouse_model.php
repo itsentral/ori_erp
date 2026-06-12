@@ -5261,6 +5261,12 @@ class Warehouse_model extends CI_Model {
 		$getWherehouse2 = $this->db->get_where('warehouse', array('category'=>'subgudang'))->result_array();
 		$no_request = $this->db->order_by('id','desc')->get_where('print_header', array('kode_trans'=>$detAdjustment[0]['kode_trans'],'aktual_date'=>NULL))->result_array();
 
+		// Preload spec_bq2 data to avoid N+1 queries in view
+		$id_milik_list = array_column($get_detail_spk2, 'id_milik');
+		if(!empty($id_milik_list)){
+			spec_bq2_preload($id_milik_list);
+		}
+
 		$data = array(
 			'title'			=> 'Request SPK Mixing',
 			'action'		=> 'index',

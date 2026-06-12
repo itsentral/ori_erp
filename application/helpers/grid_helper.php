@@ -3097,16 +3097,58 @@
 		}
 	}
 	
+	function spec_bq2_preload($ids){
+		if(empty($ids)) return;
+		$CI =& get_instance();
+		static $loaded = false;
+		if($loaded) return;
+		$loaded = true;
+
+		// Batch load so_detail_header
+		$CI->db->where_in('id', $ids);
+		$headers = $CI->db->get('so_detail_header')->result_array();
+		$headerMap = [];
+		foreach($headers as $h){
+			$headerMap[$h['id']] = $h;
+		}
+
+		// Batch load so_component_header (panjang)
+		$CI->db->select('id_milik, panjang');
+		$CI->db->where_in('id_milik', $ids);
+		$CI->db->group_by('id_milik');
+		$components = $CI->db->get('so_component_header')->result_array();
+		$componentMap = [];
+		foreach($components as $c){
+			$componentMap[$c['id_milik']] = $c['panjang'];
+		}
+
+		// Store in global cache
+		global $_spec_bq2_cache;
+		$_spec_bq2_cache = ['headers' => $headerMap, 'components' => $componentMap];
+	}
+
 	function spec_bq2($id){
+		global $_spec_bq2_cache;
 		$CI 		=& get_instance();
 		$dim = 'not found (old ipp)';
-		$restHeader		= $CI->db->get_where('so_detail_header',array('id'=>$id))->result_array();
+
+		// Use preloaded cache if available
+		if(!empty($_spec_bq2_cache)){
+			$restHeader = (!empty($_spec_bq2_cache['headers'][$id])) ? array($_spec_bq2_cache['headers'][$id]) : array();
+			if(!empty($restHeader)){
+				$parent_cat = $restHeader[0]['id_category'];
+				$panjang = (!empty($_spec_bq2_cache['components'][$id])) ? $_spec_bq2_cache['components'][$id] : $restHeader[0]['length'];
+			}
+		} else {
+			$restHeader = $CI->db->get_where('so_detail_header',array('id'=>$id))->result_array();
+			if(!empty($restHeader)){
+				$parent_cat = $restHeader[0]['id_category'];
+				$restPanjang = $CI->db->select('panjang')->limit(1)->get_where('so_component_header',array('id_milik'=>$id))->result_array();
+				$panjang = (!empty($restPanjang))?$restPanjang[0]['panjang']:$restHeader[0]['length'];
+			}
+		}
+
 		if(!empty($restHeader)){
-			$parent_cat		= $restHeader[0]['id_category'];
-			$restPanjang	= $CI->db->select('panjang')->limit(1)->get_where('so_component_header',array('id_milik'=>$id))->result_array();
-
-			$panjang = (!empty($restPanjang))?$restPanjang[0]['panjang']:$restHeader[0]['length'];
-
 			if($parent_cat == 'pipe' OR $parent_cat == 'pipe slongsong' || $parent_cat == 'saddle'){
 				$dim = floatval($restHeader[0]['diameter_1'])." x ".floatval($restHeader[0]['length'])." x ".floatval($restHeader[0]['thickness']);
 			}
