@@ -149,11 +149,30 @@ function PrintSPKPlanning($Nama_APP, $id_bq, $koneksi, $printby){
 				$qty = $valx['berat'];
 				$satuan = '1';
 			}
-			// Get accessory name
-			$qNm = "SELECT nm_acc FROM accessories WHERE id='".$valx['id_material']."' LIMIT 1";
+			// Get accessory name (sama logic dengan get_name_acc)
+			$qNm = "SELECT * FROM accessories WHERE id='".$valx['id_material']."' LIMIT 1";
 			$dNm = mysqli_query($conn, $qNm);
 			$rNm = mysqli_fetch_array($dNm);
-			$nm_acc = $rNm ? $rNm['nm_acc'] : '';
+			$nm_acc = 'Not found';
+			if($rNm){
+				$nm_acc = $rNm['nama'];
+				$radx = (!empty($rNm['radius']) && $rNm['radius'] > 0) ? 'x '.floatval($rNm['radius']).' R' : '';
+				if($rNm['category'] == '1'){
+					$nm_acc = strtoupper($rNm['nama']).' M '.floatval($rNm['diameter']).' x '.floatval($rNm['panjang']).' L '.$radx;
+				}
+				if($rNm['category'] == '2'){
+					$nm_acc = strtoupper($rNm['nama'].', '.$rNm['material']).' x '.floatval($rNm['thickness']).' T';
+				}
+				if($rNm['category'] == '3'){
+					$nm_acc = strtoupper($rNm['nama'].', '.$rNm['material']).' x '.floatval($rNm['thickness']).' T x '.strtoupper($rNm['dimensi']);
+				}
+				if($rNm['category'] == '4'){
+					$nm_acc = strtoupper($rNm['nama'].', '.$rNm['material'].' - '.$rNm['dimensi'].' - '.$rNm['spesifikasi']);
+				}
+				if($rNm['category'] == '5'){
+					$nm_acc = strtoupper($rNm['nama'].', '.$rNm['standart']);
+				}
+			}
 			// Get unit name
 			$qUnit = "SELECT kode_satuan FROM raw_pieces WHERE id_satuan='".$satuan."' LIMIT 1";
 			$dUnit = mysqli_query($conn, $qUnit);
