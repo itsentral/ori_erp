@@ -1563,6 +1563,25 @@ class Cost_quotation extends CI_Controller {
 		PrintSetButtomPrice($Nama_Beda, $koneksi, $printby, $id_bq);
 	}
 	
+	// public function print_penawaran3(){
+	// 	$id_bq	= $this->uri->segment(3);
+	// 	$data_session	= $this->session->userdata;
+	// 	$printby		= $data_session['ORI_User']['username'];
+	
+	// 	$data_url		= base_url();
+	// 	$Split_Beda		= explode('/',$data_url);
+	// 	$Jum_Beda		= count($Split_Beda);
+	// 	$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
+
+	// 	$data = array(
+	// 		'Nama_Beda' => $Nama_Beda,
+	// 		'printby' => $printby,
+	// 		'id_bq' => $id_bq
+	// 	);
+	// 	history('Print Hasil Penawaran Set Buttom Price '.$id_bq);
+	// 	$this->load->view('Print/print_set_buttom_price', $data);
+	// }
+
 	public function print_penawaran3(){
 		$id_bq	= $this->uri->segment(3);
 		$data_session	= $this->session->userdata;
@@ -1573,15 +1592,106 @@ class Cost_quotation extends CI_Controller {
 		$Jum_Beda		= count($Split_Beda);
 		$Nama_Beda		= $Split_Beda[$Jum_Beda - 2];
 
+		$getEx	= explode('-', $id_bq);
+		$ipp	= $getEx[1];
+
+		$qSupplier 	= "SELECT * FROM production WHERE no_ipp = '".$ipp."' ";
+		$getHeader	= $this->db->query($qSupplier)->result();
+
+		$qMatr = "SELECT 
+						a.id,
+						a.id_category,
+						a.length,
+						a.id_product,
+						a.diameter_1,
+						a.diameter_2,
+						a.series,
+						a.qty,
+						a.man_power AS man_power,
+						a.id_mesin AS id_mesin,
+						a.total_time AS total_time,
+						a.man_hours AS man_hours,
+						a.pe_direct_labour,
+						a.pe_indirect_labour,
+						a.pe_machine,
+						ifnull( a.pe_mould_mandrill, 0 ) AS pe_mould_mandrill,
+						a.pe_consumable,
+						a.pe_foh_consumable,
+						a.pe_foh_depresiasi,
+						a.pe_biaya_gaji_non_produksi,
+						a.pe_biaya_non_produksi,
+						a.pe_biaya_rutin_bulanan
+					FROM 
+						bq_detail_header a 
+					WHERE 
+						a.id_category <> 'pipe slongsong' 
+						AND a.id_category <> 'product kosong' 
+						AND a.id_bq = '".$id_bq."' 
+					ORDER BY 
+						a.id ASC";
+		$getDetail = $this->db->query($qMatr)->result_array();
+
+		$engC 		= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'eng cost' AND b.category = 'engine' AND b.id_bq='".$id_bq."' ORDER BY a.id ASC ";
+		$getEngCost	= $this->db->query($engC)->result_array();
+
+		$engCPC 	= "SELECT a.*, b.* FROM list_help a INNER JOIN cost_project_detail b ON a.name=b.caregory_sub WHERE a.group_by = 'pack cost' AND b.category = 'packing' AND b.id_bq='".$id_bq."' ORDER BY a.id ASC ";
+		$getPackCost= $this->db->query($engCPC)->result_array();
+
+		$gTruck 	= "SELECT
+							e.*,
+							a.shipping_name,
+							a.type,
+							(SELECT b.country_code FROM production_delivery b WHERE b.no_ipp='".$ipp."') as country_code,
+							(SELECT d.country_name FROM country d WHERE d.country_code=(SELECT b.country_code FROM production_delivery b WHERE b.no_ipp='".$ipp."')) as country_name,
+							(SELECT c.price FROM cost_export_trans c WHERE c.shipping_name = CONCAT(a.shipping_name, ' ', a.type) AND c.country_code = (SELECT b.country_code FROM production_delivery b WHERE b.no_ipp='".$ipp."') AND c.deleted='N')  as price
+						FROM
+							list_shipping a
+								INNER JOIN cost_project_detail e ON CONCAT_WS(' ',a.shipping_name, a.type)=e.caregory_sub
+						WHERE
+							a.flag = 'Y' AND e.category = 'export' AND e.id_bq='".$id_bq."'
+						ORDER BY
+							a.urut ASC";
+		$getTruck	= $this->db->query($gTruck)->result_array();
+
+		$engCPCV 	= "SELECT
+							b.*,
+							c.* 
+						FROM
+							cost_project_detail b
+							LEFT JOIN truck c ON b.kendaraan = c.id 
+						WHERE
+							 b.category = 'lokal' 
+							AND b.id_bq = '".$id_bq."' 
+						ORDER BY
+							b.id ASC ";
+		$getVia		= $this->db->query($engCPCV)->result_array();
+
+		$rest_mat		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq, 'category'=>'mat'))->result_array();
+		$rest_baut		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq, 'category'=>'baut'))->result_array();
+		$rest_plate		= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq, 'category'=>'plate'))->result_array();
+		$rest_gasket	= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq, 'category'=>'gasket'))->result_array();
+		$rest_lainnya	= $this->db->get_where('bq_acc_and_mat', array('id_bq'=>$id_bq, 'category'=>'lainnya'))->result_array();
+		$otherArray		= $this->db->get_where('cost_project_detail', array('id_bq'=>$id_bq, 'category'=>'other'))->result_array();
+
 		$data = array(
-			'Nama_Beda' => $Nama_Beda,
-			'printby' => $printby,
-			'id_bq' => $id_bq
+			'Nama_Beda' 	=> $Nama_Beda,
+			'printby' 		=> $printby,
+			'id_bq' 		=> $id_bq,
+			'getHeader'		=> $getHeader,
+			'getDetail'		=> $getDetail,
+			'getEngCost'	=> $getEngCost,
+			'getPackCost'	=> $getPackCost,
+			'getTruck'		=> $getTruck,
+			'getVia'		=> $getVia,
+			'rest_mat'		=> $rest_mat,
+			'rest_baut'		=> $rest_baut,
+			'rest_plate'	=> $rest_plate,
+			'rest_gasket'	=> $rest_gasket,
+			'rest_lainnya'	=> $rest_lainnya,
+			'otherArray'	=> $otherArray
 		);
 		history('Print Hasil Penawaran Set Buttom Price '.$id_bq);
-		$this->load->view('Print/print_set_buttom_price', $data);
-		
-		
+		$this->load->view('Print/print_set_buttom_price_v2', $data);
 	}
 	
 }
