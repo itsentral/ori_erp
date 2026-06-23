@@ -10,6 +10,11 @@ $this->load->view('include/side_menu');
 	$ppn      = ($tax*$nilainet)/100;
 	$nilaiinvoice = $nilainet+$ppn;
 	$nilaidpp  = ((11/12)*$nilainet); 
+	}else{
+	$nilainet = isset($results) ? $results->value_idr:0;
+	$ppn      = ($tax*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet);
 	}
 
 	
