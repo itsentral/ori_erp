@@ -1387,8 +1387,8 @@ class Pembelian extends CI_Controller {
 					'id_supplier'    => $datapo->id_supplier,
 					'nama_supplier'  => $datapo->nm_supplier,
 					'no_request'     => $data['invoice_no'],
-					'nilai_valas_debet'		 => 0,
-					'nilai_valas_kredit'	 => 0,
+					'debet_usd'		 => 0,
+					'kredit_usd'	 => 0,
 				);
 				$this->db->insert('tr_kartu_hutang',$datahutang);
 				//end auto jurnal
