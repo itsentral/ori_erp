@@ -1143,11 +1143,18 @@ class Pembelian extends CI_Controller {
 			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans where a.no_ipp='".$info_payterm->no_po."' and (a.id_invoice is null or a.id_invoice = '') GROUP BY a.kode_trans")->result();
 		}
         
-		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
+		$nilai_po 	= $this->db->query("select * from tran_po_header where no_po='".$info_payterm->no_po."'")->row();
+		if(!empty($nilai_po)){
         $total_price = $nilai_po->net_price;
 		$mata_uang   = $nilai_po->mata_uang;
 		$total_harga = $nilai_po->total_price;
 		$tax = $nilai_po->tax;
+		}else{
+		$total_price = 0;
+		$mata_uang   = 'IDR';
+		$total_harga = 0;
+		$tax = 0;
+		}
 
 		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang muka' AND no_po='".$info_payterm->no_po."'")->row();
 
@@ -1240,7 +1247,7 @@ class Pembelian extends CI_Controller {
 			}
 		}
 
-		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
+		$datapo = $this->db->query("select * from tran_po_header where no_po='".$no_po."'")->row();
 
 		if(empty($datapo)){
 			$this->db->trans_complete();
