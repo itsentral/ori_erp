@@ -1,20 +1,34 @@
 <?php
 $this->load->view('include/side_menu');
+    if($mata_uang =='IDR'){	
+	$nilainet = isset($results) ? $results->value_idr:0;	   
+	$ppn      = ($tax*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet);
+	}elseif($mata_uang =='USD'){ 
+	$nilainet = isset($results) ? $results->value_usd:0;
+	$ppn      = ($tax*$nilainet)/100;
+	$nilaiinvoice = $nilainet+$ppn;
+	$nilaidpp  = ((11/12)*$nilainet); 
+	}
+
+	
 ?>
 <?=form_open('pembelian/receive_invoice_save',array('id'=>'frm_data','name'=>'frm_data','role'=>'form','class'=>'form-horizontal', 'enctype'=>'multipart/form-data'));?>
 <input type="hidden" name="id_top" id="id_top" value="<?php echo (isset($id) ? $id: ''); ?>" />
 <input type="hidden" name="group_top" id="group_top" value="<?php echo (isset($results) ? $results->group_top: ''); ?>" />
 <input type="hidden" name="no_po" id="no_po" value="<?php echo (isset($results) ? $results->no_po: ''); ?>" />
+<input type="hidden" name="tax" id="tax" value="<?php echo (isset($tax) ? $tax: ''); ?>" />
 <div class="tab-content">
 	<div class="tab-pane active">
 		<div class="box box-primary">
 			<div class="box-header">
-				<h3 class="box-title"><?php echo $title;?></h3>
+				<h3 class="box-title"><?php echo $title;?></h3> 
 			</div>
 			<div class="box-body">
 				<div class="row">
 				  <div class="col-md-6">
-					<label class="control-label">Receive Date</label> 
+					<label class="control-label">Receive Date</label>
 					<input type="text" id="tgl_terima" name="tgl_terima" value="<?= (isset($results)?$results->tgl_terima:date("Y-m-d")); ?>" class="form-control tanggal" required>
 				  </div>
 				  <div class="col-md-6">
@@ -23,40 +37,63 @@ $this->load->view('include/side_menu');
 				  </div>
 				   <div class="col-sm-6">
 				         <label for="matauang" class="control-label">Mata Uang</font></label>
-                            <select id="matauang2" name="matauang2" class="form-control"> 
-							
-							<?							
-							$matauang = $results->matauang_receive_invoice;		
-							if($matauang =='IDR'){?>
-							<option value=''>Pilih Matauang</option>
-							<option value ='IDR' selected >IDR</option>
-							<option value ='USD' >USD</option>	
-							<? }elseif($matauang =='USD'){ ?>
-							<option value=''>Pilih Matauang</option>
-							<option value ='IDR' >IDR</option>
-							<option value ='USD' selected >USD</option>	
-							<? }else{ ?>
-							<option value=''>Pilih Matauang</option>
-							<option value ='IDR' >IDR</option>
-							<option value ='USD' >USD</option>	
-							<?}?>		
-							
-							
-							
-							</select>
+						  <input type="text" name="matauang2" id="matauang2" value="<?= $mata_uang ?>" class="form-control" required readonly>
                    </div>
-				  <div class="col-md-6">
-					<label class="control-label">Nilai Potongan DP</label>
-					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:"0"); ?>" required>
+                   <div class="col-sm-6">
+					<label for="tgl_bayar" class="control-label">Kurs :</label>
+                     <input type="text" name="kurs" class="form-control divide " id="kurs" value="<?= (isset($results)?$results->kurs_receive_invoice:"1"); ?>" onblur="total()">
+					</div>
+				  <div class="col-md-6" >
+					<label class="control-label">Net Price + Tax</label>
+					<input type="text" class="form-control divide" id="nilai_po" name="nilai_po" value="<?= (isset($total_harga)?$total_harga:""); ?>"  readonly>
 				  </div>
+                  <div class="col-md-6">
+					<label class="control-label">Net</label>
+					<input type="text" class="form-control divide" id="nilai_net" name="nilai_net" value="<?= $total_price; ?>" required readonly>
+				  </div>
+				  <div class="col-md-6"hidden>
+					<label class="control-label">Price Before Tax</label>
+					<input type="text" class="form-control divide" id="price_before_tax" name="price_before_tax" value="<?= $total_price; ?>" required readonly>
+				  </div>
+				  <?php if($results->group_top != 'progress' ) { ?>  
+				  <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
+				  </div>   
+				  <div class="col-md-6">
+					<label class="control-label">DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value="<?= $nilaidpp; ?>" required readonly>
+				  </div>   
 				  <div class="col-md-6">
 					<label class="control-label">Nilai PPN</label>
-					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= (isset($results)?$results->nilai_ppn:"0"); ?>" required>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value="<?= $ppn; ?>" required readonly>
 				  </div>
 				  <div class="col-md-6">
-					<label class="control-label">Total Invoice (DPP + PPN)</label>
-					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= (isset($results)?$results->invoice_total:"0"); ?>">
+					<label class="control-label">Total Invoice</label>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
+				   <?php } else {?>
+				  <div class="col-md-6" hidden>
+					<label class="control-label">Nilai Potongan DP</label>
+					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
+				  </div>
+				   <div class="col-md-6">
+					<label class="control-label">Nilai TOP</label>
+					<input type="text" class="form-control divide" id="nilai_top" name="nilai_top" value="<?= $nilainet; ?>" required readonly>
+				  </div>  
+				   <div class="col-md-6">
+					<label class="control-label">DPP</label>
+					<input type="text" class="form-control divide" id="nilai_dpp" name="nilai_dpp" value=<?= (isset($results)?$results->dpp:"0"); ?> required readonly>
+				  </div> 
+				  <div class="col-md-6">
+					<label class="control-label">Nilai PPN</label>
+					<input type="text" class="form-control divide" id="nilai_ppn" name="nilai_ppn" value=<?= (isset($results)?$results->nilai_ppn:"0"); ?> required readonly>
+				  </div>
+				  <div class="col-md-6">
+					<label class="control-label">Total Invoice</label>
+					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value=<?= (isset($results)?$results->invoice_total:"0"); ?> required readonly>
+				  </div>
+				   <?php } ?>
 				  <div class="col-md-6">
 					<label class="control-label">Nomor Faktur Pajak</label>
 					<input type="text" id="faktur_pajak" name="faktur_pajak" value="<?= (isset($results)?$results->faktur_pajak:""); ?>" class="form-control">
@@ -69,7 +106,9 @@ $this->load->view('include/side_menu');
 					<label class="control-label">Lain-lain</label>
 					<input type="text" id="lainnya" name="lainnya" value="<?= (isset($results)?$results->lainnya:""); ?>" class="form-control">
 				  </div>
+				  
 				</div>
+				<?php if($results->group_top =='progress') {?>
 				<div class="row">
 				  <div class="col-md-12">
 					<h4>Dokumen Incoming </h4>
@@ -79,6 +118,7 @@ $this->load->view('include/side_menu');
 								<th>No Dokumen</th>
 								<th>Incoming Date</th>
 								<th>PIC</th>
+								<th>Total Harga</th>
 								<th></th>
 							</tr>
 						</thead>
@@ -88,10 +128,11 @@ $this->load->view('include/side_menu');
 							foreach($dt_incoming AS $record){ 
 								echo "<tr>";
 									echo "<td align='left'><button type='button' class='btn btn-xs btn-primary detailAjust' title='View Incoming' data-kode_trans='".$record->kode_trans."' ><i class='fa fa-eye'></i></button> ".$record->kode_trans."</td>";
-									echo "<td align='left'>".$record->tanggal."</td>";
+									echo "<td align='left'>".$record->created_date."</td>";
 									echo "<td align='left'>".$record->pic."</td>";
-									echo "<td align='left'><input type='checkbox' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
-								echo "</tr>";
+									echo "<td align='left' class='total_harga'>".$record->total."</td>";
+									echo "<td align='left'><input type='checkbox' class='chk_personal check_pr' data-nomor='".$record->kode_trans."' value='".$record->kode_trans."' name='kode_trans[]' id='kt_".$record->kode_trans."'></td>";
+									echo "</tr>";
 							}
 						}
 						?>
@@ -99,12 +140,16 @@ $this->load->view('include/side_menu');
 					</table>
 				  </div>
 				</div>
+
+				<?php } ?>
 			</div>
 
 			<div class="box-footer">
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
+					<?php if ($results->invoice_no=='') { ?>
 						<button type="submit" name="simpan-com" class="btn btn-success btn-sm stsview" id="simpan-com"><i class="fa fa-save">&nbsp;</i>Submit</button>
+					<?php } ?>
 						<a href="<?=base_url()?>pembelian/purchase_order" class="btn btn-warning btn-sm"><i class="fa fa-reply">&nbsp;</i>Kembali</a>
 					</div>
 				</div>
@@ -117,6 +162,9 @@ $this->load->view('include/side_menu');
 <?php $this->load->view('include/footer'); ?>
 <script src="<?= base_url('assets/js/number-divider.min.js') ?>"></script>
 <script type="text/javascript">
+<?php if ($results->invoice_no!='') { 
+echo '$("#frm_data :input").prop("disabled", true);' ;
+} ?>
 	$(".divide").divide();
 	$(".tanggal").datepicker({
 		todayHighlight: true,
@@ -125,7 +173,17 @@ $this->load->view('include/side_menu');
 		autoclose:true
 	});
 
-	$(document).on('click', '.detailAjust', function(e){
+	// Auto-set kurs ke 1 jika IDR saat halaman load
+	$(document).ready(function(){
+		if ($('#matauang2').val() == 'IDR') {
+			var kursVal = parseFloat($('#kurs').val().split(',').join('')) || 0;
+			if (kursVal != 1) {
+				$('#kurs').val('1');
+			}
+		}
+	});
+
+	$(document).on('click', '.detailAjust', function(e){ 
 		e.preventDefault();
 		loading_spinner();
 		$(".modal-title").html("<b>DETAIL INCOMING</b>");
@@ -147,25 +205,60 @@ $this->load->view('include/side_menu');
 			}
 		});
 	});
+
 	$('#simpan-com').click(function(e){
-		$("#simpan-com").addClass("hidden");
+		//$("#simpan-com").addClass("hidden");
 		d_error='';
 		e.preventDefault();
    		if($("#tgl_terima").val()==""){
-   			d_error='Receive Date Error';
+   			d_error='Receive Date Error!';
    			alert(d_error);
    		}
 		var invoice_no=$("#invoice_no").val();
-		var invoice_total=$("#invoice_total").val();
+		var invoice_total=parseInt($("#invoice_total").val());
+		var nilai_po=parseInt($("#nilai_po").val());
+
+		console.log(invoice_total);
+		console.log(nilai_po)
 		
    		if(invoice_no==""){
-   			d_error='No Invoice / Kwitansi Error';
+   			d_error='No Invoice / Kwitansi Error!';
    			alert(d_error);
    		}
    		if(invoice_total=="" || invoice_total=="0"){
-   			d_error='Total Amount Error';
+   			d_error='Total Amount Error!';
    			alert(d_error);
-   		}
+   		}		
+		if ($('#matauang').val() == "") {
+            d_error='Mata Uang Error!';
+   			alert(d_error);
+        }
+		
+	    if ($('#matauang').val() == "USD" && $('#kurs').val() < "10000" ) {
+          		  
+		  	d_error='Kurs Error!';
+   			alert(d_error);
+        }
+
+		// Validasi: jika IDR, kurs harus 1
+		if ($('#matauang2').val() == "IDR") {
+			var kursVal = parseFloat($('#kurs').val().split(',').join('')) || 0;
+			if (kursVal != 1) {
+				$('#kurs').val('1');
+				swal({
+					title: "Perhatian!",
+					text: "Mata uang IDR, kurs otomatis diset ke 1.",
+					type: "warning",
+					timer: 3000,
+					showConfirmButton: false
+				});
+			}
+		}
+
+		if(invoice_total > nilai_po){
+   			d_error='Nilai Invoice Lebih Besar Dari Nilai PO ';
+   			alert(d_error);
+   		}	
 		
 		if(d_error==''){
 			swal({
@@ -175,7 +268,7 @@ $this->load->view('include/side_menu');
 				  if (isConfirm) {
 					  var formData 	=new FormData($('#frm_data')[0]);
 					  $.ajax({
-							url         : base_url + active_controller+"/receive_invoice_save", 
+							url         : base_url + active_controller+"/receive_invoice_save",
 							type		: "POST",
 							data		: formData,
 							cache		: false,
@@ -218,4 +311,37 @@ if($results->invoice_no!="") {
 	$(".stsview").addClass("hidden");';
 }
 ?>
+
+ 	$(document).on('click', '.check_pr', function(){
+		sumTotal();
+	});
+
+    
+	let sumTotal = () => {
+        let discount        =  getNum($('#discount').val())
+        let tax             =  getNum($('#tax').val())
+        let delivery_cost   =  getNum($('#delivery_cost').val())
+		let dpp_cek             =  getNum($('#nilai_net').val())
+
+		let sum_total = 0
+        let total
+        $(".check_pr" ).each(function() {
+            if ($(this).is(':checked')) {
+                total = getNum($(this).closest('tr').find('.total_harga').html())
+				console.log(total);
+                sum_total += Number(total);
+            }
+        });
+
+		
+		$('#price_before_tax').val(sum_total)
+		let dpp = (11/12)*sum_total;
+        $('#nilai_dpp').val(number_format(dpp,2))
+        let ppn = (sum_total * tax) / 100
+        $('#nilai_ppn').val(number_format(ppn,2))
+        let net_plus_tax = sum_total + ppn
+        $('#invoice_total').val(number_format(net_plus_tax,2))
+       
+	}
+
 </script>

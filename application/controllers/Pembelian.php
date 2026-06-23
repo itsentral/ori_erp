@@ -1135,17 +1135,34 @@ class Pembelian extends CI_Controller {
 		$data_Group			= $this->master_model->getArray('groups',array(),'id','name');
 		$info_payterm 	= $this->db->query("select * from billing_top where id='".$id."'")->row();
 		if($info_payterm->invoice_no!=""){
-			$dt_incoming=$this->db->query("select * from warehouse_adjustment where id_invoice='".$id."' and no_ipp='".$info_payterm->no_po."'")->result();
+			$dt_incoming=$this->db->query("select a.*, sum(b.harga*b.check_qty_oke) as total from warehouse_adjustment a 
+			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans
+			where a.no_ipp='".$info_payterm->no_po."' GROUP BY a.kode_trans")->result();
 		}else{
-			$dt_incoming=$this->db->query("select * from warehouse_adjustment where no_ipp='".$info_payterm->no_po."' and (id_invoice is null or id_invoice = '')")->result();
+			$dt_incoming=$this->db->query("select a.*, sum(b.harga*b.check_qty_oke) as total from warehouse_adjustment a 
+			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans where a.no_ipp='".$info_payterm->no_po."' and (a.id_invoice is null or a.id_invoice = '') GROUP BY a.kode_trans")->result();
 		}
+        
+		$nilai_po 	= $this->db->query("select * from tran_material_po_header where no_po='".$info_payterm->no_po."'")->row();
+        $total_price = $nilai_po->net_price;
+		$mata_uang   = $nilai_po->mata_uang;
+		$total_harga = $nilai_po->total_price;
+		$tax = $nilai_po->tax;
+
+		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang muka' AND no_po='".$info_payterm->no_po."'")->row();
+
 		$data = array(
 			'title'			=> 'Receive Invoice',
 			'action'		=> 'index',
 			'row_group'		=> $data_Group,
 			'results'		=> $info_payterm,
-			'dt_incoming'	=> $dt_incoming,
 			'akses_menu'	=> $Arr_Akses,
+			'dt_incoming'	=> $dt_incoming,
+			'total_price'	=> $total_price,
+			'total_harga'	=> $total_harga,
+			'mata_uang'		=> $mata_uang,
+			'tax'		    => $tax,
+			'dp'		    => $info_dp->total_dp,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);
@@ -1154,31 +1171,64 @@ class Pembelian extends CI_Controller {
 
 	function receive_invoice_save(){
 		$data = $this->input->post();
-	
+
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
+		$kursInv        = $data['kurs'];
+		$kursRos        = $kursInv;
+		$net            = $data['nilai_top'];
+		$barang         = $data['price_before_tax'];
+        
 		$id				= $data['id_top'];
-		$total			= $data['invoice_total'];
-		 
-		// print_r($data['group_top']);
-		// exit;
-		
+		if($data['group_top']=='progress'){
 		$ArrUpdate = [
 			'invoice_no' => $data['invoice_no'],
 			'nilai_ppn' => $data['nilai_ppn'],
 			'invoice_total' => $data['invoice_total'],
-			'potong_um' => $data['potong_um'],
 			'faktur_pajak' => $data['faktur_pajak'],
 			'surat_jalan' => $data['surat_jalan'],
 			'lainnya' => $data['lainnya'],
 			'tgl_terima' => $data['tgl_terima'],
-			'created_date_invoice' => $dateTime,			
-			'matauang_receive_invoice' => $data['matauang2'],
+			'kurs_receive_invoice' => $data['kurs'],
+			'matauang_receive_invoice' => $data['matauang2'], 
+			'created_date_invoice' => $dateTime,
 			'created_by_invoice' => $Username,
+			'nilai_po' => $data['nilai_po'],
+			'net'      => $data['nilai_net'],
+			'dpp'      => $data['nilai_dpp'],
+			'potong_um'      => $data['potong_um'],	
+					
+			];
+			
+		}else{
+		$ArrUpdate = [
+			'invoice_no' => $data['invoice_no'],
+			'nilai_ppn' => $data['nilai_ppn'],
+			'invoice_total' => $data['invoice_total'],
+			'faktur_pajak' => $data['faktur_pajak'],
+			'surat_jalan' => $data['surat_jalan'],
+			'lainnya' => $data['lainnya'],
+			'tgl_terima' => $data['tgl_terima'],
+			'kurs_receive_invoice' => $data['kurs'],
+			'matauang_receive_invoice' => $data['matauang2'],
+			'created_date_invoice' => $dateTime,
+			'created_by_invoice' => $Username,
+			'nilai_po' => $data['nilai_po'],
+			'net'      => $data['nilai_net'],
+			'dpp'      => $data['nilai_dpp'],
+			
+			
 		];
-
+		}
+		$total= ($data['invoice_total'])*$data['kurs'];
+		$totalunbill=0;
+		$totalap=0;
+		$coaunbill='';
+		$coaap='';
 		$this->db->trans_start();
+		$no_po=$data['no_po'];
+		$no_perkiraan='';
 
 		$kode_trans		= $this->input->post("kode_trans");
 		if(!empty($kode_trans)){
@@ -1190,133 +1240,154 @@ class Pembelian extends CI_Controller {
 			}
 		}
 
-
-		$no_po=$data['no_po']; 
-
-		$datapo = $this->db->query("select * from tran_po_header where no_po='".$no_po."'")->row();
+		$datapo = $this->db->query("select * from tran_material_po_header where no_po='".$no_po."'")->row();
 
 		if(empty($datapo)){
 			$this->db->trans_complete();
 			echo json_encode(['pesan' => 'Data PO tidak ditemukan: '.$no_po, 'status' => 2, 'id' => $id]);
 			return;
 		}
-//		if($data->nilai_terima_barang_kurs>0){
-		if($total>0){
-			$totalunbill=0;
-			$totalap=0;
-			$coaunbill='';
-			$coaap='';
-			if($data['group_top']=='uang muka'){			
+
+		$dataros = $this->db->query("select * from warehouse_adjustment where no_ipp='".$no_po."'")->row();
+		$noRos = '';
+		$selisihKurs = 0;
+		$selisihIDR = 0;
+		if(!empty($dataros)){
+            $noRos = $dataros->no_ros;
+			$kursRos = $dataros->kurs;
+			$selisihKurs = $kursInv - $kursRos;
+			$selisihIDR = $selisihKurs*$barang;
+		}
+
+		
+       
+		if($data['group_top']=='uang muka'){			
 				$jenis_jurnal='JV053';
 			}else{
-				$jenis_jurnal='JV041';
+				if($datapo->mata_uang != 'IDR'){
+					$jenis_jurnal='JV083';
+					$debet_usd =$data['invoice_total']-$data['nilai_ppn'];
+					$kredit_usd = $data['invoice_total'];
+				}else{
+					$jenis_jurnal='JV041';
+					$debet_usd = 0;
+					$kredit_usd = 0;
+				}
 			}
+
 			$datajurnal1 = $this->db->query("select * from ".DBACC.".master_oto_jurnal_detail where kode_master_jurnal='".$jenis_jurnal."' order by parameter_no")->result();
 			$nomor_jurnal=$jenis_jurnal.$no_po.rand(100,999);
-			$payment_date=$data['tgl_terima'];//date("Y-m-d");
+			$payment_date=$data['tgl_terima']; // date("Y-m-d")
 			$det_Jurnaltes1=array();
-//			$total=($data->nilai_terima_barang_kurs);
-
 			if($total!=0 && !empty($datajurnal1)) {
-			  foreach ($datajurnal1 as $rec) {
+			  foreach ($datajurnal1 as $rec) { 
 				if($rec->parameter_no=="1"){
-				   
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po.', FP:'.$data['faktur_pajak'].', Sup:'.$datapo->nm_supplier, 'no_reff' => $data['invoice_no'], 'debet' => $data['invoice_total']+$data['potong_um']-$data['nilai_ppn'], 'kredit' => 0, 'no_request' => $datapo->no_po, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['invoice_total']-$data['nilai_ppn'])*$kursRos, 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => $debet_usd, 'kredit_usd' => 0
 					);
-					$totalunbill=$data['invoice_total']+$data['potong_um']-$data['nilai_ppn'];
-					$coaunbill=$rec->no_perkiraan;
+					$totalunbill=($data['invoice_total']-$data['nilai_ppn'])*$data['kurs'];
+					$coaunbill=$rec->no_perkiraan;	
 				}
 				if($rec->parameter_no=="2"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po.', FP:'.$data['faktur_pajak'].', Sup:'.$datapo->nm_supplier, 'no_reff' => $data['invoice_no'], 'debet' => 0, 'kredit' => $data['invoice_total'], 'no_request' => $datapo->no_po, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => ($data['invoice_total'])*$data['kurs'], 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => $kredit_usd
 					);
+						$no_perkiraan= $rec->no_perkiraan;
 					$totalap=$data['invoice_total'];
-					$coaap=$rec->no_perkiraan;
 				}
 				if($rec->parameter_no=="3"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po.', FP:'.$data['faktur_pajak'].', Sup:'.$datapo->nm_supplier, 'no_reff' => $data['invoice_no'], 'debet' => $data['nilai_ppn'], 'kredit' => 0, 'no_request' => $datapo->no_po, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
 					);
 				}
-				if($rec->parameter_no=="4"){
+				
+				if($rec->parameter_no=="7"){
+					if($kursRos > 1){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Potongan DP '.$datapo->no_po.', FP:'.$data['faktur_pajak'].', Sup:'.$datapo->nm_supplier, 'no_reff' => $data['invoice_no'], 'debet' => 0, 'kredit' => $data['potong_um'], 'no_request' => $datapo->no_po, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => ($selisihIDR<0?($selisihIDR*-1):0), 'debet' => ($selisihIDR>=0?$selisihIDR:0), 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
 					);
+					}else{
+					$det_Jurnaltes1[] = array(
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => 0, 'debet' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
+					);
+					}
+					
 				}
 			  }
+			  $this->db->insert_batch('jurnaltras', $det_Jurnaltes1); 
+				//auto jurnal
+
+				$tanggal = $data['tgl_terima'];
+				$Bln	= substr($tanggal,5,2);
+				$Thn	= substr($tanggal,0,4);
+				$total	= 0;
+				$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tanggal);
+				foreach ($det_Jurnaltes1 as $vals) {
+					$datadetail = array(
+						'tipe'			=> 'JV',
+						'nomor'			=> $Nomor_JV,
+						'tanggal'		=> $tanggal,
+						'no_perkiraan'	=> $vals['no_perkiraan'],
+						'keterangan'	=> $vals['keterangan'],
+						'no_reff'		=> $vals['no_reff'],
+						'debet'			=> $vals['debet'],
+						'kredit'		=> $vals['kredit'],						
+						'debet_usd'			=> $vals['debet_usd'],
+						'kredit_usd'		=> $vals['kredit_usd'],
+						'created_on' 	=> $dateTime,
+						'created_by' 	=> $Username,
+						);
+					$total=($total+$vals['debet']);
+					$this->db->insert(DBACC.'.jurnal',$datadetail);
+				}
+				$keterangan		= 'Receive Invoice '.$data['invoice_no'];
+				$dataJVhead = array(
+					'nomor' 	    	=> $Nomor_JV,
+					'tgl'	         	=> $tanggal,
+					'jml'	            => $total,
+					'bulan'	            => $Bln,
+					'tahun'	            => $Thn,
+					'kdcab'				=> '101',
+					'jenis'			    => 'JV',
+					'keterangan'		=> $keterangan,
+					'user_id'			=> $Username,
+					'ho_valid'			=> '',
+				);
+				$this->db->insert(DBACC . '.javh', $dataJVhead);
+				$datahutang = array(
+					'tipe'       	 => 'JV',
+					'nomor'       	 => $Nomor_JV,
+					'tanggal'        => $tanggal,
+					'no_perkiraan'   => $coaunbill,
+					'keterangan'     => $keterangan,
+					'no_reff'     	 => $no_po,
+					'kredit'      	 => 0,
+					'debet'          => $totalunbill,
+					'id_supplier'    => $datapo->id_supplier,
+					'nama_supplier'  => $datapo->nm_supplier,
+					'no_request'     => $data['invoice_no'],
+				);
+				$this->db->insert('tr_kartu_hutang',$datahutang);	
+				$datahutang = array(
+					'tipe'       	 => 'JV',
+					'nomor'       	 => $Nomor_JV,
+					'tanggal'        => $tanggal,
+					'no_perkiraan'   => $no_perkiraan,
+					'keterangan'     => $keterangan,
+					'no_reff'     	 => $no_po,
+					'kredit'         => ($data['invoice_total'])*$data['kurs'],
+					'debet'      	 => 0,
+					'id_supplier'    => $datapo->id_supplier,
+					'nama_supplier'  => $datapo->nm_supplier,
+					'no_request'     => $data['invoice_no'],
+					'debet_usd'		 => 0,
+					'kredit_usd'	 => 0,
+				);
+				$this->db->insert('tr_kartu_hutang',$datahutang);
+				//end auto jurnal
 			}
-			$this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
-
-			//auto jurnal
-
-			$tanggal = $data['tgl_terima'];
-			$Bln	= substr($tanggal,5,2);
-			$Thn	= substr($tanggal,0,4);
-			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tanggal);
-			foreach ($det_Jurnaltes1 as $vals) {
-				$datadetail = array(
-					'tipe'			=> 'JV',
-					'nomor'			=> $Nomor_JV,
-					'tanggal'		=> $tanggal,
-					'no_perkiraan'	=> $vals['no_perkiraan'],
-					'keterangan'	=> $vals['keterangan'],
-					'no_reff'		=> $vals['no_reff'],
-					'debet'			=> $vals['debet'],
-					'kredit'		=> $vals['kredit'],
-					'created_on'    => $dateTime,
-					'created_by'    => $Username,
-					);
-				$total=($total+$vals['debet']);
-				$this->db->insert(DBACC.'.jurnal',$datadetail);
-			}
-			$keterangan		= 'Receive Invoice '.$data['invoice_no'];
-			$dataJVhead = array(
-				'nomor' 	    	=> $Nomor_JV,
-				'tgl'	         	=> $tanggal,
-				'jml'	            => $total,
-				'bulan'	            => $Bln,
-				'tahun'	            => $Thn,
-				'kdcab'				=> '101',
-				'jenis'			    => 'JV',
-				'keterangan'		=> $keterangan,
-				'user_id'			=> $Username,
-				'ho_valid'			=> '',
-			);
-			$this->db->insert(DBACC . '.javh', $dataJVhead);
-			$datahutang = array(
-				'tipe'       	 => 'JV',
-				'nomor'       	 => $Nomor_JV,
-				'tanggal'        => $tanggal,
-				'no_perkiraan'   => $coaunbill,
-				'keterangan'     => $keterangan,
-				'no_reff'     	 => $no_po,
-				'kredit'      	 => 0,
-				'debet'          => $totalunbill,
-				'id_supplier'    => $datapo->id_supplier,
-				'nama_supplier'  => $datapo->nm_supplier,
-				'no_request'     => $data['invoice_no'],
-			);
-			$this->db->insert('tr_kartu_hutang',$datahutang);			
-			$datahutang = array(
-				'tipe'       	 => 'JV',
-				'nomor'       	 => $Nomor_JV,
-				'tanggal'        => $tanggal,
-				'no_perkiraan'   => $coaap,
-				'keterangan'     => $keterangan,
-				'no_reff'     	 => $no_po,
-				'kredit'      	 => $totalap,
-				'debet'          => 0,
-				'id_supplier'    => $datapo->id_supplier,
-				'nama_supplier'  => $datapo->nm_supplier,
-				'no_request'     => $data['invoice_no'],
-			);
-			$this->db->insert('tr_kartu_hutang',$datahutang);			
-			//end auto jurnal
-
-		}
-	
-	$this->db->where('id',$id);
+		
+		$this->db->where('id',$id);
 		$this->db->update('billing_top', $ArrUpdate);
 		$this->db->trans_complete();
 
