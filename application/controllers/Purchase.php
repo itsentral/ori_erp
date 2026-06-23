@@ -930,6 +930,13 @@ class Purchase extends CI_Controller {
        
 		if($data['group_top']=='uang muka'){			
 				$jenis_jurnal='JV053';
+				if($datapo->mata_uang != 'IDR'){
+					$nilai_valas_debet =$data['invoice_total']-$data['nilai_ppn'];
+					$nilai_valas_kredit = $data['invoice_total'];
+				}else{
+					$nilai_valas_debet = 0;
+					$nilai_valas_kredit = 0;
+				}
 			}else{
 				if($datapo->mata_uang != 'IDR'){
 					$jenis_jurnal='JV083';
