@@ -1273,12 +1273,12 @@ class Pembelian extends CI_Controller {
 			}else{
 				if($datapo->mata_uang != 'IDR'){
 					$jenis_jurnal='JV083';
-					$debet_usd =$data['invoice_total']-$data['nilai_ppn'];
-					$kredit_usd = $data['invoice_total'];
+					$nilai_valas_debet =$data['invoice_total']-$data['nilai_ppn'];
+					$nilai_valas_kredit = $data['invoice_total'];
 				}else{
 					$jenis_jurnal='JV041';
-					$debet_usd = 0;
-					$kredit_usd = 0;
+					$nilai_valas_debet = 0;
+					$nilai_valas_kredit = 0;
 				}
 			}
 
@@ -1290,32 +1290,32 @@ class Pembelian extends CI_Controller {
 			  foreach ($datajurnal1 as $rec) { 
 				if($rec->parameter_no=="1"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['invoice_total']-$data['nilai_ppn'])*$kursRos, 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => $debet_usd, 'kredit_usd' => 0
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['invoice_total']-$data['nilai_ppn'])*$kursRos, 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => $nilai_valas_debet, 'nilai_valas_kredit' => 0
 					);
 					$totalunbill=($data['invoice_total']-$data['nilai_ppn'])*$data['kurs'];
 					$coaunbill=$rec->no_perkiraan;	
 				}
 				if($rec->parameter_no=="2"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => ($data['invoice_total'])*$data['kurs'], 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => $kredit_usd
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => 0, 'kredit' => ($data['invoice_total'])*$data['kurs'], 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => $nilai_valas_kredit
 					);
 						$no_perkiraan= $rec->no_perkiraan;
 					$totalap=$data['invoice_total'];
 				}
 				if($rec->parameter_no=="3"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
 					);
 				}
 				
 				if($rec->parameter_no=="7"){
 					if($kursRos > 1){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => ($selisihIDR<0?($selisihIDR*-1):0), 'debet' => ($selisihIDR>=0?$selisihIDR:0), 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => ($selisihIDR<0?($selisihIDR*-1):0), 'debet' => ($selisihIDR>=0?$selisihIDR:0), 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
 					);
 					}else{
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => 0, 'debet' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','debet_usd' => 0, 'kredit_usd' => 0
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs'.$datapo->no_po, 'no_request' => $datapo->no_po, 'kredit' => 0, 'debet' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
 					);
 					}
 					
@@ -1339,8 +1339,8 @@ class Pembelian extends CI_Controller {
 						'no_reff'		=> $vals['no_reff'],
 						'debet'			=> $vals['debet'],
 						'kredit'		=> $vals['kredit'],						
-						'debet_usd'			=> $vals['debet_usd'],
-						'kredit_usd'		=> $vals['kredit_usd'],
+						'nilai_valas_debet'			=> $vals['nilai_valas_debet'],
+						'nilai_valas_kredit'		=> $vals['nilai_valas_kredit'],
 						'created_on' 	=> $dateTime,
 						'created_by' 	=> $Username,
 						);
@@ -1387,8 +1387,8 @@ class Pembelian extends CI_Controller {
 					'id_supplier'    => $datapo->id_supplier,
 					'nama_supplier'  => $datapo->nm_supplier,
 					'no_request'     => $data['invoice_no'],
-					'debet_usd'		 => 0,
-					'kredit_usd'	 => 0,
+					'nilai_valas_debet'		 => 0,
+					'nilai_valas_kredit'	 => 0,
 				);
 				$this->db->insert('tr_kartu_hutang',$datahutang);
 				//end auto jurnal
