@@ -264,6 +264,16 @@ class Incoming extends CI_Controller {
 				$ArrUpdate[$val]['qty_in'] 		= $result_det[0]['qty_in'] + $qtyIN;
 				
 				//detail adjustmeny
+				//detail jurnal - get unit price first so we can use it in ArrDeatilAdj
+				if($cek_type == 'NPO'){
+                    $GET_UNITPRICE = $this->db->select('price_unit_rev AS unit_price, id_barang')->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result();
+                }
+                else{
+					$GET_UNITPRICE = $this->db->select('net_price AS unit_price, id_barang')->get_where('tran_po_detail',array('id'=>$valx['id']))->result();
+                }
+				$UNIT_PRICE = (!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0;
+				$totalprice=($totalprice+($qtyIN*$UNIT_PRICE));
+
 				$ArrDeatilAdj[$val]['no_ipp'] 			= $no_po;
 				$ArrDeatilAdj[$val]['kode_trans'] 		= $kode_trans;
 				$ArrDeatilAdj[$val]['id_po_detail']     = $valx['id'];
@@ -279,6 +289,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
 				$ArrDeatilAdj[$val]['check_qty_oke'] 	= $qtyIN ;
 				$ArrDeatilAdj[$val]['check_keterangan'] = strtolower($valx['keterangan']);
+				$ArrDeatilAdj[$val]['harga'] 			= $UNIT_PRICE;
 				
 				//detail adjustmeny
 				$ArrDeatilChk[$val]['no_ipp'] 		= $no_po;
@@ -292,16 +303,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilChk[$val]['update_by'] 	= $UserName;
 				$ArrDeatilChk[$val]['update_date'] 	= $dateTime;
 
-				//detail jurnal
-				if($cek_type == 'NPO'){
-                    $GET_UNITPRICE = $this->db->select('price_unit_rev AS unit_price, id_barang')->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result();
-                }
-                else{
-					$GET_UNITPRICE = $this->db->select('net_price AS unit_price, id_barang')->get_where('tran_po_detail',array('id'=>$valx['id']))->result();
-                }
-				$totalprice=($totalprice+($qtyIN*(!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0));
-
-				$ArrJurnal[$val]['unit_price'] 		= (!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0;
+				$ArrJurnal[$val]['unit_price'] 		= $UNIT_PRICE;
 				$ArrJurnal[$val]['qty'] 			= $qtyIN;
 				$ArrJurnal[$val]['no_po'] 			= $no_po;
 				$ArrJurnal[$val]['nm_barang'] 		= strtolower($valx['nm_barang'].' - '.$valx['spec']);
@@ -692,6 +694,15 @@ class Incoming extends CI_Controller {
 				$ArrUpdate[$val]['id'] 			= $valx['id'];
 				$ArrUpdate[$val]['qty_in'] 		= $result_det[0]['qty_in'] + $qtyIN;
 				
+				//detail jurnal - get unit price first so we can use it in ArrDeatilAdj
+				if($cek_type == 'NPO'){
+                    $GET_UNITPRICE = $this->db->select('price_unit_rev AS unit_price, id_barang')->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result();
+                }
+                else{
+					$GET_UNITPRICE = $this->db->select('net_price AS unit_price, id_barang')->get_where('tran_po_detail',array('id'=>$valx['id']))->result();
+                }
+				$UNIT_PRICE = (!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0;
+
 				//detail adjustmeny
 				$ArrDeatilAdj[$val]['no_ipp'] 			= $no_po;
 				$ArrDeatilAdj[$val]['kode_trans'] 		= $kode_trans;
@@ -707,6 +718,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['update_date'] 		= $dateTime;
 				$ArrDeatilAdj[$val]['check_qty_oke'] 	= $qtyIN ;
 				$ArrDeatilAdj[$val]['check_keterangan'] = strtolower($valx['keterangan']);
+				$ArrDeatilAdj[$val]['harga'] 			= $UNIT_PRICE;
 				
 				//detail adjustmeny
 				$ArrDeatilChk[$val]['no_ipp'] 		= $no_po;
@@ -720,14 +732,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilChk[$val]['update_by'] 	= $UserName;
 				$ArrDeatilChk[$val]['update_date'] 	= $dateTime;
 
-				//detail jurnal
-				if($cek_type == 'NPO'){
-                    $GET_UNITPRICE = $this->db->select('price_unit_rev AS unit_price, id_barang')->get_where('tran_non_po_detail',array('id'=>$valx['id']))->result();
-                }
-                else{
-					$GET_UNITPRICE = $this->db->select('net_price AS unit_price, id_barang')->get_where('tran_po_detail',array('id'=>$valx['id']))->result();
-                }
-				$ArrJurnal[$val]['unit_price'] 		= (!empty($GET_UNITPRICE[0]->unit_price))?$GET_UNITPRICE[0]->unit_price:0;
+				$ArrJurnal[$val]['unit_price'] 		= $UNIT_PRICE;
 				$ArrJurnal[$val]['qty'] 			= $qtyIN;
 				$ArrJurnal[$val]['no_po'] 			= $no_po;
 				$ArrJurnal[$val]['nm_barang'] 		= strtolower($valx['nm_barang']);
