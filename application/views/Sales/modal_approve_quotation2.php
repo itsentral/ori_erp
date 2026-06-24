@@ -394,6 +394,7 @@
 	->from('laporan_revised_detail a')
 	->join('product_parent b','a.product_parent=b.product_parent','left')
 	->where('b.type_costing','pipa')
+	->where('a.product_parent <>','pipe slongsong')
 	->where('a.revised_no',$revised_no)
 	->where('a.id_bq',$id_bq)
 	->get()
