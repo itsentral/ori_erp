@@ -2666,34 +2666,51 @@
 			unset($det_Jurnaltes);unset($datadetail);
 		}
 		if($ket=='incoming department'){
-			$kodejurnal='JV036';
 			$id=$ArrDetailProduct;
 		  	$Keterangan_INV="INCOMING DEPARTMENT ".$id;
-			$datajurnal	= $CI->Acc_model->GetTemplateJurnal($kodejurnal);
 			$nilaibayar	= 0;
 			$totalbayar	= 0;
 			$unbill_coa='';$no_po='';
 
 			// Hitung total debit dulu
 			$val_dept = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, c.coa from jurnal a left join rutin_non_planning_detail b on a.id_material=b.id left join rutin_non_planning_header c on b.no_pr=c.no_pr where a.kode_trans='".$id."'")->result();
+			
+			// Ambil data PO untuk cek mata uang
+			$first_no_po = '';
+			foreach($val_dept AS $rec){
+				$first_no_po = $rec->no_ipp;
+				break;
+			}
+			$data_po_dept = $CI->db->query("select * from tran_po_header where no_po='".$first_no_po."' limit 1")->row();
+			
+			// Tentukan kode jurnal berdasarkan mata uang: IDR=JV036, USD/lainnya=JV085
+			if (!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang != 'IDR') {
+				$kodejurnal = 'JV085';
+			} else {
+				$kodejurnal = 'JV036';
+			}
+			$datajurnal	= $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+
+			// Tentukan kurs berdasarkan mata uang PO
+			$kurs_dept = 1;
+			if (!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang != 'IDR') {
+				$tgl_kurs_dept = date('Y-m-d');
+				foreach($val_dept AS $rec){ $tgl_kurs_dept = $rec->tanggal; break; }
+				$sqlkurs_dept = "select * from ms_kurs where tanggal <='".$tgl_kurs_dept."' and mata_uang='".$data_po_dept->mata_uang."' order by tanggal desc limit 1";
+				$dtkurs_dept = $CI->db->query($sqlkurs_dept)->row();
+				if (!empty($dtkurs_dept)) $kurs_dept = $dtkurs_dept->kurs;
+			}
+
 			foreach($val_dept AS $rec){
 				$tgl_voucher = $rec->tanggal;
 				$no_po = $rec->no_ipp;
-				$totalbayar += $rec->total_nilai;
+				$totalbayar += $rec->total_nilai * $kurs_dept;
 			}
 
 			// Cek DP (Down Payment) - hitung uang muka dan hutang
-			$data_po_dept = $CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1")->row();
 			$hutang_dept = $totalbayar;
 			$uangmuka_dept = 0;
 			if (!empty($data_po_dept->nilai_dp) && $data_po_dept->nilai_dp > 0) {
-				$kurs_dept = 1;
-				if ($data_po_dept->mata_uang != 'IDR') {
-					$sqlkurs_dept = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po_dept->mata_uang."' order by tanggal desc limit 1";
-					$dtkurs_dept = $CI->db->query($sqlkurs_dept)->row();
-					if (!empty($dtkurs_dept)) $kurs_dept = $dtkurs_dept->kurs;
-				}
-
 				$nilai_dp_rupiah = ($data_po_dept->mata_uang != 'IDR') ? ($kurs_dept * $data_po_dept->nilai_dp) : $data_po_dept->nilai_dp;
 
 				if ($nilai_dp_rupiah <= $totalbayar) {
@@ -2725,7 +2742,7 @@
 					foreach($val_dept AS $rec){
 						$tgl_voucher = $rec->tanggal;
 						$no_po = $rec->no_ipp;
-						$nilaibayar = $rec->total_nilai;
+						$nilaibayar = $rec->total_nilai * $kurs_dept;
 						$det_Jurnaltes[]  = array(
 						  'nomor'         => '',
 						  'tanggal'       => $tgl_voucher,
@@ -2817,34 +2834,51 @@
 			unset($det_Jurnaltes);unset($datadetail);unset($datahutang);
 		}
 		if($ket=='incoming asset'){
-			$kodejurnal='JV038';
 			$id=$ArrDetailProduct;
 		  	$Keterangan_INV="INCOMING ASSET ".$id;
-			$datajurnal	= $CI->Acc_model->GetTemplateJurnal($kodejurnal);
 			$nilaibayar	= 0;
 			$totalbayar	= 0;
 			$unbill_coa='';$no_po='';
 
 			// Hitung total debit dulu
 			$val_asset = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, b.coa from jurnal a left join asset_planning b on a.id_material=b.code_plan where a.kode_trans='".$id."'")->result();
+			
+			// Ambil data PO untuk cek mata uang
+			$first_no_po = '';
+			foreach($val_asset AS $rec){
+				$first_no_po = $rec->no_ipp;
+				break;
+			}
+			$data_po_asset = $CI->db->query("select * from tran_po_header where no_po='".$first_no_po."' limit 1")->row();
+			
+			// Tentukan kode jurnal berdasarkan mata uang: IDR=JV038, USD/lainnya=JV084
+			if (!empty($data_po_asset->mata_uang) && $data_po_asset->mata_uang != 'IDR') {
+				$kodejurnal = 'JV084';
+			} else {
+				$kodejurnal = 'JV038';
+			}
+			$datajurnal	= $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+
+			// Tentukan kurs berdasarkan mata uang PO
+			$kurs_asset = 1;
+			if (!empty($data_po_asset->mata_uang) && $data_po_asset->mata_uang != 'IDR') {
+				$tgl_kurs_asset = date('Y-m-d');
+				foreach($val_asset AS $rec){ $tgl_kurs_asset = $rec->tanggal; break; }
+				$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_kurs_asset."' and mata_uang='".$data_po_asset->mata_uang."' order by tanggal desc limit 1";
+				$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
+				if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
+			}
+
 			foreach($val_asset AS $rec){
 				$tgl_voucher = $rec->tanggal;
 				$no_po = $rec->no_ipp;
-				$totalbayar += $rec->total_nilai;
+				$totalbayar += $rec->total_nilai * $kurs_asset;
 			}
 
 			// Cek DP (Down Payment) - hitung uang muka dan hutang
-			$data_po_asset = $CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1")->row();
 			$hutang_asset = $totalbayar;
 			$uangmuka_asset = 0;
 			if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
-				$kurs_asset = 1;
-				if ($data_po_asset->mata_uang != 'IDR') {
-					$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po_asset->mata_uang."' order by tanggal desc limit 1";
-					$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
-					if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
-				}
-
 				$nilai_dp_rupiah_asset = ($data_po_asset->mata_uang != 'IDR') ? ($kurs_asset * $data_po_asset->nilai_dp) : $data_po_asset->nilai_dp;
 
 				if ($nilai_dp_rupiah_asset <= $totalbayar) {
@@ -2876,7 +2910,7 @@
 					foreach($val_asset AS $rec){
 						$tgl_voucher = $rec->tanggal;
 						$no_po = $rec->no_ipp;
-						$nilaibayar = $rec->total_nilai;
+						$nilaibayar = $rec->total_nilai * $kurs_asset;
 						$det_Jurnaltes[]  = array(
 						  'nomor'         => '',
 						  'tanggal'       => $tgl_voucher,
