@@ -2673,6 +2673,44 @@
 			$nilaibayar	= 0;
 			$totalbayar	= 0;
 			$unbill_coa='';$no_po='';
+
+			// Hitung total debit dulu
+			$val_dept = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, c.coa from jurnal a left join rutin_non_planning_detail b on a.id_material=b.id left join rutin_non_planning_header c on b.no_pr=c.no_pr where a.kode_trans='".$id."'")->result();
+			foreach($val_dept AS $rec){
+				$tgl_voucher = $rec->tanggal;
+				$no_po = $rec->no_ipp;
+				$totalbayar += $rec->total_nilai;
+			}
+
+			// Cek DP (Down Payment) - hitung uang muka dan hutang
+			$data_po_dept = $CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1")->row();
+			$hutang_dept = $totalbayar;
+			$uangmuka_dept = 0;
+			if (!empty($data_po_dept->nilai_dp) && $data_po_dept->nilai_dp > 0) {
+				$kurs_dept = 1;
+				if ($data_po_dept->mata_uang != 'IDR') {
+					$sqlkurs_dept = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po_dept->mata_uang."' order by tanggal desc limit 1";
+					$dtkurs_dept = $CI->db->query($sqlkurs_dept)->row();
+					if (!empty($dtkurs_dept)) $kurs_dept = $dtkurs_dept->kurs;
+				}
+
+				$nilai_dp_rupiah = ($data_po_dept->mata_uang != 'IDR') ? ($kurs_dept * $data_po_dept->nilai_dp) : $data_po_dept->nilai_dp;
+
+				if ($nilai_dp_rupiah <= $totalbayar) {
+					// DP habis terpakai
+					$uangmuka_dept = $nilai_dp_rupiah;
+					$hutang_dept = $totalbayar - $nilai_dp_rupiah;
+					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 WHERE no_po='".$no_po."'");
+				} else {
+					// DP lebih besar, dikurangi sebesar total incoming
+					$uangmuka_dept = $totalbayar;
+					$hutang_dept = 0;
+					$dp_sisa_dept = ($data_po_dept->mata_uang != 'IDR') ? ($data_po_dept->nilai_dp - ($totalbayar / $kurs_dept)) : ($data_po_dept->nilai_dp - $totalbayar);
+					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_dept.", sisa_dp=".$dp_sisa_dept." WHERE no_po='".$no_po."'");
+				}
+			}
+
+			// Build jurnal entries
 			foreach($datajurnal AS $record){
 				$nokir1 = $record->no_perkiraan;
 				$tabel  = $record->menu;
@@ -2684,12 +2722,10 @@
 				$value_param  = $id;
 				$jenisjurnal = 'incoming department';
 				if ($posisi=='D'){
-					$val = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, c.coa from jurnal a left join rutin_non_planning_detail b on a.id_material=b.id left join rutin_non_planning_header c on b.no_pr=c.no_pr where a.kode_trans='".$kd_bayar."'")->result();
-					foreach($val AS $rec){
+					foreach($val_dept AS $rec){
 						$tgl_voucher = $rec->tanggal;
 						$no_po = $rec->no_ipp;
 						$nilaibayar = $rec->total_nilai;
-						$totalbayar=($totalbayar+$nilaibayar);
 						$det_Jurnaltes[]  = array(
 						  'nomor'         => '',
 						  'tanggal'       => $tgl_voucher,
@@ -2705,6 +2741,7 @@
 					}
 				} elseif ($posisi=='K'){
 					$unbill_coa=$nokir;
+					// Kredit unbill dikurangi uang muka
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2713,10 +2750,27 @@
 					  'keterangan'    => $Keterangan_INV,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
-					  'kredit'        => $totalbayar,
+					  'kredit'        => $hutang_dept,
 					  'jenis_jurnal'  => $jenisjurnal,
 					   'no_request'    => $id
 					 );
+					// Jurnal uang muka
+					if ($uangmuka_dept > 0) {
+						$coa_uangmuka_dept = '1111-01-01';
+						if (!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang != 'IDR') $coa_uangmuka_dept = '1111-01-02';
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $coa_uangmuka_dept,
+						  'keterangan'    => 'Uang muka '.$no_po.' - '.$Keterangan_INV,
+						  'no_reff'       => $id,
+						  'debet'         => 0,
+						  'kredit'        => $uangmuka_dept,
+						  'jenis_jurnal'  => $jenisjurnal,
+						   'no_request'    => $id
+						 );
+					}
 				}
 			}
 
@@ -2741,52 +2795,7 @@
 					);
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
-			$data_po=$CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1" )->row();
-			if($data_po->mata_uang!='IDR') $unbill_coa='2101-01-04';
-
-			// Cek DP (Down Payment) - jika ada, kurangi hutang
-			$hutang_dept = $totalbayar;
-			$uangmuka_dept = 0;
-			if (!empty($data_po->nilai_dp) && $data_po->nilai_dp > 0) {
-				$kurs_dept = 1;
-				if ($data_po->mata_uang != 'IDR') {
-					$sqlkurs_dept = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po->mata_uang."' order by tanggal desc limit 1";
-					$dtkurs_dept = $CI->db->query($sqlkurs_dept)->row();
-					if (!empty($dtkurs_dept)) $kurs_dept = $dtkurs_dept->kurs;
-				}
-
-				$nilai_dp_rupiah = ($data_po->mata_uang != 'IDR') ? ($kurs_dept * $data_po->nilai_dp) : $data_po->nilai_dp;
-
-				if ($nilai_dp_rupiah <= $totalbayar) {
-					// DP lebih kecil atau sama dengan total incoming -> DP habis terpakai
-					$uangmuka_dept = $nilai_dp_rupiah;
-					$hutang_dept = $totalbayar - $nilai_dp_rupiah;
-					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 WHERE no_po='".$no_po."'");
-				} else {
-					// DP lebih besar dari total incoming -> DP dikurangi sebesar total incoming
-					$uangmuka_dept = $totalbayar;
-					$hutang_dept = 0;
-					$dp_sisa_valas = ($data_po->mata_uang != 'IDR') ? ($data_po->nilai_dp - ($totalbayar / $kurs_dept)) : ($data_po->nilai_dp - $totalbayar);
-					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_valas.", sisa_dp=".$dp_sisa_valas." WHERE no_po='".$no_po."'");
-				}
-
-				// Jurnal uang muka (kredit uang muka)
-				if ($uangmuka_dept > 0) {
-					$coa_uangmuka_dept = '1111-01-01'; // COA uang muka IDR
-					if ($data_po->mata_uang != 'IDR') $coa_uangmuka_dept = '1111-01-02'; // COA uang muka valas
-					$datauangmuka = array(
-						'tipe'			=> 'JV',
-						'nomor'			=> $Nomor_JV,
-						'tanggal'		=> $tgl_voucher,
-						'no_perkiraan'	=> $coa_uangmuka_dept,
-						'keterangan'	=> 'Uang muka '.$no_po.' - '.$Keterangan_INV,
-						'no_reff'		=> $id,
-						'debet'			=> 0,
-						'kredit'		=> $uangmuka_dept,
-					);
-					$CI->db->insert(DBACC.'.jurnal',$datauangmuka);
-				}
-			}
+			if(!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang!='IDR') $unbill_coa='2101-01-04';
 
 			// Insert hutang (setelah dikurangi DP)
 			if ($hutang_dept > 0) {
@@ -2799,8 +2808,8 @@
 					'no_reff'     	 => $no_po,
 					'kredit'      	 => $hutang_dept,
 					'debet'          => 0,
-					'id_supplier'    => $data_po->id_supplier,
-					'nama_supplier'  => $data_po->nm_supplier,
+					'id_supplier'    => $data_po_dept->id_supplier,
+					'nama_supplier'  => $data_po_dept->nm_supplier,
 					'no_request'     => $id,
 				);
 				$CI->db->insert('tr_kartu_hutang',$datahutang);
@@ -2815,6 +2824,46 @@
 			$nilaibayar	= 0;
 			$totalbayar	= 0;
 			$unbill_coa='';$no_po='';
+
+			// Hitung total debit dulu
+			$val_asset = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, b.coa from jurnal a left join asset_planning b on a.id_material=b.code_plan where a.kode_trans='".$id."'")->result();
+			foreach($val_asset AS $rec){
+				$tgl_voucher = $rec->tanggal;
+				$no_po = $rec->no_ipp;
+				$totalbayar += $rec->total_nilai;
+			}
+
+			// Cek DP (Down Payment) - hitung uang muka dan hutang
+			$data_po_asset = $CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1")->row();
+			$hutang_asset = $totalbayar;
+			$uangmuka_asset = 0;
+			// DEBUG LOG - hapus setelah fix
+			log_message('error', 'INCOMING ASSET DP DEBUG: no_po='.$no_po.' | totalbayar='.$totalbayar.' | nilai_dp='.(!empty($data_po_asset->nilai_dp)?$data_po_asset->nilai_dp:'NULL').' | proses_uang_muka='.(!empty($data_po_asset->proses_uang_muka)?$data_po_asset->proses_uang_muka:'NULL'));
+			if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
+				$kurs_asset = 1;
+				if ($data_po_asset->mata_uang != 'IDR') {
+					$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po_asset->mata_uang."' order by tanggal desc limit 1";
+					$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
+					if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
+				}
+
+				$nilai_dp_rupiah_asset = ($data_po_asset->mata_uang != 'IDR') ? ($kurs_asset * $data_po_asset->nilai_dp) : $data_po_asset->nilai_dp;
+
+				if ($nilai_dp_rupiah_asset <= $totalbayar) {
+					// DP habis terpakai
+					$uangmuka_asset = $nilai_dp_rupiah_asset;
+					$hutang_asset = $totalbayar - $nilai_dp_rupiah_asset;
+					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 WHERE no_po='".$no_po."'");
+				} else {
+					// DP lebih besar, dikurangi sebesar total incoming
+					$uangmuka_asset = $totalbayar;
+					$hutang_asset = 0;
+					$dp_sisa_asset = ($data_po_asset->mata_uang != 'IDR') ? ($data_po_asset->nilai_dp - ($totalbayar / $kurs_asset)) : ($data_po_asset->nilai_dp - $totalbayar);
+					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_asset.", sisa_dp=".$dp_sisa_asset." WHERE no_po='".$no_po."'");
+				}
+			}
+
+			// Build jurnal entries
 			foreach($datajurnal AS $record){
 				$nokir1 = $record->no_perkiraan;
 				$tabel  = $record->menu;
@@ -2826,12 +2875,10 @@
 				$value_param  = $id;
 				$jenisjurnal = 'incoming asset';
 				if ($posisi=='D'){
-					$val = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, b.coa from jurnal a left join asset_planning b on a.id_material=b.code_plan where a.kode_trans='".$kd_bayar."'")->result();
-					foreach($val AS $rec){
+					foreach($val_asset AS $rec){
 						$tgl_voucher = $rec->tanggal;
 						$no_po = $rec->no_ipp;
 						$nilaibayar = $rec->total_nilai;
-						$totalbayar=($totalbayar+$nilaibayar);
 						$det_Jurnaltes[]  = array(
 						  'nomor'         => '',
 						  'tanggal'       => $tgl_voucher,
@@ -2847,6 +2894,7 @@
 					}
 				} elseif ($posisi=='K'){
 					$unbill_coa=$nokir;
+					// Kredit unbill dikurangi uang muka
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2855,10 +2903,27 @@
 					  'keterangan'    => $Keterangan_INV,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
-					  'kredit'        => $totalbayar,
+					  'kredit'        => $hutang_asset,
 					  'jenis_jurnal'  => $jenisjurnal,
 					   'no_request'    => $id
 					 );
+					// Jurnal uang muka
+					if ($uangmuka_asset > 0) {
+						$coa_uangmuka_asset = '1111-01-01';
+						if (!empty($data_po_asset->mata_uang) && $data_po_asset->mata_uang != 'IDR') $coa_uangmuka_asset = '1111-01-02';
+						$det_Jurnaltes[]  = array(
+						  'nomor'         => '',
+						  'tanggal'       => $tgl_voucher,
+						  'tipe'          => 'JV',
+						  'no_perkiraan'  => $coa_uangmuka_asset,
+						  'keterangan'    => 'Uang muka '.$no_po.' - '.$Keterangan_INV,
+						  'no_reff'       => $id,
+						  'debet'         => 0,
+						  'kredit'        => $uangmuka_asset,
+						  'jenis_jurnal'  => $jenisjurnal,
+						   'no_request'    => $id
+						 );
+					}
 				}
 			}
 
@@ -2884,51 +2949,7 @@
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			$data_po=$CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1" )->row();
-			if($data_po->mata_uang!='IDR') $unbill_coa='2101-01-05';
-
-			// Cek DP (Down Payment) - jika ada, kurangi hutang
-			$hutang_asset = $totalbayar;
-			$uangmuka_asset = 0;
-			if (!empty($data_po->nilai_dp) && $data_po->nilai_dp > 0) {
-				$kurs_asset = 1;
-				if ($data_po->mata_uang != 'IDR') {
-					$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_voucher."' and mata_uang='".$data_po->mata_uang."' order by tanggal desc limit 1";
-					$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
-					if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
-				}
-
-				$nilai_dp_rupiah_asset = ($data_po->mata_uang != 'IDR') ? ($kurs_asset * $data_po->nilai_dp) : $data_po->nilai_dp;
-
-				if ($nilai_dp_rupiah_asset <= $totalbayar) {
-					// DP lebih kecil atau sama dengan total incoming -> DP habis terpakai
-					$uangmuka_asset = $nilai_dp_rupiah_asset;
-					$hutang_asset = $totalbayar - $nilai_dp_rupiah_asset;
-					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 WHERE no_po='".$no_po."'");
-				} else {
-					// DP lebih besar dari total incoming -> DP dikurangi sebesar total incoming
-					$uangmuka_asset = $totalbayar;
-					$hutang_asset = 0;
-					$dp_sisa_valas_asset = ($data_po->mata_uang != 'IDR') ? ($data_po->nilai_dp - ($totalbayar / $kurs_asset)) : ($data_po->nilai_dp - $totalbayar);
-					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_valas_asset.", sisa_dp=".$dp_sisa_valas_asset." WHERE no_po='".$no_po."'");
-				}
-
-				// Jurnal uang muka (kredit uang muka)
-				if ($uangmuka_asset > 0) {
-					$coa_uangmuka_asset = '1111-01-01'; // COA uang muka IDR
-					if ($data_po->mata_uang != 'IDR') $coa_uangmuka_asset = '1111-01-02'; // COA uang muka valas
-					$datauangmuka_asset = array(
-						'tipe'			=> 'JV',
-						'nomor'			=> $Nomor_JV,
-						'tanggal'		=> $tgl_voucher,
-						'no_perkiraan'	=> $coa_uangmuka_asset,
-						'keterangan'	=> 'Uang muka '.$no_po.' - '.$Keterangan_INV,
-						'no_reff'		=> $id,
-						'debet'			=> 0,
-						'kredit'		=> $uangmuka_asset,
-					);
-					$CI->db->insert(DBACC.'.jurnal',$datauangmuka_asset);
-				}
-			}
+			if(!empty($data_po->mata_uang) && $data_po->mata_uang!='IDR') $unbill_coa='2101-01-05';
 
 			// Insert hutang (setelah dikurangi DP)
 			if ($hutang_asset > 0) {
