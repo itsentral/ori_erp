@@ -109,6 +109,9 @@ $this->load->view('include/side_menu');
 						$SUM = 0;
 						$no = 0;
 						foreach($getDetail AS $val => $valx){
+							if($valx['id_category'] == 'pipe slongsong'){
+								continue;
+							}
 							$no++;
 							$dataSum = 0;
 							if($valx['qty'] <> 0){
