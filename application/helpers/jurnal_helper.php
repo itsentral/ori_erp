@@ -2837,8 +2837,6 @@
 			$data_po_asset = $CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1")->row();
 			$hutang_asset = $totalbayar;
 			$uangmuka_asset = 0;
-			// DEBUG LOG - hapus setelah fix
-			log_message('error', 'INCOMING ASSET DP DEBUG: no_po='.$no_po.' | totalbayar='.$totalbayar.' | nilai_dp='.(!empty($data_po_asset->nilai_dp)?$data_po_asset->nilai_dp:'NULL').' | proses_uang_muka='.(!empty($data_po_asset->proses_uang_muka)?$data_po_asset->proses_uang_muka:'NULL'));
 			if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
 				$kurs_asset = 1;
 				if ($data_po_asset->mata_uang != 'IDR') {
