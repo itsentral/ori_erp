@@ -2738,6 +2738,7 @@
 				$param  = 'id';
 				$value_param  = $id;
 				$jenisjurnal = 'incoming department';
+				$is_valas = (!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang != 'IDR');
 				if ($posisi=='D'){
 					foreach($val_dept AS $rec){
 						$tgl_voucher = $rec->tanggal;
@@ -2753,12 +2754,15 @@
 						  'debet'         => $nilaibayar,
 						  'kredit'        => 0,
 						  'jenis_jurnal'  => $jenisjurnal,
-						  'no_request'    => $id
+						  'no_request'    => $id,
+						  'nilai_valas_debet'  => ($is_valas ? $rec->total_nilai : 0),
+						  'nilai_valas_kredit' => 0
 						 );
 					}
 				} elseif ($posisi=='K'){
 					$unbill_coa=$nokir;
 					// Kredit unbill dikurangi uang muka
+					$hutang_valas = ($is_valas && $kurs_dept > 0) ? ($hutang_dept / $kurs_dept) : 0;
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2769,12 +2773,15 @@
 					  'debet'         => 0,
 					  'kredit'        => $hutang_dept,
 					  'jenis_jurnal'  => $jenisjurnal,
-					   'no_request'    => $id
+					  'no_request'    => $id,
+					  'nilai_valas_debet'  => 0,
+					  'nilai_valas_kredit' => ($is_valas ? $hutang_valas : 0)
 					 );
 					// Jurnal uang muka
 					if ($uangmuka_dept > 0) {
 						$coa_uangmuka_dept = '1111-01-01';
-						if (!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang != 'IDR') $coa_uangmuka_dept = '1111-01-02';
+						if ($is_valas) $coa_uangmuka_dept = '1111-01-02';
+						$uangmuka_valas = ($is_valas && $kurs_dept > 0) ? ($uangmuka_dept / $kurs_dept) : 0;
 						$det_Jurnaltes[]  = array(
 						  'nomor'         => '',
 						  'tanggal'       => $tgl_voucher,
@@ -2785,7 +2792,9 @@
 						  'debet'         => 0,
 						  'kredit'        => $uangmuka_dept,
 						  'jenis_jurnal'  => $jenisjurnal,
-						   'no_request'    => $id
+						  'no_request'    => $id,
+						  'nilai_valas_debet'  => 0,
+						  'nilai_valas_kredit' => ($is_valas ? $uangmuka_valas : 0)
 						 );
 					}
 				}
@@ -2809,6 +2818,8 @@
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'nilai_valas_debet'  => (isset($vals['nilai_valas_debet']) ? $vals['nilai_valas_debet'] : 0),
+					'nilai_valas_kredit' => (isset($vals['nilai_valas_kredit']) ? $vals['nilai_valas_kredit'] : 0),
 					);
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
