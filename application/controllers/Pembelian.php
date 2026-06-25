@@ -1288,11 +1288,12 @@ class Pembelian extends CI_Controller {
 		
        
 		if($data['group_top']=='uang muka'){			
-				$jenis_jurnal='JV053';
 				if($datapo->mata_uang != 'IDR'){
+					$jenis_jurnal='JV086';
 					$nilai_valas_debet =$data['invoice_total']-$data['nilai_ppn'];
 					$nilai_valas_kredit = $data['invoice_total'];
 				}else{
+					$jenis_jurnal='JV053';
 					$nilai_valas_debet = 0;
 					$nilai_valas_kredit = 0;
 				}
