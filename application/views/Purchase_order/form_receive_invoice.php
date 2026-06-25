@@ -97,7 +97,7 @@ $this->load->view('include/side_menu');
 					<input type="text" class="form-control divide" id="invoice_total" name="invoice_total" value="<?= $nilaiinvoice; ?>" required readonly>
 				  </div>
 				   <?php } else {?>
-				  <div class="col-md-6" hidden>
+				  <div class="col-md-6">
 					<label class="control-label">Nilai Potongan DP</label>
 					<input type="text" class="form-control divide" id="potong_um" name="potong_um" value="<?= (isset($results)?$results->potong_um:$dp); ?>" required readonly>
 				  </div>
@@ -357,13 +357,18 @@ if($results->invoice_no!="") {
             }
         });
 
-		
+		// Kurangi DP (uang muka) dari total barang sebelum hitung progress
+		let dp_value = getNum($('#potong_um').val()) || 0;
+		let sum_after_dp = sum_total - dp_value;
+		if(sum_after_dp < 0) sum_after_dp = 0;
+
 		$('#price_before_tax').val(sum_total)
-		let dpp = (11/12)*sum_total;
+		$('#nilai_top').val(number_format(sum_after_dp,2))
+		let dpp = (11/12)*sum_after_dp;
         $('#nilai_dpp').val(number_format(dpp,2))
-        let ppn = (sum_total * tax) / 100
+        let ppn = (sum_after_dp * tax) / 100
         $('#nilai_ppn').val(number_format(ppn,2))
-        let net_plus_tax = sum_total + ppn
+        let net_plus_tax = sum_after_dp + ppn
         $('#invoice_total').val(number_format(net_plus_tax,2))
        
 	}
