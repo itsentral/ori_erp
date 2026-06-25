@@ -933,7 +933,7 @@ class Purchase extends CI_Controller {
 		$selisihIDR = 0;
 		if(!empty($dataros)){
             $noRos = $dataros->no_ros;
-			$kursRos = $dataros->kurs;
+			$kursRos = (!empty($dataros->kurs) && $dataros->kurs > 0) ? $dataros->kurs : $kursInv;
 			$selisihKurs = $kursInv - $kursRos;
 			$selisihIDR = $selisihKurs*$barang;
 		}
