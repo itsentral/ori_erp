@@ -345,7 +345,8 @@ class Incoming extends CI_Controller {
 				'jumlah_mat_check' 	=> $SumMat,
 				'doc' 				=> $file_name,
 				'checked_by' 		=> $UserName,
-				'checked_date' 		=> $dateTime
+				'checked_date' 		=> $dateTime,
+				'total_harga_product' => $totalprice
 			);
 
 			$ArrHeader2 = array(
@@ -659,6 +660,7 @@ class Incoming extends CI_Controller {
 		$dateTime		= date('Y-m-d H:i:s');
 		$UserName		= $data_session['ORI_User']['username'];
 		$cek_type 		= substr($no_po,0,3);
+		$totalprice		= 0;
 
 		if($adjustment == 'IN'){
 			$histHlp = "Adjustment incoming asset / ".$no_po;
@@ -719,6 +721,7 @@ class Incoming extends CI_Controller {
 				$ArrDeatilAdj[$val]['check_qty_oke'] 	= $qtyIN ;
 				$ArrDeatilAdj[$val]['check_keterangan'] = strtolower($valx['keterangan']);
 				$ArrDeatilAdj[$val]['harga'] 			= $UNIT_PRICE;
+				$totalprice = ($totalprice + ($qtyIN * $UNIT_PRICE));
 				
 				//detail adjustmeny
 				$ArrDeatilChk[$val]['no_ipp'] 		= $no_po;
@@ -773,7 +776,8 @@ class Incoming extends CI_Controller {
 				'jumlah_mat_check' 	=> $SumMat,
 				'doc' 				=> $file_name,
 				'checked_by' 		=> $UserName,
-				'checked_date' 		=> $dateTime
+				'checked_date' 		=> $dateTime,
+				'total_harga_product' => $totalprice
 			);
 
 			$ArrHeader2 = array(
