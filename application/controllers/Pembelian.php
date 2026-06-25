@@ -1182,6 +1182,18 @@ class Pembelian extends CI_Controller {
 		$data_session	= $this->session->userdata;
 		$Username 		= $this->session->userdata['ORI_User']['username'];
 		$dateTime		= date('Y-m-d H:i:s');
+		
+		// Clean numeric values from thousand separator format
+		$data['invoice_total'] = str_replace(',', '', $data['invoice_total']);
+		$data['nilai_ppn'] = str_replace(',', '', $data['nilai_ppn']);
+		$data['nilai_po'] = str_replace(',', '', $data['nilai_po']);
+		$data['nilai_net'] = str_replace(',', '', $data['nilai_net']);
+		$data['nilai_dpp'] = str_replace(',', '', $data['nilai_dpp']);
+		$data['nilai_top'] = str_replace(',', '', $data['nilai_top']);
+		$data['price_before_tax'] = str_replace(',', '', $data['price_before_tax']);
+		$data['kurs'] = str_replace(',', '', $data['kurs']);
+		if(isset($data['potong_um'])) $data['potong_um'] = str_replace(',', '', $data['potong_um']);
+
 		$kursInv        = $data['kurs'];
 		$kursRos        = $kursInv;
 		$net            = $data['nilai_top'];
@@ -1314,7 +1326,6 @@ class Pembelian extends CI_Controller {
 						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
 					);
 				}
-				
 				if($rec->parameter_no=="7"){
 					if($kursRos > 1){
 					$det_Jurnaltes1[] = array(
