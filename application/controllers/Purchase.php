@@ -825,7 +825,7 @@ class Purchase extends CI_Controller {
 		$total_harga = $nilai_po->total_price;
 		$tax = $nilai_po->tax;
 
-		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang muka' AND no_po='".$info_payterm->no_po."'")->row();
+		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang muka' AND invoice_no !='' AND no_po='".$info_payterm->no_po."'")->row();
      
 
 		$data = array(
