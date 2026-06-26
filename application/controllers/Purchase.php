@@ -833,7 +833,20 @@ class Purchase extends CI_Controller {
 		$tax = $nilai_po->tax;
 
 		$info_dp 	= $this->db->query("select sum(value_idr) as total_dp from billing_top where group_top ='uang muka' AND invoice_no !='' AND no_po='".$info_payterm->no_po."'")->row();
-     
+
+		// Total incoming yang sudah di-receive invoice sebelumnya (tidak tampil di detail)
+		$info_incoming_invoiced = $this->db->query("select sum(
+				CASE WHEN a.category = 'incoming rutin' THEN b.harga 
+				ELSE b.harga * b.check_qty_oke END
+			) as total_invoiced 
+			from warehouse_adjustment a 
+			inner join warehouse_adjustment_detail b on a.kode_trans = b.kode_trans 
+			where a.no_ipp='".$info_payterm->no_po."' and a.id_invoice is not null and a.id_invoice != ''")->row();
+		
+		$total_dp = (!empty($info_dp->total_dp)) ? $info_dp->total_dp : 0;
+		$total_invoiced = (!empty($info_incoming_invoiced->total_invoiced)) ? $info_incoming_invoiced->total_invoiced : 0;
+		$potong_um = $total_dp - $total_invoiced;
+		if($potong_um < 0) $potong_um = 0;
 
 		$data = array(
 			'title'			=> 'Receive Invoice',
@@ -846,7 +859,7 @@ class Purchase extends CI_Controller {
 			'total_harga'	=> $total_harga,
 			'mata_uang'		=> $mata_uang,
 			'tax'		    => $tax,
-			'dp'		    => $info_dp->total_dp,
+			'dp'		    => $potong_um,
 			'id'			=> $id
 		);
 		history('View receive invoice '.$id);
