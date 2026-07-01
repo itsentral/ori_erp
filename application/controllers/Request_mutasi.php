@@ -336,10 +336,17 @@ class Request_mutasi extends CI_Controller {
 		$Thn 			= substr($tgl_po,0,4);
 		
 		$dari = $jurnal->dari;
-		if($dari =='IDR') {
+		$ke   = $jurnal->ke;
+		if($dari =='IDR' && $ke =='IDR') {
+		// Sesama IDR, tidak ada valas
+		$total          = $jurnal->nilai_request;
+		$dolar          = 0;
+		}elseif($dari =='IDR') {
+		// Dari IDR ke valas: total=rupiah, dolar=valas (nilai_aktual = nilai/kurs)
 		$total          = $jurnal->nilai_request;
 		$dolar          = $jurnal->nilai_aktual;
 		}else{			
+		// Dari valas ke IDR: total=rupiah (nilai_aktual = kurs*nilai), dolar=valas
 		$total          = $jurnal->nilai_aktual;
 		$dolar          = $jurnal->nilai_request;	
 		}
