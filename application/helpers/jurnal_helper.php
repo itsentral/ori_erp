@@ -2823,7 +2823,7 @@
 					);
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
-			if(!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang!='IDR') $unbill_coa='2101-01-04';
+			if(!empty($data_po_dept->mata_uang) && $data_po_dept->mata_uang!='IDR') $unbill_coa='2101-01-05';
 
 			// Insert hutang (setelah dikurangi DP)
 			if ($hutang_dept > 0) {
