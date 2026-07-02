@@ -1689,8 +1689,15 @@ class Pembayaran_material extends CI_Controller {
 			$selisih_kurs=0;
 			$nilai_terima_barang_idr=0;
 				$datapoheader = $this->db->query("select * from tran_po_header where no_po='".$data->no_po."'")->row();
-				if($datapoheader->terima_barang_idr!=0) {
-					$selisih_kurs=(($data->nilai_po_invoice*$curs)-$datapoheader->terima_barang_idr);
+				if($data->tipe=='TR-01'){
+					// Selisih kurs uang muka: kurs bayar vs kurs receive invoice
+					if($data->kurs_receive_invoice > 1){
+						$selisih_kurs=(($data->nilai_po_invoice+$data->invoice_ppn)*$curs)-(($data->nilai_po_invoice+$data->invoice_ppn)*$data->kurs_receive_invoice);
+					}
+				} else {
+					if($datapoheader->terima_barang_idr!=0) {
+						$selisih_kurs=(($data->nilai_po_invoice*$curs)-$datapoheader->terima_barang_idr);
+					}
 				}
 			// update PO
 				$nilai_dp_kurs=0;
