@@ -6240,7 +6240,10 @@ class Delivery extends CI_Controller
 			$ArrSpool[] = $value['spool_induk'];
 		}
 
-		$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
+		$getAllSpool = [];
+		if(!empty($ArrSpool)){
+			$getAllSpool = $this->db->where_in('kode_spool',$ArrSpool)->get_where('data_erp_fg',array('jenis'=>'in','keterangan'=>'WIP to Finish Good (Spool)'))->result_array();
+		}
 		if(!empty($getAllSpool)){
 			foreach ($getAllSpool as $value => $valx) {
 				$ArrGroupSpool[$value]['tanggal'] = date('Y-m-d');
@@ -6318,6 +6321,154 @@ class Delivery extends CI_Controller
 
 		if(!empty($ArrGroupOutSpool)){
 			$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
+		}
+
+		// === UPDATE warehouse_stock_fg (tambah qty kembali ke FG) dan warehouse_stock_intransit (kurangi qty) ===
+		$tgl_voucher = date('Y-m-d');
+		$det_Jurnaltes = [];
+		$totalfg = 0;
+
+		// Ambil data dari data_erp_in_transit yang baru di-insert (jenis = 'out' berarti keluar dari intransit)
+		$dataRejectIntransit = $this->db->query("SELECT tanggal, keterangan, product, no_so, no_spk, kode_trans, id_trans, qty, nilai_unit as finishgood, kode_spool FROM data_erp_in_transit WHERE kode_delivery ='".$kode_delivery."' AND tanggal ='".$tgl_voucher."' AND jenis = 'out'")->result();
+
+		if(!empty($dataRejectIntransit)){
+			foreach($dataRejectIntransit AS $data){
+				$nm_material = $data->product;
+				$noso        = $data->no_so;
+				$kode_trans_item = $data->kode_trans;
+				$nospk       = $data->no_spk;
+				$finishgood  = $data->finishgood;
+				$qty1        = $data->qty;
+				$kode_spool  = $data->kode_spool;
+
+				if ($qty1 == null){
+					$qty = 1;
+				} else {
+					$qty = $qty1;
+				}
+
+				$totalfg += $finishgood;
+
+				// COA untuk jurnal
+				$coaintransit = '1103-04-06';
+				$coafg        = '1103-04-01';
+
+				$spasi       = ',';
+				$keterangan_jv  = $data->keterangan.$spasi.$data->product.$spasi.$data->no_spk.$spasi.$data->no_so;
+
+				// Jurnal: Debit FG, Kredit Intransit (kebalikan dari confirm delivery)
+				$det_Jurnaltes[] = array(
+					'nomor'         => '',
+					'tanggal'       => $tgl_voucher,
+					'tipe'          => 'JV',
+					'no_perkiraan'  => $coafg,
+					'keterangan'    => 'INTRANSIT - REJECT TO FINISH GOOD',
+					'no_reff'       => $kode_delivery.$noso,
+					'debet'         => $finishgood,
+					'kredit'        => 0,
+					'jenis_jurnal'  => 'Intransit-Reject-FG',
+					'no_request'    => $nospk,
+					'stspos'        => 1
+				);
+
+				$det_Jurnaltes[] = array(
+					'nomor'         => '',
+					'tanggal'       => $tgl_voucher,
+					'tipe'          => 'JV',
+					'no_perkiraan'  => $coaintransit,
+					'keterangan'    => 'INTRANSIT - REJECT TO FINISH GOOD',
+					'no_reff'       => $kode_delivery.$noso,
+					'debet'         => 0,
+					'kredit'        => $finishgood,
+					'jenis_jurnal'  => 'Intransit-Reject-FG',
+					'no_request'    => $nospk,
+					'stspos'        => 1
+				);
+
+				// Update warehouse_stock_fg (tambah qty karena produk kembali ke FG)
+				if (!empty($nm_material)){
+					if(!empty($kode_spool)){
+						$cekstokfg = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_spool ='".$kode_spool."' AND no_so ='".$noso."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'")->row();
+					} else {
+						$cekstokfg = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kode_trans_item."' AND no_so ='".$noso."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'")->row();
+					}
+
+					if(!empty($cekstokfg)){
+						if(!empty($kode_spool)){
+							$this->db->query("UPDATE warehouse_stock_fg SET qty = qty+".$qty." WHERE kode_spool ='".$kode_spool."' AND no_so ='".$noso."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+						} else {
+							$this->db->query("UPDATE warehouse_stock_fg SET qty = qty+".$qty." WHERE kode_trans ='".$kode_trans_item."' AND no_so ='".$noso."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+						}
+					} else {
+						// Insert baru jika belum ada record di warehouse_stock_fg
+						$datastokfg_new = array(
+							'tanggal'       => $tgl_voucher,
+							'keterangan'    => 'Intransit Reject to Finish Good',
+							'no_so'         => $noso,
+							'product'       => $nm_material,
+							'no_spk'        => $nospk,
+							'kode_trans'    => $kode_trans_item,
+							'qty'           => $qty,
+							'created_by'    => $username,
+							'created_date'  => $datetime,
+							'kode_spool'    => $kode_spool
+						);
+						$this->db->insert('warehouse_stock_fg', $datastokfg_new);
+					}
+
+					// Update warehouse_stock_intransit (kurangi qty karena produk keluar dari intransit)
+					if(!empty($kode_spool)){
+						$this->db->query("UPDATE warehouse_stock_intransit SET qty = qty-".$qty." WHERE kode_spool ='".$kode_spool."' AND no_so ='".$noso."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					} else {
+						$this->db->query("UPDATE warehouse_stock_intransit SET qty = qty-".$qty." WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans_item."' AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+					}
+				}
+			}
+		}
+
+		// Insert jurnal jika ada data
+		if(!empty($det_Jurnaltes)){
+			$this->db->query("DELETE FROM jurnaltras WHERE jenis_jurnal='Intransit-Reject-FG' AND no_reff LIKE '".$kode_delivery."%' AND tanggal ='".$tgl_voucher."'");
+			$this->db->insert_batch('jurnaltras', $det_Jurnaltes);
+
+			// Insert ke tabel accounting (javh + jurnal)
+			$Nomor_JV = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+			$Bln = substr($tgl_voucher, 5, 2);
+			$Thn = substr($tgl_voucher, 0, 4);
+			$Keterangan_INV = 'INTRANSIT - REJECT TO FINISH GOOD ('.$kode_delivery.')';
+
+			$dataJVhead = array(
+				'nomor'         => $Nomor_JV,
+				'tgl'           => $tgl_voucher,
+				'jml'           => $totalfg,
+				'koreksi_no'    => '-',
+				'kdcab'         => '101',
+				'jenis'         => 'JV',
+				'keterangan'    => $Keterangan_INV,
+				'bulan'         => $Bln,
+				'tahun'         => $Thn,
+				'user_id'       => $username,
+				'memo'          => 'reject intransit',
+				'tgl_jvkoreksi' => $tgl_voucher,
+				'ho_valid'      => ''
+			);
+			$this->db->insert(DBACC.'.javh', $dataJVhead);
+
+			foreach ($det_Jurnaltes as $vals) {
+				$datadetail = array(
+					'tipe'          => 'JV',
+					'nomor'         => $Nomor_JV,
+					'tanggal'       => $tgl_voucher,
+					'no_perkiraan'  => $vals['no_perkiraan'],
+					'keterangan'    => $Keterangan_INV,
+					'no_reff'       => $vals['no_reff'],
+					'debet'         => $vals['debet'],
+					'kredit'        => $vals['kredit'],
+					'created_on'    => date('Y-m-d H:i:s'),
+					'created_by'    => 'reject intransit',
+				);
+				$this->db->insert(DBACC.'.jurnal', $datadetail);
+			}
 		}
 	}
 
