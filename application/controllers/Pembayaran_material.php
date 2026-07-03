@@ -837,7 +837,7 @@ class Pembayaran_material extends CI_Controller {
 				// SELISIH KURS
 				if($rec->parameter_no=="9"){
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => round($selisih_kurs<0?($selisih_kurs1*-1):0), 'debet' => round($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'BUK', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $data->keterangan, 'no_request' => $data->no_po, 'kredit' => round($selisih_kurs<0?$selisih_kurs1:0), 'debet' => round($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,'no_reff' => $no_payment, 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$data->id_supplier, 'stspos' => '1'
 					);
 				}
 			}
