@@ -681,17 +681,19 @@ class Incoming extends CI_Controller {
 			$ArrJurnal		= array();
 			$SumMat = 0;
 
-			// Ambil kurs dari ms_kurs berdasarkan tanggal incoming (samakan dengan incoming material)
+			// Ambil kurs dari report_of_shipment (ROS) berdasarkan no_po (samakan dengan incoming material)
 			$kurs_incoming = 1;
 			if($cek_type == 'POX'){
-				$data_po_header = $this->db->query("SELECT * FROM tran_po_header WHERE no_po='".$no_po."' LIMIT 1")->row();
+				$data_ros_asset = $this->db->query("SELECT * FROM report_of_shipment WHERE no_po='".$no_po."' ORDER BY id DESC LIMIT 1")->row();
+				if(!empty($data_ros_asset->freight_curs)) $kurs_incoming = $data_ros_asset->freight_curs;
 			} else {
+				// Non-PO: fallback ke ms_kurs
 				$data_po_header = $this->db->query("SELECT * FROM tran_non_po_header WHERE no_non_po='".$no_po."' LIMIT 1")->row();
-			}
-			if(!empty($data_po_header->mata_uang) && $data_po_header->mata_uang != 'IDR'){
-				$sqlkurs_incoming = "SELECT * FROM ms_kurs WHERE tanggal <='".$tanggal."' AND mata_uang='".$data_po_header->mata_uang."' ORDER BY tanggal DESC LIMIT 1";
-				$dtkurs_incoming = $this->db->query($sqlkurs_incoming)->row();
-				if(!empty($dtkurs_incoming)) $kurs_incoming = $dtkurs_incoming->kurs;
+				if(!empty($data_po_header->mata_uang) && $data_po_header->mata_uang != 'IDR'){
+					$sqlkurs_incoming = "SELECT * FROM ms_kurs WHERE tanggal <='".$tanggal."' AND mata_uang='".$data_po_header->mata_uang."' ORDER BY tanggal DESC LIMIT 1";
+					$dtkurs_incoming = $this->db->query($sqlkurs_incoming)->row();
+					if(!empty($dtkurs_incoming)) $kurs_incoming = $dtkurs_incoming->kurs;
+				}
 			}
 
 			foreach($addInMat AS $val => $valx){
