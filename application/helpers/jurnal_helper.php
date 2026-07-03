@@ -2870,14 +2870,20 @@
 			}
 			$datajurnal	= $CI->Acc_model->GetTemplateJurnal($kodejurnal);
 
-			// Tentukan kurs berdasarkan mata uang PO
+			// Tentukan kurs berdasarkan mata uang PO - ambil dari warehouse_adjustment.kurs (samakan dengan incoming material)
 			$kurs_asset = 1;
 			if (!empty($data_po_asset->mata_uang) && $data_po_asset->mata_uang != 'IDR') {
-				$tgl_kurs_asset = date('Y-m-d');
-				foreach($val_asset AS $rec){ $tgl_kurs_asset = $rec->tanggal; break; }
-				$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_kurs_asset."' and mata_uang='".$data_po_asset->mata_uang."' order by tanggal desc limit 1";
-				$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
-				if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
+				$data_wa_asset = $CI->db->query("SELECT kurs FROM warehouse_adjustment WHERE kode_trans='".$id."' LIMIT 1")->row();
+				if (!empty($data_wa_asset) && !empty($data_wa_asset->kurs) && $data_wa_asset->kurs > 0) {
+					$kurs_asset = $data_wa_asset->kurs;
+				} else {
+					// Fallback ke ms_kurs jika warehouse_adjustment.kurs belum terisi
+					$tgl_kurs_asset = date('Y-m-d');
+					foreach($val_asset AS $rec){ $tgl_kurs_asset = $rec->tanggal; break; }
+					$sqlkurs_asset = "select * from ms_kurs where tanggal <='".$tgl_kurs_asset."' and mata_uang='".$data_po_asset->mata_uang."' order by tanggal desc limit 1";
+					$dtkurs_asset = $CI->db->query($sqlkurs_asset)->row();
+					if (!empty($dtkurs_asset)) $kurs_asset = $dtkurs_asset->kurs;
+				}
 			}
 
 			foreach($val_asset AS $rec){
@@ -2886,87 +2892,152 @@
 				$totalbayar += $rec->total_nilai * $kurs_asset;
 			}
 
-			// Cek DP (Down Payment) - hitung uang muka dan hutang
+			// Cek DP (Down Payment) - hitung uang muka dan hutang (samakan dengan incoming material)
 			$hutang_asset = $totalbayar;
 			$uangmuka_asset = 0;
+			$selisih_kurs_asset = 0;
 			if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
-				$nilai_dp_rupiah_asset = ($data_po_asset->mata_uang != 'IDR') ? ($kurs_asset * $data_po_asset->nilai_dp) : $data_po_asset->nilai_dp;
-
-				if ($nilai_dp_rupiah_asset <= $totalbayar) {
+				if ($data_po_asset->nilai_dp <= ($totalbayar / $kurs_asset)) {
 					// DP habis terpakai
-					$uangmuka_asset = $nilai_dp_rupiah_asset;
-					$hutang_asset = $totalbayar - $nilai_dp_rupiah_asset;
+					// Uang muka dicatat sebesar kurs saat bayar DP (nilai_dp_kurs)
+					$uangmuka_asset = (!empty($data_po_asset->nilai_dp_kurs)) ? $data_po_asset->nilai_dp_kurs : ($kurs_asset * $data_po_asset->nilai_dp);
+					$hutang_asset = $totalbayar - ($kurs_asset * $data_po_asset->nilai_dp);
+					// Selisih kurs = kurs saat bayar DP - kurs saat incoming × nilai DP USD
+					if (!empty($data_po_asset->nilai_dp_kurs) && $data_po_asset->mata_uang != 'IDR') {
+						$selisih_kurs_asset = ($data_po_asset->nilai_dp_kurs - ($kurs_asset * $data_po_asset->nilai_dp));
+					}
 					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 WHERE no_po='".$no_po."'");
 				} else {
 					// DP lebih besar, dikurangi sebesar total incoming
 					$uangmuka_asset = $totalbayar;
 					$hutang_asset = 0;
+					// Selisih kurs = (total_forex × kurs_saat_dp) - (kurs_incoming × total_forex)
+					if (!empty($data_po_asset->nilai_dp_kurs) && $data_po_asset->mata_uang != 'IDR') {
+						$total_forex_asset = $totalbayar / $kurs_asset;
+						$nilai_kurs_saat_dp = ($data_po_asset->nilai_dp_kurs / $data_po_asset->nilai_dp);
+						$selisih_kurs_asset = (($total_forex_asset * $nilai_kurs_saat_dp) - ($kurs_asset * $total_forex_asset));
+					}
 					$dp_sisa_asset = ($data_po_asset->mata_uang != 'IDR') ? ($data_po_asset->nilai_dp - ($totalbayar / $kurs_asset)) : ($data_po_asset->nilai_dp - $totalbayar);
 					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_asset.", sisa_dp=".$dp_sisa_asset." WHERE no_po='".$no_po."'");
 				}
 			}
 
-			// Build jurnal entries
-			foreach($datajurnal AS $record){
-				$nokir1 = $record->no_perkiraan;
-				$tabel  = $record->menu;
-				$posisi = $record->posisi;
-				$field  = $record->field;
-				$nokir  = $record->no_perkiraan;
-				$kd_bayar = $id;
-				$param  = 'id';
-				$value_param  = $id;
-				$jenisjurnal = 'incoming asset';
-				if ($posisi=='D'){
-					foreach($val_asset AS $rec){
-						$tgl_voucher = $rec->tanggal;
-						$no_po = $rec->no_ipp;
-						$nilaibayar = $rec->total_nilai * $kurs_asset;
-						$det_Jurnaltes[]  = array(
-						  'nomor'         => '',
-						  'tanggal'       => $tgl_voucher,
-						  'tipe'          => 'JV',
-						  'no_perkiraan'  => $rec->coa,
-						  'keterangan'    => $rec->nm_material.' '.$kd_bayar.', '.$no_po,
-						  'no_reff'       => $id,
-						  'debet'         => $nilaibayar,
-						  'kredit'        => 0,
-						  'jenis_jurnal'  => $jenisjurnal,
-						  'no_request'    => $id
-						 );
+			// Build jurnal entries berdasarkan parameter_no (samakan dengan incoming material JV032)
+			$jenisjurnal = 'incoming asset';
+			$det_Jurnaltes = [];
+			$total_bm_asset = 0;
+			foreach($datajurnal AS $rec){
+				// parameter_no 1: Debit Asset
+				if ($rec->parameter_no == "1") {
+					foreach($val_asset AS $val){
+						$tgl_voucher = $val->tanggal;
+						$no_po = $val->no_ipp;
+						$nilaibayar = $val->total_nilai * $kurs_asset;
+						$det_Jurnaltes[] = array(
+							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+							'no_perkiraan' => $val->coa,
+							'keterangan' => $val->nm_material.' '.$id.', '.$no_po,
+							'no_reff' => $id, 'debet' => $nilaibayar, 'kredit' => 0,
+							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+						);
 					}
-				} elseif ($posisi=='K'){
-					$unbill_coa=$nokir;
-					// Kredit unbill dikurangi uang muka
-					$det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
-					  'keterangan'    => $Keterangan_INV,
-					  'no_reff'       => $id,
-					  'debet'         => 0,
-					  'kredit'        => $hutang_asset,
-					  'jenis_jurnal'  => $jenisjurnal,
-					   'no_request'    => $id
-					 );
-					// Jurnal uang muka
-					if ($uangmuka_asset > 0) {
-						$coa_uangmuka_asset = '1111-01-01';
-						if (!empty($data_po_asset->mata_uang) && $data_po_asset->mata_uang != 'IDR') $coa_uangmuka_asset = '1111-01-02';
-						$det_Jurnaltes[]  = array(
-						  'nomor'         => '',
-						  'tanggal'       => $tgl_voucher,
-						  'tipe'          => 'JV',
-						  'no_perkiraan'  => $coa_uangmuka_asset,
-						  'keterangan'    => 'Uang muka '.$no_po.' - '.$Keterangan_INV,
-						  'no_reff'       => $id,
-						  'debet'         => 0,
-						  'kredit'        => $uangmuka_asset,
-						  'jenis_jurnal'  => $jenisjurnal,
-						   'no_request'    => $id
-						 );
+				}
+				// parameter_no 2: Kredit Uang Muka
+				if ($rec->parameter_no == "2") {
+					$coa_uangmuka_asset = $rec->no_perkiraan;
+					if ($kurs_asset > 1) $coa_uangmuka_asset = '1111-01-02';
+					if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
+						$det_Jurnaltes[] = array(
+							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+							'no_perkiraan' => $coa_uangmuka_asset,
+							'keterangan' => 'Uang muka '.$no_po,
+							'no_reff' => $id, 'debet' => 0, 'kredit' => $uangmuka_asset,
+							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+						);
+					} else {
+						$det_Jurnaltes[] = array(
+							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+							'no_perkiraan' => $coa_uangmuka_asset,
+							'keterangan' => 'Uang muka '.$no_po,
+							'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+						);
 					}
+				}
+				// parameter_no 3: Kredit Hutang Unbilled
+				if ($rec->parameter_no == "3") {
+					$coa_hutang_unbill = $rec->no_perkiraan;
+					if ($kurs_asset > 1) $coa_hutang_unbill = '2101-01-05';
+					$unbill_coa = $coa_hutang_unbill;
+					if ($hutang_asset > 0) {
+						$det_Jurnaltes[] = array(
+							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+							'no_perkiraan' => $coa_hutang_unbill,
+							'keterangan' => 'Hutang '.$no_po,
+							'no_reff' => $id, 'debet' => 0, 'kredit' => $hutang_asset,
+							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+						);
+					} else {
+						$det_Jurnaltes[] = array(
+							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+							'no_perkiraan' => $coa_hutang_unbill,
+							'keterangan' => 'Hutang '.$no_po,
+							'no_reff' => $id, 'debet' => 0, 'kredit' => $totalbayar,
+							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+						);
+					}
+				}
+				// parameter_no 4: Cash/Bank (kosong)
+				if ($rec->parameter_no == "4") {
+					$det_Jurnaltes[] = array(
+						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+						'no_perkiraan' => $rec->no_perkiraan,
+						'keterangan' => 'Cash/Bank '.$no_po,
+						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+					);
+				}
+				// parameter_no 5: Hutang Bea Masuk
+				if ($rec->parameter_no == "5") {
+					$det_Jurnaltes[] = array(
+						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+						'no_perkiraan' => $rec->no_perkiraan,
+						'keterangan' => 'Hutang Bea masuk '.$no_po,
+						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+					);
+				}
+				// parameter_no 6: PPN dibayar dimuka
+				if ($rec->parameter_no == "6") {
+					$det_Jurnaltes[] = array(
+						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+						'no_perkiraan' => $rec->no_perkiraan,
+						'keterangan' => 'PPN dibayar dimuka '.$no_po,
+						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+					);
+				}
+				// parameter_no 7: Selisih Kurs
+				if ($rec->parameter_no == "7") {
+					$det_Jurnaltes[] = array(
+						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+						'no_perkiraan' => $rec->no_perkiraan,
+						'keterangan' => 'Selisih kurs '.$no_po,
+						'no_reff' => $id,
+						'debet' => ($selisih_kurs_asset >= 0 ? $selisih_kurs_asset : 0),
+						'kredit' => ($selisih_kurs_asset < 0 ? ($selisih_kurs_asset * -1) : 0),
+						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+					);
+				}
+				// parameter_no 8: BM (Bea Masuk)
+				if ($rec->parameter_no == "8") {
+					$det_Jurnaltes[] = array(
+						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
+						'no_perkiraan' => $rec->no_perkiraan,
+						'keterangan' => 'BM '.$no_po,
+						'no_reff' => $id, 'debet' => 0, 'kredit' => $total_bm_asset,
+						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
+					);
 				}
 			}
 
@@ -2991,10 +3062,8 @@
 					);
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
-			$data_po=$CI->db->query("select * from tran_po_header where no_po='".$no_po."' limit 1" )->row();
-			if(!empty($data_po->mata_uang) && $data_po->mata_uang!='IDR') $unbill_coa='2101-01-05';
 
-			// Insert hutang (setelah dikurangi DP)
+			// Insert hutang ke kartu hutang (setelah dikurangi DP)
 			if ($hutang_asset > 0) {
 				$datahutang = array(
 					'tipe'       	 => 'JV',
@@ -3005,8 +3074,8 @@
 					'no_reff'     	 => $no_po,
 					'kredit'      	 => $hutang_asset,
 					'debet'          => 0,
-					'id_supplier'    => $data_po->id_supplier,
-					'nama_supplier'  => $data_po->nm_supplier,
+					'id_supplier'    => $data_po_asset->id_supplier,
+					'nama_supplier'  => $data_po_asset->nm_supplier,
 					'no_request'     => $id,
 				);
 				$CI->db->insert('tr_kartu_hutang',$datahutang);

@@ -680,6 +680,20 @@ class Incoming extends CI_Controller {
 			$ArrDeatilChk	= array();
 			$ArrJurnal		= array();
 			$SumMat = 0;
+
+			// Ambil kurs dari ms_kurs berdasarkan tanggal incoming (samakan dengan incoming material)
+			$kurs_incoming = 1;
+			if($cek_type == 'POX'){
+				$data_po_header = $this->db->query("SELECT * FROM tran_po_header WHERE no_po='".$no_po."' LIMIT 1")->row();
+			} else {
+				$data_po_header = $this->db->query("SELECT * FROM tran_non_po_header WHERE no_non_po='".$no_po."' LIMIT 1")->row();
+			}
+			if(!empty($data_po_header->mata_uang) && $data_po_header->mata_uang != 'IDR'){
+				$sqlkurs_incoming = "SELECT * FROM ms_kurs WHERE tanggal <='".$tanggal."' AND mata_uang='".$data_po_header->mata_uang."' ORDER BY tanggal DESC LIMIT 1";
+				$dtkurs_incoming = $this->db->query($sqlkurs_incoming)->row();
+				if(!empty($dtkurs_incoming)) $kurs_incoming = $dtkurs_incoming->kurs;
+			}
+
 			foreach($addInMat AS $val => $valx){
 				$qtyOrder 	= str_replace(',','',$valx['qty_rev']);
 				$qtyIN 		= str_replace(',','',$valx['qty_in']);
@@ -777,6 +791,7 @@ class Incoming extends CI_Controller {
 				'doc' 				=> $file_name,
 				'checked_by' 		=> $UserName,
 				'checked_date' 		=> $dateTime,
+				'kurs' 				=> $kurs_incoming,
 				'total_harga_product' => $totalprice
 			);
 
