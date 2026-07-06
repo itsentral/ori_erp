@@ -681,8 +681,6 @@ class Request_aksesoris_gudang extends CI_Controller {
 		$username		= $data_session['ORI_User']['username'];
 		$datetime		= date('Y-m-d H:i:s');
 
-		$GET_COSTBOOK = getPriceBookByDate(date('Y-m-d'));
-		$GET_MATERIALS = get_detail_consumable();
 		$GET_NO_SO = get_detail_ipp();
 		$nomor_so = (!empty($GET_NO_SO[$no_ipp]['so_number']))?$GET_NO_SO[$no_ipp]['so_number']:$no_ipp;
 
@@ -690,7 +688,9 @@ class Request_aksesoris_gudang extends CI_Controller {
 		foreach ($grouping_temp as $key => $value) {
 			$qty = $value['qty'];
 			if($qty > 0){
-				$costbook = (!empty($GET_COSTBOOK[$key]))?$GET_COSTBOOK[$key]:0;
+				// Ambil harga dari price_book berdasarkan code_group (sama seperti insert_jurnal_stock)
+				$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
+				$costbook = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 				$TotalPriceBook += $costbook * $qty;
 			}
 		}
@@ -732,7 +732,6 @@ class Request_aksesoris_gudang extends CI_Controller {
 		$username		= $data_session['ORI_User']['username'];
 		$datetime		= date('Y-m-d H:i:s');
 
-		$GET_COSTBOOK = getPriceBookByDate(date('Y-m-d'));
 		$GET_MATERIALS = get_detail_consumable();
 
 		$getHeader = $this->db->get_where('request_accessories',array('kode'=>$kode))->result_array();
@@ -748,7 +747,9 @@ class Request_aksesoris_gudang extends CI_Controller {
 			$qty = $value['qty'];
 			if($qty > 0){
 				$nm_material = (!empty($GET_MATERIALS[$key]['nm_barang']))?$GET_MATERIALS[$key]['nm_barang']:'';
-				$costbook = (!empty($GET_COSTBOOK[$key]))?$GET_COSTBOOK[$key]:0;
+				// Ambil harga dari price_book berdasarkan code_group (sama seperti insert_jurnal_stock)
+				$get_price_book = $this->db->order_by('id','desc')->get_where('price_book',array('id_material'=>$key))->result();
+				$costbook = (!empty($get_price_book[0]->price_book))?$get_price_book[0]->price_book:0;
 
 				// data_erp_fg OUT
 				$ArrFgOut[$key]['tanggal'] 		= date('Y-m-d');
