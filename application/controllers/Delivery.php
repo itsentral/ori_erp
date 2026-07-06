@@ -278,6 +278,21 @@ class Delivery extends CI_Controller
 		$dateTime		= date('Y-m-d H:i:s');
 		$username 		= $this->session->userdata['ORI_User']['username'];
 
+		// Validasi duplikat Nomor Surat Jalan
+		if (!empty($post['nomor_sj'])) {
+			$cek_duplikat = $this->db->where('nomor_sj', $post['nomor_sj'])
+				->where('kode_delivery !=', $kode_delivery)
+				->get('delivery_product')
+				->result();
+			if (!empty($cek_duplikat)) {
+				echo json_encode([
+					'pesan' => 'Nomor Surat Jalan "' . $post['nomor_sj'] . '" sudah digunakan oleh delivery ' . $cek_duplikat[0]->kode_delivery,
+					'status' => 2
+				]);
+				return;
+			}
+		}
+
 		$ArrUpdate = [
 			'kode_delivery' => $kode_delivery,
 			'nomor_sj' => $post['nomor_sj'],
@@ -597,6 +612,21 @@ class Delivery extends CI_Controller
 		$dateTime		= date('Y-m-d H:i:s');
 		$username 		= $this->session->userdata['ORI_User']['username'];
 		$rev 			= get_name('delivery_product', 'rev', 'kode_delivery', $kode_delivery);
+
+		// Validasi duplikat Nomor Surat Jalan
+		if (!empty($post['nomor_sj'])) {
+			$cek_duplikat = $this->db->where('nomor_sj', $post['nomor_sj'])
+				->where('kode_delivery !=', $kode_delivery)
+				->get('delivery_product')
+				->result();
+			if (!empty($cek_duplikat)) {
+				echo json_encode([
+					'pesan' => 'Nomor Surat Jalan "' . $post['nomor_sj'] . '" sudah digunakan oleh delivery ' . $cek_duplikat[0]->kode_delivery,
+					'status' => 2
+				]);
+				return;
+			}
+		}
 
 		$ArrUpdate = [
 			'nomor_sj' 			=> $post['nomor_sj'],
@@ -1930,6 +1960,21 @@ class Delivery extends CI_Controller
 		$project 		= $data['project'];
 		$edit_desc 		= (!empty($data['edit_desc'])) ? $data['edit_desc'] : array();
 		$edit_desc_mat 	= (!empty($data['edit_desc_mat'])) ? $data['edit_desc_mat'] : array();
+
+		// Validasi duplikat Nomor Surat Jalan
+		if (!empty($nomor_sj)) {
+			$cek_duplikat = $this->db->where('nomor_sj', $nomor_sj)
+				->where('kode_delivery !=', $kode_delivery)
+				->get('delivery_product')
+				->result();
+			if (!empty($cek_duplikat)) {
+				echo json_encode([
+					'pesan' => 'Nomor Surat Jalan "' . $nomor_sj . '" sudah digunakan oleh delivery ' . $cek_duplikat[0]->kode_delivery,
+					'status' => 2
+				]);
+				return;
+			}
+		}
 
 		$ArrUpdate = [
 			'delivery_date' => $delivery_date,
