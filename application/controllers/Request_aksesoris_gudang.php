@@ -351,6 +351,10 @@ class Request_aksesoris_gudang extends CI_Controller {
 				if(!empty($grouping_temp)){
 					move_warehouse_barang_stok($grouping_temp, $gudang_before, $gudang_after, $kode_trans);
 					insertDataGroupReport_GudangStok($grouping_temp, $gudang_before, $gudang_after, $kode_trans,$no_ipp,$kode,null);
+
+					// Insert warehouse_stock_fg & jurnal untuk aksesoris to FG
+					$this->insert_warehouse_stock_fg($grouping_temp, $kode_trans, $no_ipp, $kode);
+					insert_jurnal_stock($grouping_temp, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang indirect', 'penambahan gudang finish good aksesoris');
 				}
 				history('Outgoing aksesoris '.$kode);
 			}
@@ -629,6 +633,10 @@ class Request_aksesoris_gudang extends CI_Controller {
 			);
 			if(!empty($grouping_temp)){
 				move_warehouse_barang_stok($grouping_temp, $gudang_before, $gudang_after, $kode_trans);
+
+				// Insert data_erp_fg, data_erp_intransit, warehouse_stock_fg & jurnal untuk aksesoris delivery ke subgudang/customer
+				$this->insert_erp_intransit_aksesoris($grouping_temp, $kode_trans, $no_surat_jalan, $kode, $gudang_before, $gudang_after);
+				insert_jurnal_stock($grouping_temp, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang project', 'penambahan gudang subgudang project aksesoris');
 			}
 			history('Outgoing aksesoris '.$kode);
 		}
@@ -653,6 +661,154 @@ class Request_aksesoris_gudang extends CI_Controller {
 
 		history('Print outgoing aksesories '.$kode_trans);
 		$this->load->view('Print/print_outgoing_accessories_new', $data);
+	}
+
+	/**
+	 * Insert warehouse_stock_fg saat release to finish good aksesoris
+	 */
+	private function insert_warehouse_stock_fg($grouping_temp, $kode_trans, $no_ipp, $kode){
+		$data_session	= $this->session->userdata;
+		$username		= $data_session['ORI_User']['username'];
+		$datetime		= date('Y-m-d H:i:s');
+
+		$GET_COSTBOOK = getPriceBookByDate(date('Y-m-d'));
+		$GET_MATERIALS = get_detail_consumable();
+		$GET_NO_SO = get_detail_ipp();
+		$nomor_so = (!empty($GET_NO_SO[$no_ipp]['so_number']))?$GET_NO_SO[$no_ipp]['so_number']:$no_ipp;
+
+		$TotalPriceBook = 0;
+		foreach ($grouping_temp as $key => $value) {
+			$qty = $value['qty'];
+			if($qty > 0){
+				$costbook = (!empty($GET_COSTBOOK[$key]))?$GET_COSTBOOK[$key]:0;
+				$TotalPriceBook += $costbook * $qty;
+			}
+		}
+
+		// Insert warehouse_stock_fg sebagai 1 record product 'aksesoris fg'
+		$datastokfg = array(
+			'tanggal'       => date('Y-m-d'),
+			'keterangan'    => 'Aksesoris to Finish Good',
+			'no_so'         => $nomor_so,
+			'product'       => 'aksesoris fg',
+			'no_spk'        => $kode,
+			'kode_trans'    => $kode_trans,
+			'id_pro_det'    => '',
+			'qty'           => 1,
+			'nilai_wip'     => $TotalPriceBook,
+			'material'      => '',
+			'wip_direct'    => '',
+			'wip_indirect'  => '',
+			'wip_consumable'=> '',
+			'wip_foh'       => '',
+			'created_by'    => $username,
+			'created_date'  => $datetime,
+			'id_trans'      => '',
+		);
+
+		$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE kode_trans ='".$kode_trans."' AND no_so ='".$nomor_so."' AND no_spk ='".$kode."' AND product ='aksesoris fg'")->row();
+		if(!empty($cekstok)){
+			$this->db->query("UPDATE warehouse_stock_fg SET qty = qty+1 WHERE kode_trans ='".$kode_trans."' AND no_so ='".$nomor_so."' AND no_spk ='".$kode."' AND product ='aksesoris fg'");
+		} else {
+			$this->db->insert('warehouse_stock_fg', $datastokfg);
+		}
+	}
+
+	/**
+	 * Insert data_erp_fg (out), data_erp_intransit (in) & data_erp_incustomer saat outgoing ke subgudang/customer
+	 */
+	private function insert_erp_intransit_aksesoris($grouping_temp, $kode_trans, $no_surat_jalan, $kode, $gudang_dari, $gudang_ke){
+		$data_session	= $this->session->userdata;
+		$username		= $data_session['ORI_User']['username'];
+		$datetime		= date('Y-m-d H:i:s');
+
+		$GET_COSTBOOK = getPriceBookByDate(date('Y-m-d'));
+		$GET_MATERIALS = get_detail_consumable();
+
+		$getHeader = $this->db->get_where('request_accessories',array('kode'=>$kode))->result_array();
+		$no_ipp = (!empty($getHeader[0]['no_ipp']))?$getHeader[0]['no_ipp']:null;
+		$GET_NO_SO = get_detail_ipp();
+		$nomor_so = (!empty($GET_NO_SO[$no_ipp]['so_number']))?$GET_NO_SO[$no_ipp]['so_number']:$no_ipp;
+
+		$ArrFgOut = [];
+		$ArrIntransitIn = [];
+		$ArrInCustomer = [];
+
+		foreach ($grouping_temp as $key => $value) {
+			$qty = $value['qty'];
+			if($qty > 0){
+				$nm_material = (!empty($GET_MATERIALS[$key]['nm_barang']))?$GET_MATERIALS[$key]['nm_barang']:'';
+				$costbook = (!empty($GET_COSTBOOK[$key]))?$GET_COSTBOOK[$key]:0;
+
+				// data_erp_fg OUT
+				$ArrFgOut[$key]['tanggal'] 		= date('Y-m-d');
+				$ArrFgOut[$key]['keterangan'] 	= 'Aksesoris FG to In Transit';
+				$ArrFgOut[$key]['no_so'] 		= $nomor_so;
+				$ArrFgOut[$key]['product'] 		= 'aksesoris fg';
+				$ArrFgOut[$key]['no_spk'] 		= $kode;
+				$ArrFgOut[$key]['kode_trans'] 	= $kode_trans;
+				$ArrFgOut[$key]['id_material'] 	= $key;
+				$ArrFgOut[$key]['nm_material'] 	= $nm_material;
+				$ArrFgOut[$key]['qty_mat'] 		= $qty;
+				$ArrFgOut[$key]['cost_book'] 	= $costbook;
+				$ArrFgOut[$key]['nilai_unit'] 	= $costbook;
+				$ArrFgOut[$key]['nilai_wip'] 	= $costbook * $qty;
+				$ArrFgOut[$key]['created_by'] 	= $username;
+				$ArrFgOut[$key]['created_date'] 	= $datetime;
+				$ArrFgOut[$key]['gudang'] 		= $gudang_dari;
+				$ArrFgOut[$key]['jenis'] 		= 'out';
+				$ArrFgOut[$key]['kode_delivery'] = $no_surat_jalan;
+
+				// data_erp_in_transit IN
+				$ArrIntransitIn[$key]['tanggal'] 		= date('Y-m-d');
+				$ArrIntransitIn[$key]['keterangan'] 		= 'Aksesoris FG to In Transit';
+				$ArrIntransitIn[$key]['no_so'] 			= $nomor_so;
+				$ArrIntransitIn[$key]['product'] 		= 'aksesoris fg';
+				$ArrIntransitIn[$key]['no_spk'] 		= $kode;
+				$ArrIntransitIn[$key]['kode_trans'] 		= $kode_trans;
+				$ArrIntransitIn[$key]['id_material'] 	= $key;
+				$ArrIntransitIn[$key]['nm_material'] 	= $nm_material;
+				$ArrIntransitIn[$key]['qty_mat'] 		= $qty;
+				$ArrIntransitIn[$key]['cost_book'] 		= $costbook;
+				$ArrIntransitIn[$key]['nilai_unit'] 		= $costbook;
+				$ArrIntransitIn[$key]['created_by'] 		= $username;
+				$ArrIntransitIn[$key]['created_date'] 	= $datetime;
+				$ArrIntransitIn[$key]['gudang'] 		= $gudang_ke;
+				$ArrIntransitIn[$key]['kode_delivery'] 	= $no_surat_jalan;
+
+				// data_erp_in_customer
+				$ArrInCustomer[$key]['tanggal'] 		= date('Y-m-d');
+				$ArrInCustomer[$key]['keterangan'] 		= 'Aksesoris In Transit to Customer';
+				$ArrInCustomer[$key]['no_so'] 			= $nomor_so;
+				$ArrInCustomer[$key]['product'] 		= 'aksesoris fg';
+				$ArrInCustomer[$key]['no_spk'] 		= $kode;
+				$ArrInCustomer[$key]['kode_trans'] 		= $kode_trans;
+				$ArrInCustomer[$key]['id_material'] 	= $key;
+				$ArrInCustomer[$key]['nm_material'] 	= $nm_material;
+				$ArrInCustomer[$key]['qty_mat'] 		= $qty;
+				$ArrInCustomer[$key]['cost_book'] 		= $costbook;
+				$ArrInCustomer[$key]['nilai_unit'] 		= $costbook;
+				$ArrInCustomer[$key]['created_by'] 		= $username;
+				$ArrInCustomer[$key]['created_date'] 	= $datetime;
+				$ArrInCustomer[$key]['kode_delivery'] 	= $no_surat_jalan;
+			}
+		}
+
+		// Update warehouse_stock_fg (kurangi qty karena keluar dari FG)
+		$cekstok = $this->db->query("SELECT * FROM warehouse_stock_fg WHERE no_so ='".$nomor_so."' AND no_spk ='".$kode."' AND product ='aksesoris fg'")->row();
+		if(!empty($cekstok)){
+			$this->db->query("UPDATE warehouse_stock_fg SET qty = qty-1 WHERE no_so ='".$nomor_so."' AND no_spk ='".$kode."' AND product ='aksesoris fg'");
+		}
+
+		if(!empty($ArrFgOut)){
+			$this->db->insert_batch('data_erp_fg', $ArrFgOut);
+		}
+		if(!empty($ArrIntransitIn)){
+			$this->db->insert_batch('data_erp_in_transit', $ArrIntransitIn);
+		}
+		if(!empty($ArrInCustomer)){
+			$this->db->insert_batch('data_erp_in_customer', $ArrInCustomer);
+		}
 	}
 
 
