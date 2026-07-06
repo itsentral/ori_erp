@@ -2038,6 +2038,7 @@ class Outgoing extends CI_Controller {
 						}
 						    //=======NEW=============
 							$ArrFinishGoodProduct = [];
+							$datastokfg = [];
 							if($field_joint == 'yes'){
 								$qty = str_replace(',','',$data['qty_kit']);
 								$ArrFinishGoodProduct = array(
@@ -2064,6 +2065,43 @@ class Outgoing extends CI_Controller {
 									'id_pro_det' =>'',
 									'qty' => str_replace(',','',$data['qty_kit']),
 									'nilai_wip' => $TotalPriceBook/$qty,
+									'material' =>'',
+									'wip_direct' =>'',
+									'wip_indirect' => '',
+									'wip_consumable' => '',
+									'wip_foh' => '',
+									'created_by' => $data_session['ORI_User']['username'],
+									'created_date' => $dateTime,
+									'id_trans' =>'',
+								);
+							}
+
+							// === Material to Finish Good (perlakuan seperti field joint, qty=1, product='material fg') ===
+							if($field_joint != 'yes' && !empty($ArrFinishGood)){
+								$ArrFinishGoodProduct = array(
+									'tanggal' 			=> date('Y-m-d'),
+									'keterangan' 		=> 'Material to Finish Good',
+									'no_so' 			=> $no_ipp,
+									'product' 			=> 'material fg',
+									'no_spk' 			=> $no_spk,
+									'kode_trans' 		=> $kode_trans,
+									'nilai_wip' 		=> $TotalPriceBook,
+									'nilai_unit' 		=> $TotalPriceBook,
+									'qty' 				=> 1,
+									'created_by' 		=> $data_session['ORI_User']['username'],
+									'created_date' 		=> $dateTime
+								);
+
+								$datastokfg = array(
+									'tanggal' => date('Y-m-d'),
+									'keterangan' => 'Material to Finish Good',
+									'no_so' => $no_ipp,
+									'product' => 'material fg',
+									'no_spk' => $no_spk,
+									'kode_trans' => $kode_trans,
+									'id_pro_det' =>'',
+									'qty' => 1,
+									'nilai_wip' => $TotalPriceBook,
 									'material' =>'',
 									'wip_direct' =>'',
 									'wip_indirect' => '',
