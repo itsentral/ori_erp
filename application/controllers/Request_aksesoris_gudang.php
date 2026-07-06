@@ -354,7 +354,12 @@ class Request_aksesoris_gudang extends CI_Controller {
 
 					// Insert warehouse_stock_fg & jurnal untuk aksesoris to FG
 					$this->insert_warehouse_stock_fg($grouping_temp, $kode_trans, $no_ipp, $kode);
-					insert_jurnal_stock($grouping_temp, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang indirect', 'penambahan gudang finish good aksesoris');
+					// Format ulang array agar sesuai dengan parameter insert_jurnal_stock (key: qty_good)
+					$grouping_jurnal = [];
+					foreach($grouping_temp as $k => $v){
+						$grouping_jurnal[$k]['qty_good'] = $v['qty'];
+					}
+					insert_jurnal_stock($grouping_jurnal, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang indirect', 'penambahan gudang finish good aksesoris');
 				}
 				history('Outgoing aksesoris '.$kode);
 			}
@@ -636,7 +641,12 @@ class Request_aksesoris_gudang extends CI_Controller {
 
 				// Insert data_erp_fg, data_erp_intransit, warehouse_stock_fg & jurnal untuk aksesoris delivery ke subgudang/customer
 				$this->insert_erp_intransit_aksesoris($grouping_temp, $kode_trans, $no_surat_jalan, $kode, $gudang_before, $gudang_after);
-				insert_jurnal_stock($grouping_temp, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang project', 'penambahan gudang subgudang project aksesoris');
+				// Format ulang array agar sesuai dengan parameter insert_jurnal_stock (key: qty_good)
+				$grouping_jurnal = [];
+				foreach($grouping_temp as $k => $v){
+					$grouping_jurnal[$k]['qty_good'] = $v['qty'];
+				}
+				insert_jurnal_stock($grouping_jurnal, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang project', 'penambahan gudang subgudang project aksesoris');
 			}
 			history('Outgoing aksesoris '.$kode);
 		}
