@@ -214,12 +214,13 @@
 	</div>
 	<div class='form-group row'>
 		<label class='label-control col-sm-1'></label>
-		<div class='col-sm-11'><div id='alert-max' style="font-size: 17px;font-weight: bold;color: red;padding-bottom: 10px;">PROGRESS MELEBIHI 100% !!</div>
+		<div class='col-sm-11'><div id='alert-max' style="font-size: 17px;font-weight: bold;color: red;padding-bottom: 10px;">TOTAL DPP MELEBIHI NILAI PO !!</div>
 			<?php
 				echo form_button(array('type'=>'button','class'=>'btn btn-md btn-primary','value'=>'save','content'=>'Save','id'=>'save_term'));
 			?>
 		</div>
 	</div>
+	<input type='hidden' id='po_total_value' value='<?=$data[0]->net_price;?>'>
 </div>
 <style>
 	.datepicker{
@@ -300,20 +301,7 @@
 		var a		= det_id[1];
 		term_value(a);
 		
-		var progress = 0;
-		$(".progress_term" ).each(function() {
-			progress 	+= getNum($(this).val().split(",").join(""));
-		});
-		
-		if(progress > 100.0001){
-			$('#save_term').hide();
-			alert(progress);
-			$('#alert-max').show();
-		}
-		else{
-			$('#save_term').show();
-			$('#alert-max').hide();
-		}
+		check_dpp_limit();
 	});
 	
 	$(document).on('keyup', '.progress_term', function(){
@@ -322,19 +310,7 @@
 		var a		= det_id[1];
 		term_process(a);
 		
-		var progress = 0;
-		$(".progress_term" ).each(function() {
-			progress 	+= getNum($(this).val().split(",").join(""));
-		});
-		
-		if(progress > 100){
-			$('#edit_po').hide();
-			$('#alert-max').show();
-		}
-		else{
-			$('#edit_po').show();
-			$('#alert-max').hide();
-		}
+		check_dpp_limit();
 	});
 	
 	$(document).on('click', '.addPart', function(){
@@ -380,19 +356,7 @@
 		var get_id 		= $(this).parent().parent().attr('class');
 		$("."+get_id).remove();
 		
-		var progress = 0;
-		$(".progress_term" ).each(function() {
-			progress 	+= getNum($(this).val().split(",").join(""));
-		});
-		
-		if(progress > 100){
-			$('#edit_po').hide();
-			$('#alert-max').show();
-		}
-		else{
-			$('#edit_po').show();
-			$('#alert-max').hide();
-		}
+		check_dpp_limit();
 	});
 	
 	function sum_total(a){
@@ -502,6 +466,25 @@
 		});
 	}
 	
+	function check_dpp_limit(){
+		var po_total = getNum($('#po_total_value').val());
+		var total_dpp = 0;
+		$(".sum_tot_idr" ).each(function() {
+			total_dpp += getNum($(this).val().split(",").join(""));
+		});
+		
+		if(total_dpp > po_total){
+			$('#save_term').hide();
+			$('#edit_po').hide();
+			$('#alert-max').show();
+		}
+		else{
+			$('#save_term').show();
+			$('#edit_po').show();
+			$('#alert-max').hide();
+		}
+	}
+
 	function getNum(val) {
 	   if (isNaN(val) || val == '') {
 		 return 0;
