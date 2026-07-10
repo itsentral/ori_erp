@@ -20,7 +20,6 @@ class Tracking_so_model extends CI_Model {
 				a.id_milik,
 				a.no_spk,
 				a.id_category AS product,
-				a.spesifikasi,
 				a.qty AS qty_so,
 				b.no_po,
 				c.so_number
@@ -145,12 +144,15 @@ class Tracking_so_model extends CI_Model {
 				$inv_o = $cust_r - $inv_qty; // Items not yet invoiced
 				if($inv_o < 0) $inv_o = 0;
 
+				// Get spesifikasi using helper function spec_bq3
+				$spesifikasi = spec_bq3($detail['id']);
+
 				$result[] = array(
 					'no_po'			=> $no_po,
 					'so_number'		=> (!empty($detail['so_number'])) ? $detail['so_number'] : '-',
 					'no_spk'		=> (!empty($detail['no_spk'])) ? $detail['no_spk'] : '-',
 					'product'		=> strtoupper($detail['product']),
-					'spesifikasi'	=> (!empty($detail['spesifikasi'])) ? $detail['spesifikasi'] : '-',
+					'spesifikasi'	=> (!empty($spesifikasi)) ? $spesifikasi : '-',
 					'qty_so'		=> $qty_so,
 					'spk_r'			=> $spk_r,
 					'spk_o'			=> $spk_o,
