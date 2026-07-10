@@ -153,9 +153,9 @@ $this->load->view('include/side_menu');
 								$ID_UNIQ 	= $valx['id_milik'];
 							}
 
-							$DESC = (!empty($GET_DESC)) ? $GET_DESC : $valx['desc'];
+							$DESC = (!empty($valx['desc'])) ? $valx['desc'] : ((!empty($GET_DESC)) ? $GET_DESC : '');
 							$WARNING_DESC = '';
-							if (empty($GET_DESC) && empty($valx['sts_product']) && $valx['sts'] != 'loose_dead' && empty($valx['type_product'])) {
+							if (empty($GET_DESC) && empty($valx['desc']) && empty($valx['sts_product']) && $valx['sts'] != 'loose_dead' && empty($valx['type_product'])) {
 								$WARNING_DESC = "<br><span style='color:red;font-size:11px;'><i class='fa fa-exclamation-triangle'></i> Data billing SO belum tersedia</span>";
 							}
 							echo "<tr>";
