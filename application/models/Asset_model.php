@@ -88,7 +88,7 @@ class Asset_model extends CI_Model{
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['cost_center']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['depresiasi']." Year</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_asset'])."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['user_asset']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nama_user']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['lokasi']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['status_asset']))."</div>";
 
@@ -148,7 +148,7 @@ class Asset_model extends CI_Model{
 					d.coa AS no_perkiraan,
 					d.keterangan AS ket_coa,
 					a.code_ori,
-					a.user_asset,
+					a.nama_user,
 					a.lokasi,
 					a.status_asset
 				FROM
@@ -201,7 +201,7 @@ class Asset_model extends CI_Model{
 			6 => 'cost_center',
 			7 => 'depresiasi',
 			8 => 'nilai_asset',
-			9 => 'a.user_asset',
+			9 => 'a.nama_user',
 			10 => 'a.lokasi',
 			11 => 'a.status_asset'
 

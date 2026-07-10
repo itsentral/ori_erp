@@ -19,7 +19,7 @@ $tgl_perolehan  = (!empty($data))?$data[0]['tgl_perolehan']:'';
 $nama_user  	= (!empty($data))?$data[0]['nama_user']:'';
 $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 $code_ori  		= (!empty($data))?$data[0]['code_ori']:'';
-$user_asset  	= (!empty($data))?$data[0]['user_asset']:'';
+$user_asset  	= (!empty($data))?$data[0]['nama_user']:'';
 $lokasi  		= (!empty($data))?$data[0]['lokasi']:'';
 $status_asset  	= (!empty($data))?$data[0]['status_asset']:'';
 
@@ -70,7 +70,7 @@ $status_asset  	= (!empty($data))?$data[0]['status_asset']:'';
 				<label class='label-control col-sm-2'><b>User</b></label>
 				<div class='col-sm-4'>
 					<?php
-						echo form_input(array('id'=>'user_asset','name'=>'user_asset','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'User'), $user_asset);
+						echo form_input(array('id'=>'user_asset','name'=>'nama_user','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'User'), $user_asset);
 					?>
 				</div>
 			</div>
@@ -240,14 +240,6 @@ $status_asset  	= (!empty($data))?$data[0]['status_asset']:'';
                     <?php
                         echo form_input(array('id'=>'tanggal_oleh','name'=>'tanggal_oleh','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Date of Acquisition', 'readonly'=>'readonly'),$tgl_perolehan);
                     ?>
-                </div>
-			</div>
-			<div class='form-group row'>		 	 
-				<label class='label-control col-sm-2'><b>Nama User</b></label>
-                <div class='col-sm-4'>
-					<?php
-					echo form_input(array('id'=>'nama_user','name'=>'nama_user','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Nama User',$disabled=>$disabled),$nama_user);											
-				?>	
                 </div>
 			</div>
             <div class='box-footer'>
