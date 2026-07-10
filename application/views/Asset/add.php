@@ -18,6 +18,10 @@ $tgl_depresiasi  = (!empty($data))?$data[0]['tgl_depresiasi']:'';
 $tgl_perolehan  = (!empty($data))?$data[0]['tgl_perolehan']:'';
 $nama_user  	= (!empty($data))?$data[0]['nama_user']:'';
 $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
+$code_ori  		= (!empty($data))?$data[0]['code_ori']:'';
+$user_asset  	= (!empty($data))?$data[0]['user_asset']:'';
+$lokasi  		= (!empty($data))?$data[0]['lokasi']:'';
+$status_asset  	= (!empty($data))?$data[0]['status_asset']:'';
 
 // echo $_SERVER['DOCUMENT_ROOT'];
 ?>
@@ -43,6 +47,12 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 						?>
 					</select>	
 				</div>
+				<label class='label-control col-sm-2'><b>Code ORI</b></label>
+				<div class='col-sm-4'>
+					<?php
+						echo form_input(array('id'=>'code_ori','name'=>'code_ori','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Code ORI'), $code_ori);
+					?>
+				</div>
 			</div>
 			<div class='form-group row'>
 				<label class='label-control col-sm-2'><b>Tax Category <span class='text-red'>*</span></b></label>
@@ -56,6 +66,12 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 							}
 						?>
 					</select>	
+				</div>
+				<label class='label-control col-sm-2'><b>User</b></label>
+				<div class='col-sm-4'>
+					<?php
+						echo form_input(array('id'=>'user_asset','name'=>'user_asset','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'User'), $user_asset);
+					?>
 				</div>
 			</div>
             <div class='form-group row'>
@@ -71,6 +87,19 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
                         ?>
                     </select>
                 </div>
+				<label class='label-control col-sm-2'><b>Lokasi</b></label>
+				<div class='col-sm-4'>
+					<select name='lokasi' id='lokasi' class='form-control input-md chosen-select'>
+						<option value=''>Select Lokasi</option>
+						<?php
+							$arr_lokasi = array('OPC 1','OPC 2','OPC 3','Office');
+							foreach($arr_lokasi as $lok){
+								$sel_lok = (!empty($lokasi) && $lokasi == $lok)?'selected':'';
+								echo "<option value='".$lok."' ".$sel_lok.">".$lok."</option>";
+							}
+						?>
+					</select>
+				</div>
             </div>
 			<div class='form-group row'>
                 <label class='label-control col-sm-2'><b>Asset Name <span class='text-red'>*</span></b></label>
@@ -79,7 +108,22 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
                             echo form_input(array('id'=>'nm_asset','name'=>'nm_asset','class'=>'form-control input-md','autocomplete'=>'off','placeholder'=>'Asset Name'), $nm_asset);
                         ?>
                 </div>
-				<label class='label-control col-sm-2'><b>Kelompok Penyusutan</b></label>
+				<label class='label-control col-sm-2'><b>Status</b></label>
+				<div class='col-sm-4'>
+					<select name='status_asset' id='status_asset' class='form-control input-md chosen-select'>
+						<option value=''>Select Status</option>
+						<?php
+							$arr_status = array('Digunakan','Tidak digunakan','Terjual');
+							foreach($arr_status as $sts){
+								$sel_sts = (!empty($status_asset) && $status_asset == $sts)?'selected':'';
+								echo "<option value='".$sts."' ".$sel_sts.">".$sts."</option>";
+							}
+						?>
+					</select>
+				</div>
+            </div>
+			<div class='form-group row'>
+                <label class='label-control col-sm-2'><b>Kelompok Penyusutan</b></label>
                 <div class='col-sm-4'>
                     <select name='id_coa' id='id_coa' class='form-control input-md chosen_select' <?=$disabled;?>>
                         <option value='0'>Select Kelompok Penyusutan</option>
@@ -90,6 +134,12 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 								echo "<option value='".$valx['id']."' ".$sexd.">".strtoupper($valx['coa'].' | '.$valx['keterangan'])."</option>";
 							}
                         ?>
+                    </select>
+                </div>
+				<label class='label-control col-sm-2'><b>Cost Center</b></label>
+                <div class='col-sm-4'>
+                    <select name='cost_center' id='cost_center' class='form-control input-md chosen_select' <?=$disabled;?>>
+                        <option value='0'>List Empty</option>
                     </select>
                 </div>
             </div>
@@ -106,12 +156,6 @@ $id_coa  		= (!empty($data))?$data[0]['id_coa']:'';
 								}
 							}
                         ?>
-                    </select>
-                </div>
-                <label class='label-control col-sm-2'><b>Cost Center</b></label>
-                <div class='col-sm-4'>
-                    <select name='cost_center' id='cost_center' class='form-control input-md chosen_select' <?=$disabled;?>>
-                        <option value='0'>List Empty</option>
                     </select>
                 </div>
             </div>

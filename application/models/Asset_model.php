@@ -80,7 +80,7 @@ class Asset_model extends CI_Model{
 
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
-			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['kd_asset']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['code_ori']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nm_asset']))."</div>";
 			$nestedData[]	= "<div align='center'>".date('d-M-Y',strtotime($row['tgl_perolehan']))."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['nm_category']))."</div>";
@@ -88,6 +88,9 @@ class Asset_model extends CI_Model{
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['cost_center']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['depresiasi']." Year</div>";
 			$nestedData[]	= "<div align='right'>".number_format($row['nilai_asset'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['user_asset']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['lokasi']))."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['status_asset']))."</div>";
 
 				$edit 	= "";
 				$delete = "";
@@ -143,7 +146,11 @@ class Asset_model extends CI_Model{
 					a.cost_center,
 					a.tgl_perolehan,
 					d.coa AS no_perkiraan,
-					d.keterangan AS ket_coa
+					d.keterangan AS ket_coa,
+					a.code_ori,
+					a.user_asset,
+					a.lokasi,
+					a.status_asset
 				FROM
 					asset a 
 					LEFT JOIN asset_category c ON a.category = c.id
@@ -155,6 +162,7 @@ class Asset_model extends CI_Model{
 						a.nm_asset LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR a.category LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR a.kd_asset LIKE '%".$this->db->escape_like_str($like_value)."%'
+						OR a.code_ori LIKE '%".$this->db->escape_like_str($like_value)."%'
 					)
 				GROUP BY a.kd_asset
 			";
@@ -185,13 +193,17 @@ class Asset_model extends CI_Model{
 		$data['totalFiltered'] 	= $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'id',
-			1 => 'kd_asset',
+			1 => 'a.code_ori',
 			2 => 'nm_asset',
 			3 => 'tgl_perolehan',
 			4 => 'nm_category',
 			5 => 'd.coa',
-			6 => 'depresiasi',
-			7 => 'nilai_asset'
+			6 => 'cost_center',
+			7 => 'depresiasi',
+			8 => 'nilai_asset',
+			9 => 'a.user_asset',
+			10 => 'a.lokasi',
+			11 => 'a.status_asset'
 
 		);
 

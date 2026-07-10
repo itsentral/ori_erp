@@ -35,21 +35,27 @@ $this->load->view('include/side_menu');
 					<thead>
 						<tr class='bg-blue' >
 							<th class="text-center" width='5%'>#</th>
-							<th class="text-center">Kode Asset</th>
+							<th class="text-center">Code ORI</th>
 							<th class="text-center">Asset Name</th>
 							<th class="text-center" width='8%'>Tgl Perolehan</th>
 							<th class="text-center" width='10%'>Category</th>
-							<th class="text-center" width='20%'>Kelompok Penyusutan</th>
-							<th class="text-center" width='10%'>Costcenter</th>
-							<th class="text-center" width='8%'>Depreciation</th>
-							<th class="text-center" width='10%'>Acquisition</th>
-							<th class="text-center no-sort" width='10%'>#</th>
+							<th class="text-center" width='15%'>Kelompok Penyusutan</th>
+							<th class="text-center" width='8%'>Costcenter</th>
+							<th class="text-center" width='7%'>Depreciation</th>
+							<th class="text-center" width='9%'>Acquisition</th>
+							<th class="text-center" width='7%'>User</th>
+							<th class="text-center" width='7%'>Lokasi</th>
+							<th class="text-center" width='7%'>Status</th>
+							<th class="text-center no-sort" width='8%'>#</th>
 						</tr>
 					</thead>
 					<tbody></tbody>
 					<tfoot>
 						<tr>
-							<th colspan="7" style="text-align:center">SUM</th>
+							<th colspan="8" style="text-align:center">SUM</th>
+							<th></th>
+							<th></th>
+							<th></th>
 							<th></th>
 							<th></th>
 						</tr>
@@ -157,7 +163,7 @@ $this->load->view('include/side_menu');
 				"targets"	: 'no-sort',
 				"orderable"	: false,
 				},
-				{ className: 'text-right', targets: [7] }
+				{ className: 'text-right', targets: [8] }
 			],
 			"sPaginationType": "simple_numbers",
 			"iDisplayLength": 10,
@@ -181,7 +187,7 @@ $this->load->view('include/side_menu');
 			},
 			drawCallback: function( settings ) {
 				var api = this.api();
-				$( api.column( 7 ).footer() ).html("<div align='right'>"+ number_format(total_aset) +"</div>");
+				$( api.column( 8 ).footer() ).html("<div align='right'>"+ number_format(total_aset) +"</div>");
 			}
 
 

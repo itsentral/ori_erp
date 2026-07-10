@@ -208,6 +208,10 @@ class Asset extends CI_Controller{
 				$detailData[$lopp]['id_costcenter'] = $data['cost_center'];
 				$detailData[$lopp]['nama_user'] 	= $data['nama_user'];
 				$detailData[$lopp]['cost_center'] 	= get_name('costcenter', 'nm_costcenter', 'id_costcenter', $data['cost_center']);
+				$detailData[$lopp]['code_ori'] 		= $data['code_ori'];
+				$detailData[$lopp]['user_asset'] 	= $data['user_asset'];
+				$detailData[$lopp]['lokasi'] 		= $data['lokasi'];
+				$detailData[$lopp]['status_asset'] 	= $data['status_asset'];
 				$detailData[$lopp]['created_by'] 	= $this->session->userdata['ORI_User']['username'];
 				$detailData[$lopp]['created_date'] 	= date('Y-m-d h:i:s');
 				$detailData[$lopp]['tgl_depresiasi'] = $tgl_oleh;

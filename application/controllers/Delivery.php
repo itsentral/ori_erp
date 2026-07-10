@@ -5694,8 +5694,13 @@ class Delivery extends CI_Controller
 					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 					$id_material 	= (!empty($getDetOutgoing[0]['id_material']))?$getDetOutgoing[0]['id_material']:0;
+					$qty_oke_delivery = (!empty($getDetOutgoing[0]['qty_oke']))?$getDetOutgoing[0]['qty_oke']:0;
 
-					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material,'qty_mat'=>$qty_oke_delivery))->result_array();
+					// fallback jika tidak ketemu (data lama yang belum di-split)
+					if(empty($getSummary)){
+						$getSummary = $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+					}
 				}
 
 				if($valx['sts_product'] == 'field joint'){
@@ -6142,8 +6147,13 @@ class Delivery extends CI_Controller
 					$getDetOutgoing = $this->db->select('*')->get_where('warehouse_adjustment_detail',array('id'=>$valx['id_uniq']))->result_array();
 					$kode_trans 	= (!empty($getDetOutgoing[0]['kode_trans']))?$getDetOutgoing[0]['kode_trans']:0;
 					$id_material 	= (!empty($getDetOutgoing[0]['id_material']))?$getDetOutgoing[0]['id_material']:0;
+					$qty_oke_delivery = (!empty($getDetOutgoing[0]['qty_oke']))?$getDetOutgoing[0]['qty_oke']:0;
 
-					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+					$getSummary 	= $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material,'qty_mat'=>$qty_oke_delivery))->result_array();
+					// fallback jika tidak ketemu (data lama yang belum di-split)
+					if(empty($getSummary)){
+						$getSummary = $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('kode_trans'=>$kode_trans,'id_material'=>$id_material))->result_array();
+					}
 				}
 
 				if($valx['sts_product'] == 'field joint'){

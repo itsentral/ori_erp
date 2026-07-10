@@ -1873,6 +1873,7 @@ class Outgoing extends CI_Controller {
 						$temp = [];
 
 						$TotalPriceBook = 0;
+						$loopIdx = 0; // index unik per baris untuk ArrFinishGood, tempMaterial, tempMaterialIn
 						foreach($valueParent as $value) {
 							if(!array_key_exists($value['id'], $temp)) {
 								$temp[$value['id']]['good'] = 0;
@@ -1979,61 +1980,62 @@ class Outgoing extends CI_Controller {
 
 
 							
-							$tempMaterial[$value['id']]['tanggal'] 		= $DateTime;
-							$tempMaterial[$value['id']]['keterangan'] 	= null;
-							$tempMaterial[$value['id']]['no_ipp'] 		= $no_ipp;
-							$tempMaterial[$value['id']]['no_spk'] 		= $no_spk;
-							$tempMaterial[$value['id']]['product'] 		= $nm_product;
-							$tempMaterial[$value['id']]['kode_trans'] 		= $kode_trans;
-							$tempMaterial[$value['id']]['id_material'] 		= $restWhDetail2[0]->id_material;
-							$tempMaterial[$value['id']]['nm_material'] 		= $restWhDetail2[0]->nm_material;
-							$tempMaterial[$value['id']]['qty'] 				= $QTY_OKE;
-							$tempMaterial[$value['id']]['cost_book'] 		= $PRICE;
-							$tempMaterial[$value['id']]['created_by'] 		= $UserName;
-							$tempMaterial[$value['id']]['created_date'] 	= $DateTime;
-							$tempMaterial[$value['id']]['tipe'] 			= 'out';
-							$tempMaterial[$value['id']]['gudang'] 			= $id_gudang;
-							$tempMaterial[$value['id']]['gudang_dari'] 		= $id_gudang;
-							$tempMaterial[$value['id']]['gudng_ke'] 		= $gudang_ke;
+							$tempMaterial[$loopIdx]['tanggal'] 		= $DateTime;
+							$tempMaterial[$loopIdx]['keterangan'] 	= null;
+							$tempMaterial[$loopIdx]['no_ipp'] 		= $no_ipp;
+							$tempMaterial[$loopIdx]['no_spk'] 		= $no_spk;
+							$tempMaterial[$loopIdx]['product'] 		= $nm_product;
+							$tempMaterial[$loopIdx]['kode_trans'] 		= $kode_trans;
+							$tempMaterial[$loopIdx]['id_material'] 		= $restWhDetail2[0]->id_material;
+							$tempMaterial[$loopIdx]['nm_material'] 		= $restWhDetail2[0]->nm_material;
+							$tempMaterial[$loopIdx]['qty'] 				= $QtyIn;
+							$tempMaterial[$loopIdx]['cost_book'] 		= $PRICE;
+							$tempMaterial[$loopIdx]['created_by'] 		= $UserName;
+							$tempMaterial[$loopIdx]['created_date'] 	= $DateTime;
+							$tempMaterial[$loopIdx]['tipe'] 			= 'out';
+							$tempMaterial[$loopIdx]['gudang'] 			= $id_gudang;
+							$tempMaterial[$loopIdx]['gudang_dari'] 		= $id_gudang;
+							$tempMaterial[$loopIdx]['gudng_ke'] 		= $gudang_ke;
 
 
-                            $ArrFinishGood[$value['id']]['tanggal'] 		= $DateTime;
-							$ArrFinishGood[$value['id']]['keterangan'] 		= 'Subgudang to Finish Good';
-							$ArrFinishGood[$value['id']]['no_so'] 			= $no_ipp;
-							$ArrFinishGood[$value['id']]['product'] 		= $nm_product;
-							$ArrFinishGood[$value['id']]['no_spk'] 			= $no_spk;
-							$ArrFinishGood[$value['id']]['kode_trans'] 		= $kode_trans;
-							$ArrFinishGood[$value['id']]['id_material'] 	= $restWhDetail2[0]->id_material;
-							$ArrFinishGood[$value['id']]['nm_material'] 	= $restWhDetail2[0]->nm_material;
-							$ArrFinishGood[$value['id']]['qty_mat'] 		= $QTY_OKE;
-							$ArrFinishGood[$value['id']]['cost_book'] 		= $PRICE;
-							$ArrFinishGood[$value['id']]['nilai_unit'] 		= $PRICE;
-							$ArrFinishGood[$value['id']]['created_by'] 		= $UserName;
-							$ArrFinishGood[$value['id']]['created_date'] 	= $DateTime;
-							$ArrFinishGood[$value['id']]['gudang'] 			= $gudang_ke;
-							$ArrFinishGood[$value['id']]['nilai_wip'] 		= $PRICE*$QTY_OKE;
-                            $total_harga  = $PRICE*$QTY_OKE;
+                            $ArrFinishGood[$loopIdx]['tanggal'] 		= $DateTime;
+							$ArrFinishGood[$loopIdx]['keterangan'] 		= 'Subgudang to Finish Good';
+							$ArrFinishGood[$loopIdx]['no_so'] 			= $no_ipp;
+							$ArrFinishGood[$loopIdx]['product'] 		= $nm_product;
+							$ArrFinishGood[$loopIdx]['no_spk'] 			= $no_spk;
+							$ArrFinishGood[$loopIdx]['kode_trans'] 		= $kode_trans;
+							$ArrFinishGood[$loopIdx]['id_material'] 	= $restWhDetail2[0]->id_material;
+							$ArrFinishGood[$loopIdx]['nm_material'] 	= $restWhDetail2[0]->nm_material;
+							$ArrFinishGood[$loopIdx]['qty_mat'] 		= $QtyIn;
+							$ArrFinishGood[$loopIdx]['cost_book'] 		= $PRICE;
+							$ArrFinishGood[$loopIdx]['nilai_unit'] 		= $PRICE;
+							$ArrFinishGood[$loopIdx]['created_by'] 		= $UserName;
+							$ArrFinishGood[$loopIdx]['created_date'] 	= $DateTime;
+							$ArrFinishGood[$loopIdx]['gudang'] 			= $gudang_ke;
+							$ArrFinishGood[$loopIdx]['nilai_wip'] 		= $PRICE*$QtyIn;
+                            $total_harga  = $PRICE*$QtyIn;
 						   
 
-							$tempMaterialIn[$value['id']]['tanggal'] 		= $DateTime;
-							$tempMaterialIn[$value['id']]['keterangan'] 	= null;
-							$tempMaterialIn[$value['id']]['no_ipp'] 		= $no_ipp;
-							$tempMaterialIn[$value['id']]['no_spk'] 		= $no_spk;
-							$tempMaterialIn[$value['id']]['product'] 		= $nm_product;
-							$tempMaterialIn[$value['id']]['kode_trans'] 	= $kode_trans;
-							$tempMaterialIn[$value['id']]['id_material'] 	= $restWhDetail2[0]->id_material;
-							$tempMaterialIn[$value['id']]['nm_material'] 	= $restWhDetail2[0]->nm_material;
-							$tempMaterialIn[$value['id']]['qty'] 			= $QTY_OKE;
-							$tempMaterialIn[$value['id']]['cost_book'] 		= $PRICE;
-							$tempMaterialIn[$value['id']]['created_by'] 	= $UserName;
-							$tempMaterialIn[$value['id']]['created_date'] 	= $DateTime;
-							$tempMaterialIn[$value['id']]['tipe'] 			= 'in';
-							$tempMaterialIn[$value['id']]['gudang'] 		= $gudang_ke;
-							$tempMaterialIn[$value['id']]['gudang_dari'] 	= $id_gudang;
-							$tempMaterialIn[$value['id']]['gudng_ke'] 		= $gudang_ke;
+							$tempMaterialIn[$loopIdx]['tanggal'] 		= $DateTime;
+							$tempMaterialIn[$loopIdx]['keterangan'] 	= null;
+							$tempMaterialIn[$loopIdx]['no_ipp'] 		= $no_ipp;
+							$tempMaterialIn[$loopIdx]['no_spk'] 		= $no_spk;
+							$tempMaterialIn[$loopIdx]['product'] 		= $nm_product;
+							$tempMaterialIn[$loopIdx]['kode_trans'] 	= $kode_trans;
+							$tempMaterialIn[$loopIdx]['id_material'] 	= $restWhDetail2[0]->id_material;
+							$tempMaterialIn[$loopIdx]['nm_material'] 	= $restWhDetail2[0]->nm_material;
+							$tempMaterialIn[$loopIdx]['qty'] 			= $QtyIn;
+							$tempMaterialIn[$loopIdx]['cost_book'] 		= $PRICE;
+							$tempMaterialIn[$loopIdx]['created_by'] 	= $UserName;
+							$tempMaterialIn[$loopIdx]['created_date'] 	= $DateTime;
+							$tempMaterialIn[$loopIdx]['tipe'] 			= 'in';
+							$tempMaterialIn[$loopIdx]['gudang'] 		= $gudang_ke;
+							$tempMaterialIn[$loopIdx]['gudang_dari'] 	= $id_gudang;
+							$tempMaterialIn[$loopIdx]['gudng_ke'] 		= $gudang_ke;
 
 
 							 $TotalPriceBook += $total_harga;
+							 $loopIdx++;
 							
 						}
 						    //=======NEW=============
