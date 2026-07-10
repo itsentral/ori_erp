@@ -27,7 +27,6 @@ class Tracking_so_model extends CI_Model {
 			LEFT JOIN billing_so b ON REPLACE(a.id_bq,'BQ-','') = b.no_ipp
 			LEFT JOIN so_number c ON a.id_bq = c.id_bq
 			WHERE a.id_bq = '".$this->db->escape_str($id_bq)."'
-			AND a.cancel_date IS NULL
 			ORDER BY a.id ASC
 		")->result_array();
 
