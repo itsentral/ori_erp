@@ -310,7 +310,7 @@ class Warehouse extends CI_Controller {
 					$ArrDetailPR[$val]['app_date']		= $dateTime;
 					$ArrDetailPR[$val]['created_by'] 	= $data_session['ORI_User']['username'];
 					$ArrDetailPR[$val]['created_date'] 	= $dateTime;
-					$ArrDetailPR[$val]['in_gudang']    	= 'project';
+					// $ArrDetailPR[$val]['in_gudang']    	= 'project';
 
 					$ArrUpDetail_acc[$val]['id'] 			= $valx['id'];
 					$ArrUpDetail_acc[$val]['no_pr'] 		= $no_pr_group;
