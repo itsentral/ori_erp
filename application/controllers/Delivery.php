@@ -593,6 +593,8 @@ class Delivery extends CI_Controller
 		$result_print2 = $this->db->order_by('a.id', 'asc')->group_by('a.id_uniq')->select('COUNT(a.id_milik) AS qty_product, a.*, "" AS type_product, "" AS product_tanki')->where('(berat > 0 OR berat IS NULL)')->get_where('delivery_product_detail a', array('a.kode_delivery' => $kode_delivery, 'sts_product' => 'so material'))->result_array();
 		$result_print = array_merge($result_print1, $result_print2, $result_print3);
 		$data = array(
+			'GET_DESC_DEAL'		=> get_descDealSO(),
+			'GET_ID_MILIK'		=> get_idMilikSODeal(),
 			'result'			=> $result,
 			'result2'			=> $result2,
 			'result3'			=> $result3,
