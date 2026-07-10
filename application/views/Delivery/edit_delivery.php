@@ -155,7 +155,7 @@ $this->load->view('include/side_menu');
 
 							$DESC = (!empty($GET_DESC)) ? $GET_DESC : $valx['desc'];
 							$WARNING_DESC = '';
-							if (empty($ID_MILIK) && $valx['sts_product'] != 'so material' && $valx['sts'] != 'loose_dead' && $valx['type_product'] != 'tanki') {
+							if (empty($GET_DESC) && $valx['sts_product'] != 'so material' && $valx['sts'] != 'loose_dead' && $valx['type_product'] != 'tanki') {
 								$WARNING_DESC = "<span class='text-red text-sm'><i class='fa fa-exclamation-triangle'></i> Data billing SO belum tersedia</span>";
 							}
 							echo "<tr>";
