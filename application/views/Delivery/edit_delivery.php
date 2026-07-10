@@ -635,15 +635,15 @@ $this->load->view('include/side_menu');
 								if (data.status == 1) {
 									swal({
 										title: "Success!",
-										text: 'Succcess Process!',
+										text: data.pesan,
 										type: "success",
 										timer: 3000
 									});
-									window.reload();
+									location.reload();
 								} else {
 									swal({
 										title: "Failed!",
-										text: 'Failed Process!',
+										text: data.pesan,
 										type: "warning",
 										timer: 3000
 									});
