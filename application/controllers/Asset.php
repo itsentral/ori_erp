@@ -393,6 +393,10 @@ class Asset extends CI_Controller{
 			'department' 	=> get_name('department', 'nm_dept', 'id', $lokasi_asset_new),
 			'id_costcenter'	=> $cost_center_new,
 			'cost_center' 	=> get_name('costcenter', 'nm_costcenter', 'id_costcenter', $cost_center_new),
+			'nama_user' 	=> $data['nama_user'],
+			'code_ori' 		=> $data['code_ori'],
+			'lokasi' 		=> $data['lokasi'],
+			'status_asset' 	=> $data['status_asset'],
 			'modified_by' 	=> $this->session->userdata['ORI_User']['username'],
 			'modified_date' => date('Y-m-d h:i:s')
 		);

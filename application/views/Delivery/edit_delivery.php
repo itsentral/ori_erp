@@ -154,6 +154,10 @@ $this->load->view('include/side_menu');
 							}
 
 							$DESC = (!empty($GET_DESC)) ? $GET_DESC : $valx['desc'];
+							$WARNING_DESC = '';
+							if (empty($ID_MILIK) && $valx['sts_product'] != 'so material' && $valx['sts'] != 'loose_dead' && $valx['type_product'] != 'tanki') {
+								$WARNING_DESC = "<span class='text-red text-sm'><i class='fa fa-exclamation-triangle'></i> Data billing SO belum tersedia</span>";
+							}
 							echo "<tr>";
 							echo "<td align='center'>" . $NOMOR . "</td>";
 							echo "<td align='center'>" . $QTY . "</td>";
@@ -166,6 +170,7 @@ $this->load->view('include/side_menu');
 							} else {
 								echo "<input type='hidden' name='edit_desc[$val][id_milik]' class='form-control' value='" . $ID_UNIQ . "'>";
 								echo "<input type='text' name='edit_desc[$val][desc]' class='form-control' value='" . $DESC . "'>";
+								echo $WARNING_DESC;
 							}
 							echo "</td>";
 							echo "</tr>";
