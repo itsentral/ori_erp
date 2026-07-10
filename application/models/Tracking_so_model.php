@@ -69,12 +69,11 @@ class Tracking_so_model extends CI_Model {
 				// FG (Finish Good) - items that have been moved to FG
 				$fg_data = $this->db->query("
 					SELECT COUNT(*) AS total_fg
-					FROM data_erp_fg j
-					LEFT JOIN data_erp_wip_group h ON j.id_trans = h.id_trans AND h.jenis = 'in' AND j.jenis = 'in'
-					LEFT JOIN production_spk_parsial g ON CONCAT(g.kode_spk_x,'/',g.created_date) = h.kode_trans
-					LEFT JOIN production_spk f ON g.id_spk = f.id
+					FROM production_spk f
+					JOIN production_spk_parsial g ON f.id = g.id_spk AND g.spk = '1'
+					JOIN data_erp_wip_group h ON CONCAT(f.kode_spk,'/',g.created_date) = h.kode_trans AND h.jenis = 'in'
+					JOIN data_erp_fg j ON h.id_trans = j.id_trans AND j.jenis = 'in'
 					WHERE f.id_milik = '".$this->db->escape_str($detail['id'])."'
-					AND j.jenis = 'in'
 				")->row();
 				$fg_total = (!empty($fg_data)) ? (int)$fg_data->total_fg : 0;
 				$fg_r = $fg_total; // Released to FG
@@ -84,13 +83,12 @@ class Tracking_so_model extends CI_Model {
 				// IN TRANSIT - items that have been sent/delivered
 				$transit_data = $this->db->query("
 					SELECT COUNT(*) AS total_transit, GROUP_CONCAT(DISTINCT k.kode_delivery SEPARATOR ', ') AS delivery_codes
-					FROM data_erp_in_transit k
-					LEFT JOIN data_erp_fg j ON k.id_trans = j.id_trans AND k.jenis = 'in' AND j.jenis = 'in' AND k.id_pro = j.id_pro
-					LEFT JOIN data_erp_wip_group h ON j.id_trans = h.id_trans AND h.jenis = 'in' AND j.jenis = 'in'
-					LEFT JOIN production_spk_parsial g ON CONCAT(g.kode_spk_x,'/',g.created_date) = h.kode_trans
-					LEFT JOIN production_spk f ON g.id_spk = f.id
+					FROM production_spk f
+					JOIN production_spk_parsial g ON f.id = g.id_spk AND g.spk = '1'
+					JOIN data_erp_wip_group h ON CONCAT(f.kode_spk,'/',g.created_date) = h.kode_trans AND h.jenis = 'in'
+					JOIN data_erp_fg j ON h.id_trans = j.id_trans AND j.jenis = 'in'
+					JOIN data_erp_in_transit k ON j.id_trans = k.id_trans AND j.jenis = k.jenis AND j.id_pro = k.id_pro AND k.jenis = 'in'
 					WHERE f.id_milik = '".$this->db->escape_str($detail['id'])."'
-					AND k.jenis = 'in'
 				")->row();
 				$transit_total = (!empty($transit_data)) ? (int)$transit_data->total_transit : 0;
 				$no_delivery = (!empty($transit_data->delivery_codes)) ? $transit_data->delivery_codes : '-';
@@ -101,14 +99,13 @@ class Tracking_so_model extends CI_Model {
 				// IN CUSTOMER - items received by customer
 				$cust_data = $this->db->query("
 					SELECT COUNT(*) AS total_cust
-					FROM data_erp_in_customer l
-					LEFT JOIN data_erp_in_transit k ON l.id_trans = k.id_trans AND l.jenis = 'in' AND k.jenis = 'in' AND l.id_pro = k.id_pro
-					LEFT JOIN data_erp_fg j ON k.id_trans = j.id_trans AND k.jenis = 'in' AND j.jenis = 'in' AND k.id_pro = j.id_pro
-					LEFT JOIN data_erp_wip_group h ON j.id_trans = h.id_trans AND h.jenis = 'in' AND j.jenis = 'in'
-					LEFT JOIN production_spk_parsial g ON CONCAT(g.kode_spk_x,'/',g.created_date) = h.kode_trans
-					LEFT JOIN production_spk f ON g.id_spk = f.id
+					FROM production_spk f
+					JOIN production_spk_parsial g ON f.id = g.id_spk AND g.spk = '1'
+					JOIN data_erp_wip_group h ON CONCAT(f.kode_spk,'/',g.created_date) = h.kode_trans AND h.jenis = 'in'
+					JOIN data_erp_fg j ON h.id_trans = j.id_trans AND j.jenis = 'in'
+					JOIN data_erp_in_transit k ON j.id_trans = k.id_trans AND j.jenis = k.jenis AND j.id_pro = k.id_pro AND k.jenis = 'in'
+					JOIN data_erp_in_customer l ON k.id_trans = l.id_trans AND k.jenis = l.jenis AND k.id_pro = l.id_pro AND l.jenis = 'in'
 					WHERE f.id_milik = '".$this->db->escape_str($detail['id'])."'
-					AND l.jenis = 'in'
 				")->row();
 				$cust_total = (!empty($cust_data)) ? (int)$cust_data->total_cust : 0;
 				$cust_r = $cust_total; // Released (sudah di customer)
