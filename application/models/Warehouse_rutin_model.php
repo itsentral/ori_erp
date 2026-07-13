@@ -635,18 +635,22 @@ class Warehouse_rutin_model extends CI_Model {
 							if ($data_po->nilai_dp > 0) {
 								if ($data_po->nilai_dp <= $total_forex) {
 									// DP habis semua
-									$uangmuka = $data_po->nilai_dp_kurs;
+									$uangmuka = ($kurs_ros > 1 && $data_po->nilai_dp_kurs > 0) ? $data_po->nilai_dp_kurs : ($data_po->nilai_dp * $kurs);
 									$uangmukausd = $data_po->nilai_dp;
-									$selisih_kurs=($uangmuka-($kurs * $data_po->nilai_dp));
+									$selisih_kurs = ($kurs_ros > 1) ? ($uangmuka - ($kurs * $data_po->nilai_dp)) : 0;
 									$hutang = ($total_rupiah - $uangmuka);
 									$hutang_kurs = $total_forex - $data_po->nilai_dp;
 									$this->db->query("update tran_po_header set nilai_terima_barang_kurs=".$hutang.",proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 where no_po='" . $no_po . "'");
 								} else {
 									// DP masih sisa
-									$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
-									$uangmuka = ($total_forex * $nilai_kurs_saat_dp);
+									if($kurs_ros > 1 && $data_po->nilai_dp_kurs > 0){
+										$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
+										$uangmuka = ($total_forex * $nilai_kurs_saat_dp);
+									} else {
+										$uangmuka = $total_forex;
+									}
 									$uangmukausd = $total_forex;
-									$selisih_kurs=(($total_forex*$nilai_kurs_saat_dp)-($kurs * $total_forex));
+									$selisih_kurs = ($kurs_ros > 1 && $data_po->nilai_dp_kurs > 0) ? (($total_forex * ($data_po->nilai_dp_kurs/$data_po->nilai_dp)) - ($kurs * $total_forex)) : 0;
 									$hutang = 0;
 									$hutang_kurs = 0;
 
