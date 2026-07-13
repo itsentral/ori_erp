@@ -611,24 +611,27 @@ class Warehouse_rutin_model extends CI_Model {
 							}
 						}
 						if ($rec->parameter_no == "2") {
-							$uangmuka = $total_rupiah;
+							$uangmuka = 0;
+							$uangmukausd = 0;
 
 							$coa_uangmuka=$rec->no_perkiraan;
 							if($kurs_ros>1) $coa_uangmuka='1111-01-02';
 
 							if ($data_po->nilai_dp > 0) {
 								if ($data_po->nilai_dp <= $total_forex) {
+									// DP habis semua
 									$uangmuka = $data_po->nilai_dp_kurs;
 									$uangmukausd = $data_po->nilai_dp;
 									$selisih_kurs=($uangmuka-($kurs * $data_po->nilai_dp));
-									$hutang = ($total_rupiah - ($kurs * $data_po->nilai_dp));
-									$hutang_kurs = $total_forex-$data_po->nilai_dp;
+									$hutang = ($total_rupiah - $uangmuka);
+									$hutang_kurs = $total_forex - $data_po->nilai_dp;
 									$this->db->query("update tran_po_header set nilai_terima_barang_kurs=".$hutang.",proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 where no_po='" . $no_po . "'");
 								} else {
+									// DP masih sisa
 									$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
-									$selisih_kurs=(($total_forex*$nilai_kurs_saat_dp)-($kurs * $total_forex));
 									$uangmuka = ($total_forex * $nilai_kurs_saat_dp);
 									$uangmukausd = $total_forex;
+									$selisih_kurs=(($total_forex*$nilai_kurs_saat_dp)-($kurs * $total_forex));
 									$hutang = 0;
 									$hutang_kurs = 0;
 
@@ -637,46 +640,49 @@ class Warehouse_rutin_model extends CI_Model {
 								$det_Jurnaltes1[] = array(
 									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_uangmuka, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $uangmuka), 'kredit' => ($rec->posisi == 'D' ? 0 : $uangmuka), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $uangmukausd), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $uangmukausd), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
 								);
-							} else {
-								$det_Jurnaltes1[] = array(
-									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_uangmuka, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-								);
 							}
+							// kalau tidak ada DP, tidak perlu insert entry uang muka
 						}
 						if ($rec->parameter_no == "3") {
 							$coa_hutang_unbill=$rec->no_perkiraan;
 							if($kurs_ros>1) $coa_hutang_unbill='2101-01-05';
-							if ($hutang > 0) {
+							
+							// Unbill = Material - Uang Muka
+							$unbill_nilai = ($total_rupiah - $uangmuka);
+							$unbill_kurs = ($total_forex - $uangmukausd);
+
+							if ($unbill_nilai > 0) {
 								$det_Jurnaltes1[] = array(
-									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $unbill_nilai), 'kredit' => ($rec->posisi == 'D' ? 0 : $unbill_nilai), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $unbill_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $unbill_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
 								);
-								$unbill_nilai=$hutang;
-							} else {
-								$det_Jurnaltes1[] = array(
-									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $total_rupiah), 'kredit' => ($rec->posisi == 'D' ? 0 : $total_rupiah), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $total_forex), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $total_forex), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-								);
-								$unbill_nilai=$total_rupiah;
 							}
 						}
 						if ($rec->parameter_no == "4") {
-							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Cash/Bank ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-							);
+							// Cash/Bank - skip jika tidak ada nilai
 						}
 						if ($rec->parameter_no == "5") {
-							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Forwarder ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-							);
+							// Hutang Forwarder - hanya insert jika ada forwarding
+							if(($total_forward_bef_ppn+$total_forward_ppn) > 0){
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Forwarder ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+							}
 						}
 						if ($rec->parameter_no == "6") {
-							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN dibayar dimuka ' . $no_po, 'no_request' => $no_po, 'debet' => $total_forward_ppn, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-							);
+							// PPN dibayar dimuka - hanya insert jika ada PPN forwarding
+							if($total_forward_ppn > 0){
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN dibayar dimuka ' . $no_po, 'no_request' => $no_po, 'debet' => $total_forward_ppn, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+							}
 						}
 						if ($rec->parameter_no == "7") {
-							$det_Jurnaltes1[] = array(
-								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs ' . $no_po, 'no_request' => $no_po, 'kredit' => ($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => ($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
-							);
+							// Selisih kurs - hanya insert jika ada selisih
+							if($selisih_kurs != 0){
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs ' . $no_po, 'no_request' => $no_po, 'kredit' => ($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => ($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+							}
 						}
 					}
 				}
