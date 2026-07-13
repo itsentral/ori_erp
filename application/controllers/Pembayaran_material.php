@@ -1064,7 +1064,9 @@ class Pembayaran_material extends CI_Controller {
 			// update PO
 				$nilai_dp_kurs=0;
 				if($data->tipe=='TR-01'){
-					$nilai_dp_kurs= ($data->nilai_po_invoice*$data->curs);
+					// Gunakan kurs receive invoice (kurs saat hutang diakui), bukan kurs bayar
+					$kurs_dp = (!empty($data->kurs_receive_invoice) && $data->kurs_receive_invoice > 1) ? $data->kurs_receive_invoice : $data->curs;
+					$nilai_dp_kurs= ($data->nilai_po_invoice*$kurs_dp);
 				}
 				$this->db->query("update tran_po_header set nilai_dp_kurs=".$nilai_dp_kurs.",nilai_terima_barang_kurs=0, total_bayar=(total_bayar+".($data->nilai_po_invoice)."),
 				total_bayar_rupiah=(total_bayar_rupiah+".($data->nilai_po_invoice*$data->curs).")
@@ -1176,7 +1178,9 @@ class Pembayaran_material extends CI_Controller {
 				$nilai_dp_kurs=0;
 				$addsql="";
 				if($data->tipe=='TR-01'){
-					$nilai_dp_kurs= ($data->nilai_po_invoice*$data->curs);
+					// Gunakan kurs receive invoice (kurs saat hutang diakui), bukan kurs bayar
+					$kurs_dp = (!empty($data->kurs_receive_invoice) && $data->kurs_receive_invoice > 1) ? $data->kurs_receive_invoice : $data->curs;
+					$nilai_dp_kurs= ($data->nilai_po_invoice*$kurs_dp);
 				}else{					//$addsql=",nilai_terima_barang_kurs=(nilai_terima_barang_kurs-".$data->nilai_po_invoice."),total_terima_barang_idr=(total_terima_barang_idr-".(($data->nilai_po_invoice-$data->potongan_dp)*$data->curs).")";
 				}
 				$this->db->query("update tran_material_po_header set nilai_dp_kurs=".$nilai_dp_kurs."
@@ -1703,7 +1707,9 @@ class Pembayaran_material extends CI_Controller {
 				$nilai_dp_kurs=0;
 				$addsql="";
 				if($data->tipe=='TR-01'){
-					$nilai_dp_kurs= ($data->nilai_po_invoice*$curs);
+					// Gunakan kurs receive invoice (kurs saat hutang diakui), bukan kurs bayar
+					$kurs_dp = (!empty($data->kurs_receive_invoice) && $data->kurs_receive_invoice > 1) ? $data->kurs_receive_invoice : $curs;
+					$nilai_dp_kurs= ($data->nilai_po_invoice*$kurs_dp);
 					$addsql=", nilai_dp_kurs=".$nilai_dp_kurs."";
 				}
 				$this->db->query("update tran_po_header set terima_barang_kurs=0, terima_barang_idr=0

@@ -2936,13 +2936,17 @@
 			// Cek DP (Down Payment) - hitung uang muka dan hutang (samakan dengan incoming material)
 			$hutang_asset = $totalbayar;
 			$uangmuka_asset = 0;
+			$uangmuka_asset_usd = 0;
+			$hutang_asset_usd = 0;
 			$selisih_kurs_asset = 0;
 			if (!empty($data_po_asset->nilai_dp) && $data_po_asset->nilai_dp > 0) {
 				if ($data_po_asset->nilai_dp <= ($totalbayar / $kurs_asset)) {
 					// DP habis terpakai
 					// Uang muka dicatat sebesar kurs saat bayar DP (nilai_dp_kurs)
 					$uangmuka_asset = (!empty($data_po_asset->nilai_dp_kurs)) ? $data_po_asset->nilai_dp_kurs : ($kurs_asset * $data_po_asset->nilai_dp);
+					$uangmuka_asset_usd = $data_po_asset->nilai_dp;
 					$hutang_asset = $totalbayar - ($kurs_asset * $data_po_asset->nilai_dp);
+					$hutang_asset_usd = ($totalbayar / $kurs_asset) - $data_po_asset->nilai_dp;
 					// Selisih kurs = kurs saat bayar DP - kurs saat incoming × nilai DP USD
 					if (!empty($data_po_asset->nilai_dp_kurs) && $data_po_asset->mata_uang != 'IDR') {
 						$selisih_kurs_asset = ($data_po_asset->nilai_dp_kurs - ($kurs_asset * $data_po_asset->nilai_dp));
@@ -2951,7 +2955,9 @@
 				} else {
 					// DP lebih besar, dikurangi sebesar total incoming
 					$uangmuka_asset = $totalbayar;
+					$uangmuka_asset_usd = $totalbayar / $kurs_asset;
 					$hutang_asset = 0;
+					$hutang_asset_usd = 0;
 					// Selisih kurs = (total_forex × kurs_saat_dp) - (kurs_incoming × total_forex)
 					if (!empty($data_po_asset->nilai_dp_kurs) && $data_po_asset->mata_uang != 'IDR') {
 						$total_forex_asset = $totalbayar / $kurs_asset;
@@ -2961,12 +2967,16 @@
 					$dp_sisa_asset = ($data_po_asset->mata_uang != 'IDR') ? ($data_po_asset->nilai_dp - ($totalbayar / $kurs_asset)) : ($data_po_asset->nilai_dp - $totalbayar);
 					$CI->db->query("UPDATE tran_po_header SET proses_uang_muka='Y', nilai_dp=".$dp_sisa_asset.", sisa_dp=".$dp_sisa_asset." WHERE no_po='".$no_po."'");
 				}
+			} else {
+				// Tidak ada DP, semua masuk hutang
+				$hutang_asset_usd = ($kurs_asset > 1) ? ($totalbayar / $kurs_asset) : 0;
 			}
 
 			// Build jurnal entries berdasarkan parameter_no (samakan dengan incoming material JV032)
 			$jenisjurnal = 'incoming asset';
 			$det_Jurnaltes = [];
 			$total_bm_asset = 0;
+			$is_valas = ($kurs_asset > 1) ? true : false;
 			foreach($datajurnal AS $rec){
 				// parameter_no 1: Debit Asset
 				if ($rec->parameter_no == "1") {
@@ -2979,6 +2989,7 @@
 							'no_perkiraan' => $val->coa,
 							'keterangan' => $val->nm_material.' '.$id.', '.$no_po,
 							'no_reff' => $id, 'debet' => $nilaibayar, 'kredit' => 0,
+							'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 						);
 					}
@@ -2993,6 +3004,7 @@
 							'no_perkiraan' => $coa_uangmuka_asset,
 							'keterangan' => 'Uang muka '.$no_po,
 							'no_reff' => $id, 'debet' => 0, 'kredit' => $uangmuka_asset,
+							'nilai_valas_debet' => 0, 'nilai_valas_kredit' => ($is_valas ? $uangmuka_asset_usd : 0),
 							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 						);
 					} else {
@@ -3001,6 +3013,7 @@
 							'no_perkiraan' => $coa_uangmuka_asset,
 							'keterangan' => 'Uang muka '.$no_po,
 							'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+							'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 						);
 					}
@@ -3016,6 +3029,7 @@
 							'no_perkiraan' => $coa_hutang_unbill,
 							'keterangan' => 'Hutang '.$no_po,
 							'no_reff' => $id, 'debet' => 0, 'kredit' => $hutang_asset,
+							'nilai_valas_debet' => 0, 'nilai_valas_kredit' => ($is_valas ? $hutang_asset_usd : 0),
 							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 						);
 					} else {
@@ -3024,6 +3038,7 @@
 							'no_perkiraan' => $coa_hutang_unbill,
 							'keterangan' => 'Hutang '.$no_po,
 							'no_reff' => $id, 'debet' => 0, 'kredit' => $totalbayar,
+							'nilai_valas_debet' => 0, 'nilai_valas_kredit' => ($is_valas ? ($totalbayar / $kurs_asset) : 0),
 							'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 						);
 					}
@@ -3035,6 +3050,7 @@
 						'no_perkiraan' => $rec->no_perkiraan,
 						'keterangan' => 'Cash/Bank '.$no_po,
 						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
@@ -3045,6 +3061,7 @@
 						'no_perkiraan' => $rec->no_perkiraan,
 						'keterangan' => 'Hutang Bea masuk '.$no_po,
 						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
@@ -3055,6 +3072,7 @@
 						'no_perkiraan' => $rec->no_perkiraan,
 						'keterangan' => 'PPN dibayar dimuka '.$no_po,
 						'no_reff' => $id, 'debet' => 0, 'kredit' => 0,
+						'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
@@ -3067,6 +3085,7 @@
 						'no_reff' => $id,
 						'debet' => ($selisih_kurs_asset >= 0 ? $selisih_kurs_asset : 0),
 						'kredit' => ($selisih_kurs_asset < 0 ? ($selisih_kurs_asset * -1) : 0),
+						'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
@@ -3077,6 +3096,7 @@
 						'no_perkiraan' => $rec->no_perkiraan,
 						'keterangan' => 'BM '.$no_po,
 						'no_reff' => $id, 'debet' => 0, 'kredit' => $total_bm_asset,
+						'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0,
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
@@ -3100,6 +3120,8 @@
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'nilai_valas_debet'		=> isset($vals['nilai_valas_debet']) ? $vals['nilai_valas_debet'] : 0,
+					'nilai_valas_kredit'	=> isset($vals['nilai_valas_kredit']) ? $vals['nilai_valas_kredit'] : 0,
 					);
 				$CI->db->insert(DBACC.'.jurnal',$datadetail);
 			}
