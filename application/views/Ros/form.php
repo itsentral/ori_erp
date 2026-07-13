@@ -199,6 +199,7 @@ if(isset($data->status_rg_check)){
 					$total_price=$price*$qty_ship; 
 					$total_fc_costprd=$fc_cost_unit*$qty_ship;
 					$total_price_fc_cost=$total_price+$total_fc_costprd;
+					$bm=0;
 					if(isset($valx->bm)) $bm=$valx->bm;
 
 					echo "<td align=right><input type='hidden' name='price_ref_sup[]' id='price_ref_sup".$No."' value='".$price_ref_sup."' class='price_ref_sup'>
