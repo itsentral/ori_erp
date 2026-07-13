@@ -2483,15 +2483,11 @@
 			
 			$totalall = $datajurnal->nilaibayar;
 
-			// Ambil data DP dari session (disimpan oleh process_incoming)
+			// Ambil data DP dari global variable (disimpan oleh process_incoming)
 			$data_po_jurnal=$CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='".$id."') limit 1" )->row();
 			$dp_amount = 0;
-			if(!empty($data_po_jurnal)){
-				// Baca dp yang dipotong dari session
-				$dp_session = $CI->session->userdata('dp_potong_'.$id);
-				if(!empty($dp_session) && $dp_session > 0){
-					$dp_amount = $dp_session;
-				}
+			if(!empty($data_po_jurnal) && isset($GLOBALS['dp_potong_incoming'])){
+				$dp_amount = $GLOBALS['dp_potong_incoming'];
 			}
 			$unbill_amount = $totalall - $dp_amount;
 
@@ -2502,7 +2498,7 @@
 				$jenisjurnal = $ket;
 
 				// Parameter 1: Material (Debit)
-				if ($parameter_no == '1' && $posisi=='D'){
+				if (trim($parameter_no) == '1' && $posisi=='D'){
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2518,7 +2514,7 @@
 					 );
 				}
 				// Parameter 2: Uang Muka / DP (Kredit) - hanya jika ada DP
-				if ($parameter_no == '2' && $dp_amount > 0){
+				if (trim($parameter_no) == '2' && $dp_amount > 0){
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2534,7 +2530,7 @@
 					 );
 				}
 				// Parameter 3: Unbill A/P (Kredit) - sisa setelah DP
-				if ($parameter_no == '3' && $unbill_amount > 0){
+				if (trim($parameter_no) == '3' && $unbill_amount > 0){
 					$unbill_coa=$nokir;
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
