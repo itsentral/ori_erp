@@ -1296,7 +1296,9 @@ class Pembelian extends CI_Controller {
             $noRos = $dataros->no_ros;
 			$kursRos = (!empty($dataros->kurs) && $dataros->kurs > 0) ? $dataros->kurs : $kursInv;
 			$selisihKurs = $kursInv - $kursRos;
-			$selisihIDR = $selisihKurs*$barang;
+			// Gunakan nilai invoice saat ini (invoice_total - ppn), bukan total PO
+			$nilai_invoice_nett = $data['invoice_total'] - $data['nilai_ppn'];
+			$selisihIDR = $selisihKurs * $nilai_invoice_nett;
 		}
 
 		
