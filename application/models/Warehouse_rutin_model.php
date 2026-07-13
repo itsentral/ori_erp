@@ -586,6 +586,21 @@ class Warehouse_rutin_model extends CI_Model {
 			// Jurnal
 				$data_po = $this->db->query("SELECT * FROM tran_po_header WHERE no_po='$no_po'")->row();
 				$datajurnal1 = $this->db->query("select * from " . DBACC . ".master_oto_jurnal_detail where kode_master_jurnal='" . $jenis_jurnal . "' order by parameter_no")->result();
+				
+				// DEBUG: hapus setelah fix
+				$debug_dp = array(
+					'no_po' => $no_po,
+					'nilai_dp' => isset($data_po->nilai_dp) ? $data_po->nilai_dp : 'NULL',
+					'nilai_dp_kurs' => isset($data_po->nilai_dp_kurs) ? $data_po->nilai_dp_kurs : 'NULL',
+					'sisa_dp' => isset($data_po->sisa_dp) ? $data_po->sisa_dp : 'NULL',
+					'proses_uang_muka' => isset($data_po->proses_uang_muka) ? $data_po->proses_uang_muka : 'NULL',
+					'total_harga_product' => $total_harga_product,
+					'total_harga_product_usd' => $total_harga_product_usd,
+					'jenis_jurnal' => $jenis_jurnal,
+					'count_template' => count($datajurnal1),
+				);
+				log_message('error', 'DEBUG_DP: ' . json_encode($debug_dp));
+				
 				$hutang = 0;
 				$hutang_kurs = 0;
 				$uangmuka = 0;
@@ -593,7 +608,7 @@ class Warehouse_rutin_model extends CI_Model {
 				$kurs=$kurs_ros;
 				$total_harga=0;
 				$total_rupiah=$total_harga_product;
-				$total_forex=$total_harga_product_usd;
+				$total_forex=($kurs_ros > 1) ? $total_harga_product_usd : $total_harga_product;
 				$selisih_kurs=0;
 				$coa_hutang_unbill='';
 				$unbill_nilai=0;

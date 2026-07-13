@@ -2483,11 +2483,23 @@
 			
 			$totalall = $datajurnal->nilaibayar;
 
-			// Ambil data DP dari global variable (disimpan oleh process_incoming)
+			// Ambil data DP dari jurnaltras yang sudah di-commit oleh process_incoming
 			$data_po_jurnal=$CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='".$id."') limit 1" )->row();
 			$dp_amount = 0;
-			if(!empty($data_po_jurnal) && isset($GLOBALS['dp_potong_incoming'])){
-				$dp_amount = $GLOBALS['dp_potong_incoming'];
+			if(!empty($data_po_jurnal)){
+				// Cek dari jurnaltras - entry uang muka yang sudah di-insert oleh process_incoming
+				$jurnaltras_dp = $CI->db->query("SELECT SUM(kredit) as total_dp FROM jurnaltras WHERE no_reff='".$id."' AND jenis_jurnal='JV035' AND keterangan LIKE 'Uang muka%'")->row();
+				if(!empty($jurnaltras_dp) && $jurnaltras_dp->total_dp > 0){
+					$dp_amount = $jurnaltras_dp->total_dp;
+				}
+				// Fallback: cek dari GLOBALS jika jurnaltras belum committed
+				if($dp_amount == 0 && isset($GLOBALS['dp_potong_incoming']) && $GLOBALS['dp_potong_incoming'] > 0){
+					$dp_amount = $GLOBALS['dp_potong_incoming'];
+				}
+				// Fallback 2: cek langsung dari tran_po_header jika proses_uang_muka sudah Y
+				if($dp_amount == 0 && $data_po_jurnal->proses_uang_muka == 'Y' && $data_po_jurnal->nilai_dp_kurs > 0){
+					$dp_amount = min($data_po_jurnal->nilai_dp_kurs, $totalall);
+				}
 			}
 			$unbill_amount = $totalall - $dp_amount;
 
