@@ -112,29 +112,22 @@ class Tracking_so_model extends CI_Model {
 				$cust_o = $transit_r - $cust_total; // Outstanding
 				if($cust_o < 0) $cust_o = 0;
 
-				// INVOICE - items that have been invoiced
+				// INVOICE - get detail per material from tr_invoice_detail
 				$inv_data = $this->db->query("
 					SELECT 
 						GROUP_CONCAT(DISTINCT ih.no_invoice SEPARATOR ', ') AS invoice_numbers,
-						SUM(ih.total_invoice_idr) AS total_nilai
-					FROM tr_invoice_header ih
-					WHERE ih.no_ipp = '".$this->db->escape_str(str_replace('BQ-','',$id_bq))."'
-					AND ih.no_po = '".$this->db->escape_str($no_po)."'
-				")->row();
-
-				$no_invoice = (!empty($inv_data->invoice_numbers)) ? $inv_data->invoice_numbers : '-';
-				$inv_nilai = (!empty($inv_data->total_nilai)) ? number_format($inv_data->total_nilai, 2) : '-';
-
-				// Invoice qty calculation (how many items from customer have been invoiced)
-				$inv_qty_data = $this->db->query("
-					SELECT COALESCE(SUM(id.qty),0) AS total_inv_qty
+						COALESCE(SUM(id.harga_total_idr),0) AS total_nilai,
+						COALESCE(SUM(id.qty),0) AS total_inv_qty
 					FROM tr_invoice_detail id
 					LEFT JOIN tr_invoice_header ih ON id.no_invoice = ih.no_invoice
 					WHERE ih.no_ipp = '".$this->db->escape_str(str_replace('BQ-','',$id_bq))."'
 					AND ih.no_po = '".$this->db->escape_str($no_po)."'
 					AND id.nm_material LIKE '%".$this->db->escape_like_str($detail['product'])."%'
 				")->row();
-				$inv_qty = (!empty($inv_qty_data)) ? (int)$inv_qty_data->total_inv_qty : 0;
+
+				$no_invoice = (!empty($inv_data->invoice_numbers)) ? $inv_data->invoice_numbers : '-';
+				$inv_nilai = (!empty($inv_data->total_nilai) && $inv_data->total_nilai > 0) ? number_format($inv_data->total_nilai, 2) : '-';
+				$inv_qty = (!empty($inv_data)) ? (int)$inv_data->total_inv_qty : 0;
 
 				$inv_r = $inv_qty; // Items invoiced
 				$inv_o = $cust_r - $inv_qty; // Items not yet invoiced

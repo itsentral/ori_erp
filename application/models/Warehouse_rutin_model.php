@@ -584,113 +584,133 @@ class Warehouse_rutin_model extends CI_Model {
 
 
 			// Jurnal
-				// $data_po = $this->db->query("SELECT * FROM tran_po_header WHERE no_po='$no_po'")->row();
-				// $datajurnal1 = $this->db->query("select * from " . DBACC . ".master_oto_jurnal_detail where kode_master_jurnal='" . $jenis_jurnal . "' order by parameter_no")->result();
-				// $hutang = 0;
-				// $uangmuka = 0;
-				// $kurs=$kurs_ros;
-				// $total_harga=0;
-				// $total_rupiah=$total_harga_product;
-				// $total_forex=$total_harga_product_usd;
-				// $selisih_kurs=0;
-				// if(!empty($datajurnal1)){
-				// 	foreach ($datajurnal1 as $rec) {
-				// 		if ($rec->parameter_no == "1") {
-				// 			foreach ($CoaMaterial as $key =>$values){
-				// 				$hargaforwardingpercoa = 0;
-				// 				if($values > 0 AND $total_harga_product > 0){
-				// 				$hargaforwardingpercoa = (($values/$total_harga_product)*$total_forward_bef_ppn);
-				// 				}
-				// 				$det_Jurnaltes1[] = array(
-				// 					'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $key, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : ($values+$hargaforwardingpercoa)), 'kredit' => ($rec->posisi == 'D' ? 0 : ($values+$hargaforwardingpercoa)), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 				);
-				// 			}
-				// 		}
-				// 		if ($rec->parameter_no == "2") {
-				// 			$uangmuka = $total_rupiah;
-				// 			if ($data_po->nilai_dp > 0) {
-				// 				if ($data_po->nilai_dp <= $total_forex) {
-				// 					$uangmuka = $data_po->nilai_dp_kurs;//($kurs * $data_po->nilai_dp);
-				// 					$selisih_kurs=($uangmuka-($kurs * $data_po->nilai_dp));
-				// 					$hutang = ($total_rupiah - ($kurs * $data_po->nilai_dp));
-				// 					$this->db->query("update tran_po_header set nilai_terima_barang_kurs=".$hutang.",proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 where no_po='" . $no_po . "'");
-				// 				} else {
-				// 					$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
-				// 					$selisih_kurs=(($data_po->total_forex*$nilai_kurs_saat_dp)-($kurs * $data_po->total_forex));
+				$data_po = $this->db->query("SELECT * FROM tran_po_header WHERE no_po='$no_po'")->row();
+				$datajurnal1 = $this->db->query("select * from " . DBACC . ".master_oto_jurnal_detail where kode_master_jurnal='" . $jenis_jurnal . "' order by parameter_no")->result();
+				$hutang = 0;
+				$hutang_kurs = 0;
+				$uangmuka = 0;
+				$uangmukausd = 0;
+				$kurs=$kurs_ros;
+				$total_harga=0;
+				$total_rupiah=$total_harga_product;
+				$total_forex=$total_harga_product_usd;
+				$selisih_kurs=0;
+				$coa_hutang_unbill='';
+				$unbill_nilai=0;
+				if(!empty($datajurnal1)){
+					foreach ($datajurnal1 as $rec) {
+						if ($rec->parameter_no == "1") {
+							foreach ($CoaMaterial as $key =>$values){
+								$hargaforwardingpercoa = 0;
+								if($values > 0 AND $total_harga_product > 0){
+								$hargaforwardingpercoa = (($values/$total_harga_product)*$total_forward_bef_ppn);
+								}
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $key, 'keterangan' => 'Material ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : ($values+$hargaforwardingpercoa)), 'kredit' => ($rec->posisi == 'D' ? 0 : ($values+$hargaforwardingpercoa)), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => $key
+								);
+							}
+						}
+						if ($rec->parameter_no == "2") {
+							$uangmuka = $total_rupiah;
 
-				// 					$this->db->query("update tran_po_header set proses_uang_muka='Y', nilai_dp=(nilai_dp-" . $total_forex . "), sisa_dp=(sisa_dp-" . $total_forex . ") where no_po='" . $no_po . "'");
-				// 				}
-				// 				$det_Jurnaltes1[] = array(
-				// 					'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $uangmuka), 'kredit' => ($rec->posisi == 'D' ? 0 : $uangmuka), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 				);
-				// 			} else {
-				// 				$det_Jurnaltes1[] = array(
-				// 					'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 				);
-				// 			}
-				// 		}
-				// 		if ($rec->parameter_no == "3") {
-				// 			if ($hutang > 0) {
-				// 				$det_Jurnaltes1[] = array(
-				// 					'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 				);
-				// 			} else {
-				// 				$det_Jurnaltes1[] = array(
-				// 					'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $total_rupiah), 'kredit' => ($rec->posisi == 'D' ? 0 : $total_rupiah), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 				);
-				// 			}
-				// 		}
-				// 		if ($rec->parameter_no == "4") {
-				// 			$det_Jurnaltes1[] = array(
-				// 				'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Cash/Bank' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 			);
-				// 		}
-				// 		if ($rec->parameter_no == "5") {
-				// 			$det_Jurnaltes1[] = array(
-				// 				'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Forwarder ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 			);
-				// 		}
-				// 		if ($rec->parameter_no == "6") {
-				// 			$det_Jurnaltes1[] = array(
-				// 				'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN dibayar dimuka' . $no_po, 'no_request' => $no_po, 'debet' => $total_forward_ppn, 'kredit' => 0, 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 			);
-				// 		}
-				// 		if ($rec->parameter_no == "7") {
-				// 			$det_Jurnaltes1[] = array(
-				// 				'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs' . $no_po, 'no_request' => $no_po, 'kredit' => ($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => ($selisih_kurs>=0?$selisih_kurs:0), 'no_reff' => $no_ros, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier
-				// 			);
-				// 		}
-				// 	}
-				// }
-				// $this->db->query("update tran_po_header set total_terima_barang_idr=(total_terima_barang_idr+" . $total_rupiah . ") where no_po='" . $no_po . "'");
-				// if(!empty($det_Jurnaltes1)){
-				// $this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
-				// }
-			// loping warehouse_adjustment_detail
-			// foreach ($ArrDeatilAdj as $key=>$val){
-			// 	$harga_freight = 0;
-			// 	if($total_harga_product > 0){
-			// 	$harga_freight=round(((($val['harga']*$val['check_qty_oke'])/$total_harga_product)*$total_forward_bef_ppn/$val['check_qty_oke']),0);
-			// 	}
-			// 	$ArrDeatil[$key]['harga_freight'] = $harga_freight;
-			// 	$stock_exp	= "SELECT sum(stock) as ttl_qty,sum((stock)*harga) as ttl_harga FROM warehouse_rutin_stock WHERE code_group = '".$val['id_material']."' and gudang='10' group by code_group";
-			// 	$dtstock	= $this->db->query($stock_exp)->result();
+							$coa_uangmuka=$rec->no_perkiraan;
+							if($kurs_ros>1) $coa_uangmuka='1111-01-02';
 
-			// 	if(!empty($dtstock)){
-			// 		$ttl_harga=($dtstock[0]->ttl_harga+(($val['harga']+$harga_freight)*$val['check_qty_oke']));
-			// 		$ttl_qty=($dtstock[0]->ttl_qty+$val['check_qty_oke']);
-			// 		$newharga=0;
-			// 		if($ttl_qty > 0 AND $ttl_harga > 0){
-			// 		$newharga=round(($ttl_harga/$ttl_qty),0);
-			// 		}
-			// 		$this->db->query("update warehouse_rutin_stock set harga='".$newharga."' WHERE code_group = '".$val['id_material']."' and gudang='10'");
-			// 	}else{
-			// 		if(!empty($ArrStockNew)){
-			// 			$newharga=($val['harga']+$harga_freight);
-			// 			$ArrStockNew[$val['id_material']]['harga']=$newharga;
-			// 		}
-			// 	}
-			// }
+							if ($data_po->nilai_dp > 0) {
+								if ($data_po->nilai_dp <= $total_forex) {
+									$uangmuka = $data_po->nilai_dp_kurs;
+									$uangmukausd = $data_po->nilai_dp;
+									$selisih_kurs=($uangmuka-($kurs * $data_po->nilai_dp));
+									$hutang = ($total_rupiah - ($kurs * $data_po->nilai_dp));
+									$hutang_kurs = $total_forex-$data_po->nilai_dp;
+									$this->db->query("update tran_po_header set nilai_terima_barang_kurs=".$hutang.",proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 where no_po='" . $no_po . "'");
+								} else {
+									$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
+									$selisih_kurs=(($total_forex*$nilai_kurs_saat_dp)-($kurs * $total_forex));
+									$uangmuka = ($total_forex * $nilai_kurs_saat_dp);
+									$uangmukausd = $total_forex;
+									$hutang = 0;
+									$hutang_kurs = 0;
+
+									$this->db->query("update tran_po_header set proses_uang_muka='Y', nilai_dp=(nilai_dp-" . $total_forex . "), sisa_dp=(sisa_dp-" . $total_forex . ") where no_po='" . $no_po . "'");
+								}
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_uangmuka, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $uangmuka), 'kredit' => ($rec->posisi == 'D' ? 0 : $uangmuka), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $uangmukausd), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $uangmukausd), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+							} else {
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_uangmuka, 'keterangan' => 'Uang muka ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+							}
+						}
+						if ($rec->parameter_no == "3") {
+							$coa_hutang_unbill=$rec->no_perkiraan;
+							if($kurs_ros>1) $coa_hutang_unbill='2101-01-05';
+							if ($hutang > 0) {
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+								$unbill_nilai=$hutang;
+							} else {
+								$det_Jurnaltes1[] = array(
+									'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $total_rupiah), 'kredit' => ($rec->posisi == 'D' ? 0 : $total_rupiah), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $total_forex), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $total_forex), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+								);
+								$unbill_nilai=$total_rupiah;
+							}
+						}
+						if ($rec->parameter_no == "4") {
+							$det_Jurnaltes1[] = array(
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Cash/Bank ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+							);
+						}
+						if ($rec->parameter_no == "5") {
+							$det_Jurnaltes1[] = array(
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Hutang Forwarder ' . $no_po, 'no_request' => $no_po, 'debet' => 0, 'kredit' => ($total_forward_bef_ppn+$total_forward_ppn), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+							);
+						}
+						if ($rec->parameter_no == "6") {
+							$det_Jurnaltes1[] = array(
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN dibayar dimuka ' . $no_po, 'no_request' => $no_po, 'debet' => $total_forward_ppn, 'kredit' => 0, 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+							);
+						}
+						if ($rec->parameter_no == "7") {
+							$det_Jurnaltes1[] = array(
+								'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'Selisih kurs ' . $no_po, 'no_request' => $no_po, 'kredit' => ($selisih_kurs<0?($selisih_kurs*-1):0), 'debet' => ($selisih_kurs>=0?$selisih_kurs:0), 'nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0, 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' => ''
+							);
+						}
+					}
+				}
+				$this->db->query("update tran_po_header set total_terima_barang_idr=(total_terima_barang_idr+" . $total_rupiah . ") where no_po='" . $no_po . "'");
+				if(!empty($det_Jurnaltes1)){
+					$this->db->insert_batch('jurnaltras', $det_Jurnaltes1);
+				}
+
+			// loping warehouse_adjustment_detail - update harga rata-rata
+			foreach ($ArrDeatilAdj as $key=>$val){
+				$harga_freight = 0;
+				if($total_harga_product > 0){
+				$harga_freight=round(((($val['harga']*$val['check_qty_oke'])/$total_harga_product)*$total_forward_bef_ppn/$val['check_qty_oke']),0);
+				}
+				$stock_exp	= "SELECT sum(stock) as ttl_qty,sum((stock)*harga) as ttl_harga FROM warehouse_rutin_stock WHERE code_group = '".$val['id_material']."' and gudang='".$gudang."' group by code_group";
+				$dtstock	= $this->db->query($stock_exp)->result();
+
+				if(!empty($dtstock)){
+					$ttl_harga=($dtstock[0]->ttl_harga+(($val['harga']+$harga_freight)*$val['check_qty_oke']));
+					$ttl_qty=($dtstock[0]->ttl_qty+$val['check_qty_oke']);
+					$newharga=0;
+					if($ttl_qty > 0 AND $ttl_harga > 0){
+					$newharga=round(($ttl_harga/$ttl_qty),0);
+					}
+					$this->db->query("update warehouse_rutin_stock set harga='".$newharga."' WHERE code_group = '".$val['id_material']."' and gudang='".$gudang."'");
+				}else{
+					if(!empty($ArrStockNew)){
+						$newharga=($val['harga']+$harga_freight);
+						if(isset($ArrStockNew[$val['id_material']])){
+							$ArrStockNew[$val['id_material']]['harga']=$newharga;
+						}
+					}
+				}
+			}
 
 
 				$this->db->update_batch('tran_po_detail', $ArrUpdate, 'id');
