@@ -757,7 +757,10 @@ class Warehouse_rutin_model extends CI_Model {
 		}
 		else{
 			if(!empty($grouping_temp)){
+				// Simpan dp_amount ke session untuk dipakai auto_jurnal_product
+				$this->session->set_userdata('dp_potong_'.$kode_trans, $uangmuka);
 				insert_jurnal_stock($grouping_temp,NULL,10,$kode_trans,'incoming stok','penambahan gudang indirect','incoming stok');
+				$this->session->unset_userdata('dp_potong_'.$kode_trans);
 			}
 			history($histHlp);
 //			$this->db->trans_rollback();

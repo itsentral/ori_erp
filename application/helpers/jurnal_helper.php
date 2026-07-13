@@ -2483,14 +2483,14 @@
 			
 			$totalall = $datajurnal->nilaibayar;
 
-			// Ambil data DP dari jurnaltras yang sudah di-insert oleh process_incoming
+			// Ambil data DP dari session (disimpan oleh process_incoming)
 			$data_po_jurnal=$CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='".$id."') limit 1" )->row();
 			$dp_amount = 0;
 			if(!empty($data_po_jurnal)){
-				// Cek apakah ada jurnal DP yang sudah dibuat di jurnaltras untuk transaksi ini
-				$jurnaltras_dp = $CI->db->query("select sum(kredit) as total_dp from jurnaltras where no_reff='".$id."' and jenis_jurnal='JV035' and keterangan like 'Uang muka%'")->row();
-				if(!empty($jurnaltras_dp) && $jurnaltras_dp->total_dp > 0){
-					$dp_amount = $jurnaltras_dp->total_dp;
+				// Baca dp yang dipotong dari session
+				$dp_session = $CI->session->userdata('dp_potong_'.$id);
+				if(!empty($dp_session) && $dp_session > 0){
+					$dp_amount = $dp_session;
 				}
 			}
 			$unbill_amount = $totalall - $dp_amount;
