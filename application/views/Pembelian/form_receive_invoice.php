@@ -230,9 +230,14 @@ echo '$("#frm_data :input").prop("disabled", true);' ;
    			d_error='No Invoice / Kwitansi Error!';
    			alert(d_error);
    		}
+   		var group_top = $("#group_top").val();
+   		var potong_um = parseFloat($("#potong_um").val()) || 0;
    		if(invoice_total=="" || invoice_total=="0"){
-   			d_error='Total Amount Error!';
-   			alert(d_error);
+   			// Jika progress dan potongan DP >= incoming (balance), invoice total 0 diperbolehkan
+   			if(!(group_top == 'progress' && potong_um > 0)){
+   				d_error='Total Amount Error!';
+   				alert(d_error);
+   			}
    		}		
 		if ($('#matauang').val() == "") {
             d_error='Mata Uang Error!';
