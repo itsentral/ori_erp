@@ -2481,17 +2481,28 @@
 			$det_Jurnaltes = [];
 			$unbill_coa='';
 			
-			// print_r($id);
-			// exit;
-			
+			$totalall = $datajurnal->nilaibayar;
+
+			// Ambil data DP dari jurnaltras yang sudah di-insert oleh process_incoming
+			$data_po_jurnal=$CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='".$id."') limit 1" )->row();
+			$dp_amount = 0;
+			if(!empty($data_po_jurnal)){
+				// Cek apakah ada jurnal DP yang sudah dibuat di jurnaltras untuk transaksi ini
+				$jurnaltras_dp = $CI->db->query("select sum(kredit) as total_dp from jurnaltras where no_reff='".$id."' and jenis_jurnal='JV035' and keterangan like 'Uang muka%'")->row();
+				if(!empty($jurnaltras_dp) && $jurnaltras_dp->total_dp > 0){
+					$dp_amount = $jurnaltras_dp->total_dp;
+				}
+			}
+			$unbill_amount = $totalall - $dp_amount;
+
 			foreach($masterjurnal AS $record){
 				$posisi = $record->posisi;
 				$nokir  = $record->no_perkiraan;
-				$param  = 'id';
-				$value_param  = $id;
+				$parameter_no = $record->parameter_no;
 				$jenisjurnal = $ket;
-				$totalall = $datajurnal->nilaibayar;
-				if ($posisi=='D'){
+
+				// Parameter 1: Material (Debit)
+				if ($parameter_no == '1' && $posisi=='D'){
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
 					  'tanggal'       => $tgl_voucher,
@@ -2505,7 +2516,25 @@
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					 );
-				} elseif ($posisi=='K'){
+				}
+				// Parameter 2: Uang Muka / DP (Kredit) - hanya jika ada DP
+				if ($parameter_no == '2' && $dp_amount > 0){
+					$det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => $nokir,
+					  'keterangan'    => $Keterangan_INV,
+					  'no_reff'       => $id,
+					  'debet'         => 0,
+					  'kredit'        => $dp_amount,
+					  'jenis_jurnal'  => $jenisjurnal,
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					 );
+				}
+				// Parameter 3: Unbill A/P (Kredit) - sisa setelah DP
+				if ($parameter_no == '3' && $unbill_amount > 0){
 					$unbill_coa=$nokir;
 					$det_Jurnaltes[]  = array(
 					  'nomor'         => '',
@@ -2515,12 +2544,13 @@
 					  'keterangan'    => $Keterangan_INV,
 					  'no_reff'       => $id,
 					  'debet'         => 0,
-					  'kredit'        => $totalall,
+					  'kredit'        => $unbill_amount,
 					  'jenis_jurnal'  => $jenisjurnal,
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					 );
 				}
+				// Parameter 4-8: skip (Cash, Forwarder, PPN, Selisih Kurs, Import Duty tidak relevan di auto jurnal)
 			}
 			$CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='".$UserName."',approval_date='".$DateTime."' WHERE kode_trans ='$id' and category='".$jenisjurnal."'");
 			$CI->db->insert_batch('jurnaltras',$det_Jurnaltes);
@@ -2545,20 +2575,23 @@
 			}
 			$data_po=$CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='".$id."') limit 1" )->row();
 			if($data_po->mata_uang!='IDR') $unbill_coa='2101-01-04';
-			$datahutang = array(
-				'tipe'       	 => 'JV',
-				'nomor'       	 => $Nomor_JV,
-				'tanggal'        => $tgl_voucher,
-				'no_perkiraan'   => $unbill_coa,
-				'keterangan'     => $Keterangan_INV,
-				'no_reff'     	 => $data_po->no_po,
-				'kredit'      	 => $datajurnal->nilaibayar,
-				'debet'          => 0,
-				'id_supplier'    => $data_po->id_supplier,
-				'nama_supplier'  => $data_po->nm_supplier,
-				'no_request'     => $id,
-			);
-			$CI->db->insert('tr_kartu_hutang',$datahutang);
+			if(empty($unbill_coa)) $unbill_coa='2101-01-03';
+			if($unbill_amount > 0){
+				$datahutang = array(
+					'tipe'       	 => 'JV',
+					'nomor'       	 => $Nomor_JV,
+					'tanggal'        => $tgl_voucher,
+					'no_perkiraan'   => $unbill_coa,
+					'keterangan'     => $Keterangan_INV,
+					'no_reff'     	 => $data_po->no_po,
+					'kredit'      	 => $unbill_amount,
+					'debet'          => 0,
+					'id_supplier'    => $data_po->id_supplier,
+					'nama_supplier'  => $data_po->nm_supplier,
+					'no_request'     => $id,
+				);
+				$CI->db->insert('tr_kartu_hutang',$datahutang);
+			}
 			unset($det_Jurnaltes);unset($datadetail);unset($datahutang);
 		}
 		if($ket=='outgoing stok'){
