@@ -2977,13 +2977,32 @@
 			$det_Jurnaltes = [];
 			$total_bm_asset = 0;
 			$is_valas = ($kurs_asset > 1) ? true : false;
+
+			// Ambil data BM dari report_of_shipment_product (samakan dengan incoming material)
+			$bm_per_item = [];
+			if ($is_valas) {
+				$data_ros_asset = $CI->db->query("SELECT * FROM report_of_shipment WHERE no_po='".$first_no_po."' ORDER BY id DESC LIMIT 1")->row();
+				if (!empty($data_ros_asset)) {
+					$ros_products = $CI->db->query("SELECT * FROM report_of_shipment_product WHERE id_ros='".$data_ros_asset->id."'")->result();
+					foreach ($ros_products as $rp) {
+						if (!empty($rp->bm) && $rp->bm > 0) {
+							$bm_per_item[$rp->id_material] = $rp->bm;
+						}
+					}
+				}
+			}
+
 			foreach($datajurnal AS $rec){
-				// parameter_no 1: Debit Asset
+				// parameter_no 1: Debit Asset (termasuk BM)
 				if ($rec->parameter_no == "1") {
 					foreach($val_asset AS $val){
 						$tgl_voucher = $val->tanggal;
 						$no_po = $val->no_ipp;
 						$nilaibayar = $val->total_nilai * $kurs_asset;
+						// Tambahkan BM jika ada
+						$bm_item = isset($bm_per_item[$val->id_material]) ? $bm_per_item[$val->id_material] : 0;
+						$nilaibayar += $bm_item;
+						$total_bm_asset += $bm_item;
 						$det_Jurnaltes[] = array(
 							'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
 							'no_perkiraan' => $val->coa,
@@ -3054,7 +3073,7 @@
 						'jenis_jurnal' => $jenisjurnal, 'no_request' => $id
 					);
 				}
-				// parameter_no 5: Hutang Bea Masuk
+				// parameter_no 5: Hutang Bea Masuk (forwarder/PPJK - belum diimplementasi untuk asset)
 				if ($rec->parameter_no == "5") {
 					$det_Jurnaltes[] = array(
 						'nomor' => '', 'tanggal' => $tgl_voucher, 'tipe' => 'JV',
