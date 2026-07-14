@@ -32,7 +32,7 @@ class Serah_terima_asset_model extends CI_Model{
         $this->db->trans_start();
 
         $data_session = $this->session->userdata;
-        $user_id = $data_session['ORI_User']['id'];
+        $user_id = $data_session['ORI_User']['username'];
 
         $form_no = $this->generateFormNo();
 
@@ -91,7 +91,7 @@ class Serah_terima_asset_model extends CI_Model{
         $this->db->trans_start();
 
         $data_session = $this->session->userdata;
-        $user_id = $data_session['ORI_User']['id'];
+        $user_id = $data_session['ORI_User']['username'];
         $header_id = $post['id'];
 
         // Update Header
@@ -177,7 +177,7 @@ class Serah_terima_asset_model extends CI_Model{
      */
     public function deleteSerahTerima($id){
         $data_session = $this->session->userdata;
-        $user_id = $data_session['ORI_User']['id'];
+        $user_id = $data_session['ORI_User']['username'];
 
         $this->db->where('id', $id);
         $this->db->update('serah_terima_asset', array(
