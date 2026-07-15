@@ -3126,15 +3126,27 @@ else
 			$totaluangmuka2_idr = 0;
 
 			if($jenis_invoice=='uang muka' && $um_persen2 != 0){
-				$totaluangmuka2_idr = $this->input->post('grand_total') - $this->input->post('down_payment');
-				$totaluangmuka2 = $totaluangmuka2/$kurs;
+				$totaluangmuka2_idr = str_replace(',','',$this->input->post('grand_total')) - str_replace(',','',$this->input->post('down_payment'));
+				$totaluangmuka2 = $totaluangmuka2_idr/$kurs;
 			}
 			if($jenis_invoice=='progress' && $um_persen2 != 0){
-				$totaluangmuka2_idr = $this->input->post('down_payment2');
-				$totaluangmuka2 = $totaluangmuka2/$kurs;
+				$totaluangmuka2_idr = str_replace(',','',$this->input->post('down_payment2'));
+				$totaluangmuka2 = $totaluangmuka2_idr/$kurs;
 			}
 
 			//INSERT DATABASE TR INVOICE HEADER
+			$tot_product_clean		= str_replace(',','',$this->input->post('tot_product'));
+			$total_material_clean	= str_replace(',','',$this->input->post('total_material'));
+			$total_bq_nf_clean		= str_replace(',','',$this->input->post('total_bq_nf'));
+			$total_enginering_clean	= str_replace(',','',$this->input->post('total_enginering'));
+			$total_packing_clean	= str_replace(',','',$this->input->post('total_packing'));
+			$total_trucking_clean	= str_replace(',','',$this->input->post('total_trucking'));
+			$grand_total_clean		= str_replace(',','',$this->input->post('grand_total'));
+			$potongan_retensi_clean	= str_replace(',','',$this->input->post('potongan_retensi'));
+			$ppn_clean				= str_replace(',','',$this->input->post('ppn'));
+			$total_invoice_clean_idr= str_replace(',','',$this->input->post('total_invoice'));
+			$down_payment_clean		= str_replace(',','',$this->input->post('down_payment'));
+
 			$headerinv = [
 				'keterangan'				=> $this->input->post('keterangan'),
 				'ppnselect' 		     	=> $ppnselect,
@@ -3147,32 +3159,32 @@ else
 				'nm_customer' 		      	=> $nm_customer,
 				'persentase' 		        => $progress,
 				'progress_persen' 			=> $this->input->post('persen'),
-				'total_product'	         	=> $this->input->post('tot_product')/$kurs,
-				'total_product_idr'	        => $this->input->post('tot_product'),
+				'total_product'	         	=> $tot_product_clean/$kurs,
+				'total_product_idr'	        => $tot_product_clean,
 				'total_gab_product'	        => $total_gab_product,
 				'total_gab_product_idr'	    => $total_gab_product_idr,
-				'total_material'	        => $this->input->post('total_material')/$kurs,
-				'total_material_idr'	    => $this->input->post('total_material'),
-				'total_bq'	                => $this->input->post('total_bq_nf')/$kurs,
-				'total_bq_idr'	            => $this->input->post('total_bq_nf'),
-				'total_enginering'	        => $this->input->post('total_enginering')/$kurs,
-				'total_enginering_idr'	    => $this->input->post('total_enginering'),
-				'total_packing'	            => $this->input->post('total_packing')/$kurs,
-				'total_packing_idr'	        => $this->input->post('total_packing'),
-				'total_trucking'	        => $this->input->post('total_trucking')/$kurs,
-				'total_trucking_idr'	    => $this->input->post('total_trucking'),
-				'total_dpp_usd'	            => $this->input->post('grand_total')/$kurs,
-				'total_dpp_rp'	            => $this->input->post('grand_total'),
+				'total_material'	        => $total_material_clean/$kurs,
+				'total_material_idr'	    => $total_material_clean,
+				'total_bq'	                => $total_bq_nf_clean/$kurs,
+				'total_bq_idr'	            => $total_bq_nf_clean,
+				'total_enginering'	        => $total_enginering_clean/$kurs,
+				'total_enginering_idr'	    => $total_enginering_clean,
+				'total_packing'	            => $total_packing_clean/$kurs,
+				'total_packing_idr'	        => $total_packing_clean,
+				'total_trucking'	        => $total_trucking_clean/$kurs,
+				'total_trucking_idr'	    => $total_trucking_clean,
+				'total_dpp_usd'	            => $grand_total_clean/$kurs,
+				'total_dpp_rp'	            => $grand_total_clean,
 				'total_diskon'	            => $diskon/$kurs,
 				'total_diskon_idr'	        => $diskon,
-				'total_retensi'	            => $this->input->post('potongan_retensi')/$kurs,
-				'total_retensi_idr'	        => $this->input->post('potongan_retensi'),
-				'total_ppn'	                => $this->input->post('ppn')/$kurs,
-				'total_ppn_idr'	            => $this->input->post('ppn'),
-				'total_invoice'	            => $this->input->post('total_invoice')/$kurs,
-				'total_invoice_idr'	        => $this->input->post('total_invoice'),
-				'total_um'	                => $this->input->post('down_payment')/$kurs,
-				'total_um_idr'	            => $this->input->post('down_payment'),
+				'total_retensi'	            => $potongan_retensi_clean/$kurs,
+				'total_retensi_idr'	        => $potongan_retensi_clean,
+				'total_ppn'	                => $ppn_clean/$kurs,
+				'total_ppn_idr'	            => $ppn_clean,
+				'total_invoice'	            => $total_invoice_clean_idr/$kurs,
+				'total_invoice_idr'	        => $total_invoice_clean_idr,
+				'total_um'	                => $down_payment_clean/$kurs,
+				'total_um_idr'	            => $down_payment_clean,
 				'kurs_jual'	                => $kurs,
 				'no_po'	                    => $this->input->post('nomor_po'),
 				'no_faktur'	                => $this->input->post('nomor_faktur'),
@@ -3186,8 +3198,8 @@ else
 				'base_cur'					=> $base_cur,
 				'total_retensi2'			=> $retensi_ppn/$kurs,
 				'total_retensi2_idr'		=> $retensi_ppn,
-				'sisa_invoice'	        	=> $this->input->post('total_invoice')/$kurs,
-				'sisa_invoice_idr'	        => $this->input->post('total_invoice'),
+				'sisa_invoice'	        	=> $total_invoice_clean_idr/$kurs,
+				'sisa_invoice_idr'	        => $total_invoice_clean_idr,
 				'so_number'					=> $so_number
 			];
 
@@ -3634,8 +3646,8 @@ else
 				'progress_persen' => $progress_pex,
 				'grand_total' => $grand_total,
 				'status'	=> $stsx,
-				'real_tagih_usd'	=> $this->input->post('total_invoice') /$kurs,
-				'real_tagih_idr'	=> $this->input->post('total_invoice')
+				'real_tagih_usd'	=> $total_invoice_clean_idr/$kurs,
+				'real_tagih_idr'	=> $total_invoice_clean_idr
 			];
 }
 			$this->db->trans_start();
