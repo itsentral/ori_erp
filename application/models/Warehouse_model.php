@@ -1052,6 +1052,8 @@ class Warehouse_model extends CI_Model {
 							$this->db->query("update tran_material_po_header set nilai_terima_barang_kurs=".$hutang.",proses_uang_muka='Y', nilai_dp=0, sisa_dp=0 where no_po='" . $no_po . "'");
 						} else {
 							$nilai_kurs_saat_dp=($data_po->nilai_dp_kurs/$data_po->nilai_dp);
+							$uangmuka = ($total_forex * $nilai_kurs_saat_dp);
+							$uangmukausd = $total_forex;
 							$selisih_kurs=(($total_forex*$nilai_kurs_saat_dp)-($kurs * $total_forex));
 
 							$this->db->query("update tran_material_po_header set proses_uang_muka='Y', nilai_dp=(nilai_dp-" . $total_forex . "), sisa_dp=(sisa_dp-" . $total_forex . ") where no_po='" . $no_po . "'");
@@ -1076,13 +1078,9 @@ class Warehouse_model extends CI_Model {
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
 						);
 						$unbill_nilai=$hutang;
-					} else {
-						$det_Jurnaltes1[] = array(
-							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $total_rupiah), 'kredit' => ($rec->posisi == 'D' ? 0 : $total_rupiah), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
-						);
 					}
 					$unbill_coa=$rec->no_perkiraan;
-					$unbill_nilai=$total_rupiah;
+					if($hutang > 0) $unbill_nilai=$total_rupiah;
 				}
 				if ($rec->parameter_no == "4") {
 					$det_Jurnaltes1[] = array(
