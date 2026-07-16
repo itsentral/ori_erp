@@ -716,7 +716,7 @@ class Pembayaran_material extends CI_Controller {
 				bayar_kurs=(bayar_kurs+".($data->nilai_po_invoice)."),
 				bayar_idr=(bayar_idr+".($data->nilai_po_invoice*$curs)."),
 				sisa_hutang_kurs=(sisa_hutang_kurs-".($data->nilai_po_invoice)."),
-				sisa_hutang_idr=(sisa_hutang_idr-".($data->nilai_po_invoice*$curs).")				
+				sisa_hutang_idr=(sisa_hutang_idr-".($data->nilai_po_invoice*$kurs_hutang).")				
 				".
 				($data->tipe=='TR-01'? 
 				",nilai_dp=(nilai_dp+".$data->nilai_po_invoice."), sisa_dp=(sisa_dp+".$data->nilai_po_invoice.")" : 
@@ -744,7 +744,7 @@ class Pembayaran_material extends CI_Controller {
 				'no_perkiraan'   => $coahutang,
 				'keterangan'     => $keterangan,
 				'no_reff'     	 => $data->no_po,
-				'debet'      	 => (($data->nilai_po_invoice+$data->invoice_ppn)*$curs),
+				'debet'      	 => (($data->nilai_po_invoice+$data->invoice_ppn)*$kurs_hutang),
 				'kredit'         => 0,
 				'id_supplier'    => $data->id_supplier,
 				'nama_supplier'  => $data_supplier->nm_supplier,
