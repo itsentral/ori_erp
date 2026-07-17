@@ -131,17 +131,13 @@ $NOS_PO = implode('/',array_unique($nomorPO));
  <body>
 <table class="gridtable2" width="700" border="0" style="border-bottom:none;">
 	<tr>
-		<td rowspan="7" style="border-bottom:none; border-right:none;" width="120" align="center" valign="middle">
+		<td rowspan="7" style="border-bottom:none; border-right:none;" width="140" align="center" valign="middle">
 			<?php if(!empty($logo_url)): ?>
 			<img src="<?=$logo_url;?>" height="60" width="55">
 			<?php endif; ?>
 		</td>
-		<td rowspan="7" align="center" style="border-bottom:none; border-left:none; vertical-align:top;" colspan="3" width="200">
-			<b>PT. ORI POLYTEC COMPOSITES</b><br>
-			Jl. Akasia II Block A9/3<br>
-			Cikarang - Bekasi - Indonesia<br>
-			Telp : (021) 8972193<br>
-			Fax  : 8972192
+		<td colspan="3" align="center" style="border-bottom:none; border-left:none; border-top:none;" width="200">
+			<b>PT. ORI POLYTEC COMPOSITES</b>
 		</td>
 		<td style="font-size: 9px; border-right:none; border-bottom: none;">Form No</td>
 		<td style="font-size: 9px; border-left:none; border-right:none; border-bottom: none;" width="2" >:</td>
@@ -149,11 +145,13 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 		<td style="border-bottom:none;" colspan="3" rowspan="2" align="center" width="220"><u><b>DISTRIBUSI SURAT JALAN</b></u></td>
 	</tr>
 	<tr>
+		<td colspan="3" align="center" style="border:none; border-left:none;">Jl. Akasia II Block A9/3</td>
 		<td style="font-size: 9px; border-right:none; border-top: none; border-bottom: none;">Rev. No</td>
 		<td style="font-size: 9px; border:none;">:</td>
 		<td style="font-size: 9px; border-left:none; border-top: none; border-bottom: none;" align=left colspan=2><?=$header_del[0]->rev;?></td>
 	</tr>
 	<tr>
+		<td colspan="3" align="center" style="border:none; border-left:none;">Cikarang - Bekasi - Indonesia</td>
 		<td style="font-size: 9px; border-right:none; border-top: none;">Issue Date</td>
 		<td style="font-size: 9px; border-right:none; border-top: none; border-left:none;">:</td>
 		<td style="font-size: 9px; border-left:none; border-top: none;" align=left colspan=2><?=$header_del[0]->issue_date;?></td>
@@ -162,12 +160,14 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 		<td style="font-size: 9px; border-bottom:none; border-left: none; border-top: none;" nowrap>Penagihan / Finance</td>
 	</tr>
 	<tr>
+		<td colspan="3" align="center" style="border:none; border-left:none;">Telp : (021) 8972193</td>
 		<td colspan="4" style="border-bottom:none;" align="center" width="260"><u><b>SURAT JALAN</b></u></td>
 		<td style="font-size: 9px; border-bottom:none; border-top: none; border-right: none;">Merah</td>
 		<td style="font-size: 9px; border:none;">:</td>
 		<td style="font-size: 9px; border-bottom:none; border-top: none; border-left:none;">PPIC/Logistik</td>
 	</tr>
 	<tr>
+		<td colspan="3" align="center" style="border:none; border-left:none; border-bottom:none;">Fax  : 8972192</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-right: none;">NO</td>
 		<td style="font-size: 12px; border:none;">:</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-left:none;" align=left colspan=2><?=strtoupper($header_del[0]->nomor_sj);?></td>
@@ -176,6 +176,7 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 		<td style="font-size: 9px; border-bottom:none; border-top: none; border-left:none;">Pembeli / Penerima</td>
 	</tr>
 	<tr>
+		<td colspan="3" style="border:none; border-left:none; border-bottom:none;">&nbsp;</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-right: none;" valign=top>NO. PO</td>
 		<td style="font-size: 12px; border:none;" valign=top width="2">:</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-left:none; word-wrap:break-word;width:120pt;" align=left colspan=2><?php
@@ -193,6 +194,7 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 		<td style="font-size: 9px; border-bottom:none; border-top: none; border-left:none;">Cost Control</td>
 	</tr>
 	<tr>
+		<td colspan="3" style="border:none; border-left:none; border-bottom:none;">&nbsp;</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-right: none;">NO. SO</td>
 		<td style="font-size: 12px; border:none;">:</td>
 		<td style="font-size: 12px; border-bottom:none; border-top: none; border-left:none;" align=left colspan=2><?=$NOS_OS;?></td>
