@@ -92,7 +92,7 @@ $status_asset  	= (!empty($data))?$data[0]['status_asset']:'';
 					<select name='lokasi' id='lokasi' class='form-control input-md chosen-select'>
 						<option value=''>Select Lokasi</option>
 						<?php
-							$arr_lokasi = array('OPC 1','OPC 2','OPC 3','Office');
+							$arr_lokasi = array('OPC 1','OPC 2','OPC 3','Office','Site');
 							foreach($arr_lokasi as $lok){
 								$sel_lok = (!empty($lokasi) && $lokasi == $lok)?'selected':'';
 								echo "<option value='".$lok."' ".$sel_lok.">".$lok."</option>";
