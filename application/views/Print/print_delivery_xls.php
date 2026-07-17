@@ -136,7 +136,7 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 			<img src="<?=$logo_url;?>" height="70" width="65">
 			<?php endif; ?>
 		</td>
-		<td rowspan="7" align="center" style="border-bottom:none; border-left:none;" colspan="3" width="140">
+		<td rowspan="7" align="center" style="border-bottom:none; border-left:none; vertical-align:top; padding-top:5px;" colspan="3" width="140">
 			<b>PT. ORI POLYTEC COMPOSITES</b><br>
 			Jl. Akasia II Block A9/3<br>
 			Cikarang - Bekasi - Indonesia<br>
