@@ -360,6 +360,19 @@ class Request_aksesoris_gudang extends CI_Controller {
 						$grouping_jurnal[$k]['qty_good'] = $v['qty'];
 					}
 					insert_jurnal_stock($grouping_jurnal, $gudang_before, $gudang_after, $kode_trans, 'outgoing stok', 'pengurangan gudang indirect', 'penambahan gudang finish good aksesoris');
+
+					// Override COA debit di jurnaltras: ganti 5204-02-28 menjadi 1103-04-01 (persediaan FG aksesoris)
+					$this->db->where('no_reff', $kode_trans);
+					$this->db->where('jenis_jurnal', 'outgoing stok');
+					$this->db->where('no_perkiraan', '5204-02-28');
+					$this->db->where('debet >', 0);
+					$this->db->update('jurnaltras', array('no_perkiraan' => '1103-04-01'));
+
+					// Override juga di tabel jurnal accounting (DBACC)
+					$this->db->where('no_reff', $kode_trans);
+					$this->db->where('no_perkiraan', '5204-02-28');
+					$this->db->where('debet >', 0);
+					$this->db->update(DBACC.'.jurnal', array('no_perkiraan' => '1103-04-01'));
 				}
 				history('Outgoing aksesoris '.$kode);
 			}
