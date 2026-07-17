@@ -3,15 +3,6 @@
 date_default_timezone_set('Asia/Jakarta');
 $today = date('l, d F Y [H:i:s]');
 
-// Logo ORI
-$sroot = $_SERVER['DOCUMENT_ROOT'];
-$logoPath = $sroot."/assets/images/ori_logo.jpg";
-$logoBase64 = '';
-if(file_exists($logoPath)){
-	$logoData = file_get_contents($logoPath);
-	$logoBase64 = 'data:image/jpeg;base64,'.base64_encode($logoData);
-}
-
 $header 		= $this->db->get_where('production', array('no_ipp'=>str_replace('PRO-','',$result[0]['id_produksi'])))->result();
 $header_del 	= $this->db->get_where('delivery_product', array('kode_delivery'=>$kode_delivery))->result();
 $alamat 		= $header_del[0]->alamat;
@@ -141,8 +132,8 @@ $NOS_PO = implode('/',array_unique($nomorPO));
 <table class="gridtable2" width="700" border="0" style="border-bottom:none;">
 	<tr>
 		<td rowspan="7" style="border-bottom:none; border-right:none;" width="80" align="center">
-			<?php if(!empty($logoBase64)): ?>
-			<img src="<?=$logoBase64;?>" height="90" width="80">
+			<?php if(!empty($logo_url)): ?>
+			<img src="<?=$logo_url;?>" height="90" width="80">
 			<?php endif; ?>
 		</td>
 		<td rowspan="7" align="center"  style="border-bottom:none; border-left:none;" colspan="3" width="140">

@@ -4249,6 +4249,7 @@ class Delivery extends CI_Controller
 			'kode_delivery'	=> $kode_delivery,
 			'GET_DESC_DEAL'	=> get_descDealSO(),
 			'GET_ID_MILIK'	=> get_idMilikSODeal(),
+			'logo_url'		=> base_url().'assets/images/ori_logo.jpg',
 		);
 		/*		$this->load->view('Print/print_delivery_xls',$data);
 */
