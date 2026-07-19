@@ -5686,6 +5686,74 @@ class Delivery extends CI_Controller
 			}
 		}
 
+		// AKSESORIS
+		$ArrGroupAksesoris = [];
+		$ArrGroupOutAksesoris = [];
+		$ArrayDeliveryAksesoris = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts_product'=>'aksesoris'))->result_array();
+		if(!empty($ArrayDeliveryAksesoris)){
+			foreach ($ArrayDeliveryAksesoris as $value => $valx) {
+				// Cari data di data_erp_fg berdasarkan no_spk (kode request) dari request_accessories
+				$getReqAcc = $this->db->get_where('request_accessories',array('id'=>$valx['id_uniq']))->result();
+				$kode_req = (!empty($getReqAcc[0]->kode))?$getReqAcc[0]->kode:'';
+
+				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good'))->result_array();
+
+				if(!empty($getSummary)){
+					foreach ($getSummary as $key => $value2x) {
+						$UNIQ2 = 'acc-'.$value.'-'.$key;
+						$ArrGroupAksesoris[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupAksesoris[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupAksesoris[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupAksesoris[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupAksesoris[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupAksesoris[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupAksesoris[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupAksesoris[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupAksesoris[$UNIQ2]['nilai_unit'] = $value2x['nilai_wip'];
+						$ArrGroupAksesoris[$UNIQ2]['created_by'] = $username;
+						$ArrGroupAksesoris[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupAksesoris[$UNIQ2]['id_trans'] = (!empty($value2x['id_trans']))?$value2x['id_trans']:'';
+						$ArrGroupAksesoris[$UNIQ2]['id_pro'] = (!empty($value2x['id_pro']))?$value2x['id_pro']:0;
+						$ArrGroupAksesoris[$UNIQ2]['qty_ke'] = (!empty($value2x['qty_ke']))?$value2x['qty_ke']:0;
+						$ArrGroupAksesoris[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupAksesoris[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupAksesoris[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupAksesoris[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupAksesoris[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupAksesoris[$UNIQ2]['gudang'] = $value2x['gudang'];
+
+						$ArrGroupOutAksesoris[$UNIQ2]['tanggal'] = date('Y-m-d');
+						$ArrGroupOutAksesoris[$UNIQ2]['keterangan'] = 'Finish Good to In Transit';
+						$ArrGroupOutAksesoris[$UNIQ2]['no_so'] 	= $value2x['no_so'];
+						$ArrGroupOutAksesoris[$UNIQ2]['product'] = $value2x['product'];
+						$ArrGroupOutAksesoris[$UNIQ2]['no_spk'] = $value2x['no_spk'];
+						$ArrGroupOutAksesoris[$UNIQ2]['kode_trans'] = $value2x['kode_trans'];
+						$ArrGroupOutAksesoris[$UNIQ2]['id_pro_det'] = $value2x['id_pro_det'];
+						$ArrGroupOutAksesoris[$UNIQ2]['qty'] = $value2x['qty'];
+						$ArrGroupOutAksesoris[$UNIQ2]['nilai_unit'] = (!empty($value2x['nilai_unit']))?$value2x['nilai_unit']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['nilai_wip'] = (!empty($value2x['nilai_wip']))?$value2x['nilai_wip']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['material'] = (!empty($value2x['material']))?$value2x['material']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['wip_direct'] = (!empty($value2x['wip_direct']))?$value2x['wip_direct']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['wip_indirect'] = (!empty($value2x['wip_indirect']))?$value2x['wip_indirect']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['wip_consumable'] = (!empty($value2x['wip_consumable']))?$value2x['wip_consumable']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['wip_foh'] = (!empty($value2x['wip_foh']))?$value2x['wip_foh']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['created_by'] = $username;
+						$ArrGroupOutAksesoris[$UNIQ2]['created_date'] = $datetime;
+						$ArrGroupOutAksesoris[$UNIQ2]['id_trans'] = (!empty($value2x['id_trans']))?$value2x['id_trans']:'';
+						$ArrGroupOutAksesoris[$UNIQ2]['id_pro'] = (!empty($value2x['id_pro']))?$value2x['id_pro']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['qty_ke'] = (!empty($value2x['qty_ke']))?$value2x['qty_ke']:0;
+						$ArrGroupOutAksesoris[$UNIQ2]['kode_delivery'] = $kode_delivery;
+						$ArrGroupOutAksesoris[$UNIQ2]['jenis'] = 'out';
+						$ArrGroupOutAksesoris[$UNIQ2]['id_material'] = $value2x['id_material'];
+						$ArrGroupOutAksesoris[$UNIQ2]['nm_material'] = $value2x['nm_material'];
+						$ArrGroupOutAksesoris[$UNIQ2]['qty_mat'] = $value2x['qty_mat'];
+						$ArrGroupOutAksesoris[$UNIQ2]['cost_book'] = $value2x['cost_book'];
+						$ArrGroupOutAksesoris[$UNIQ2]['gudang'] = $value2x['gudang'];
+					}
+				}
+			}
+		}
+
         
 		$ArrGroupMaterial = [];
 		$ArrGroupOutMaterial = [];
@@ -5997,7 +6065,15 @@ class Delivery extends CI_Controller
 				$this->db->insert_batch('data_erp_fg',$ArrGroupOutSpool);
 			}
 
-			if(!empty($ArrGroupOut) || !empty($ArrGroupOutMaterial) || !empty($ArrGroupOutSpool)){
+			if(!empty($ArrGroupAksesoris)){
+				$this->db->insert_batch('data_erp_in_transit',$ArrGroupAksesoris);
+			}
+
+			if(!empty($ArrGroupOutAksesoris)){
+				$this->db->insert_batch('data_erp_fg',$ArrGroupOutAksesoris);
+			}
+
+			if(!empty($ArrGroupOut) || !empty($ArrGroupOutMaterial) || !empty($ArrGroupOutSpool) || !empty($ArrGroupOutAksesoris)){
 				$this->jurnalIntransit($kode_delivery);
 			}
 		

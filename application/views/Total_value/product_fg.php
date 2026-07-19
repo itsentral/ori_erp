@@ -28,6 +28,18 @@ $gudang = $this->uri->segment(3);
 		<?php } elseif($gudang=='incustomer') {?>
 			<button type='button' class='btn btn-sm btn-success' id='download_excel4'><i class='fa fa-file-excel-o'></i> Download Incustomer</button>
 		<?php } ?>
+
+		<div class="row" style="margin-top:10px;">
+			<div class="col-sm-4">
+				<div class="info-box bg-aqua">
+					<span class="info-box-icon"><i class="fa fa-database"></i></span>
+					<div class="info-box-content">
+						<span class="info-box-text">Total Inventory (Total Value)</span>
+						<span class="info-box-number" id="total_inventory">Rp 0</span>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body table-responsive">
@@ -108,6 +120,7 @@ $gudang = $this->uri->segment(3);
 				var date_filter = $('#date_filter').val();
 				var category = $('#category').val();
 				DataTables(gudang, date_filter,category);
+				loadTotalInventory();
 			}
 		}
 	});
@@ -134,6 +147,7 @@ $gudang = $this->uri->segment(3);
         var gudang = $('#gudang').val();
         var date_filter = $('#date_filter').val();
         DataTables(gudang, date_filter);
+        loadTotalInventory();
         
         $(document).on('change','#gudang, #date_filter', function(e){
 			e.preventDefault();
@@ -141,6 +155,7 @@ $gudang = $this->uri->segment(3);
 			var date_filter = $('#date_filter').val();
 			var category = $('#category').val();
         	DataTables(gudang, date_filter, category);
+        	loadTotalInventory();
 		});
 
 		$(document).on('click','#search', function(e){
@@ -149,6 +164,7 @@ $gudang = $this->uri->segment(3);
 			var date_filter = $('#date_filter').val();
 			var category = $('#category').val();
         	DataTables(gudang, date_filter, category);
+        	loadTotalInventory();
 		});
 
 	    $(document).on('click', '.look_history', function(e){
@@ -224,6 +240,27 @@ $gudang = $this->uri->segment(3);
 			// 	}
 			// 	}
 			// }
+		});
+	}
+
+	function loadTotalInventory(){
+		var gudang1 = $('#gudang1').val();
+		var date_filter = $('#date_filter').val();
+		
+		$.ajax({
+			url: base_url + active_controller + '/get_total_inventory_fg',
+			type: 'POST',
+			data: {
+				gudang: gudang1,
+				date_filter: date_filter
+			},
+			dataType: 'json',
+			success: function(response){
+				$('#total_inventory').text('Rp ' + response.total_inventory_formatted);
+			},
+			error: function(){
+				$('#total_inventory').text('Rp 0');
+			}
 		});
 	}
 

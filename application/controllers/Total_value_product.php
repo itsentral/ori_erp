@@ -109,6 +109,13 @@ class Total_value_product extends CI_Controller {
         $row++;
     }
 
+    // TOTAL ROW
+    $sheet->mergeCells('A'.$row.':H'.$row);
+    $sheet->setCellValue('A'.$row, 'TOTAL');
+    $sheet->getStyle('A'.$row.':I'.$row)->getFont()->setBold(true);
+    $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+    $sheet->setCellValue('I'.$row, '=SUM(I4:I'.($row-1).')');
+
     $filename = 'Stock_'.$gudang.'_'.(!empty($date_filter)?$date_filter:date('Y-m-d')).'.xls';
 
     header("Content-Type: application/vnd.ms-excel");
@@ -328,6 +335,49 @@ private function getDataWIP($gudang, $date_filter = null){
 		);
 
 		echo json_encode($json_data);
+	}
+
+    public function get_total_inventory_fg(){
+		$gudang = $this->input->post('gudang');
+		$date_filter = $this->input->post('date_filter');
+
+		// Tentukan tabel berdasarkan gudang dan date_filter
+		if(!empty($date_filter)){
+			if($gudang=='wip'){
+				$table = "warehouse_stock_wip_per_day";
+			}elseif($gudang=='fg'){
+				$table = "warehouse_stock_fg_per_day";
+			}elseif($gudang=='intransit'){
+				$table = "warehouse_stock_intransit_per_day";
+			}elseif($gudang=='incustomer'){
+				$table = "warehouse_stock_incustomer_per_day";
+			}
+		}else{
+			if($gudang=='wip'){
+				$table = "warehouse_stock_wip";
+			}elseif($gudang=='fg'){
+				$table = "warehouse_stock_fg";
+			}elseif($gudang=='intransit'){
+				$table = "warehouse_stock_intransit";
+			}elseif($gudang=='incustomer'){
+				$table = "warehouse_stock_incustomer";
+			}
+		}
+
+		$where_date = '';
+		if(!empty($date_filter)){
+			$where_date = " WHERE DATE(a.hist_date) = '".$this->db->escape_str($date_filter)."'";
+		}
+
+		$sql = "SELECT SUM(a.nilai_wip * a.qty) AS total_inventory FROM ".$table." a ".$where_date;
+		$result = $this->db->query($sql)->row();
+
+		$total = ($result && $result->total_inventory) ? $result->total_inventory : 0;
+
+		echo json_encode(array(
+			'total_inventory' => $total,
+			'total_inventory_formatted' => number_format($total, 2, ',', '.')
+		));
 	}
 
     public function server_side_product_stock_wip(){
