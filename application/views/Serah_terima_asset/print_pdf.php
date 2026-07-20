@@ -128,7 +128,7 @@ $idt = group_company();
     <table class="header-table">
         <tr>
             <td class="logo" width="80">
-                <img src="<?= base_url('assets/img/logo.png'); ?>" alt="Logo" style="max-width:60px; max-height:50px;">
+                <img src="<?= base_url('assets/images/ori_logo.jpg'); ?>" alt="Logo" style="max-width:60px; max-height:50px;">
             </td>
             <td class="title-cell">FORM SERAH TERIMA ASSET & TOOLS</td>
             <td class="doc-info" width="180">
