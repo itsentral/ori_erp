@@ -1005,8 +1005,10 @@ class Purchase extends CI_Controller {
 					$totalap=$data['invoice_total'];
 				}
 				if($rec->parameter_no=="3"){
+					$supplier_ppn = $this->db->query("select npwp from supplier where id_supplier='".$datapo->id_supplier."' limit 1")->row();
+					$ket_ppn = 'PPN PO '.$datapo->no_po.', FP:'.(isset($data['faktur_pajak']) && $data['faktur_pajak'] != '' ? $data['faktur_pajak'] : '-').', '.(isset($supplier_ppn->npwp) ? $supplier_ppn->npwp : '').', Sup:'.(isset($datapo->nm_supplier) ? $datapo->nm_supplier : '');
 					$det_Jurnaltes1[] = array(
-						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => 'PPN PO '.$datapo->no_po, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
+						'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $rec->no_perkiraan, 'keterangan' => $ket_ppn, 'no_request' => $datapo->no_po, 'debet' => ($data['nilai_ppn'])*$data['kurs'], 'kredit' => 0, 'no_reff' => $data['invoice_no'], 'jenis_jurnal'=>$jenis_jurnal, 'nocust'=>$datapo->id_supplier, 'stspos' => '1','nilai_valas_debet' => 0, 'nilai_valas_kredit' => 0
 					);
 				}
 				if($rec->parameter_no=="7"){
