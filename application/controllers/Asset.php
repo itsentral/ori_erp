@@ -2036,5 +2036,719 @@ class Asset extends CI_Controller{
 		echo json_encode($Arr_Data);
 	}
 
+	// ==================== UPLOAD ASSET ====================
+
+	public function upload(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses			= getAcccesmenu($controller);
+		if($Arr_Akses['create'] !='1'){
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$data = array(
+			'title'			=> 'Upload Asset (Bulk Import)',
+			'action'		=> 'upload',
+			'akses_menu'	=> $Arr_Akses
+		);
+		$this->load->view('Asset/upload', $data);
+	}
+
+	public function download_template_upload(){
+		set_time_limit(0);
+		ini_set('memory_limit','512M');
+		$this->load->library("PHPExcel");
+		$objPHPExcel = new PHPExcel();
+
+		$style_header = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb'=>'000000')
+				)
+			),
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb'=>'4472C4'),
+			),
+			'font' => array(
+				'bold' => true,
+				'color' => array('rgb'=>'FFFFFF'),
+			),
+			'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+			)
+		);
+
+		$style_note = array(
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb'=>'FFF2CC'),
+			),
+			'font' => array(
+				'italic' => true,
+				'size' => 9,
+			)
+		);
+
+		// ============ GET DATA MASTER ============
+		$categories = $this->db->query("SELECT id, nm_category FROM asset_category WHERE status='Y' ORDER BY id")->result_array();
+		$cat_pajak = $this->db->query("SELECT id, nm_category FROM asset_category_pajak ORDER BY id")->result_array();
+		$coa_list = $this->db->query("SELECT id, coa, keterangan FROM asset_coa WHERE status='Y' ORDER BY id")->result_array();
+		$branches = $this->db->query("SELECT * FROM asset_branch ORDER BY id")->result_array();
+		$depts = $this->db->query("SELECT id, nm_dept FROM department WHERE deleted='N' ORDER BY id")->result_array();
+		$costcenters = $this->db->query("SELECT id_costcenter, nm_costcenter FROM costcenter ORDER BY id_costcenter")->result_array();
+
+		// ============ SHEET 1 - DATA ASSET (INPUT) ============
+		$sheet = $objPHPExcel->getActiveSheet();
+		$sheet->setTitle('Data Asset');
+
+		$headers = array(
+			'A'=>'NAMA ASSET *',
+			'B'=>'TGL PEROLEHAN * (YYYY-MM-DD)',
+			'C'=>'CATEGORY *',
+			'D'=>'CATEGORY PAJAK',
+			'E'=>'KELOMPOK PENYUSUTAN (COA)',
+			'F'=>'NILAI ASSET *',
+			'G'=>'DEPRESIASI (TAHUN)',
+			'H'=>'BRANCH *',
+			'I'=>'CODE ORI',
+			'J'=>'NAMA USER',
+			'K'=>'LOKASI',
+			'L'=>'STATUS ASSET',
+			'M'=>'TGL MULAI DEPRESIASI (YYYY-MM-DD)',
+			'N'=>'DEPARTMENT',
+			'O'=>'COST CENTER',
+			'P'=>'PENYUSUTAN *'
+		);
+
+		foreach($headers as $col => $val){
+			$sheet->setCellValue($col.'1', $val);
+			$sheet->getStyle($col.'1')->applyFromArray($style_header);
+			$sheet->getColumnDimension($col)->setAutoSize(true);
+		}
+
+		// Baris 2 = petunjuk isi
+		$sheet->setCellValue('A2', '(isi nama asset)');
+		$sheet->setCellValue('B2', '(format: 2024-01-15)');
+		$sheet->setCellValue('C2', '(pilih dari dropdown)');
+		$sheet->setCellValue('D2', '(pilih dari dropdown)');
+		$sheet->setCellValue('E2', '(pilih dari dropdown)');
+		$sheet->setCellValue('F2', '(angka, tanpa titik/koma)');
+		$sheet->setCellValue('G2', '(angka tahun, misal: 4)');
+		$sheet->setCellValue('H2', '(pilih dari dropdown)');
+		$sheet->setCellValue('I2', '(kode lama, opsional)');
+		$sheet->setCellValue('J2', '(nama pengguna)');
+		$sheet->setCellValue('K2', '(pilih dari dropdown)');
+		$sheet->setCellValue('L2', '(pilih dari dropdown)');
+		$sheet->setCellValue('M2', '(format: 2024-01-15)');
+		$sheet->setCellValue('N2', '(pilih dari dropdown)');
+		$sheet->setCellValue('O2', '(pilih dari dropdown)');
+		$sheet->setCellValue('P2', '(pilih dari dropdown)');
+		$sheet->getStyle('A2:P2')->applyFromArray($style_note);
+
+		// ============ SHEET 2 - LIST (HIDDEN, untuk dropdown source) ============
+		$objPHPExcel->createSheet();
+		$sheet2 = $objPHPExcel->getSheet(1);
+		$sheet2->setTitle('List');
+
+		// Kolom A: Category => "ID - NAMA"
+		$sheet2->setCellValue('A1', 'CATEGORY');
+		$sheet2->getStyle('A1')->applyFromArray($style_header);
+		$rowCat = 2;
+		foreach($categories as $cat){
+			$sheet2->setCellValue('A'.$rowCat, $cat['id'].' - '.strtoupper($cat['nm_category']));
+			$rowCat++;
+		}
+
+		// Kolom B: Category Pajak => "ID - NAMA"
+		$sheet2->setCellValue('B1', 'CATEGORY PAJAK');
+		$sheet2->getStyle('B1')->applyFromArray($style_header);
+		$rowPjk = 2;
+		foreach($cat_pajak as $cp){
+			$sheet2->setCellValue('B'.$rowPjk, $cp['id'].' - '.strtoupper($cp['nm_category']));
+			$rowPjk++;
+		}
+
+		// Kolom C: COA => "ID - COA | KETERANGAN"
+		$sheet2->setCellValue('C1', 'KELOMPOK PENYUSUTAN');
+		$sheet2->getStyle('C1')->applyFromArray($style_header);
+		$rowCoa = 2;
+		foreach($coa_list as $coa){
+			$sheet2->setCellValue('C'.$rowCoa, $coa['id'].' - '.$coa['coa'].' | '.strtoupper($coa['keterangan']));
+			$rowCoa++;
+		}
+
+		// Kolom D: Branch => "KODE - NAMA"
+		$sheet2->setCellValue('D1', 'BRANCH');
+		$sheet2->getStyle('D1')->applyFromArray($style_header);
+		$rowBr = 2;
+		foreach($branches as $br){
+			$kode_br = (!empty($br['kode']))?$br['kode']:$br['id_branch'];
+			$nama_br = (!empty($br['nama']))?$br['nama']:((!empty($br['nm_alias']))?$br['nm_alias']:'');
+			$sheet2->setCellValue('D'.$rowBr, $kode_br.' - '.strtoupper($nama_br));
+			$rowBr++;
+		}
+
+		// Kolom E: Lokasi (fixed list)
+		$sheet2->setCellValue('E1', 'LOKASI');
+		$sheet2->getStyle('E1')->applyFromArray($style_header);
+		$arr_lokasi = array('OPC 1','OPC 2','OPC 3','Office','Site');
+		$rowLok = 2;
+		foreach($arr_lokasi as $lok){
+			$sheet2->setCellValue('E'.$rowLok, $lok);
+			$rowLok++;
+		}
+
+		// Kolom F: Status Asset (fixed list)
+		$sheet2->setCellValue('F1', 'STATUS ASSET');
+		$sheet2->getStyle('F1')->applyFromArray($style_header);
+		$arr_status = array('Digunakan','Tidak digunakan','Terjual');
+		$rowSts = 2;
+		foreach($arr_status as $sts){
+			$sheet2->setCellValue('F'.$rowSts, $sts);
+			$rowSts++;
+		}
+
+		// Kolom G: Department => "ID - NAMA"
+		$sheet2->setCellValue('G1', 'DEPARTMENT');
+		$sheet2->getStyle('G1')->applyFromArray($style_header);
+		$rowDept = 2;
+		foreach($depts as $d){
+			$sheet2->setCellValue('G'.$rowDept, $d['id'].' - '.strtoupper($d['nm_dept']));
+			$rowDept++;
+		}
+
+		// Kolom H: Costcenter => "ID - NAMA"
+		$sheet2->setCellValue('H1', 'COSTCENTER');
+		$sheet2->getStyle('H1')->applyFromArray($style_header);
+		$rowCc = 2;
+		foreach($costcenters as $cc){
+			$sheet2->setCellValue('H'.$rowCc, $cc['id_costcenter'].' - '.strtoupper($cc['nm_costcenter']));
+			$rowCc++;
+		}
+
+		// Kolom I: Penyusutan (Yes/No)
+		$sheet2->setCellValue('I1', 'PENYUSUTAN');
+		$sheet2->getStyle('I1')->applyFromArray($style_header);
+		$sheet2->setCellValue('I2', 'Yes');
+		$sheet2->setCellValue('I3', 'No');
+		$rowPny = 4; // last row + 1
+
+		$sheet2->getColumnDimension('A')->setAutoSize(true);
+		$sheet2->getColumnDimension('B')->setAutoSize(true);
+		$sheet2->getColumnDimension('C')->setAutoSize(true);
+		$sheet2->getColumnDimension('D')->setAutoSize(true);
+		$sheet2->getColumnDimension('E')->setAutoSize(true);
+		$sheet2->getColumnDimension('F')->setAutoSize(true);
+		$sheet2->getColumnDimension('G')->setAutoSize(true);
+		$sheet2->getColumnDimension('H')->setAutoSize(true);
+		$sheet2->getColumnDimension('I')->setAutoSize(true);
+
+		// ============ SET DATA VALIDATION (DROPDOWN) di Sheet 1 ============
+		$maxRow = 1000; // Dropdown berlaku sampai baris 1000
+
+		// C: Category dropdown
+		$lastCat = $rowCat - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('C'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$A$2:$A$'.$lastCat);
+		}
+
+		// D: Category Pajak dropdown
+		$lastPjk = $rowPjk - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('D'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$B$2:$B$'.$lastPjk);
+		}
+
+		// E: COA dropdown
+		$lastCoa = $rowCoa - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('E'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$C$2:$C$'.$lastCoa);
+		}
+
+		// H: Branch dropdown
+		$lastBr = $rowBr - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('H'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$D$2:$D$'.$lastBr);
+		}
+
+		// K: Lokasi dropdown
+		$lastLok = $rowLok - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('K'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$E$2:$E$'.$lastLok);
+		}
+
+		// L: Status Asset dropdown
+		$lastSts = $rowSts - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('L'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$F$2:$F$'.$lastSts);
+		}
+
+		// N: Department dropdown
+		$lastDept = $rowDept - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('N'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$G$2:$G$'.$lastDept);
+		}
+
+		// O: Costcenter dropdown
+		$lastCc = $rowCc - 1;
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('O'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$H$2:$H$'.$lastCc);
+		}
+
+		// P: Penyusutan dropdown (Yes/No)
+		for($r = 3; $r <= $maxRow; $r++){
+			$objValidation = $sheet->getCell('P'.$r)->getDataValidation();
+			$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+			$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			$objValidation->setAllowBlank(true);
+			$objValidation->setShowDropDown(true);
+			$objValidation->setFormula1('List!$I$2:$I$3');
+		}
+
+		// ============ SHEET 3 - REFERENCE (readable) ============
+		$objPHPExcel->createSheet();
+		$sheet3 = $objPHPExcel->getSheet(2);
+		$sheet3->setTitle('Reference');
+
+		$sheet3->setCellValue('A1', 'KETERANGAN:');
+		$sheet3->setCellValue('A2', 'Sheet "Data Asset" sudah memiliki dropdown di kolom-kolom yang memerlukan ID.');
+		$sheet3->setCellValue('A3', 'Kolom dengan tanda * adalah WAJIB diisi.');
+		$sheet3->setCellValue('A4', 'Data mulai diisi dari BARIS 3 (baris 2 adalah petunjuk).');
+		$sheet3->setCellValue('A5', 'Format dropdown: "ID - NAMA". Sistem akan otomatis mengambil ID-nya.');
+		$sheet3->setCellValue('A6', '');
+		$sheet3->setCellValue('A7', 'DAFTAR KOLOM:');
+		$sheet3->setCellValue('A8', 'A = Nama Asset (ketik manual)');
+		$sheet3->setCellValue('A9', 'B = Tanggal Perolehan (format YYYY-MM-DD, misal 2024-01-15)');
+		$sheet3->setCellValue('A10', 'C = Category (pilih dari dropdown)');
+		$sheet3->setCellValue('A11', 'D = Category Pajak (pilih dari dropdown)');
+		$sheet3->setCellValue('A12', 'E = Kelompok Penyusutan/COA (pilih dari dropdown)');
+		$sheet3->setCellValue('A13', 'F = Nilai Asset (angka, tanpa titik/koma, misal 10000000)');
+		$sheet3->setCellValue('A14', 'G = Depresiasi dalam tahun (angka, misal 4)');
+		$sheet3->setCellValue('A15', 'H = Branch (pilih dari dropdown)');
+		$sheet3->setCellValue('A16', 'I = Code ORI / kode asset lama (ketik manual, opsional)');
+		$sheet3->setCellValue('A17', 'J = Nama User / pengguna asset (ketik manual)');
+		$sheet3->setCellValue('A18', 'K = Lokasi (pilih dari dropdown)');
+		$sheet3->setCellValue('A19', 'L = Status Asset (pilih dari dropdown)');
+		$sheet3->setCellValue('A20', 'M = Tanggal Mulai Depresiasi (format YYYY-MM-DD, opsional. Jika kosong = sama dengan tgl perolehan)');
+		$sheet3->setCellValue('A21', 'N = Department (pilih dari dropdown)');
+		$sheet3->setCellValue('A22', 'O = Cost Center (pilih dari dropdown)');
+		$sheet3->setCellValue('A23', 'P = Penyusutan (pilih dari dropdown: Yes / No)');
+		$sheet3->setCellValue('A24', '');
+		$sheet3->setCellValue('A25', 'CATATAN:');
+		$sheet3->setCellValue('A26', '- Jika Tax Category (D) diisi, Depresiasi (G) bisa dikosongkan (otomatis diambil dari jangka waktu tax category).');
+		$sheet3->setCellValue('A27', '- Jika Penyusutan = No, jadwal depresiasi tidak akan di-generate.');
+
+		$sheet3->getColumnDimension('A')->setWidth(80);
+		$sheet3->getStyle('A1')->getFont()->setBold(true);
+		$sheet3->getStyle('A7')->getFont()->setBold(true);
+
+		$objPHPExcel->setActiveSheetIndex(0);
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		ob_end_clean();
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="template-upload-asset.xlsx"');
+		$objWriter->save("php://output");
+	}
+
+	public function proses_upload(){
+		$Arr_Kembali = array();
+
+		if(empty($_FILES['excel_file']['name'])){
+			echo json_encode(array('status'=>3,'pesan'=>'File tidak ditemukan.'));
+			return;
+		}
+
+		$tmp = explode(".", $_FILES['excel_file']['name']);
+		$exts = strtolower(end($tmp));
+		if(!in_array($exts, array('xls','xlsx'))){
+			echo json_encode(array('status'=>3,'pesan'=>'Format file harus .xls atau .xlsx'));
+			return;
+		}
+
+		$this->load->library(array('PHPExcel'));
+		$config['upload_path'] = './assets/file/';
+		$config['file_name'] = 'upload_asset_'.date('YmdHis');
+		$config['allowed_types'] = 'xls|xlsx';
+		$config['max_size'] = 10000;
+
+		$this->load->library('upload', $config);
+		$this->upload->initialize($config);
+
+		if(!$this->upload->do_upload('excel_file')){
+			$error = $this->upload->display_errors();
+			echo json_encode(array('status'=>3,'pesan'=>$error));
+			return;
+		}
+
+		$media = $this->upload->data();
+		$inputFileName = './assets/file/'.$media['file_name'];
+
+		try{
+			$inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+			$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+			$objReader->setReadDataOnly(true);
+			$objPHPExcel = $objReader->load($inputFileName);
+		}catch(Exception $e){
+			echo json_encode(array('status'=>3,'pesan'=>'Error loading file: '.$e->getMessage()));
+			return;
+		}
+
+		$sheet = $objPHPExcel->getSheet(0);
+		$highestRow = $sheet->getHighestRow();
+
+		if($highestRow < 3){
+			echo json_encode(array('status'=>3,'pesan'=>'File kosong atau tidak ada data. Data dimulai dari baris 3.'));
+			return;
+		}
+
+		$db2 = $this->load->database('instalasi', TRUE);
+		$data_session = $this->session->userdata;
+		$errors = array();
+		$detailData = array();
+		$detailDataDash = array();
+		$ArrInstalasi = array();
+		$ArrPrice = array();
+		$ArrCategoryCheck = array();
+
+		$region = $db2->query("SELECT * FROM region ORDER BY urut ASC")->result_array();
+
+		// Get current max code_group
+		$q_group = "SELECT max(code_group) as maxP FROM asset WHERE code_group LIKE 'AS%' ";
+		$rest_group = $this->db->query($q_group)->result_array();
+		$angka_group = $rest_group[0]['maxP'];
+		$urut_g = (int)substr($angka_group, 2, 5);
+
+		$success_count = 0;
+
+		// Data dimulai dari baris 3 (baris 1 = header, baris 2 = petunjuk)
+		for($i = 3; $i <= $highestRow; $i++){
+			$nm_asset 		= trim($sheet->getCell('A'.$i)->getValue());
+			$tgl_perolehan 	= trim($sheet->getCell('B'.$i)->getValue());
+			$raw_category 	= trim($sheet->getCell('C'.$i)->getValue());
+			$raw_cat_pajak 	= trim($sheet->getCell('D'.$i)->getValue());
+			$raw_coa 		= trim($sheet->getCell('E'.$i)->getValue());
+			$nilai_asset 	= trim($sheet->getCell('F'.$i)->getValue());
+			$raw_depresiasi = trim($sheet->getCell('G'.$i)->getValue());
+			$raw_branch 	= trim($sheet->getCell('H'.$i)->getValue());
+			$code_ori 		= trim($sheet->getCell('I'.$i)->getValue());
+			$nama_user 		= trim($sheet->getCell('J'.$i)->getValue());
+			$lokasi 		= trim($sheet->getCell('K'.$i)->getValue());
+			$status_asset 	= trim($sheet->getCell('L'.$i)->getValue());
+			$tgl_depresiasi = trim($sheet->getCell('M'.$i)->getValue());
+			$raw_dept 		= trim($sheet->getCell('N'.$i)->getValue());
+			$raw_costcenter = trim($sheet->getCell('O'.$i)->getValue());
+			$raw_penyusutan = trim($sheet->getCell('P'.$i)->getValue());
+
+			// Skip empty row
+			if(empty($nm_asset)) continue;
+
+			// ====== PARSE ID dari format dropdown "ID - NAMA" ======
+			$category 		= $this->_parse_id($raw_category);
+			$category_pajak = $this->_parse_id($raw_cat_pajak);
+			$id_coa 		= $this->_parse_id($raw_coa);
+			$branch 		= $this->_parse_id($raw_branch);
+			$id_dept 		= $this->_parse_id($raw_dept);
+			$id_costcenter 	= $this->_parse_id($raw_costcenter);
+
+			// Depresiasi: bisa langsung angka atau otomatis dari tax category
+			$depresiasi = $raw_depresiasi;
+			if(empty($depresiasi) && !empty($category_pajak)){
+				$q_jw = $this->db->query("SELECT jangka_waktu FROM asset_category_pajak WHERE id='".$category_pajak."'")->result_array();
+				$depresiasi = (!empty($q_jw[0]['jangka_waktu']))?$q_jw[0]['jangka_waktu']:0;
+			}
+
+			// Penyusutan (Yes/No)
+			$penyusutan = 'Y';
+			if(!empty($raw_penyusutan)){
+				$penyusutan = (strtolower($raw_penyusutan) == 'no' || strtolower($raw_penyusutan) == 'n') ? 'N' : 'Y';
+			}
+
+			// Validasi wajib
+			if(empty($tgl_perolehan)){
+				$errors[] = "Baris $i: Tgl Perolehan kosong.";
+				continue;
+			}
+			if(empty($category)){
+				$errors[] = "Baris $i: Category kosong.";
+				continue;
+			}
+			if(empty($nilai_asset)){
+				$errors[] = "Baris $i: Nilai Asset kosong.";
+				continue;
+			}
+			if(empty($depresiasi)){
+				$errors[] = "Baris $i: Depresiasi kosong (isi manual atau pilih Tax Category).";
+				continue;
+			}
+			if(empty($branch)){
+				$errors[] = "Baris $i: Branch kosong.";
+				continue;
+			}
+
+			// Format tanggal
+			if(is_numeric($tgl_perolehan)){
+				$tgl_perolehan = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($tgl_perolehan));
+			}
+			if(is_numeric($tgl_depresiasi)){
+				$tgl_depresiasi = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($tgl_depresiasi));
+			}
+			if(empty($tgl_depresiasi)){
+				$tgl_depresiasi = $tgl_perolehan;
+			}
+
+			// Generate kd_asset
+			$nmCategory = $this->asset_model->getWhere('asset_category', 'id', $category);
+			$nm_category_text = (!empty($nmCategory[0]['nm_category']))?$nmCategory[0]['nm_category']:'';
+
+			$KdCategory = sprintf('%02s', $category);
+			$KdCategoryPjk = sprintf('%02s', $category_pajak);
+			$Year_perolehan = date('y', strtotime($tgl_perolehan));
+			$Month_perolehan = date('m', strtotime($tgl_perolehan));
+			$Ym_perolehan = $Year_perolehan.$Month_perolehan;
+
+			$qQuery = "SELECT max(kd_asset) as maxP FROM asset WHERE kd_asset LIKE '".$branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-%' ";
+			$restQuery = $this->db->query($qQuery)->result_array();
+			$angkaUrut2 = $restQuery[0]['maxP'];
+			$urutan2 = (int)substr($angkaUrut2, 13, 3);
+			$urutan2++;
+			$urut2 = sprintf('%03s', $urutan2);
+			$kode_assets = $branch."-".$Ym_perolehan.$KdCategory.$KdCategoryPjk."-".$urut2;
+
+			// Generate code_group
+			$urut_g++;
+			$kode_group = "AS".sprintf('%05s', $urut_g);
+
+			// Hitung value penyusutan per bulan
+			$value = 0;
+			if($depresiasi > 0){
+				$value = $nilai_asset / ($depresiasi * 12);
+			}
+
+			// Data asset
+			$detailData[] = array(
+				'kd_asset' 		=> $kode_assets.'001',
+				'code_group' 	=> $kode_group,
+				'nm_asset' 		=> $nm_asset,
+				'tgl_perolehan' => $tgl_perolehan,
+				'id_coa' 		=> $id_coa,
+				'category' 		=> $category,
+				'category_pajak'=> $category_pajak,
+				'nm_category' 	=> strtoupper($nm_category_text),
+				'nilai_asset' 	=> $nilai_asset,
+				'qty' 			=> 1,
+				'asset_ke' 		=> 1,
+				'depresiasi' 	=> $depresiasi,
+				'value' 		=> $value,
+				'kdcab' 		=> $branch,
+				'penyusutan' 	=> $penyusutan,
+				'id_dept' 		=> $id_dept,
+				'department' 	=> get_name('department', 'nm_dept', 'id', $id_dept),
+				'id_costcenter' => $id_costcenter,
+				'nama_user' 	=> $nama_user,
+				'cost_center' 	=> get_name('costcenter', 'nm_costcenter', 'id_costcenter', $id_costcenter),
+				'code_ori' 		=> $code_ori,
+				'lokasi' 		=> $lokasi,
+				'status_asset' 	=> $status_asset,
+				'created_by' 	=> $data_session['ORI_User']['username'],
+				'created_date' 	=> date('Y-m-d H:i:s'),
+				'tgl_depresiasi'=> $tgl_depresiasi
+			);
+
+			// Data asset_generate (jadwal depresiasi) - hanya jika penyusutan = Y
+			if($penyusutan == 'Y'){
+				$jmlx = $depresiasi * 12;
+				$date_now = $tgl_depresiasi;
+				$date_now_real = date('Y-m-d');
+
+				for($x = 1; $x <= $jmlx; $x++){
+					$Tanggal = date('Y-m', mktime(0,0,0, substr($date_now,5,2)+$x, 0, substr($date_now,0,4)));
+					$TglNow = date('Y-m', strtotime($date_now_real));
+					$flagx = 'N';
+					if($Tanggal < $TglNow){
+						$flagx = 'Y';
+					}
+
+					$detailDataDash[] = array(
+						'kd_asset' 		=> $kode_assets.'001',
+						'nm_asset' 		=> $nm_asset,
+						'category' 		=> $category,
+						'category_pajak'=> $category_pajak,
+						'nm_category' 	=> strtoupper($nm_category_text),
+						'bulan' 		=> substr($Tanggal, 5, 2),
+						'tahun' 		=> substr($Tanggal, 0, 4),
+						'lokasi_asset' 	=> $id_dept,
+						'cost_center' 	=> $id_costcenter,
+						'nilai_susut' 	=> $value,
+						'kdcab' 		=> $branch,
+						'flag' 			=> $flagx
+					);
+				}
+			}
+
+			// Data vehicle_tool_new (instalasi)
+			$ArrInstalasi[] = array(
+				'code_group' 	=> $kode_group,
+				'category' 		=> 'asset '.strtolower($nm_category_text),
+				'spec' 			=> strtolower($nm_asset),
+				'created_by' 	=> $data_session['ORI_User']['username'],
+				'created_date' 	=> date('Y-m-d H:i:s')
+			);
+
+			// Data price_ref (instalasi)
+			foreach($region as $reg){
+				$ArrPrice[] = array(
+					'category' 			=> 'vehicle tool',
+					'code_group' 		=> $kode_group,
+					'unit_material' 	=> 'month',
+					'kurs' 				=> 'IDR',
+					'region' 			=> $reg['region'],
+					'rate' 				=> $nilai_asset,
+					'updated_by' 		=> $data_session['ORI_User']['username'],
+					'updated_date' 		=> date('Y-m-d H:i:s')
+				);
+			}
+
+			// Check category untuk vehicle_tool_category
+			$cat_key = 'asset '.strtolower($nm_category_text);
+			if(!in_array($cat_key, $ArrCategoryCheck)){
+				$ArrCategoryCheck[] = $cat_key;
+			}
+
+			$success_count++;
+		}
+
+		if(empty($detailData)){
+			echo json_encode(array('status'=>3,'pesan'=>'Tidak ada data valid untuk diimport.','errors'=>$errors));
+			return;
+		}
+
+		// Insert ke database
+		$this->db->trans_start();
+			// 1. Insert asset
+			$this->db->insert_batch('asset', $detailData);
+
+			// 2. Insert asset_generate
+			if(!empty($detailDataDash)){
+				// Batch insert per 500 rows to avoid memory issue
+				$chunks = array_chunk($detailDataDash, 500);
+				foreach($chunks as $chunk){
+					$this->db->insert_batch('asset_generate', $chunk);
+				}
+			}
+
+			// 3. Insert vehicle_tool_new (instalasi)
+			if(!empty($ArrInstalasi)){
+				$db2->insert_batch('vehicle_tool_new', $ArrInstalasi);
+			}
+
+			// 4. Insert price_ref (instalasi)
+			if(!empty($ArrPrice)){
+				$chunks_price = array_chunk($ArrPrice, 500);
+				foreach($chunks_price as $chunk){
+					$db2->insert_batch('price_ref', $chunk);
+				}
+			}
+
+			// 5. Insert vehicle_tool_category (jika belum ada)
+			foreach($ArrCategoryCheck as $cat_name){
+				$num_cty = $db2->query("SELECT * FROM vehicle_tool_category WHERE category='".$cat_name."'")->num_rows();
+				if($num_cty < 1){
+					$db2->insert('vehicle_tool_category', array(
+						'category' 		=> $cat_name,
+						'created_by' 	=> 'asset',
+						'created_date' 	=> date('Y-m-d H:i:s')
+					));
+				}
+			}
+		$this->db->trans_complete();
+
+		// Hapus file upload
+		if(file_exists($inputFileName)){
+			unlink($inputFileName);
+		}
+
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			$Arr_Kembali = array(
+				'pesan'		=> 'Upload gagal. Silakan coba lagi.',
+				'status'	=> 0,
+				'errors'	=> $errors
+			);
+		}
+		else{
+			$this->db->trans_commit();
+			$Arr_Kembali = array(
+				'pesan'		=> 'Upload berhasil! '.$success_count.' asset berhasil diimport.',
+				'status'	=> 1,
+				'errors'	=> $errors
+			);
+			history('Upload bulk asset: '.$success_count.' items');
+		}
+
+		echo json_encode($Arr_Kembali);
+	}
+
+	/**
+	 * Helper: Parse ID dari format dropdown "ID - NAMA"
+	 * Contoh: "1 - BANGUNAN I" => return "1"
+	 * Contoh: "ORI - HEAD OFFICE" => return "ORI"
+	 * Jika tidak ada " - ", return value apa adanya (plain ID)
+	 */
+	private function _parse_id($value){
+		if(empty($value)) return '';
+		if(strpos($value, ' - ') !== false){
+			$parts = explode(' - ', $value, 2);
+			return trim($parts[0]);
+		}
+		return trim($value);
+	}
+
 }
 ?>

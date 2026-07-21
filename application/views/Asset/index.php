@@ -12,6 +12,9 @@ $this->load->view('include/side_menu');
 				<a href="<?php echo site_url('asset/add') ?>" class="btn btn-md btn-success" id='btn-add'>
 					<i class="fa fa-plus"></i> Add Asset
 				</a>
+				<a href="<?php echo site_url('asset/upload') ?>" class="btn btn-md btn-warning">
+					<i class="fa fa-upload"></i> Upload Asset
+				</a>
 				<a href="<?php echo site_url('asset/download_excel_all_default/0') ?>" target='_blank' class="btn btn-md btn-info" '>
 					<i class="fa fa-file-excel-o"></i> Download ALL
 				</a>
