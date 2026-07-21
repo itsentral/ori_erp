@@ -2096,7 +2096,7 @@ class Asset extends CI_Controller{
 		$categories = $this->db->query("SELECT id, nm_category FROM asset_category WHERE status='Y' ORDER BY id")->result_array();
 		$cat_pajak = $this->db->query("SELECT id, nm_category FROM asset_category_pajak ORDER BY id")->result_array();
 		$coa_list = $this->db->query("SELECT id, coa, keterangan FROM asset_coa WHERE status='Y' ORDER BY id")->result_array();
-		$branches = $this->db->query("SELECT * FROM asset_branch ORDER BY id")->result_array();
+		$branches = $this->db->query("SELECT * FROM asset_branch ORDER BY id_branch")->result_array();
 		$depts = $this->db->query("SELECT id, nm_dept FROM department WHERE deleted='N' ORDER BY id")->result_array();
 		$costcenters = $this->db->query("SELECT id_costcenter, nm_costcenter FROM costcenter ORDER BY id_costcenter")->result_array();
 
@@ -2180,14 +2180,13 @@ class Asset extends CI_Controller{
 			$rowCoa++;
 		}
 
-		// Kolom D: Branch => "KODE - NAMA"
+		// Kolom D: Branch => "ID_BRANCH - NAMA"
 		$sheet2->setCellValue('D1', 'BRANCH');
 		$sheet2->getStyle('D1')->applyFromArray($style_header);
 		$rowBr = 2;
 		foreach($branches as $br){
-			$kode_br = (!empty($br['kode']))?$br['kode']:$br['id_branch'];
-			$nama_br = (!empty($br['nama']))?$br['nama']:((!empty($br['nm_alias']))?$br['nm_alias']:'');
-			$sheet2->setCellValue('D'.$rowBr, $kode_br.' - '.strtoupper($nama_br));
+			$nama_br = (!empty($br['nm_alias']))?$br['nm_alias']:'';
+			$sheet2->setCellValue('D'.$rowBr, $br['id_branch'].' - '.strtoupper($nama_br));
 			$rowBr++;
 		}
 
