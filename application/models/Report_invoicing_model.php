@@ -333,7 +333,7 @@ class Report_invoicing_model extends CI_Model {
 		$dv = array_filter(array_map('trim', explode(',', $product)));
 
 		$getDetail = $this->db
-			->select('no_spk,id_trans,kode_trans,kode_delivery,nilai_unit,product,material,wip_direct,wip_indirect,wip_consumable,wip_foh')
+			->select('no_so,no_spk,id_trans,kode_trans,kode_delivery,nilai_unit,product,material,wip_direct,wip_indirect,wip_consumable,wip_foh')
 			->from('view_incustomer_cogs_detail')
 			->where_in('kode_delivery', $dv)
 			->get()

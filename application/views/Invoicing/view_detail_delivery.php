@@ -8,6 +8,7 @@
                         <thead>
                             <tr class='bg-blue'>
                                 <th class="text-center" width='4%'>#</th>
+                                <th class="text-center" width='8%'>No SO</th>
                                 <th class="text-center" width='8%'>No SPK</th>
                                 <th class="text-center" width='8%'>Id Trans</th>
                                 <th class="text-center" width='8%'>Product</th>
@@ -32,6 +33,7 @@
                                 ?>
                                 <tr id='tr_<?= $numb;?>' >
                                 <td align='center'><?=$no;?></td>
+                                <td ><?= strtoupper($valx['no_so']);?></td>
                                 <td ><?= strtoupper($valx['no_spk']);?></td>
                                 <td ><?= strtoupper($valx['id_trans']);?></td>
                                 <td ><?= strtoupper($valx['product']);?></td>
