@@ -29,6 +29,18 @@ $gudang = $this->uri->segment(3);
 			<button type='button' class='btn btn-sm btn-success' id='download_excel4'><i class='fa fa-file-excel-o'></i> Download Incustomer</button>
 		<?php } ?>
 
+		<div class='form-group row' style='margin-top:10px;'>
+			<div class='col-sm-2'>
+				<input type="text" id='date_start_rekap' class='form-control datepicker text-center' data-role="datepicker3" readonly placeholder='Dari Tanggal'>
+			</div>
+			<div class='col-sm-2'>
+				<input type="text" id='date_end_rekap' class='form-control datepicker text-center' data-role="datepicker3" readonly placeholder='Sampai Tanggal'>
+			</div>
+			<div class='col-sm-2'>
+				<button type='button' class='btn btn-sm btn-info' id='download_rekap_daily'><i class='fa fa-file-excel-o'></i> Download Rekap Harian</button>
+			</div>
+		</div>
+
 		<div class="row" style="margin-top:10px;">
 			<div class="col-sm-4">
 				<div class="info-box bg-aqua">
@@ -123,6 +135,25 @@ $gudang = $this->uri->segment(3);
 				loadTotalInventory();
 			}
 		}
+	});
+
+	$('input[type="text"][data-role="datepicker3"]').datepicker({
+		dateFormat: 'yy-mm-dd',
+		changeMonth:true,
+		changeYear:true
+	});
+
+	$(document).on('click', '#download_rekap_daily', function(e){
+		e.preventDefault();
+		var gudang1 = $('#gudang1').val();
+		var date_start = $('#date_start_rekap').val();
+		var date_end = $('#date_end_rekap').val();
+		if(!date_start || !date_end){
+			alert('Pilih periode tanggal terlebih dahulu');
+			return;
+		}
+		var Links = base_url + active_controller+'/ExcelRekapDaily/'+gudang1+'/'+date_start+'/'+date_end;
+		window.open(Links,'_blank');
 	});
 
 	$(document).on('click', '#download_excel2', function(e){

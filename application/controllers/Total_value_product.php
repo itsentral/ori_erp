@@ -380,6 +380,105 @@ private function getDataWIP($gudang, $date_filter = null){
 		));
 	}
 
+	public function ExcelRekapDaily(){
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+
+		$gudang = $this->uri->segment(3);
+		$date_start = $this->uri->segment(4);
+		$date_end = $this->uri->segment(5);
+
+		if(empty($gudang) || empty($date_start) || empty($date_end)){
+			echo "Parameter tidak lengkap"; return;
+		}
+
+		// Tentukan tabel per_day berdasarkan gudang
+		if($gudang=='fg'){
+			$table = "warehouse_stock_fg_per_day";
+		}elseif($gudang=='intransit'){
+			$table = "warehouse_stock_intransit_per_day";
+		}elseif($gudang=='incustomer'){
+			$table = "warehouse_stock_incustomer_per_day";
+		}elseif($gudang=='wip'){
+			$table = "warehouse_stock_wip_per_day";
+		}else{
+			echo "Gudang tidak valid"; return;
+		}
+
+		// Query: sum total value per hari dalam range tanggal
+		$sql = "SELECT DATE(a.hist_date) AS tanggal, SUM(a.nilai_wip * a.qty) AS total_value
+				FROM ".$table." a
+				WHERE DATE(a.hist_date) >= '".$this->db->escape_str($date_start)."'
+				AND DATE(a.hist_date) <= '".$this->db->escape_str($date_end)."'
+				GROUP BY DATE(a.hist_date)
+				ORDER BY DATE(a.hist_date) ASC";
+
+		$results = $this->db->query($sql)->result_array();
+
+		// Generate Excel
+		$this->load->library("PHPExcel");
+		$objPHPExcel = new PHPExcel();
+		$sheet = $objPHPExcel->getActiveSheet();
+
+		$nm_gudang = strtoupper($gudang);
+		$periode = date('d/m/Y', strtotime($date_start)).' - '.date('d/m/Y', strtotime($date_end));
+
+		// HEADER
+		$sheet->setCellValue('A1', 'REKAP TOTAL VALUE HARIAN - '.$nm_gudang);
+		$sheet->mergeCells('A1:B1');
+		$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+		$sheet->setCellValue('A2', 'Periode: '.$periode);
+		$sheet->mergeCells('A2:B2');
+
+		// TABLE HEADER
+		$sheet->setCellValue('A4', 'Tanggal');
+		$sheet->setCellValue('B4', 'Value ERP');
+		$sheet->getStyle('A4:B4')->getFont()->setBold(true);
+		$sheet->getStyle('A4:B4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$sheet->getColumnDimension('A')->setWidth(18);
+		$sheet->getColumnDimension('B')->setWidth(25);
+
+		// ISI DATA
+		$row = 5;
+		$grand_total = 0;
+		foreach($results as $val){
+			$tanggal_formatted = date('d/m/Y', strtotime($val['tanggal']));
+			$total_value = ($val['total_value']) ? $val['total_value'] : 0;
+			$grand_total += $total_value;
+
+			$sheet->setCellValue('A'.$row, $tanggal_formatted);
+			$sheet->setCellValue('B'.$row, $total_value);
+			$sheet->getStyle('B'.$row)->getNumberFormat()->setFormatCode('#,##0.00');
+			$row++;
+		}
+
+		// TOTAL ROW
+		$sheet->setCellValue('A'.$row, 'TOTAL');
+		$sheet->setCellValue('B'.$row, $grand_total);
+		$sheet->getStyle('A'.$row.':B'.$row)->getFont()->setBold(true);
+		$sheet->getStyle('B'.$row)->getNumberFormat()->setFormatCode('#,##0.00');
+
+		// Border untuk seluruh tabel
+		$styleArray = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+				),
+			),
+		);
+		$sheet->getStyle('A4:B'.$row)->applyFromArray($styleArray);
+
+		$filename = 'Rekap_Daily_'.$gudang.'_'.$date_start.'_to_'.$date_end.'.xls';
+
+		header("Content-Type: application/vnd.ms-excel");
+		header("Content-Disposition: attachment;filename=".$filename);
+		header("Cache-Control: max-age=0");
+
+		$writer = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$writer->save('php://output');
+	}
+
     public function server_side_product_stock_wip(){
 		$requestData	= $_REQUEST;
 		
