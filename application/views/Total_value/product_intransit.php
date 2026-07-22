@@ -52,18 +52,6 @@ $gudang = $this->uri->segment(3);
 				</div>
 			</div>
 		</div>
-
-		<div class="row" style="margin-top:10px;">
-			<div class="col-sm-4">
-				<div class="info-box bg-aqua">
-					<span class="info-box-icon"><i class="fa fa-database"></i></span>
-					<div class="info-box-content">
-						<span class="info-box-text">Total Inventory (Total Value)</span>
-						<span class="info-box-number" id="total_inventory">Rp 0</span>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body table-responsive">
