@@ -11,10 +11,10 @@ class Ledger_material_model extends CI_Model {
 	 * Ambil list gudang dari warehouse_history join warehouse untuk nama category
 	 */
 	public function get_list_gudang(){
-		$sql = "SELECT a.id_gudang, a.kd_gudang, b.category 
+		$sql = "SELECT a.id_gudang, b.category 
 				FROM warehouse_history a 
 				LEFT JOIN warehouse b ON a.id_gudang = b.id 
-				GROUP BY a.id_gudang, a.kd_gudang, b.category 
+				GROUP BY a.id_gudang 
 				ORDER BY a.id_gudang ASC";
 		return $this->db->query($sql)->result_array();
 	}

@@ -77,7 +77,7 @@ $this->load->view('include/side_menu');
 					<?php
 					if(!empty($list_gudang)){
 						foreach($list_gudang as $gd){
-							$nm_gudang = !empty($gd['category']) ? strtoupper($gd['category']) : $gd['kd_gudang'];
+							$nm_gudang = !empty($gd['category']) ? strtoupper($gd['category']) : '-';
 							echo "<option value='".$gd['id_gudang']."'>".$gd['id_gudang']." - ".$nm_gudang."</option>";
 						}
 					}
