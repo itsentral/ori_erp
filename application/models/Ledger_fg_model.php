@@ -15,10 +15,9 @@ class Ledger_fg_model extends CI_Model {
 	public function get_ledger_data($bulan, $tahun){
 		$result = array('data' => array());
 
-		$bln = (int)$bulan;
-		$thn = (int)$tahun;
+		$tgl_filter = $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
-		// Detail transaksi pada periode ini (exclude keterangan 'Join to Finish Good')
+		// Detail transaksi pada periode ini (filter berdasarkan created_date)
 		$sql_detail = "SELECT 
 							a.id,
 							a.tanggal,
@@ -32,10 +31,10 @@ class Ledger_fg_model extends CI_Model {
 							a.qty,
 							a.nilai_wip,
 							a.jenis,
-							a.nm_material
+							a.nm_material,
+							a.created_date
 						FROM data_erp_fg a
-						WHERE MONTH(a.tanggal) = ".$bln."
-						AND YEAR(a.tanggal) = ".$thn."
+						WHERE DATE_FORMAT(a.tanggal, '%Y-%m') = '".$tgl_filter."'
 						AND a.keterangan NOT LIKE '%Join to Finish Good%'
 						AND a.keterangan NOT LIKE '%Material to Finish Good%'
 						ORDER BY a.tanggal ASC, a.id ASC";

@@ -35,10 +35,9 @@ class Ledger_fg extends CI_Controller {
 	public function get_data_json(){
 		$controller		= ucfirst(strtolower($this->uri->segment(1)));
 		$Arr_Akses		= getAcccesmenu($controller);
-		$requestData	= $_REQUEST;
 
-		$bulan	= isset($requestData['bulan']) ? $requestData['bulan'] : date('m');
-		$tahun	= isset($requestData['tahun']) ? $requestData['tahun'] : date('Y');
+		$bulan	= $this->input->get('bulan') ? $this->input->get('bulan') : date('m');
+		$tahun	= $this->input->get('tahun') ? $this->input->get('tahun') : date('Y');
 
 		$fetch = $this->Ledger_fg_model->get_ledger_data($bulan, $tahun);
 
