@@ -101,10 +101,14 @@ class Ledger_fg extends CI_Controller {
 		$Row++;
 
 		if(!empty($fetch['data'])){
+			$totalIn = 0;
+			$totalOut = 0;
 			foreach($fetch['data'] as $group){
 				// Detail rows
 				if(!empty($group['detail'])){
 					foreach($group['detail'] as $det){
+						$totalIn += $det['in'];
+						$totalOut += $det['out'];
 						$sheet->setCellValue('A'.$Row, $det['keterangan']);
 						$sheet->setCellValue('B'.$Row, $det['tanggal']);
 						$sheet->setCellValue('C'.$Row, $det['nomor_bukti']);
@@ -118,6 +122,13 @@ class Ledger_fg extends CI_Controller {
 					}
 				}
 			}
+			// Total row
+			$sheet->setCellValue('D'.$Row, 'TOTAL');
+			$sheet->setCellValue('E'.$Row, $totalIn);
+			$sheet->setCellValue('F'.$Row, $totalOut);
+			$sheet->setCellValue('G'.$Row, $totalIn - $totalOut);
+			$sheet->getStyle('A'.$Row.':G'.$Row)->applyFromArray($tableHeader);
+			$Row++;
 		}
 
 		$objPHPExcel->getActiveSheet()->setTitle('Ledger FG');

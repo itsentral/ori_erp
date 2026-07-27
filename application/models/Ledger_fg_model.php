@@ -28,6 +28,7 @@ class Ledger_fg_model extends CI_Model {
 							a.no_spk,
 							a.kode_trans,
 							a.id_trans,
+							a.kode_delivery,
 							a.qty,
 							a.nilai_wip,
 							a.jenis,
@@ -58,11 +59,19 @@ class Ledger_fg_model extends CI_Model {
 				$running_saldo -= $nilai_wip;
 			}
 
+			// No Reff: jika out = kode_delivery + no_so, jika in = id_trans + no_so
+			$no_reff = '';
+			if(strpos($jenis, 'in') !== false){
+				$no_reff = $row['id_trans'].$row['no_so'];
+			} else {
+				$no_reff = $row['kode_delivery'].$row['no_so'];
+			}
+
 			$group['detail'][] = array(
 				'keterangan'	=> $row['keterangan'],
 				'tanggal'		=> date('d-m-Y', strtotime($row['tanggal'])),
 				'nomor_bukti'	=> $row['kode_trans'],
-				'sm'			=> $row['id_trans'],
+				'sm'			=> $no_reff,
 				'in'			=> $val_in,
 				'out'			=> $val_out,
 				'saldo'			=> $running_saldo

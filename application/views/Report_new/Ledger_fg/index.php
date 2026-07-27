@@ -124,10 +124,14 @@ $(document).ready(function(){
 			success: function(response){
 				var html = '';
 				if(response.data && response.data.length > 0){
+					var totalIn = 0;
+					var totalOut = 0;
 					$.each(response.data, function(i, group){
 						// Detail rows
 						if(group.detail && group.detail.length > 0){
 							$.each(group.detail, function(j, det){
+								totalIn += parseFloat(det.in) || 0;
+								totalOut += parseFloat(det.out) || 0;
 								html += '<tr>';
 								html += '<td>'+det.keterangan+'</td>';
 								html += '<td class="text-center">'+det.tanggal+'</td>';
@@ -140,6 +144,13 @@ $(document).ready(function(){
 							});
 						}
 					});
+					// Total row
+					html += '<tr class="row-header">';
+					html += '<td colspan="4" class="text-right"><strong>TOTAL</strong></td>';
+					html += '<td class="text-right"><strong>'+formatNumber(totalIn)+'</strong></td>';
+					html += '<td class="text-right"><strong>'+formatNumber(totalOut)+'</strong></td>';
+					html += '<td class="text-right"><strong>'+formatNumber(totalIn - totalOut)+'</strong></td>';
+					html += '</tr>';
 				} else {
 					html = '<tr><td colspan="7" class="text-center">Data tidak ditemukan</td></tr>';
 				}
