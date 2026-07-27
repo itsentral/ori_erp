@@ -16,7 +16,7 @@ class Ledger_intransit_model extends CI_Model {
 	public function get_ledger_data($bulan, $tahun){
 		$result = array('data' => array());
 
-		$tgl_filter	= $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
+		$tgl_filter = $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
 		// Detail transaksi pada periode ini - data murni tanpa filter
 		$sql_detail = "SELECT 
@@ -34,7 +34,7 @@ class Ledger_intransit_model extends CI_Model {
 							a.jenis,
 							a.nm_material
 						FROM data_erp_in_transit a
-						WHERE a.tanggal LIKE '".$tgl_filter."%'
+						WHERE DATE_FORMAT(a.tanggal, '%Y-%m') = '".$tgl_filter."'
 						ORDER BY a.tanggal ASC, a.id ASC";
 		$detail_rows = $this->db->query($sql_detail)->result_array();
 
