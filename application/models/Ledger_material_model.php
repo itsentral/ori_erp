@@ -11,7 +11,7 @@ class Ledger_material_model extends CI_Model {
 	 * Ambil list gudang dari warehouse_history join warehouse untuk nama category
 	 */
 	public function get_list_gudang(){
-		$sql = "SELECT a.id_gudang, b.category 
+		$sql = "SELECT a.id_gudang, b.category, b.nm_gudang 
 				FROM warehouse_history a 
 				LEFT JOIN warehouse b ON a.id_gudang = b.id 
 				GROUP BY a.id_gudang 
@@ -69,12 +69,15 @@ class Ledger_material_model extends CI_Model {
 			$val_out	= 0;
 
 			// Jika id_gudang = id_gudang_dari berarti In, jika id_gudang = id_gudang_ke berarti Out
+			$keterangan = '';
 			if($row['id_gudang'] == $row['id_gudang_dari']){
 				$val_in = $total_harga;
 				$running_saldo += $total_harga;
+				$keterangan = 'penambahan gudang';
 			} else if($row['id_gudang'] == $row['id_gudang_ke']){
 				$val_out = $total_harga;
 				$running_saldo -= $total_harga;
+				$keterangan = 'pengurangan gudang';
 			}
 
 			$result['data'][] = array(
@@ -82,7 +85,7 @@ class Ledger_material_model extends CI_Model {
 				'nm_category'	=> $row['nm_category'],
 				'tanggal'		=> date('d-m-Y H:i', strtotime($row['update_date'])),
 				'kode_trans'	=> $row['no_ipp'],
-				'keterangan'	=> $row['ket'],
+				'keterangan'	=> $keterangan,
 				'harga'			=> (float)$row['harga'],
 				'in'			=> $val_in,
 				'out'			=> $val_out,
