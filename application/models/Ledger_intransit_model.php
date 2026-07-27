@@ -1,23 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Ledger_fg_model extends CI_Model {
+class Ledger_intransit_model extends CI_Model {
 
 	public function __construct() {
 		parent::__construct();
 	}
 
 	/**
-	 * Get ledger data Finish Good dari tabel data_erp_fg
+	 * Get ledger data In Transit dari tabel data_erp_in_transit
 	 * In = jenis 'in' (nilai_wip)
 	 * Out = jenis 'out' (nilai_wip)
+	 * Data murni tanpa filter keterangan
 	 */
 	public function get_ledger_data($bulan, $tahun){
 		$result = array('data' => array());
 
 		$tgl_filter	= $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
-		// Detail transaksi pada periode ini (exclude keterangan 'Join to Finish Good')
+		// Detail transaksi pada periode ini - data murni tanpa filter
 		$sql_detail = "SELECT 
 							a.id,
 							a.tanggal,
@@ -32,16 +33,14 @@ class Ledger_fg_model extends CI_Model {
 							a.nilai_wip,
 							a.jenis,
 							a.nm_material
-						FROM data_erp_fg a
+						FROM data_erp_in_transit a
 						WHERE a.tanggal LIKE '".$tgl_filter."%'
-						AND a.keterangan NOT LIKE '%Join to Finish Good%'
-						AND a.keterangan NOT LIKE '%Material to Finish Good%'
 						ORDER BY a.tanggal ASC, a.id ASC";
 		$detail_rows = $this->db->query($sql_detail)->result_array();
 
 		$group = array(
-			'nama'			=> 'FINISHED GOODS SO',
-			'detail'		=> array()
+			'nama'		=> 'FINISHED GOODS IN TRANSIT',
+			'detail'	=> array()
 		);
 
 		$running_saldo = 0;
