@@ -59,13 +59,8 @@ class Ledger_intransit_model extends CI_Model {
 				$running_saldo -= $nilai_unit;
 			}
 
-			// No Reff: jika out = kode_delivery + no_so, jika in = id_trans + no_so
-			$no_reff = '';
-			if(strpos($jenis, 'in') !== false){
-				$no_reff = $row['id_trans'].$row['no_so'];
-			} else {
-				$no_reff = $row['kode_delivery'].$row['no_so'];
-			}
+			// No Reff: kode_delivery + no_so
+			$no_reff = $row['kode_delivery'].$row['no_so'];
 
 			$group['detail'][] = array(
 				'keterangan'	=> $row['keterangan'],
