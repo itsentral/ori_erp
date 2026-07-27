@@ -30,7 +30,7 @@ class Ledger_intransit_model extends CI_Model {
 							a.id_trans,
 							a.kode_delivery,
 							a.qty,
-							a.nilai_wip,
+							a.nilai_unit,
 							a.jenis,
 							a.nm_material
 						FROM data_erp_in_transit a
@@ -46,17 +46,17 @@ class Ledger_intransit_model extends CI_Model {
 		$running_saldo = 0;
 
 		foreach($detail_rows as $row){
-			$nilai_wip	= (float)$row['nilai_wip'];
+			$nilai_unit	= (float)$row['nilai_unit'];
 			$jenis		= strtolower($row['jenis']);
 			$val_in		= 0;
 			$val_out	= 0;
 
 			if(strpos($jenis, 'in') !== false){
-				$val_in = $nilai_wip;
-				$running_saldo += $nilai_wip;
+				$val_in = $nilai_unit;
+				$running_saldo += $nilai_unit;
 			} else {
-				$val_out = $nilai_wip;
-				$running_saldo -= $nilai_wip;
+				$val_out = $nilai_unit;
+				$running_saldo -= $nilai_unit;
 			}
 
 			// No Reff: jika out = kode_delivery + no_so, jika in = id_trans + no_so
