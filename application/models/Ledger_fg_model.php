@@ -35,7 +35,7 @@ class Ledger_fg_model extends CI_Model {
 							a.nm_material
 						FROM data_erp_fg a
 						WHERE DATE(a.tanggal) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."'
-						AND a.keterangan != 'Join to Finish Good'
+						AND a.keterangan NOT LIKE '%Join to Finish Good%'
 						ORDER BY a.tanggal ASC, a.id ASC";
 		$detail_rows = $this->db->query($sql_detail)->result_array();
 
