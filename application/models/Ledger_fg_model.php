@@ -18,7 +18,7 @@ class Ledger_fg_model extends CI_Model {
 		$tgl_awal	= $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT).'-01';
 		$tgl_akhir	= date('Y-m-t', strtotime($tgl_awal));
 
-		// Detail transaksi pada periode ini
+		// Detail transaksi pada periode ini (exclude keterangan 'Join to Finish Good')
 		$sql_detail = "SELECT 
 							a.id,
 							a.tanggal,
@@ -35,6 +35,7 @@ class Ledger_fg_model extends CI_Model {
 							a.nm_material
 						FROM data_erp_fg a
 						WHERE DATE(a.tanggal) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."'
+						AND a.keterangan != 'Join to Finish Good'
 						ORDER BY a.tanggal ASC, a.id ASC";
 		$detail_rows = $this->db->query($sql_detail)->result_array();
 
