@@ -111,15 +111,15 @@ class Ledger_material_model extends CI_Model {
 				$total_debet += $total_harga;
 				$keterangan = 'adjustment';
 			} else if($row['id_gudang'] == $row['id_gudang_dari']){
-				$val_in = $total_harga;
-				$running_saldo += $total_harga;
-				$total_debet += $total_harga;
-				$keterangan = 'penambahan gudang';
-			} else if($row['id_gudang'] == $row['id_gudang_ke']){
 				$val_out = $total_harga;
 				$running_saldo -= $total_harga;
 				$total_kredit += $total_harga;
 				$keterangan = 'pengurangan gudang';
+			} else if($row['id_gudang'] == $row['id_gudang_ke']){
+				$val_in = $total_harga;
+				$running_saldo += $total_harga;
+				$total_debet += $total_harga;
+				$keterangan = 'penambahan gudang';
 			}
 
 			$result['data'][] = array(
