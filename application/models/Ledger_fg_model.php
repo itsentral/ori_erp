@@ -17,7 +17,16 @@ class Ledger_fg_model extends CI_Model {
 
 		$tgl_filter = $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
-		// Detail transaksi pada periode ini (filter berdasarkan created_date)
+		// Ambil saldo awal dari tabel begining_stock
+		$sql_saldo = "SELECT saldoawal FROM begining_stock 
+					  WHERE no_perkiraan = 'finishgood' 
+					  AND bln = '".$this->db->escape_str($bulan)."' 
+					  AND thn = '".$this->db->escape_str($tahun)."' 
+					  LIMIT 1";
+		$row_saldo = $this->db->query($sql_saldo)->row();
+		$saldo_awal = (!empty($row_saldo)) ? (float)$row_saldo->saldoawal : 0;
+
+		// Detail transaksi pada periode ini
 		$sql_detail = "SELECT 
 							a.id,
 							a.tanggal,
@@ -42,10 +51,11 @@ class Ledger_fg_model extends CI_Model {
 
 		$group = array(
 			'nama'			=> 'FINISHED GOODS SO',
+			'saldo_awal'	=> $saldo_awal,
 			'detail'		=> array()
 		);
 
-		$running_saldo = 0;
+		$running_saldo = $saldo_awal;
 
 		foreach($detail_rows as $row){
 			$nilai_wip	= (float)$row['nilai_wip'];
@@ -80,8 +90,39 @@ class Ledger_fg_model extends CI_Model {
 			);
 		}
 
-		if(!empty($group['detail'])){
+		if(!empty($group['detail']) || $saldo_awal != 0){
 			$result['data'][] = $group;
+		}
+
+		// Update saldo_akhir di begining_stock setelah proses
+		$saldo_akhir = $running_saldo;
+		$cek = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = 'finishgood' AND bln = '".$this->db->escape_str($bulan)."' AND thn = '".$this->db->escape_str($tahun)."'")->row();
+		if(!empty($cek)){
+			$this->db->where('id', $cek->id);
+			$this->db->update('begining_stock', array('saldo_akhir' => $saldo_akhir));
+		}
+
+		// Saldo akhir jadi saldo awal bulan berikutnya
+		$bln_next = (int)$bulan + 1;
+		$thn_next = (int)$tahun;
+		if($bln_next > 12){
+			$bln_next = 1;
+			$thn_next = $thn_next + 1;
+		}
+		$bln_next_str = str_pad($bln_next, 2, '0', STR_PAD_LEFT);
+
+		$cek_next = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = 'finishgood' AND bln = '".$bln_next_str."' AND thn = '".$thn_next."'")->row();
+		if(!empty($cek_next)){
+			$this->db->where('id', $cek_next->id);
+			$this->db->update('begining_stock', array('saldoawal' => $saldo_akhir));
+		} else {
+			$this->db->insert('begining_stock', array(
+				'no_perkiraan'	=> 'finishgood',
+				'nama'			=> 'finishgood',
+				'saldoawal'		=> $saldo_akhir,
+				'bln'			=> $bln_next_str,
+				'thn'			=> $thn_next
+			));
 		}
 
 		return $result;
