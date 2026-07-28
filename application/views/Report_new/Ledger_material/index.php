@@ -146,6 +146,17 @@ $(document).ready(function(){
 			success: function(response){
 				var html = '';
 				if(response.data && response.data.length > 0){
+					// Row saldo awal
+					if(response.saldo_awal && response.saldo_awal != 0){
+						html += '<tr class="row-header">';
+						html += '<td colspan="5">SALDO AWAL</td>';
+						html += '<td class="text-right">0</td>';
+						html += '<td class="text-right">0</td>';
+						html += '<td class="text-right">0</td>';
+						html += '<td class="text-right">'+formatNumber(response.saldo_awal)+'</td>';
+						html += '</tr>';
+					}
+
 					var totalIn = 0;
 					var totalOut = 0;
 					$.each(response.data, function(j, det){

@@ -20,14 +20,40 @@ class Ledger_material_model extends CI_Model {
 	}
 
 	/**
+	 * Mapping id_gudang ke no_perkiraan di begining_stock
+	 */
+	private function get_no_perkiraan_gudang($id_gudang){
+		$mapping = array(
+			'2' => 'pusat',
+			'3' => 'subgudang1',
+			'4' => 'subgudang2'
+		);
+		return isset($mapping[$id_gudang]) ? $mapping[$id_gudang] : null;
+	}
+
+	/**
 	 * Get ledger data Material dari tabel warehouse_history
-	 * In = jumlah_mat > 0
-	 * Out = jumlah_mat < 0 (absolute value)
+	 * In = id_gudang = id_gudang_dari
+	 * Out = id_gudang = id_gudang_ke
 	 */
 	public function get_ledger_data($bulan, $tahun, $id_gudang = ''){
-		$result = array('data' => array());
+		$result = array('data' => array(), 'saldo_awal' => 0);
 
 		$tgl_filter = $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
+
+		// Ambil saldo awal dari begining_stock jika gudang dipilih
+		$saldo_awal = 0;
+		$no_perkiraan = $this->get_no_perkiraan_gudang($id_gudang);
+		if(!empty($no_perkiraan)){
+			$sql_saldo = "SELECT saldoawal FROM begining_stock 
+						  WHERE no_perkiraan = '".$this->db->escape_str($no_perkiraan)."' 
+						  AND bln = '".$this->db->escape_str($bulan)."' 
+						  AND thn = '".$this->db->escape_str($tahun)."' 
+						  LIMIT 1";
+			$row_saldo = $this->db->query($sql_saldo)->row();
+			$saldo_awal = (!empty($row_saldo)) ? (float)$row_saldo->saldoawal : 0;
+		}
+		$result['saldo_awal'] = $saldo_awal;
 
 		$where_gudang = '';
 		if(!empty($id_gudang)){
@@ -61,7 +87,9 @@ class Ledger_material_model extends CI_Model {
 						ORDER BY a.update_date ASC, a.id ASC";
 		$detail_rows = $this->db->query($sql_detail)->result_array();
 
-		$running_saldo = 0;
+		$running_saldo = $saldo_awal;
+		$total_debet = 0;
+		$total_kredit = 0;
 
 		foreach($detail_rows as $row){
 			$total_harga = abs((float)$row['total_harga']);
@@ -69,14 +97,28 @@ class Ledger_material_model extends CI_Model {
 			$val_out	= 0;
 
 			// Jika id_gudang = id_gudang_dari berarti In, jika id_gudang = id_gudang_ke berarti Out
+			// Jika id_gudang_dari = 0 berarti In (adjustment)
+			// Jika id_gudang_dari = null berarti Out (adjustment)
 			$keterangan = '';
-			if($row['id_gudang'] == $row['id_gudang_dari']){
+			if($row['id_gudang_dari'] === null || $row['id_gudang_dari'] === ''){
+				$val_out = $total_harga;
+				$running_saldo -= $total_harga;
+				$total_kredit += $total_harga;
+				$keterangan = 'adjustment';
+			} else if($row['id_gudang_dari'] == '0' || $row['id_gudang_dari'] == 0){
 				$val_in = $total_harga;
 				$running_saldo += $total_harga;
+				$total_debet += $total_harga;
+				$keterangan = 'adjustment';
+			} else if($row['id_gudang'] == $row['id_gudang_dari']){
+				$val_in = $total_harga;
+				$running_saldo += $total_harga;
+				$total_debet += $total_harga;
 				$keterangan = 'penambahan gudang';
 			} else if($row['id_gudang'] == $row['id_gudang_ke']){
 				$val_out = $total_harga;
 				$running_saldo -= $total_harga;
+				$total_kredit += $total_harga;
 				$keterangan = 'pengurangan gudang';
 			}
 
@@ -91,6 +133,43 @@ class Ledger_material_model extends CI_Model {
 				'out'			=> $val_out,
 				'saldo'			=> $running_saldo
 			);
+		}
+
+		// Update begining_stock jika gudang dipilih dan ada mapping
+		if(!empty($no_perkiraan)){
+			$saldo_akhir = $running_saldo;
+			$cek = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = '".$this->db->escape_str($no_perkiraan)."' AND bln = '".$this->db->escape_str($bulan)."' AND thn = '".$this->db->escape_str($tahun)."'")->row();
+			if(!empty($cek)){
+				$this->db->where('id', $cek->id);
+				$this->db->update('begining_stock', array(
+					'saldo_akhir' => $saldo_akhir,
+					'debet' => $total_debet,
+					'kredit' => $total_kredit
+				));
+			}
+
+			// Saldo akhir jadi saldo awal bulan berikutnya
+			$bln_next = (int)$bulan + 1;
+			$thn_next = (int)$tahun;
+			if($bln_next > 12){
+				$bln_next = 1;
+				$thn_next = $thn_next + 1;
+			}
+			$bln_next_str = str_pad($bln_next, 2, '0', STR_PAD_LEFT);
+
+			$cek_next = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = '".$this->db->escape_str($no_perkiraan)."' AND bln = '".$bln_next_str."' AND thn = '".$thn_next."'")->row();
+			if(!empty($cek_next)){
+				$this->db->where('id', $cek_next->id);
+				$this->db->update('begining_stock', array('saldoawal' => $saldo_akhir));
+			} else {
+				$this->db->insert('begining_stock', array(
+					'no_perkiraan'	=> $no_perkiraan,
+					'nama'			=> $no_perkiraan,
+					'saldoawal'		=> $saldo_akhir,
+					'bln'			=> $bln_next_str,
+					'thn'			=> $thn_next
+				));
+			}
 		}
 
 		return $result;
