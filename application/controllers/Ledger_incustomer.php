@@ -103,6 +103,14 @@ class Ledger_incustomer extends CI_Controller {
 			$totalIn = 0;
 			$totalOut = 0;
 			foreach($fetch['data'] as $group){
+				// Header row saldo awal
+				$sheet->setCellValue('A'.$Row, $group['nama']);
+				$sheet->setCellValue('D'.$Row, 'Saldo Awal ->');
+				$sheet->setCellValue('G'.$Row, $group['saldo_awal']);
+				$sheet->getStyle('A'.$Row.':G'.$Row)->applyFromArray($tableBodyLeft);
+				$sheet->getStyle('A'.$Row)->getFont()->setBold(true);
+				$Row++;
+
 				if(!empty($group['detail'])){
 					foreach($group['detail'] as $det){
 						$totalIn += $det['in'];
