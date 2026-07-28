@@ -56,6 +56,8 @@ class Ledger_fg_model extends CI_Model {
 		);
 
 		$running_saldo = $saldo_awal;
+		$total_debet = 0;
+		$total_kredit = 0;
 
 		foreach($detail_rows as $row){
 			$nilai_wip	= (float)$row['nilai_wip'];
@@ -66,9 +68,11 @@ class Ledger_fg_model extends CI_Model {
 			if(strpos($jenis, 'in') !== false){
 				$val_in = $nilai_wip;
 				$running_saldo += $nilai_wip;
+				$total_debet += $nilai_wip;
 			} else {
 				$val_out = $nilai_wip;
 				$running_saldo -= $nilai_wip;
+				$total_kredit += $nilai_wip;
 			}
 
 			// No Reff: jika out = kode_delivery + no_so, jika in = id_trans + no_so
@@ -94,12 +98,16 @@ class Ledger_fg_model extends CI_Model {
 			$result['data'][] = $group;
 		}
 
-		// Update saldo_akhir di begining_stock setelah proses
+		// Update saldo_akhir di begining_stock bulan ini
 		$saldo_akhir = $running_saldo;
 		$cek = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = 'finishgood' AND bln = '".$this->db->escape_str($bulan)."' AND thn = '".$this->db->escape_str($tahun)."'")->row();
 		if(!empty($cek)){
 			$this->db->where('id', $cek->id);
-			$this->db->update('begining_stock', array('saldo_akhir' => $saldo_akhir));
+			$this->db->update('begining_stock', array(
+				'saldo_akhir' => $saldo_akhir,
+				'debet' => $total_debet,
+				'kredit' => $total_kredit
+			));
 		}
 
 		// Saldo akhir jadi saldo awal bulan berikutnya

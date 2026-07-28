@@ -127,6 +127,17 @@ $(document).ready(function(){
 					var totalIn = 0;
 					var totalOut = 0;
 					$.each(response.data, function(i, group){
+						// Row header dengan saldo awal
+						html += '<tr class="row-header">';
+						html += '<td>'+group.nama+'</td>';
+						html += '<td></td>';
+						html += '<td></td>';
+						html += '<td class="text-right text-danger">Saldo Awal -></td>';
+						html += '<td class="text-right">0</td>';
+						html += '<td class="text-right">0</td>';
+						html += '<td class="text-right">'+formatNumber(group.saldo_awal)+'</td>';
+						html += '</tr>';
+
 						if(group.detail && group.detail.length > 0){
 							$.each(group.detail, function(j, det){
 								totalIn += parseFloat(det.in) || 0;
