@@ -88,7 +88,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		
 		
-		if(empty($Date_Find) || $$Date_Find == '-'){			
+		if(empty($Date_Find) || $Date_Find == '-'){			
 			$Date_Find	= date('Y-m-d');
 		}
 		
