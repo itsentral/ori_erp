@@ -138,13 +138,26 @@ class Ledger_material_model extends CI_Model {
 		// Update begining_stock jika gudang dipilih dan ada mapping
 		if(!empty($no_perkiraan)){
 			$saldo_akhir = $running_saldo;
-			$cek = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = '".$this->db->escape_str($no_perkiraan)."' AND bln = '".$this->db->escape_str($bulan)."' AND thn = '".$this->db->escape_str($tahun)."'")->row();
+			$bln_str = str_pad($bulan, 2, '0', STR_PAD_LEFT);
+			$cek = $this->db->query("SELECT id FROM begining_stock WHERE no_perkiraan = '".$this->db->escape_str($no_perkiraan)."' AND bln = '".$this->db->escape_str($bln_str)."' AND thn = '".$this->db->escape_str($tahun)."'")->row();
 			if(!empty($cek)){
 				$this->db->where('id', $cek->id);
 				$this->db->update('begining_stock', array(
 					'saldo_akhir' => $saldo_akhir,
 					'debet' => $total_debet,
 					'kredit' => $total_kredit
+				));
+			} else {
+				// Jika belum ada record bulan ini, buat dulu dengan saldoawal = 0
+				$this->db->insert('begining_stock', array(
+					'no_perkiraan'	=> $no_perkiraan,
+					'nama'			=> $no_perkiraan,
+					'saldoawal'		=> 0,
+					'bln'			=> $bln_str,
+					'thn'			=> $tahun,
+					'saldo_akhir'	=> $saldo_akhir,
+					'debet'			=> $total_debet,
+					'kredit'		=> $total_kredit
 				));
 			}
 

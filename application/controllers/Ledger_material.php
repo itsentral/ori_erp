@@ -107,6 +107,18 @@ class Ledger_material extends CI_Controller {
 
 		$Row++;
 
+		// Row saldo awal
+		if(isset($fetch['saldo_awal']) && $fetch['saldo_awal'] != 0){
+			$sheet->setCellValue('A'.$Row, 'SALDO AWAL');
+			$sheet->mergeCells('A'.$Row.':E'.$Row);
+			$sheet->setCellValue('F'.$Row, 0);
+			$sheet->setCellValue('G'.$Row, 0);
+			$sheet->setCellValue('H'.$Row, 0);
+			$sheet->setCellValue('I'.$Row, $fetch['saldo_awal']);
+			$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableHeader);
+			$Row++;
+		}
+
 		if(!empty($fetch['data'])){
 			$totalIn = 0;
 			$totalOut = 0;
