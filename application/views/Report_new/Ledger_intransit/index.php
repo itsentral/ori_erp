@@ -126,6 +126,7 @@ $(document).ready(function(){
 				if(response.data && response.data.length > 0){
 					var totalIn = 0;
 					var totalOut = 0;
+					var lastSaldo = 0;
 					$.each(response.data, function(i, group){
 						// Row header dengan saldo awal
 						html += '<tr class="row-header">';
@@ -142,6 +143,7 @@ $(document).ready(function(){
 							$.each(group.detail, function(j, det){
 								totalIn += parseFloat(det.in) || 0;
 								totalOut += parseFloat(det.out) || 0;
+								lastSaldo = parseFloat(det.saldo) || 0;
 								html += '<tr>';
 								html += '<td>'+det.keterangan+'</td>';
 								html += '<td class="text-center">'+det.tanggal+'</td>';
@@ -159,7 +161,7 @@ $(document).ready(function(){
 					html += '<td colspan="4" class="text-right"><strong>TOTAL</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalIn)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalOut)+'</strong></td>';
-					html += '<td class="text-right"><strong>'+formatNumber(totalIn - totalOut)+'</strong></td>';
+					html += '<td class="text-right"><strong>'+formatNumber(lastSaldo)+'</strong></td>';
 					html += '</tr>';
 				} else {
 					html = '<tr><td colspan="7" class="text-center">Data tidak ditemukan</td></tr>';

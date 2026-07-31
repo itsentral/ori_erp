@@ -159,9 +159,11 @@ $(document).ready(function(){
 
 					var totalIn = 0;
 					var totalOut = 0;
+					var lastSaldo = 0;
 					$.each(response.data, function(j, det){
 						totalIn += parseFloat(det.in) || 0;
 						totalOut += parseFloat(det.out) || 0;
+						lastSaldo = parseFloat(det.saldo) || 0;
 						html += '<tr>';
 						html += '<td>'+det.nm_material+'</td>';
 						html += '<td>'+det.nm_category+'</td>';
@@ -179,7 +181,7 @@ $(document).ready(function(){
 					html += '<td colspan="6" class="text-right"><strong>TOTAL</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalIn)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalOut)+'</strong></td>';
-					html += '<td class="text-right"><strong>'+formatNumber(totalIn - totalOut)+'</strong></td>';
+					html += '<td class="text-right"><strong>'+formatNumber(lastSaldo)+'</strong></td>';
 					html += '</tr>';
 				} else {
 					html = '<tr><td colspan="9" class="text-center">Data tidak ditemukan</td></tr>';

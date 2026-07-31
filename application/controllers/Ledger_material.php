@@ -122,9 +122,11 @@ class Ledger_material extends CI_Controller {
 		if(!empty($fetch['data'])){
 			$totalIn = 0;
 			$totalOut = 0;
+			$lastSaldo = 0;
 			foreach($fetch['data'] as $det){
 				$totalIn += $det['in'];
 				$totalOut += $det['out'];
+				$lastSaldo = $det['saldo'];
 				$sheet->setCellValue('A'.$Row, $det['nm_material']);
 				$sheet->setCellValue('B'.$Row, $det['nm_category']);
 				$sheet->setCellValue('C'.$Row, $det['tanggal']);
@@ -142,7 +144,7 @@ class Ledger_material extends CI_Controller {
 			$sheet->setCellValue('F'.$Row, 'TOTAL');
 			$sheet->setCellValue('G'.$Row, $totalIn);
 			$sheet->setCellValue('H'.$Row, $totalOut);
-			$sheet->setCellValue('I'.$Row, $totalIn - $totalOut);
+			$sheet->setCellValue('I'.$Row, $lastSaldo);
 			$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableHeader);
 			$Row++;
 		}

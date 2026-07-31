@@ -102,6 +102,7 @@ class Ledger_intransit extends CI_Controller {
 		if(!empty($fetch['data'])){
 			$totalIn = 0;
 			$totalOut = 0;
+			$lastSaldo = 0;
 			foreach($fetch['data'] as $group){
 				// Header row saldo awal
 				$sheet->setCellValue('A'.$Row, $group['nama']);
@@ -115,6 +116,7 @@ class Ledger_intransit extends CI_Controller {
 					foreach($group['detail'] as $det){
 						$totalIn += $det['in'];
 						$totalOut += $det['out'];
+						$lastSaldo = $det['saldo'];
 						$sheet->setCellValue('A'.$Row, $det['keterangan']);
 						$sheet->setCellValue('B'.$Row, $det['tanggal']);
 						$sheet->setCellValue('C'.$Row, $det['nomor_bukti']);
@@ -132,7 +134,7 @@ class Ledger_intransit extends CI_Controller {
 			$sheet->setCellValue('D'.$Row, 'TOTAL');
 			$sheet->setCellValue('E'.$Row, $totalIn);
 			$sheet->setCellValue('F'.$Row, $totalOut);
-			$sheet->setCellValue('G'.$Row, $totalIn - $totalOut);
+			$sheet->setCellValue('G'.$Row, $lastSaldo);
 			$sheet->getStyle('A'.$Row.':G'.$Row)->applyFromArray($tableHeader);
 			$Row++;
 		}
