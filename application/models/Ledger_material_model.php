@@ -148,11 +148,11 @@ class Ledger_material_model extends CI_Model {
 					'kredit' => $total_kredit
 				));
 			} else {
-				// Jika belum ada record bulan ini, buat dulu dengan saldoawal = 0
+				// Jika belum ada record bulan ini, buat dengan saldoawal dari bulan sebelumnya
 				$this->db->insert('begining_stock', array(
 					'no_perkiraan'	=> $no_perkiraan,
 					'nama'			=> $no_perkiraan,
-					'saldoawal'		=> 0,
+					'saldoawal'		=> $saldo_awal,
 					'bln'			=> $bln_str,
 					'thn'			=> $tahun,
 					'saldo_akhir'	=> $saldo_akhir,
