@@ -482,7 +482,6 @@ class Qc_deadstok extends CI_Controller
 
 			if(!empty($ArrIN_FG_MATERIAL)){
 				$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
-				$this->jurnalFG($kode_spk);
 			}
 		$this->db->trans_complete();
 
@@ -494,6 +493,12 @@ class Qc_deadstok extends CI_Controller
 			);
 		} else {
 			$this->db->trans_commit();
+
+			// Jurnal dipanggil setelah commit agar data data_erp_fg sudah tersedia untuk dibaca
+			if(!empty($ArrIN_FG_MATERIAL)){
+				$this->jurnalFG($kode_spk);
+			}
+
 			$Arr_Kembali	= array(
 				'pesan'		=> 'Success process data. Thanks ...',
 				'status'	=> 1
