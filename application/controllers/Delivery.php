@@ -6967,7 +6967,8 @@ class Delivery extends CI_Controller
 			$totalfg =0;
 			  
 			$det_Jurnaltes = [];
-			$qty_n = 0; 
+			$qty_n = 0;
+			$kode_trans_valid = ''; 
 			foreach($wip AS $data){
 				
 				$nm_material = $data->product;	
@@ -7028,6 +7029,9 @@ class Delivery extends CI_Controller
 					  	
 
 					 $kode_trans = $data->kode_trans;
+					 if(!empty($kode_trans)){
+					 	$kode_trans_valid = $kode_trans;
+					 }
 					 $nospk      = $data->no_spk;
 					 $qty1       = $data->qty;
 					 $noso       = $data->no_so;
@@ -7079,7 +7083,11 @@ class Delivery extends CI_Controller
 			unset($det_Jurnaltes);unset($datadetail);
 
 
-			$wipgroup = $this->db->query("SELECT * FROM data_erp_in_customer WHERE kode_trans ='".$kode_trans."' AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();	
+			if(!empty($kode_trans_valid)){
+				$wipgroup = $this->db->query("SELECT * FROM data_erp_in_customer WHERE kode_trans ='".$kode_trans_valid."' AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();
+			}else{
+				$wipgroup = $this->db->query("SELECT * FROM data_erp_in_customer WHERE kode_trans IS NULL AND tanggal='".$tgl_voucher."' AND product IS NOT NULL limit 1")->row();
+			}
 			
 			if(empty($wipgroup)){
 				return;

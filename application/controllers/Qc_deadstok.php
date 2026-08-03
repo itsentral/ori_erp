@@ -705,7 +705,38 @@ class Qc_deadstok extends CI_Controller
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					  
-					 ); 		
+					 );
+
+					 // Jurnal FG Deadstok to FG SO
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '1103-04-01',
+					  'keterangan'    => 'FG Deadstok to FG SO,'.$data->product.','.$data->no_spk.','.$data->no_so,
+					  'no_reff'       => $id.$noso,
+					  'debet'         => $finishgood,
+					  'kredit'        => 0,
+					  'jenis_jurnal'  => 'Fg deadstock to Fg SO',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
+
+					 $det_Jurnaltes[]  = array(
+					  'nomor'         => '',
+					  'tanggal'       => $tgl_voucher,
+					  'tipe'          => 'JV',
+					  'no_perkiraan'  => '1103-04-02',
+					  'keterangan'    => 'FG Deadstok to FG SO,'.$data->product.','.$data->no_spk.','.$data->no_so,
+					  'no_reff'       => $id.$noso,
+					  'debet'         => 0,
+					  'kredit'        => $finishgood,
+					  'jenis_jurnal'  => 'Fg deadstock to Fg SO',
+					  'no_request'    => $no_request,
+					  'stspos'		  =>1
+					  
+					 );
 
 					
 					$kode_trans = $data->kode_trans;
