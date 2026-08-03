@@ -483,6 +483,94 @@ class Qc_deadstok extends CI_Controller
 			if(!empty($ArrIN_FG_MATERIAL)){
 				$this->db->insert_batch('data_erp_fg',$ArrIN_FG_MATERIAL);
 			}
+
+			// Jurnal FG Deadstok to FG SO
+			if(!empty($ArrIN_FG_MATERIAL)){
+				$det_jurnal_fg_so = [];
+				$total_fg_so = 0;
+				$tgl_voucher_fg = date('Y-m-d');
+				$no_request_fg = '';
+				$id_fg = '';
+				$noso_fg = '';
+				$keterangan_fg = '';
+
+				foreach ($ArrIN_FG_MATERIAL as $fg_val) {
+					$finishgood_val = $fg_val['nilai_unit'];
+					$total_fg_so += $finishgood_val;
+					$tgl_voucher_fg = $fg_val['tanggal'];
+					$no_request_fg = $fg_val['no_spk'];
+					$id_fg = $fg_val['id_trans'];
+					$noso_fg = ','.$fg_val['no_so'];
+					$keterangan_fg = 'FG Deadstok to FG SO,'.$fg_val['product'].','.$fg_val['no_spk'].','.$fg_val['no_so'];
+
+					$det_jurnal_fg_so[] = array(
+						'nomor'         => '',
+						'tanggal'       => $tgl_voucher_fg,
+						'tipe'          => 'JV',
+						'no_perkiraan'  => '1103-04-01',
+						'keterangan'    => $keterangan_fg,
+						'no_reff'       => $id_fg.$noso_fg,
+						'debet'         => $finishgood_val,
+						'kredit'        => 0,
+						'jenis_jurnal'  => 'Fg deadstock to Fg SO',
+						'no_request'    => $no_request_fg,
+						'stspos'        => 1
+					);
+
+					$det_jurnal_fg_so[] = array(
+						'nomor'         => '',
+						'tanggal'       => $tgl_voucher_fg,
+						'tipe'          => 'JV',
+						'no_perkiraan'  => '1103-04-02',
+						'keterangan'    => $keterangan_fg,
+						'no_reff'       => $id_fg.$noso_fg,
+						'debet'         => 0,
+						'kredit'        => $finishgood_val,
+						'jenis_jurnal'  => 'Fg deadstock to Fg SO',
+						'no_request'    => $no_request_fg,
+						'stspos'        => 1
+					);
+				}
+
+				if(!empty($det_jurnal_fg_so)){
+					$this->db->insert_batch('jurnaltras', $det_jurnal_fg_so);
+
+					// Insert ke DBACC
+					$Nomor_JV_FGSO = $this->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher_fg);
+					$Bln_fg = substr($tgl_voucher_fg, 5, 2);
+					$Thn_fg = substr($tgl_voucher_fg, 0, 4);
+					$dataJVhead_fgso = array(
+						'nomor' => $Nomor_JV_FGSO,
+						'tgl' => $tgl_voucher_fg,
+						'jml' => $total_fg_so,
+						'koreksi_no' => '-',
+						'kdcab' => '101',
+						'jenis' => 'JV',
+						'keterangan' => 'Fg deadstock to Fg SO '.$keterangan_fg,
+						'bulan' => $Bln_fg,
+						'tahun' => $Thn_fg,
+						'user_id' => $username,
+						'memo' => $id_fg,
+						'tgl_jvkoreksi' => $tgl_voucher_fg,
+						'ho_valid' => ''
+					);
+					$this->db->insert(DBACC.'.javh', $dataJVhead_fgso);
+
+					foreach ($det_jurnal_fg_so as $jfg) {
+						$this->db->insert(DBACC.'.jurnal', array(
+							'tipe'          => 'JV',
+							'nomor'         => $Nomor_JV_FGSO,
+							'tanggal'       => $jfg['tanggal'],
+							'no_perkiraan'  => $jfg['no_perkiraan'],
+							'keterangan'    => $jfg['keterangan'],
+							'no_reff'       => $jfg['no_reff'],
+							'debet'         => $jfg['debet'],
+							'kredit'        => $jfg['kredit'],
+						));
+					}
+				}
+			}
+
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -494,7 +582,7 @@ class Qc_deadstok extends CI_Controller
 		} else {
 			$this->db->trans_commit();
 
-			// Jurnal dipanggil setelah commit agar data data_erp_fg sudah tersedia untuk dibaca
+			// Jurnal WIP to FG
 			if(!empty($ArrIN_FG_MATERIAL)){
 				$this->jurnalFG($kode_spk);
 			}
@@ -707,37 +795,6 @@ class Qc_deadstok extends CI_Controller
 					  'debet'         => 0,
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'WIP to Fg deadstock',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					  
-					 );
-
-					 // Jurnal FG Deadstok to FG SO
-					 $det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => '1103-04-01',
-					  'keterangan'    => 'FG Deadstok to FG SO,'.$data->product.','.$data->no_spk.','.$data->no_so,
-					  'no_reff'       => $id.$noso,
-					  'debet'         => $finishgood,
-					  'kredit'        => 0,
-					  'jenis_jurnal'  => 'Fg deadstock to Fg SO',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					  
-					 );
-
-					 $det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => '1103-04-02',
-					  'keterangan'    => 'FG Deadstok to FG SO,'.$data->product.','.$data->no_spk.','.$data->no_so,
-					  'no_reff'       => $id.$noso,
-					  'debet'         => 0,
-					  'kredit'        => $finishgood,
-					  'jenis_jurnal'  => 'Fg deadstock to Fg SO',
 					  'no_request'    => $no_request,
 					  'stspos'		  =>1
 					  
