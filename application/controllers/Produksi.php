@@ -11659,7 +11659,10 @@ class Produksi extends CI_Controller {
 
 		if(!empty($getDetDeadStock)){
 			foreach ($getDetDeadStock as $key => $value) {
-				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$value['id_deadstok'],'jenis'=>'in deadstok'))->result_array();
+				// Ambil id_milik dari tabel deadstok untuk mencari data FG asli
+				$getDeadstokParent = $this->db->get_where('deadstok', array('id'=>$value['id_deadstok']))->row();
+				$id_pro_det_fg = (!empty($getDeadstokParent->id_milik)) ? $getDeadstokParent->id_milik : $value['id_deadstok'];
+				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$id_pro_det_fg,'jenis'=>'in deadstok'))->result_array();
 				if(!empty($getDataFG)){
 					$ArrOUT_FG[$key]['tanggal'] = date('Y-m-d');
 					$ArrOUT_FG[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
