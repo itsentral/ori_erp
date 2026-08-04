@@ -953,11 +953,7 @@ class Deadstok extends CI_Controller {
 				$cogs          	= $material+$wip_direct+$wip_indirect+$wip_foh+$wip_consumable;
 				
 				$totalfg        = $finishgood;
-				if ($nm_material=='pipe'){			
-				$coa_wip 		='1103-03-02';	
-				}else{
-				$coa_wip 		='1103-03-03';						
-				}					
+				$coa_wip 		='1103-04-02';					
 				$coafg   		='1103-04-01';
                 				
 					 $det_Jurnaltes[]  = array(
