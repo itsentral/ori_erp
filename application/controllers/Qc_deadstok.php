@@ -815,6 +815,7 @@ class Qc_deadstok extends CI_Controller
 				
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='finishgood deadstock to WIP' and no_reff ='$idtrans' AND tanggal ='".$Date."'"); 
+			if(!empty($det_Jurnaltes)){
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
@@ -924,6 +925,7 @@ class Qc_deadstok extends CI_Controller
 			}
 		
 	    }
+	    } // end if(!empty($det_Jurnaltes))
     }
 
 }
