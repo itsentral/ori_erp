@@ -11662,7 +11662,7 @@ class Produksi extends CI_Controller {
 				// Ambil id_milik dari tabel deadstok untuk mencari data FG asli
 				$getDeadstokParent = $this->db->get_where('deadstok', array('id'=>$value['id_deadstok']))->row();
 				$id_pro_det_fg = (!empty($getDeadstokParent->id_milik)) ? $getDeadstokParent->id_milik : $value['id_deadstok'];
-				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro_det'=>$id_pro_det_fg,'jenis'=>'in deadstok'))->result_array();
+				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro_det_fg,'jenis'=>'in deadstok'))->result_array();
 				
 				// DEBUG LOG - hapus setelah fix
 				log_message('error', 'CLOSING DEADSTOK DEBUG: id_deadstok='.$value['id_deadstok'].', id_pro_det_fg='.$id_pro_det_fg.', getDataFG count='.count($getDataFG));
