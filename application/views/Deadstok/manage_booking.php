@@ -199,7 +199,8 @@ $this->load->view('include/side_menu');
 		},
 		function(isConfirm) {
 			if (isConfirm) {
-				// loading_spinner();
+				// Disable tombol confirm agar tidak bisa diklik 2x
+				$('.confirm').prop('disabled', true).text('Processing...');
 				var formData  	= new FormData($('#form_proses')[0]);
 				$.ajax({
 					url			: base_url + active_controller+'/booking_deadstok',  
@@ -226,6 +227,7 @@ $this->load->view('include/side_menu');
 								type	: "warning",
 								timer	: 3000
 							});
+							$('.confirm').prop('disabled', false).text('Yes, Process it!');
 						}
 					},
 					error: function() {
@@ -235,6 +237,7 @@ $this->load->view('include/side_menu');
 						type		: "warning",								  
 						timer		: 3000
 						});
+						$('.confirm').prop('disabled', false).text('Yes, Process it!');
 					}
 				});
 			} else {

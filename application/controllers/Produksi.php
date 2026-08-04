@@ -13897,6 +13897,7 @@ class Produksi extends CI_Controller {
 				
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='produksi wip' and no_reff ='$id'");
+			if(!empty($det_Jurnaltes)){
 			$this->db->insert_batch('jurnaltras',$det_Jurnaltes); 
 			
 			
@@ -13923,6 +13924,7 @@ class Produksi extends CI_Controller {
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
+			} // end if(!empty($det_Jurnaltes))
 		  
 		}
 }
