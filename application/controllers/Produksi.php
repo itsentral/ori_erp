@@ -11664,9 +11664,6 @@ class Produksi extends CI_Controller {
 				$id_pro_det_fg = (!empty($getDeadstokParent->id_milik)) ? $getDeadstokParent->id_milik : $value['id_deadstok'];
 				$getDataFG = $this->db->order_by('id','desc')->limit(1)->get_where('data_erp_fg',array('id_pro'=>$id_pro_det_fg,'jenis'=>'in deadstok'))->result_array();
 				
-				// DEBUG LOG - hapus setelah fix
-				log_message('error', 'CLOSING DEADSTOK DEBUG: id_deadstok='.$value['id_deadstok'].', id_pro_det_fg='.$id_pro_det_fg.', getDataFG count='.count($getDataFG));
-				
 				if(!empty($getDataFG)){
 					$ArrOUT_FG[$key]['tanggal'] = date('Y-m-d');
 					$ArrOUT_FG[$key]['keterangan'] = 'Finish Good to WIP (Deadstock Modif)';
