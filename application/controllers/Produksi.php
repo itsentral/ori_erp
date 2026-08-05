@@ -13916,37 +13916,35 @@ class Produksi extends CI_Controller {
 
 			    $debit  = $totalwip;			
 				
-				if($totalwip != 0 ){
-					 $det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokirwip,
-					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id.$noso,
-					  'debet'         => $totalwip,
-					  'kredit'        => 0,
-					  'jenis_jurnal'  => 'produksi wip deadstock',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					   );
-					
-				}else{
-								
-					$det_Jurnaltes[]  = array(
-					  'nomor'         => '',
-					  'tanggal'       => $tgl_voucher,
-					  'tipe'          => 'JV',
-					  'no_perkiraan'  => $nokir,
-					  'keterangan'    => $keterangan,
-					  'no_reff'       => $id,
-					  'debet'         => 0,
-					  'kredit'        => $kredit,
-					  'jenis_jurnal'  => 'produksi wip deadstock',
-					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					 );
-				}
+				// Insert debit WIP (selalu masuk meskipun nilai 0)
+				$det_Jurnaltes[]  = array(
+				  'nomor'         => '',
+				  'tanggal'       => $tgl_voucher,
+				  'tipe'          => 'JV',
+				  'no_perkiraan'  => $nokirwip,
+				  'keterangan'    => $keterangan,
+				  'no_reff'       => $id.$noso,
+				  'debet'         => $wiptotal,
+				  'kredit'        => 0,
+				  'jenis_jurnal'  => 'produksi wip deadstock',
+				  'no_request'    => $no_request,
+				  'stspos'		  =>1
+				   );
+
+				// Insert kredit gudang produksi
+				$det_Jurnaltes[]  = array(
+				  'nomor'         => '',
+				  'tanggal'       => $tgl_voucher,
+				  'tipe'          => 'JV',
+				  'no_perkiraan'  => $nokir,
+				  'keterangan'    => $keterangan,
+				  'no_reff'       => $id.$noso,
+				  'debet'         => 0,
+				  'kredit'        => $kredit,
+				  'jenis_jurnal'  => 'produksi wip deadstock',
+				  'no_request'    => $no_request,
+				  'stspos'		  =>1
+				 );
 				
 			}
 			
