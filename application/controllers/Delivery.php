@@ -5696,7 +5696,13 @@ class Delivery extends CI_Controller
 				$getReqAcc = $this->db->get_where('request_accessories',array('id'=>$valx['id_uniq']))->result();
 				$kode_req = (!empty($getReqAcc[0]->kode))?$getReqAcc[0]->kode:'';
 
-				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good'))->result_array();
+				// Filter berdasarkan id_material (disimpan di kolom 'product' pada delivery_product_detail)
+				$id_material_acc = (!empty($valx['product']))?$valx['product']:null;
+				$where_fg = array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good');
+				if(!empty($id_material_acc)){
+					$where_fg['id_material'] = $id_material_acc;
+				}
+				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',$where_fg)->result_array();
 
 				if(!empty($getSummary)){
 					foreach ($getSummary as $key => $value2x) {
