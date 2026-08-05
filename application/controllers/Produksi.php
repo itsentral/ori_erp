@@ -13914,24 +13914,7 @@ class Produksi extends CI_Controller {
 					}					
 					
 
-			    $debit  = $totalwip;			
-				
-				// Insert debit WIP (selalu masuk meskipun nilai 0)
-				$det_Jurnaltes[]  = array(
-				  'nomor'         => '',
-				  'tanggal'       => $tgl_voucher,
-				  'tipe'          => 'JV',
-				  'no_perkiraan'  => $nokirwip,
-				  'keterangan'    => $keterangan,
-				  'no_reff'       => $id.$noso,
-				  'debet'         => $wiptotal,
-				  'kredit'        => 0,
-				  'jenis_jurnal'  => 'produksi wip deadstock',
-				  'no_request'    => $no_request,
-				  'stspos'		  =>1
-				   );
-
-				// Insert kredit gudang produksi
+				// Insert kredit gudang produksi (per material)
 				$det_Jurnaltes[]  = array(
 				  'nomor'         => '',
 				  'tanggal'       => $tgl_voucher,
@@ -13947,6 +13930,21 @@ class Produksi extends CI_Controller {
 				 );
 				
 			}
+
+			// Insert 1 debit WIP di akhir (total semua kredit)
+			$det_Jurnaltes[]  = array(
+			  'nomor'         => '',
+			  'tanggal'       => $tgl_voucher,
+			  'tipe'          => 'JV',
+			  'no_perkiraan'  => $nokirwip,
+			  'keterangan'    => 'WIP Produk '.$noso,
+			  'no_reff'       => $id.$noso,
+			  'debet'         => $wiptotal,
+			  'kredit'        => 0,
+			  'jenis_jurnal'  => 'produksi wip deadstock',
+			  'no_request'    => $no_request,
+			  'stspos'		  =>1
+			   );
 			
 			       
 				
@@ -13962,7 +13960,7 @@ class Produksi extends CI_Controller {
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'Jurnal Produksi - WIP';
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalwip, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $wiptotal, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
