@@ -5691,18 +5691,18 @@ class Delivery extends CI_Controller
 		$ArrGroupOutAksesoris = [];
 		$ArrayDeliveryAksesoris = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts_product'=>'aksesoris'))->result_array();
 		if(!empty($ArrayDeliveryAksesoris)){
+			// Track kode_req yang sudah diproses untuk mencegah duplikasi
+			$processedKodeReq = [];
 			foreach ($ArrayDeliveryAksesoris as $value => $valx) {
 				// Cari data di data_erp_fg berdasarkan no_spk (kode request) dari request_accessories
 				$getReqAcc = $this->db->get_where('request_accessories',array('id'=>$valx['id_uniq']))->result();
 				$kode_req = (!empty($getReqAcc[0]->kode))?$getReqAcc[0]->kode:'';
 
-				// Filter berdasarkan id_material (disimpan di kolom 'product' pada delivery_product_detail)
-				$id_material_acc = (!empty($valx['product']))?$valx['product']:null;
-				$where_fg = array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good');
-				if(!empty($id_material_acc)){
-					$where_fg['id_material'] = $id_material_acc;
-				}
-				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',$where_fg)->result_array();
+				// Skip jika kode_req ini sudah pernah diproses
+				if(in_array($kode_req, $processedKodeReq)) continue;
+				$processedKodeReq[] = $kode_req;
+
+				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good'))->result_array();
 
 				if(!empty($getSummary)){
 					foreach ($getSummary as $key => $value2x) {
