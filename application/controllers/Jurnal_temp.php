@@ -1228,6 +1228,28 @@ class Jurnal_temp extends CI_Controller {
 			$no_ipp 	= $EXPLODE[2];
 			//			$getData = $this->db->get_where('jurnal',array('category'=>'laporan produksi','no_ipp'=>$no_ipp,'id_spk'=>$id_spk,'id_milik'=>$id_milik))->result_array();
 			$getData = $this->db->query("SELECT a.*,b.coa FROM jurnal a join product_parent b on a.product=b.product_parent WHERE a.id_milik='$id_milik' AND a.id_spk='$id_spk' AND a.no_ipp = '$no_ipp' AND a.category = 'laporan produksi'")->result_array();
+			
+			// Jika JOIN gagal (deadstock - product tidak ada di product_parent), tentukan COA langsung
+			if(empty($getData)){
+				$getData = $this->db->get_where('jurnal',array('category'=>'laporan produksi','no_ipp'=>$no_ipp,'id_spk'=>$id_spk,'id_milik'=>$id_milik))->result_array();
+				// Ambil type dari deadstok via production_spk -> deadstok_modif -> deadstok
+				$getSpk = $this->db->get_where('production_spk',array('id'=>$id_spk))->row();
+				$coa_deadstok = '1103-03-03'; // default non-pipe
+				if(!empty($getSpk)){
+					$getDeadstokModif = $this->db->select('b.type')
+						->join('deadstok b','a.id_deadstok=b.id','left')
+						->get_where('deadstok_modif a', array('a.kode_spk'=>$getSpk->kode_spk))
+						->row();
+					if(!empty($getDeadstokModif) && $getDeadstokModif->type == 'pipe'){
+						$coa_deadstok = '1103-03-02';
+					}
+				}
+				// Tambahkan coa ke setiap row
+				foreach($getData as $keyD => $rowD){
+					$getData[$keyD]['coa'] = $coa_deadstok;
+				}
+			}
+
 			foreach ($getData as $key => $value) { $nomor++;
 			    $total  = ($total+$value['total_nilai']);
 				$ArrayTemp[$nomor]['id'] = $value['id'];
