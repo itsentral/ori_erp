@@ -3356,7 +3356,7 @@
 			$length_cutting 	= $get_detProduksi[0]->length_split;
 			$length_full 		= $get_detProduksi[0]->length;
 			$no_ipp 			= str_replace('BQ-','',$id_bq);
-			$kode_trans1        = $getReportFG[0]['kode_trans'];
+			$kode_trans1        = (!empty($getReportFG[0]['kode_trans'])) ? $getReportFG[0]['kode_trans'] : ((!empty($getReportFG_DEADSTOCK[0]['kode_trans'])) ? $getReportFG_DEADSTOCK[0]['kode_trans'] : '');
             $kode_trans_new     = $kode_trans1.$nomor;
 			$keterangan 		= $product.'/'.$id_milik.'/'.$nomor_so.'.'.$product_ke.'/'.$no_spk.'/'.$kode_pro;
 
