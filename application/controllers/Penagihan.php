@@ -6911,21 +6911,11 @@ else
 			}
 			
 //loose_dead	
-			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by a.id_milik, a.product, a.id_produksi ";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
 					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
-				}
-				
-			}else{
-//loose_dead fallback - langsung dari delivery_product_detail tanpa join production_detail
-				$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by a.id_milik, a.product, a.id_produksi ";
-				$delivery_loose	= $this->db->query($sql)->result_array();
-				if(!empty($delivery_loose)){
-					foreach ($delivery_loose as $keys=>$vals){
-						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
-					}
 				}
 			}
 		
@@ -6967,6 +6957,11 @@ else
 			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
 			x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
 			
+//fallback for deadstok - langsung dari billing_so_product via no_ipp karena id_milik tidak nyambung ke so_detail_header
+			if(empty($getDetail)){
+				$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, IFNULL(c.qty,0) as qty_delivery, IFNULL(c.cogs,0) as cogs, c.sts_do from billing_so_product a left join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp, x.id_product, x.id_penagihan, x.sts_do from penagihan_product_temp x where x.id_penagihan='".$id."' group by x.no_ipp,x.id_product) c on a.no_ipp=c.no_ipp where a.no_ipp in ('".$noipp."')")->result_array();
+			}
+
 			$getDetailcut	= $this->db->query("select a.* FROM penagihan_product_temp a WHERE a.sts_do='cut non produksi' AND a.id_penagihan='".$id."'")->result_array();
 			
 			$getidmilik   = $this->db->query("SELECT sum(x.qty) AS qty,sum(x.cogs) AS cogs, x.no_ipp, x.id_product, CONCAT('BQ-', x.no_ipp) AS id_bq, x.id_penagihan, y.id_milik,  x.sts_do  FROM  penagihan_product_temp x JOIN so_detail_header y ON x.id_milik = y.id WHERE x.id_penagihan='".$id."' AND y.id_milik IS NULL  GROUP BY x.no_ipp, x.id_product, y.id_milik")->result_array();
