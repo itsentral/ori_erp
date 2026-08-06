@@ -6918,6 +6918,15 @@ else
 					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
 				}
 				
+			}else{
+//loose_dead fallback - langsung dari delivery_product_detail tanpa join production_detail
+				$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by a.id_milik, a.product, a.id_produksi ";
+				$delivery_loose	= $this->db->query($sql)->result_array();
+				if(!empty($delivery_loose)){
+					foreach ($delivery_loose as $keys=>$vals){
+						$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
+					}
+				}
 			}
 		
 			// $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' ";
