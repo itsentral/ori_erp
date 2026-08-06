@@ -3731,6 +3731,23 @@ else
 			$id_bq=implode("','BQ-",$in_ipp);
 			$kode_delivery=str_ireplace(",","','",$penagihan[0]->delivery_no);
 			$getHeader	= $this->db->where_in('no_ipp',$in_ipp)->get('production')->result();
+			
+			// Default values
+			$getDetail = array();
+			$getEngCost = array();
+			$getPackCost = array();
+			$getTruck = array();
+			$getOther = array();
+			$non_frp = array();
+			$material = array();
+			$list_top = array();
+			$get_kurs1 = null;
+			$uang_muka_persen = 0;
+			$down_payment = 0;
+			$sisa_um = 0;
+			$sisa_um_idr = 0;
+			$down_payment2 = 0;
+
 			if(!empty($penagihan_detail)){
 				$getDetail	= $this->db->query("select *,harga_total as total_deal_usd, dim_1 as dim1,dim_2 as dim2, qty as qty_delivery,qty_sisa as qty_inv, nm_material as product, product_cust as customer_item
 				from penagihan_detail where kategori_detail='PRODUCT' and id_penagihan='".$id."'")->result_array();
@@ -3745,12 +3762,16 @@ else
 				$get_kurs1	= $this->db->select(' (kurs_jual) AS kurs,  (progress_persen) AS uang_muka_persen,  0 AS uang_muka_persen2')->where('id',$id)->get('penagihan')->result();
 				
 				$get_kurs  = $this->db->query("select persen_um as uang_muka_persen,kurs_um as kurs,sisa_um AS sisa_um,sisa_um_idr AS sisa_um_idr from tr_kartu_po_customer where nomor_po ='".$penagihan[0]->no_po."'")->result();
-				$sisa_um   = $get_kurs[0]->sisa_um;
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
-				$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+				if(!empty($get_kurs)){
+					$sisa_um   = $get_kurs[0]->sisa_um;
+					$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+					$sisa_um_idr   = $get_kurs[0]->sisa_um_idr;
+				}
 
 				$get_tagih	= $this->db->order_by('id','ASC')->get_where('penagihan',array('no_po'=>$penagihan[0]->no_po,'type'=>'uang muka'))->result();
-				$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				if(!empty($get_kurs)){
+					$uang_muka_persen = $get_kurs[0]->uang_muka_persen;
+				}
 				if($base_cur=='USD'){
 					$down_payment = (!empty($get_tagih))?$get_tagih[0]->grand_total:0;
 				}else{
@@ -3790,7 +3811,7 @@ else
 			'in_so'			=> implode(',',$in_so),
 			'arr_in_ipp'	=> $in_ipp,
 			'penagihan'		=> $penagihan,
-			'kurs'			=> $get_kurs1[0]->kurs,
+			'kurs'			=> (!empty($get_kurs1)) ? $get_kurs1[0]->kurs : 0,
 			'uang_muka_persen'	=> $uang_muka_persen,
 			'uang_muka_persen2'	=> 0,
 			'down_payment'	=> $down_payment,

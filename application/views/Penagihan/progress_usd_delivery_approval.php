@@ -25,7 +25,7 @@
 		<?php
 		$numb=0;
 		$SUM = 0;$total_cogs=0;
-		foreach($getDetail AS $val => $valx){ $numb++;
+		if(!empty($getDetail)) foreach($getDetail AS $val => $valx){ $numb++;
 			$pr		= 'pr';
 			$numb1	= $pr.$numb;
 			if(isset($valx['harga_total'])){
