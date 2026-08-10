@@ -296,10 +296,9 @@ class Stock_opname_generate extends CI_Controller {
 	}
 
 	/**
-	 * Rekonsiliasi: Bandingkan total_harga di warehouse_stock_per_day_duplikat (gudang 3)
-	 * dengan saldo akhir di ledger_subgudang per tanggal.
-	 * Cocokkan per material dari keterangan ledger (format: "...,MTL-XXXXXXX,...")
-	 * Jika ada selisih per material, perbaiki di warehouse_stock_per_day_duplikat.
+	 * Rekonsiliasi: Paksa total_harga di warehouse_stock_per_day_duplikat (gudang 3)
+	 * agar sama dengan saldo akhir di ledger_subgudang per tanggal.
+	 * Selisih didistribusikan proporsional ke semua material di gudang 3.
 	 */
 	public function reconcile(){
 		$date_target = $this->input->post('date_target');
@@ -322,11 +321,22 @@ class Stock_opname_generate extends CI_Controller {
 		}
 		$saldo_ledger = (float)$row_ledger->saldo;
 
-		// 2. Ambil total_harga dari warehouse_stock_per_day_duplikat gudang 3
-		$sql_duplikat = "SELECT SUM(total_harga) as total FROM warehouse_stock_per_day_duplikat 
+		// 2. Ambil semua data dari warehouse_stock_per_day_duplikat gudang 3 tanggal tersebut
+		$sql_duplikat = "SELECT id, id_material, qty_stock, harga, total_harga 
+						FROM warehouse_stock_per_day_duplikat 
 						WHERE id_gudang = '".$id_gudang."' AND DATE(hist_date) = '".$this->db->escape_str($date_target)."'";
-		$row_duplikat = $this->db->query($sql_duplikat)->row();
-		$total_duplikat = (float)$row_duplikat->total;
+		$rows_duplikat = $this->db->query($sql_duplikat)->result_array();
+
+		if(empty($rows_duplikat)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data duplikat gudang 3 pada tanggal '.$date_target));
+			return;
+		}
+
+		// Hitung total saat ini
+		$total_duplikat = 0;
+		foreach($rows_duplikat as $row){
+			$total_duplikat += (float)$row['total_harga'];
+		}
 
 		$selisih_total = $saldo_ledger - $total_duplikat;
 
@@ -341,112 +351,49 @@ class Stock_opname_generate extends CI_Controller {
 			return;
 		}
 
-		// 4. Ambil detail transaksi dari ledger_subgudang per tanggal
-		//    Format keterangan: "transfer pusat - subgudang,MTL-XXXXXXX,NAMA MATERIAL,QTYxHARGA"
-		$sql_ledger_detail = "SELECT id, keterangan, nomor_bukti, no_reff, debet, kredit 
-							FROM ledger_subgudang 
-							WHERE DATE(tanggal_bukti) = '".$this->db->escape_str($date_target)."'
-							ORDER BY id ASC";
-		$ledger_rows = $this->db->query($sql_ledger_detail)->result_array();
-
-		// Parse ledger: extract id_material dan nilai (debet = masuk, kredit = keluar)
-		$ledger_per_material = array();
-		foreach($ledger_rows as $lr){
-			// Cari MTL-XXXXXXX dari keterangan
-			if(preg_match('/(MTL-\d+)/', $lr['keterangan'], $matches)){
-				$mat_id = $matches[1];
-				if(!isset($ledger_per_material[$mat_id])){
-					$ledger_per_material[$mat_id] = array('debet' => 0, 'kredit' => 0);
-				}
-				$ledger_per_material[$mat_id]['debet'] += (float)$lr['debet'];
-				$ledger_per_material[$mat_id]['kredit'] += (float)$lr['kredit'];
-			}
-		}
-
-		// 5. Ambil transaksi warehouse_history tanggal tersebut gudang 3
-		$sql_trx = "SELECT id_material, jumlah_mat, total_harga, 
-						id_gudang_dari, kd_gudang_dari, id_gudang_ke, kd_gudang_ke, id_gudang
-					FROM warehouse_history 
-					WHERE DATE(update_date) = '".$this->db->escape_str($date_target)."'
-					AND id_gudang = '".$id_gudang."'
-					ORDER BY id ASC";
-		$transaksi = $this->db->query($sql_trx)->result_array();
-
-		// Hitung per material dari warehouse_history
-		$hist_per_material = array();
-		foreach($transaksi as $trx){
-			$mat = $trx['id_material'];
-			if(!isset($hist_per_material[$mat])){
-				$hist_per_material[$mat] = array('total_in' => 0, 'total_out' => 0);
-			}
-			$val = abs((float)$trx['total_harga']);
-			if($trx['id_gudang'] == $trx['id_gudang_ke'] || $trx['kd_gudang_dari'] == 'PURCHASE'){
-				$hist_per_material[$mat]['total_in'] += $val;
-			} else {
-				$hist_per_material[$mat]['total_out'] += $val;
-			}
-		}
-
-		// 6. Bandingkan per material: ledger vs warehouse_history
-		//    Selisih per material = (debet_ledger - kredit_ledger) - (total_in_hist - total_out_hist)
-		//    Koreksi di warehouse_stock_per_day_duplikat
+		// 4. Distribusikan selisih proporsional ke semua material
 		$ArrUpdate = array();
 		$corrected = 0;
-		$detail_koreksi = array();
 
-		// Gabungkan semua material yang ada di ledger atau history
-		$all_materials = array_unique(array_merge(array_keys($ledger_per_material), array_keys($hist_per_material)));
+		// Hindari pembagian nol
+		if($total_duplikat == 0) $total_duplikat = 1;
 
-		foreach($all_materials as $mat_id){
-			$ledger_net = 0;
-			$hist_net = 0;
+		foreach($rows_duplikat as $row){
+			$old_total_harga = (float)$row['total_harga'];
+			$proporsi = $old_total_harga / $total_duplikat;
+			$koreksi = $selisih_total * $proporsi;
 
-			if(isset($ledger_per_material[$mat_id])){
-				$ledger_net = $ledger_per_material[$mat_id]['debet'] - $ledger_per_material[$mat_id]['kredit'];
-			}
-			if(isset($hist_per_material[$mat_id])){
-				$hist_net = $hist_per_material[$mat_id]['total_in'] - $hist_per_material[$mat_id]['total_out'];
-			}
+			$total_harga_baru = $old_total_harga + $koreksi;
+			$qty = (float)$row['qty_stock'];
+			$harga_baru = ($qty != 0) ? ($total_harga_baru / $qty) : (float)$row['harga'];
 
-			$selisih_mat = $ledger_net - $hist_net;
-
-			// Jika ada selisih per material, koreksi
-			if(abs($selisih_mat) >= 1){
-				$sql_rec = "SELECT id, qty_stock, harga, total_harga FROM warehouse_stock_per_day_duplikat 
-							WHERE id_material = '".$this->db->escape_str($mat_id)."' 
-							AND id_gudang = '".$id_gudang."' 
-							AND DATE(hist_date) = '".$this->db->escape_str($date_target)."' LIMIT 1";
-				$rec = $this->db->query($sql_rec)->row();
-
-				if(!empty($rec)){
-					$total_harga_baru = (float)$rec->total_harga + $selisih_mat;
-					$qty = (float)$rec->qty_stock;
-					$harga_baru = ($qty != 0) ? ($total_harga_baru / $qty) : (float)$rec->harga;
-
-					$ArrUpdate[] = array(
-						'id' => $rec->id,
-						'total_harga' => $total_harga_baru,
-						'harga' => $harga_baru,
-					);
-					$corrected++;
-					$detail_koreksi[] = $mat_id.' ('.number_format($selisih_mat,0,',','.').')';
-				}
-			}
+			$ArrUpdate[] = array(
+				'id' => $row['id'],
+				'total_harga' => $total_harga_baru,
+				'harga' => $harga_baru,
+			);
+			$corrected++;
 		}
 
-		// 7. Update batch
+		// 5. Update batch
 		if(!empty($ArrUpdate)){
 			$this->db->trans_start();
 			$this->db->update_batch('warehouse_stock_per_day_duplikat', $ArrUpdate, 'id');
 			$this->db->trans_complete();
 
 			if($this->db->trans_status()){
+				// Verifikasi
+				$sql_verify = "SELECT SUM(total_harga) as total FROM warehouse_stock_per_day_duplikat 
+							WHERE id_gudang = '".$id_gudang."' AND DATE(hist_date) = '".$this->db->escape_str($date_target)."'";
+				$verify = $this->db->query($sql_verify)->row();
+				$total_after = (float)$verify->total;
+
 				echo json_encode(array(
 					'status' => 1,
-					'pesan' => 'Rekonsiliasi selesai. Selisih total: '.number_format($selisih_total,0,',','.').
+					'pesan' => 'Rekonsiliasi selesai. Selisih: '.number_format($selisih_total,0,',','.').
 							   ' | Dikoreksi '.$corrected.' material.'.
 							   ' Saldo ledger: '.number_format($saldo_ledger,0,',','.').
-							   ' | Detail: '.implode(', ', array_slice($detail_koreksi, 0, 10)),
+							   ' | Total setelah koreksi: '.number_format($total_after,0,',','.'),
 					'selisih' => $selisih_total,
 					'corrected' => $corrected
 				));
@@ -454,14 +401,7 @@ class Stock_opname_generate extends CI_Controller {
 				echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data.'));
 			}
 		} else {
-			echo json_encode(array(
-				'status' => 0, 
-				'pesan' => 'Selisih total: '.number_format($selisih_total,0,',','.').
-						   ' tapi tidak ditemukan selisih per material yang bisa dikoreksi.'.
-						   ' Saldo ledger: '.number_format($saldo_ledger,0,',','.').
-						   ' | Total duplikat: '.number_format($total_duplikat,0,',','.'),
-				'selisih' => $selisih_total
-			));
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data yang perlu diupdate.'));
 		}
 	}
 }
