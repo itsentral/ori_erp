@@ -80,31 +80,31 @@ class Ledger_indirect_model extends CI_Model {
 			$val_out	= 0;
 			$keterangan = '';
 
-			// Logika In/Out
-			if($row['id_gudang_dari'] === null || $row['id_gudang_dari'] === ''){
-				// adjustment keluar
-				$val_out = $nilai;
-				$running_saldo -= $nilai;
-				$total_kredit += $nilai;
-				$keterangan = 'adjustment';
-			} else if($row['id_gudang_dari'] == '0' || $row['id_gudang_dari'] == 0){
-				// adjustment masuk / purchase
+			// Logika In/Out berdasarkan gudang_dari
+			if(strtoupper(trim($row['gudang_dari'])) == 'PURCHASE'){
+				// Pembelian masuk
 				$val_in = $nilai;
 				$running_saldo += $nilai;
 				$total_debet += $nilai;
-				$keterangan = 'adjustment';
-			} else if($row['id_gudang'] == $row['id_gudang_dari']){
-				// keluar dari gudang ini
-				$val_out = $nilai;
-				$running_saldo -= $nilai;
-				$total_kredit += $nilai;
-				$keterangan = 'pengurangan gudang';
+				$keterangan = 'pembelian';
 			} else if($row['id_gudang'] == $row['id_gudang_ke']){
-				// masuk ke gudang ini
+				// Masuk dari gudang lain
 				$val_in = $nilai;
 				$running_saldo += $nilai;
 				$total_debet += $nilai;
 				$keterangan = 'penambahan gudang';
+			} else if($row['id_gudang'] == $row['id_gudang_dari']){
+				// Keluar ke gudang lain
+				$val_out = $nilai;
+				$running_saldo -= $nilai;
+				$total_kredit += $nilai;
+				$keterangan = 'pengurangan gudang';
+			} else {
+				// Lainnya (adjustment dll)
+				$val_out = $nilai;
+				$running_saldo -= $nilai;
+				$total_kredit += $nilai;
+				$keterangan = 'adjustment';
 			}
 
 			$nm_material = (!empty($row['material_name_new'])) ? $row['material_name_new'] : $row['material_name'];
