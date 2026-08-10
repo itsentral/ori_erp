@@ -24,6 +24,7 @@
 	</div>
 </div>
 
+<?php $this->load->view('include/footer'); ?>
 <script>
 $(document).ready(function(){
 
