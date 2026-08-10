@@ -17,6 +17,9 @@
 				<button type="button" class="btn btn-warning btn-sm" id="btn_reconcile">
 					<i class="fa fa-balance-scale"></i> Rekonsiliasi
 				</button>
+				<button type="button" class="btn btn-info btn-sm" id="btn_fix_tras">
+					<i class="fa fa-wrench"></i> Fix Tran Detail
+				</button>
 			</div>
 			<div class="col-sm-6" style="padding-top:25px;">
 				<div id="info_panel" class="alert alert-info" style="display:none; padding:8px; margin:0;">
@@ -107,6 +110,43 @@ $(document).ready(function(){
 			},
 			error: function(){
 				btn.prop('disabled', false).html('<i class="fa fa-balance-scale"></i> Rekonsiliasi');
+				alert('Terjadi kesalahan server!');
+			}
+		});
+	});
+
+	// Fix Tran Detail button
+	$('#btn_fix_tras').on('click', function(){
+		var date_target = $('#date_target').val();
+		if(!date_target){
+			alert('Pilih tanggal terlebih dahulu!');
+			return;
+		}
+
+		if(!confirm('Fix harga di tran_warehouse_jurnal_detail gudang 3 tanggal '+date_target+' berdasarkan ledger_subgudang?')){
+			return;
+		}
+
+		var btn = $(this);
+		btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+
+		$.ajax({
+			url: '<?php echo site_url("stock_opname_generate/fix_tran_detail"); ?>',
+			type: 'POST',
+			data: { date_target: date_target },
+			dataType: 'json',
+			success: function(res){
+				btn.prop('disabled', false).html('<i class="fa fa-wrench"></i> Fix Tran Detail');
+				if(res.status == 1){
+					$('#info_panel').removeClass('alert-danger').addClass('alert-info').show();
+					$('#info_text').html('<i class="fa fa-check"></i> '+res.pesan);
+				} else {
+					$('#info_panel').removeClass('alert-info').addClass('alert-danger').show();
+					$('#info_text').html('<i class="fa fa-warning"></i> '+res.pesan);
+				}
+			},
+			error: function(){
+				btn.prop('disabled', false).html('<i class="fa fa-wrench"></i> Fix Tran Detail');
 				alert('Terjadi kesalahan server!');
 			}
 		});
