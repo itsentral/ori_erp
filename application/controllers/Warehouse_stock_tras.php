@@ -777,7 +777,9 @@ class Warehouse_stock_tras extends CI_Controller {
 									head_stock.qty_booking,
 									head_stock.qty_rusak,
 									head_stock.id_gudang,
-									head_whr.nm_gudang
+									head_whr.nm_gudang,
+									head_stock.harga,
+									head_stock.total_harga
 								FROM
 									".$Table_Stock."
 								LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
@@ -1049,24 +1051,8 @@ class Warehouse_stock_tras extends CI_Controller {
 				$Qty_Temp	= $Harga_Temp = $Total_Temp = 0;
 				if(isset($Temp_Compare[$Code_UnitFind]) && !empty($Temp_Compare[$Code_UnitFind])){
 					$Qty_Temp	= $Temp_Compare[$Code_UnitFind]['qty_stock'];
-					
-					## AMBIL HARGA ##
-					$Jenis_Gudang		= '';			
-					if(isset($rows_Gudang[$Code_Gudang]) && !empty($rows_Gudang[$Code_Gudang])){
-						$Jenis_Gudang	= $rows_Gudang[$Code_Gudang];
-					}
-					
-					$Table_Price		= $this->GetTablePrice($Jenis_Gudang);
-					$Query_Price		= "SELECT * FROM ".$Table_Price." WHERE id_material = '".$Code_Material."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
-					$rows_Price			= $this->db->query($Query_Price)->row();
-					if($rows_Price){
-						if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
-							$Harga_Temp		= $rows_Price->price_book;
-						}
-						
-					}
-					
-					$Total_Temp = $Harga_HPP * $Qty_Temp;
+					$Harga_Temp	= (!empty($Temp_Compare[$Code_UnitFind]['harga']))?$Temp_Compare[$Code_UnitFind]['harga']:0;
+					$Total_Temp	= (!empty($Temp_Compare[$Code_UnitFind]['total_harga']))?$Temp_Compare[$Code_UnitFind]['total_harga']:0;
 					
 					unset($Temp_Compare[$Code_UnitFind]);
 				}
@@ -1080,7 +1066,7 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Temp,$Harga_HPP,$Total_Temp);
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Temp,$Harga_Temp,$Total_Temp);
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
