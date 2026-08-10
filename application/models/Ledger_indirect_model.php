@@ -12,9 +12,11 @@ class Ledger_indirect_model extends CI_Model {
 	/**
 	 * Get ledger data Indirect dari tabel warehouse_rutin_history
 	 * Filter id_gudang = 10 (Indirect)
-	 * Logika sama dengan Ledger Material:
-	 * In = id_gudang_dari = 0 (adjustment) atau id_gudang = id_gudang_ke
-	 * Out = id_gudang_dari = null (adjustment) atau id_gudang = id_gudang_dari
+	 * Logika In/Out:
+	 * - gudang_dari kosong/null dan id_gudang_dari = 0 => In (adjustment/purchase)
+	 * - id_gudang = id_gudang_ke => In (penambahan gudang)
+	 * - id_gudang = id_gudang_dari => Out (pengurangan gudang)
+	 * Nilai = jumlah_qty * harga
 	 */
 	public function get_ledger_data($bulan, $tahun){
 		$result = array('data' => array(), 'saldo_awal' => 0);
@@ -34,33 +36,33 @@ class Ledger_indirect_model extends CI_Model {
 
 		$sql_detail = "SELECT 
 							a.id,
-							a.id_material,
-							a.nm_material,
-							a.id_category,
-							a.nm_category,
+							a.code_group,
+							a.category_awal,
+							a.category_code,
+							a.material_name,
 							a.id_gudang,
-							a.kd_gudang,
+							a.gudang,
 							a.id_gudang_dari,
-							a.kd_gudang_dari,
+							a.gudang_dari,
 							a.id_gudang_ke,
-							a.kd_gudang_ke,
-							a.no_ipp,
-							a.jumlah_mat,
+							a.gudang_ke,
+							a.qty_stock_awal,
+							a.qty_stock_akhir,
+							a.qty_rusak_awal,
+							a.qty_rusak_akhir,
+							a.no_trans,
+							a.jumlah_qty,
 							a.ket,
+							a.update_by,
 							a.update_date,
 							a.harga,
-							a.total_harga,
-							a.saldo_awal,
-							a.saldo_akhir,
-							a.harga_baru,
-							a.code_group,
-							a.material_name,
-							a.gudang,
-							a.gudang_dari,
-							a.gudang_ke,
-							a.no_trans,
-							a.jumlah_qty
+							a.saldo_awal AS hist_saldo_awal,
+							a.saldo_akhir AS hist_saldo_akhir,
+							b.material_name AS material_name_new,
+							c.category AS nm_category
 						FROM warehouse_rutin_history a
+						LEFT JOIN con_nonmat_new b ON a.code_group = b.code_group AND b.deleted_date IS NULL
+						LEFT JOIN con_nonmat_category_awal c ON a.category_awal = c.id
 						WHERE a.id_gudang = '".$this->id_gudang."'
 						AND DATE_FORMAT(a.update_date, '%Y-%m') = '".$tgl_filter."'
 						ORDER BY a.update_date ASC, a.id ASC";
@@ -71,43 +73,50 @@ class Ledger_indirect_model extends CI_Model {
 		$total_kredit = 0;
 
 		foreach($detail_rows as $row){
-			$total_harga = abs((float)$row['total_harga']);
+			$harga = (float)$row['harga'];
+			$jumlah_qty = abs((float)$row['jumlah_qty']);
+			$nilai = $jumlah_qty * $harga;
 			$val_in		= 0;
 			$val_out	= 0;
 			$keterangan = '';
 
-			// Logika sama dengan Ledger Material
+			// Logika In/Out
 			if($row['id_gudang_dari'] === null || $row['id_gudang_dari'] === ''){
-				$val_out = $total_harga;
-				$running_saldo -= $total_harga;
-				$total_kredit += $total_harga;
+				// adjustment keluar
+				$val_out = $nilai;
+				$running_saldo -= $nilai;
+				$total_kredit += $nilai;
 				$keterangan = 'adjustment';
 			} else if($row['id_gudang_dari'] == '0' || $row['id_gudang_dari'] == 0){
-				$val_in = $total_harga;
-				$running_saldo += $total_harga;
-				$total_debet += $total_harga;
+				// adjustment masuk / purchase
+				$val_in = $nilai;
+				$running_saldo += $nilai;
+				$total_debet += $nilai;
 				$keterangan = 'adjustment';
 			} else if($row['id_gudang'] == $row['id_gudang_dari']){
-				$val_out = $total_harga;
-				$running_saldo -= $total_harga;
-				$total_kredit += $total_harga;
+				// keluar dari gudang ini
+				$val_out = $nilai;
+				$running_saldo -= $nilai;
+				$total_kredit += $nilai;
 				$keterangan = 'pengurangan gudang';
 			} else if($row['id_gudang'] == $row['id_gudang_ke']){
-				$val_in = $total_harga;
-				$running_saldo += $total_harga;
-				$total_debet += $total_harga;
+				// masuk ke gudang ini
+				$val_in = $nilai;
+				$running_saldo += $nilai;
+				$total_debet += $nilai;
 				$keterangan = 'penambahan gudang';
 			}
 
-			$nm_material = (!empty($row['nm_material'])) ? $row['nm_material'] : $row['material_name'];
+			$nm_material = (!empty($row['material_name_new'])) ? $row['material_name_new'] : $row['material_name'];
+			$nm_category = (!empty($row['nm_category'])) ? $row['nm_category'] : '';
 
 			$result['data'][] = array(
 				'nm_material'	=> $nm_material,
-				'nm_category'	=> $row['nm_category'],
+				'nm_category'	=> $nm_category,
 				'tanggal'		=> date('d-m-Y H:i', strtotime($row['update_date'])),
-				'kode_trans'	=> (!empty($row['no_ipp'])) ? $row['no_ipp'] : $row['no_trans'],
+				'kode_trans'	=> $row['no_trans'],
 				'keterangan'	=> $keterangan,
-				'harga'			=> (float)$row['harga'],
+				'harga'			=> $harga,
 				'in'			=> $val_in,
 				'out'			=> $val_out,
 				'saldo'			=> $running_saldo
