@@ -10,7 +10,7 @@
 		<div class="row" style="margin-bottom:15px;">
 			<div class="col-sm-3">
 				<label>Pilih Tanggal Generate:</label>
-				<input type="text" id="date_target" name="date_target" class="form-control datepicker text-center" placeholder="Pilih Tanggal" readonly>
+				<input type="text" id="date_target" name="date_target" class="form-control text-center" placeholder="Pilih Tanggal" readonly>
 			</div>
 			<div class="col-sm-3" style="padding-top:25px;">
 				<button type="button" class="btn btn-success btn-sm" id="btn_generate">
@@ -101,11 +101,11 @@
 $(document).ready(function(){
 	var table = null;
 
-	// Init datepicker
+	// Init datepicker (jQuery UI)
 	$('#date_target').datepicker({
-		format: 'yyyy-mm-dd',
-		autoclose: true,
-		todayHighlight: true
+		dateFormat: 'yy-mm-dd',
+		changeMonth: true,
+		changeYear: true
 	});
 
 	// Load available dates
