@@ -779,7 +779,9 @@ class Warehouse_stock_tras extends CI_Controller {
 									head_stock.id_gudang,
 									head_whr.nm_gudang,
 									head_stock.harga,
-									head_stock.total_harga
+									head_stock.total_harga,
+									head_stock.costbook,
+									head_stock.total_value
 								FROM
 									".$Table_Stock."
 								LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
@@ -1051,8 +1053,8 @@ class Warehouse_stock_tras extends CI_Controller {
 				$Qty_Temp	= $Harga_Temp = $Total_Temp = 0;
 				if(isset($Temp_Compare[$Code_UnitFind]) && !empty($Temp_Compare[$Code_UnitFind])){
 					$Qty_Temp	= $Temp_Compare[$Code_UnitFind]['qty_stock'];
-					$Harga_Temp	= (!empty($Temp_Compare[$Code_UnitFind]['harga']))?$Temp_Compare[$Code_UnitFind]['harga']:0;
-					$Total_Temp	= (!empty($Temp_Compare[$Code_UnitFind]['total_harga']))?$Temp_Compare[$Code_UnitFind]['total_harga']:0;
+					$Harga_Temp	= $Harga_HPP;
+					$Total_Temp = $Harga_HPP * $Qty_Temp;
 					
 					unset($Temp_Compare[$Code_UnitFind]);
 				}
