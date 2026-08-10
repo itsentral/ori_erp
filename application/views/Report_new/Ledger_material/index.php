@@ -107,6 +107,7 @@ $this->load->view('include/side_menu');
 								<th>ID Material</th>
 								<th>Material</th>
 								<th>Kategori</th>
+								<th>Qty</th>
 								<th>Tanggal</th>
 								<th>Kode Trans</th>
 								<th>Keterangan</th>
@@ -117,7 +118,7 @@ $this->load->view('include/side_menu');
 							</tr>
 						</thead>
 						<tbody id="tbody_ledger">
-							<tr><td colspan="10" class="text-center">Silahkan pilih periode lalu klik Tampilkan</td></tr>
+							<tr><td colspan="11" class="text-center">Silahkan pilih periode lalu klik Tampilkan</td></tr>
 						</tbody>
 					</table>
 				</div>
@@ -137,7 +138,7 @@ $(document).ready(function(){
 		var bulanInt = parseInt(bulan);
 
 		$('#title_periode').html('<strong>LAPORAN LEDGER MATERIAL</strong><br><strong>Periode : '+Arr_Bulan[bulanInt]+' '+tahun+'</strong>');
-		$('#tbody_ledger').html('<tr><td colspan="10" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+		$('#tbody_ledger').html('<tr><td colspan="11" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
 
 		$.ajax({
 			url: '<?php echo site_url("Ledger_material/get_data_json"); ?>',
@@ -150,7 +151,7 @@ $(document).ready(function(){
 					// Row saldo awal
 					if(response.saldo_awal && response.saldo_awal != 0){
 						html += '<tr class="row-header">';
-						html += '<td colspan="6">SALDO AWAL</td>';
+						html += '<td colspan="7">SALDO AWAL</td>';
 						html += '<td class="text-right">0</td>';
 						html += '<td class="text-right">0</td>';
 						html += '<td class="text-right">0</td>';
@@ -169,6 +170,7 @@ $(document).ready(function(){
 						html += '<td>'+det.id_material+'</td>';
 						html += '<td>'+det.nm_material+'</td>';
 						html += '<td>'+det.nm_category+'</td>';
+						html += '<td class="text-right">'+formatNumber(det.qty)+'</td>';
 						html += '<td class="text-center">'+det.tanggal+'</td>';
 						html += '<td>'+det.kode_trans+'</td>';
 						html += '<td>'+det.keterangan+'</td>';
@@ -180,18 +182,18 @@ $(document).ready(function(){
 					});
 					// Total row
 					html += '<tr class="row-header">';
-					html += '<td colspan="7" class="text-right"><strong>TOTAL</strong></td>';
+					html += '<td colspan="8" class="text-right"><strong>TOTAL</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalIn)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalOut)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(lastSaldo)+'</strong></td>';
 					html += '</tr>';
 				} else {
-					html = '<tr><td colspan="10" class="text-center">Data tidak ditemukan</td></tr>';
+					html = '<tr><td colspan="11" class="text-center">Data tidak ditemukan</td></tr>';
 				}
 				$('#tbody_ledger').html(html);
 			},
 			error: function(){
-				$('#tbody_ledger').html('<tr><td colspan="10" class="text-center text-danger">Gagal memuat data</td></tr>');
+				$('#tbody_ledger').html('<tr><td colspan="11" class="text-center text-danger">Gagal memuat data</td></tr>');
 			}
 		});
 	});
