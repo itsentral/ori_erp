@@ -147,11 +147,9 @@ class Stock_opname_generate extends CI_Controller {
 
 			// Hitung qty baru
 			$qty_new = $qty_stock_prev + $qty_in - $qty_out;
-			if($qty_new < 0) $qty_new = 0;
 
 			// Hitung total_harga baru (nilai persediaan)
 			$total_harga_new = $total_harga_prev + $val_in - $val_out;
-			if($total_harga_new < 0) $total_harga_new = 0;
 
 			// Hitung harga rata-rata baru
 			$harga_new = ($qty_new > 0) ? ($total_harga_new / $qty_new) : $harga_prev;
