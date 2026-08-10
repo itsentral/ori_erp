@@ -14,6 +14,9 @@
 				<button type="button" class="btn btn-success btn-sm" id="btn_generate">
 					<i class="fa fa-cogs"></i> Generate Stock
 				</button>
+				<button type="button" class="btn btn-warning btn-sm" id="btn_reconcile">
+					<i class="fa fa-balance-scale"></i> Rekonsiliasi
+				</button>
 			</div>
 			<div class="col-sm-6" style="padding-top:25px;">
 				<div id="info_panel" class="alert alert-info" style="display:none; padding:8px; margin:0;">
@@ -67,6 +70,43 @@ $(document).ready(function(){
 			},
 			error: function(){
 				btn.prop('disabled', false).html('<i class="fa fa-cogs"></i> Generate Stock');
+				alert('Terjadi kesalahan server!');
+			}
+		});
+	});
+
+	// Reconcile button
+	$('#btn_reconcile').on('click', function(){
+		var date_target = $('#date_target').val();
+		if(!date_target){
+			alert('Pilih tanggal terlebih dahulu!');
+			return;
+		}
+
+		if(!confirm('Rekonsiliasi data gudang 3 (Sub Gudang) tanggal '+date_target+' dengan ledger_subgudang?')){
+			return;
+		}
+
+		var btn = $(this);
+		btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+
+		$.ajax({
+			url: '<?php echo site_url("stock_opname_generate/reconcile"); ?>',
+			type: 'POST',
+			data: { date_target: date_target },
+			dataType: 'json',
+			success: function(res){
+				btn.prop('disabled', false).html('<i class="fa fa-balance-scale"></i> Rekonsiliasi');
+				if(res.status == 1){
+					$('#info_panel').removeClass('alert-danger').addClass('alert-info').show();
+					$('#info_text').html('<i class="fa fa-check"></i> '+res.pesan);
+				} else {
+					$('#info_panel').removeClass('alert-info').addClass('alert-danger').show();
+					$('#info_text').html('<i class="fa fa-warning"></i> '+res.pesan);
+				}
+			},
+			error: function(){
+				btn.prop('disabled', false).html('<i class="fa fa-balance-scale"></i> Rekonsiliasi');
 				alert('Terjadi kesalahan server!');
 			}
 		});

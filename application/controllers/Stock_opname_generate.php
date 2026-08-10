@@ -294,4 +294,170 @@ class Stock_opname_generate extends CI_Controller {
 		$summary = $this->stock_opname_generate_model->get_summary_by_date($date);
 		echo json_encode($summary);
 	}
+
+	/**
+	 * Rekonsiliasi: Bandingkan total_harga di warehouse_stock_per_day_duplikat (gudang 3)
+	 * dengan saldo akhir di ledger_subgudang per tanggal.
+	 * Jika ada selisih, cari material yang transaksinya tidak cocok dan perbaiki.
+	 */
+	public function reconcile(){
+		$date_target = $this->input->post('date_target');
+		if(empty($date_target)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tanggal harus dipilih!'));
+			return;
+		}
+
+		$id_gudang = '3'; // Sub Gudang
+
+		// 1. Ambil saldo akhir dari ledger_subgudang (baris terakhir di tanggal tersebut)
+		$sql_ledger = "SELECT saldo FROM ledger_subgudang 
+						WHERE DATE(tanggal_bukti) = '".$this->db->escape_str($date_target)."' 
+						ORDER BY id DESC LIMIT 1";
+		$row_ledger = $this->db->query($sql_ledger)->row();
+
+		if(empty($row_ledger)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data ledger_subgudang pada tanggal '.$date_target));
+			return;
+		}
+		$saldo_ledger = (float)$row_ledger->saldo;
+
+		// 2. Ambil total_harga dari warehouse_stock_per_day_duplikat gudang 3
+		$sql_duplikat = "SELECT SUM(total_harga) as total FROM warehouse_stock_per_day_duplikat 
+						WHERE id_gudang = '".$id_gudang."' AND DATE(hist_date) = '".$this->db->escape_str($date_target)."'";
+		$row_duplikat = $this->db->query($sql_duplikat)->row();
+		$total_duplikat = (float)$row_duplikat->total;
+
+		$selisih = $saldo_ledger - $total_duplikat;
+
+		// 3. Jika tidak ada selisih, selesai
+		if(abs($selisih) < 1){
+			echo json_encode(array(
+				'status' => 1, 
+				'pesan' => 'Data sudah cocok. Saldo ledger: '.number_format($saldo_ledger,0,',','.').
+						   ' | Total duplikat: '.number_format($total_duplikat,0,',','.'),
+				'selisih' => 0
+			));
+			return;
+		}
+
+		// 4. Cari transaksi di warehouse_history tanggal tersebut untuk gudang 3
+		$sql_trx = "SELECT id_material, jumlah_mat, total_harga, harga, 
+						id_gudang_dari, kd_gudang_dari, id_gudang_ke, kd_gudang_ke, id_gudang
+					FROM warehouse_history 
+					WHERE DATE(update_date) = '".$this->db->escape_str($date_target)."'
+					AND (id_gudang = '".$id_gudang."')
+					ORDER BY id ASC";
+		$transaksi = $this->db->query($sql_trx)->result_array();
+
+		// 5. Cari transaksi dari ledger_subgudang pada tanggal tersebut (debet/kredit per nomor bukti)
+		$sql_ledger_detail = "SELECT keterangan, nomor_bukti, no_reff, debet, kredit, saldo 
+							FROM ledger_subgudang 
+							WHERE DATE(tanggal_bukti) = '".$this->db->escape_str($date_target)."'
+							ORDER BY id ASC";
+		$ledger_rows = $this->db->query($sql_ledger_detail)->result_array();
+
+		// 6. Bandingkan per material: hitung nilai transaksi per material dari warehouse_history
+		//    vs debet di ledger (masuk) / kredit di ledger (keluar)
+		$trx_per_material = array();
+		foreach($transaksi as $trx){
+			$mat = $trx['id_material'];
+			if(!isset($trx_per_material[$mat])){
+				$trx_per_material[$mat] = array('total_in' => 0, 'total_out' => 0);
+			}
+			$val = abs((float)$trx['total_harga']);
+			if($trx['id_gudang'] == $trx['id_gudang_ke'] || $trx['kd_gudang_dari'] == 'PURCHASE'){
+				$trx_per_material[$mat]['total_in'] += $val;
+			} else {
+				$trx_per_material[$mat]['total_out'] += $val;
+			}
+		}
+
+		// Hitung total transaksi dari warehouse_history
+		$total_in_hist = 0;
+		$total_out_hist = 0;
+		foreach($trx_per_material as $mat_vals){
+			$total_in_hist += $mat_vals['total_in'];
+			$total_out_hist += $mat_vals['total_out'];
+		}
+
+		// Hitung total dari ledger
+		$total_debet_ledger = 0;
+		$total_kredit_ledger = 0;
+		foreach($ledger_rows as $lr){
+			$total_debet_ledger += (float)$lr['debet'];
+			$total_kredit_ledger += (float)$lr['kredit'];
+		}
+
+		// 7. Cari selisih per sisi (debet = masuk, kredit = keluar)
+		$selisih_in = $total_debet_ledger - $total_in_hist;
+		$selisih_out = $total_kredit_ledger - $total_out_hist;
+
+		// 8. Koreksi di warehouse_stock_per_day_duplikat
+		//    Jika selisih_in != 0, berarti ada material yang nilai masuknya tidak cocok
+		//    Koreksi proporsional berdasarkan material yang bertransaksi hari itu
+		$ArrUpdate = array();
+		$corrected = 0;
+
+		if(abs($selisih) >= 1 && !empty($trx_per_material)){
+			// Hitung total nilai transaksi sebagai basis proporsional
+			$total_trx_value = $total_in_hist + $total_out_hist;
+			if($total_trx_value == 0) $total_trx_value = 1;
+
+			foreach($trx_per_material as $mat_id => $mat_vals){
+				$mat_trx_value = $mat_vals['total_in'] + $mat_vals['total_out'];
+				$proporsi = $mat_trx_value / $total_trx_value;
+				$koreksi = $selisih * $proporsi;
+
+				if(abs($koreksi) < 0.01) continue;
+
+				// Ambil record dari duplikat
+				$sql_rec = "SELECT id, qty_stock, harga, total_harga FROM warehouse_stock_per_day_duplikat 
+							WHERE id_material = '".$this->db->escape_str($mat_id)."' 
+							AND id_gudang = '".$id_gudang."' 
+							AND DATE(hist_date) = '".$this->db->escape_str($date_target)."' LIMIT 1";
+				$rec = $this->db->query($sql_rec)->row();
+
+				if(!empty($rec)){
+					$total_harga_baru = (float)$rec->total_harga + $koreksi;
+					$qty = (float)$rec->qty_stock;
+					$harga_baru = ($qty != 0) ? ($total_harga_baru / $qty) : (float)$rec->harga;
+
+					$ArrUpdate[] = array(
+						'id' => $rec->id,
+						'total_harga' => $total_harga_baru,
+						'harga' => $harga_baru,
+					);
+					$corrected++;
+				}
+			}
+		}
+
+		// 9. Update batch
+		if(!empty($ArrUpdate)){
+			$this->db->trans_start();
+			$this->db->update_batch('warehouse_stock_per_day_duplikat', $ArrUpdate, 'id');
+			$this->db->trans_complete();
+
+			if($this->db->trans_status()){
+				echo json_encode(array(
+					'status' => 1,
+					'pesan' => 'Rekonsiliasi selesai. Selisih: '.number_format($selisih,0,',','.').
+							   ' | Dikoreksi '.$corrected.' material. Saldo ledger: '.number_format($saldo_ledger,0,',','.'),
+					'selisih' => $selisih,
+					'corrected' => $corrected
+				));
+			} else {
+				echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data.'));
+			}
+		} else {
+			echo json_encode(array(
+				'status' => 0, 
+				'pesan' => 'Selisih ditemukan: '.number_format($selisih,0,',','.').
+						   ' tapi tidak ada material yang bisa dikoreksi pada tanggal tersebut.'.
+						   ' Saldo ledger: '.number_format($saldo_ledger,0,',','.').
+						   ' | Total duplikat: '.number_format($total_duplikat,0,',','.'),
+				'selisih' => $selisih
+			));
+		}
+	}
 }
