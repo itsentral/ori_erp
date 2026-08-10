@@ -738,7 +738,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$Table_Stock	= "warehouse_stock head_stock";
 		if($Date_Find < date('Y-m-d')){
-			$Table_Stock	= "warehouse_stock_per_day head_stock";
+			$Table_Stock	= "warehouse_stock_per_day_duplikat head_stock";
 			
 			if(!empty($WHERE2))$WHERE2	.=" AND ";
 			$WHERE2	.="DATE(head_stock.hist_date) = '".$Date_Find."'";
