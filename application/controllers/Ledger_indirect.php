@@ -22,12 +22,10 @@ class Ledger_indirect extends CI_Controller {
 		}
 
 		$menu_akses		= $this->master_model->getMenu();
-		$list_material	= $this->Ledger_indirect_model->get_list_material();
 		$data = array(
 			'title'			=> 'Laporan Ledger Indirect',
 			'action'		=> 'index',
 			'data_menu'		=> $menu_akses,
-			'list_material'	=> $list_material,
 			'akses_menu'	=> $Arr_Akses
 		);
 
@@ -40,9 +38,8 @@ class Ledger_indirect extends CI_Controller {
 
 		$bulan		= $this->input->get('bulan') ? $this->input->get('bulan') : date('m');
 		$tahun		= $this->input->get('tahun') ? $this->input->get('tahun') : date('Y');
-		$code_group	= $this->input->get('code_group') ? $this->input->get('code_group') : '';
 
-		$fetch = $this->Ledger_indirect_model->get_ledger_data($bulan, $tahun, $code_group);
+		$fetch = $this->Ledger_indirect_model->get_ledger_data($bulan, $tahun);
 
 		echo json_encode($fetch);
 	}
@@ -53,7 +50,6 @@ class Ledger_indirect extends CI_Controller {
 
 		$bulan		= $this->uri->segment(3);
 		$tahun		= $this->uri->segment(4);
-		$code_group	= $this->uri->segment(5);
 
 		$this->load->library("PHPExcel");
 		$objPHPExcel = new PHPExcel();
@@ -70,54 +66,52 @@ class Ledger_indirect extends CI_Controller {
 		$Arr_Bulan = array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
 		$sheet = $objPHPExcel->getActiveSheet();
 
-		$fetch = $this->Ledger_indirect_model->get_ledger_data($bulan, $tahun, $code_group);
+		$fetch = $this->Ledger_indirect_model->get_ledger_data($bulan, $tahun);
 
 		$Row = 1;
-		$Col_Akhir = getColsChar(10);
+		$Col_Akhir = getColsChar(9);
 		$sheet->setCellValue('A'.$Row, 'LAPORAN LEDGER INDIRECT');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$Row)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$Row);
 
 		$Row++;
-		$nm_material = (!empty($code_group)) ? $code_group : 'Semua Material';
-		$sheet->setCellValue('A'.$Row, 'Periode : '.$Arr_Bulan[(int)$bulan].' '.$tahun.' | Material : '.$nm_material);
+		$sheet->setCellValue('A'.$Row, 'Periode : '.$Arr_Bulan[(int)$bulan].' '.$tahun.' | Gudang : Indirect');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$Row)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$Row);
 
 		$Row += 2;
-		$sheet->setCellValue('A'.$Row, 'Code Group');
-		$sheet->setCellValue('B'.$Row, 'Material');
+		$sheet->setCellValue('A'.$Row, 'Material');
+		$sheet->setCellValue('B'.$Row, 'Kategori');
 		$sheet->setCellValue('C'.$Row, 'Tanggal');
-		$sheet->setCellValue('D'.$Row, 'No Trans');
+		$sheet->setCellValue('D'.$Row, 'Kode Trans');
 		$sheet->setCellValue('E'.$Row, 'Keterangan');
-		$sheet->setCellValue('F'.$Row, 'Gudang Dari');
-		$sheet->setCellValue('G'.$Row, 'Gudang Ke');
-		$sheet->setCellValue('H'.$Row, 'In');
-		$sheet->setCellValue('I'.$Row, 'Out');
-		$sheet->setCellValue('J'.$Row, 'Saldo');
+		$sheet->setCellValue('F'.$Row, 'Harga');
+		$sheet->setCellValue('G'.$Row, 'In');
+		$sheet->setCellValue('H'.$Row, 'Out');
+		$sheet->setCellValue('I'.$Row, 'Saldo');
 
-		$sheet->getStyle('A'.$Row.':J'.$Row)->applyFromArray($tableHeader);
-		$sheet->getColumnDimension('A')->setWidth(20);
-		$sheet->getColumnDimension('B')->setWidth(30);
+		$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableHeader);
+		$sheet->getColumnDimension('A')->setWidth(30);
+		$sheet->getColumnDimension('B')->setWidth(20);
 		$sheet->getColumnDimension('C')->setWidth(20);
 		$sheet->getColumnDimension('D')->setWidth(25);
 		$sheet->getColumnDimension('E')->setWidth(30);
-		$sheet->getColumnDimension('F')->setWidth(20);
-		$sheet->getColumnDimension('G')->setWidth(20);
+		$sheet->getColumnDimension('F')->setWidth(18);
+		$sheet->getColumnDimension('G')->setWidth(18);
 		$sheet->getColumnDimension('H')->setWidth(18);
-		$sheet->getColumnDimension('I')->setWidth(18);
-		$sheet->getColumnDimension('J')->setWidth(22);
+		$sheet->getColumnDimension('I')->setWidth(22);
 
 		$Row++;
 
 		// Row saldo awal
 		if(isset($fetch['saldo_awal']) && $fetch['saldo_awal'] != 0){
 			$sheet->setCellValue('A'.$Row, 'SALDO AWAL');
-			$sheet->mergeCells('A'.$Row.':G'.$Row);
+			$sheet->mergeCells('A'.$Row.':E'.$Row);
+			$sheet->setCellValue('F'.$Row, 0);
+			$sheet->setCellValue('G'.$Row, 0);
 			$sheet->setCellValue('H'.$Row, 0);
-			$sheet->setCellValue('I'.$Row, 0);
-			$sheet->setCellValue('J'.$Row, $fetch['saldo_awal']);
-			$sheet->getStyle('A'.$Row.':J'.$Row)->applyFromArray($tableHeader);
+			$sheet->setCellValue('I'.$Row, $fetch['saldo_awal']);
+			$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableHeader);
 			$Row++;
 		}
 
@@ -129,26 +123,25 @@ class Ledger_indirect extends CI_Controller {
 				$totalIn += $det['in'];
 				$totalOut += $det['out'];
 				$lastSaldo = $det['saldo'];
-				$sheet->setCellValue('A'.$Row, $det['code_group']);
-				$sheet->setCellValue('B'.$Row, $det['material_name']);
+				$sheet->setCellValue('A'.$Row, $det['nm_material']);
+				$sheet->setCellValue('B'.$Row, $det['nm_category']);
 				$sheet->setCellValue('C'.$Row, $det['tanggal']);
-				$sheet->setCellValue('D'.$Row, $det['no_trans']);
+				$sheet->setCellValue('D'.$Row, $det['kode_trans']);
 				$sheet->setCellValue('E'.$Row, $det['keterangan']);
-				$sheet->setCellValue('F'.$Row, $det['gudang_dari']);
-				$sheet->setCellValue('G'.$Row, $det['gudang_ke']);
-				$sheet->setCellValue('H'.$Row, $det['in']);
-				$sheet->setCellValue('I'.$Row, $det['out']);
-				$sheet->setCellValue('J'.$Row, $det['saldo']);
-				$sheet->getStyle('A'.$Row.':J'.$Row)->applyFromArray($tableBodyRight);
-				$sheet->getStyle('A'.$Row.':G'.$Row)->applyFromArray($tableBodyLeft);
+				$sheet->setCellValue('F'.$Row, $det['harga']);
+				$sheet->setCellValue('G'.$Row, $det['in']);
+				$sheet->setCellValue('H'.$Row, $det['out']);
+				$sheet->setCellValue('I'.$Row, $det['saldo']);
+				$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableBodyRight);
+				$sheet->getStyle('A'.$Row.':E'.$Row)->applyFromArray($tableBodyLeft);
 				$Row++;
 			}
 			// Total row
-			$sheet->setCellValue('G'.$Row, 'TOTAL');
-			$sheet->setCellValue('H'.$Row, $totalIn);
-			$sheet->setCellValue('I'.$Row, $totalOut);
-			$sheet->setCellValue('J'.$Row, $lastSaldo);
-			$sheet->getStyle('A'.$Row.':J'.$Row)->applyFromArray($tableHeader);
+			$sheet->setCellValue('F'.$Row, 'TOTAL');
+			$sheet->setCellValue('G'.$Row, $totalIn);
+			$sheet->setCellValue('H'.$Row, $totalOut);
+			$sheet->setCellValue('I'.$Row, $lastSaldo);
+			$sheet->getStyle('A'.$Row.':I'.$Row)->applyFromArray($tableHeader);
 			$Row++;
 		}
 
