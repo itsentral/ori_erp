@@ -79,34 +79,30 @@ class Warehouse_stock_tras extends CI_Controller {
 	public function display_data(){		
         
 		$rows_Gudang	= $this->master_model->getArray('warehouse',array(),'id','category');
-        $Sub_Find		= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";	
 		$WHERE			= "1=1";
+		$WHERE2			= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-') AND head_stock.qty_stock <> 0";
 		$requestData	= $_REQUEST;
 		
 		$Coa_Cari		= trim($this->input->post('no_perkiraan'));
 		$Date_Find		= trim($this->input->post('tanggal'));
 		
-		
-		
 		if(empty($Date_Find) || $Date_Find == '-'){			
 			$Date_Find	= date('Y-m-d');
 		}
 		
-		if($Date_Find){
-			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
-			$Sub_Find	.="DATE(tras_stock.tgl_trans ) <= '".$Date_Find."'";
+		// Tentukan tabel stock sesuai tanggal (sama seperti ExcelStockCompare)
+		$Table_Stock	= "warehouse_stock head_stock";
+		if($Date_Find < date('Y-m-d')){
+			$Table_Stock	= "warehouse_stock_per_day_duplikat head_stock";
+			
+			if(!empty($WHERE2))$WHERE2	.=" AND ";
+			$WHERE2	.="DATE(head_stock.hist_date) = '".$Date_Find."'";
 		}
 		
 		if($Coa_Cari){
-			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
-			$Sub_Find	.="head_whr.coa_1 IN('".$Coa_Cari."')";
+			if(!empty($WHERE2))$WHERE2	.=" AND ";
+			$WHERE2	.="head_whr.coa_1 IN('".$Coa_Cari."')";
 		}
-		
-		
-		$Query_Sub_Find		= $this->SubQueryStock($Sub_Find);
-		
-		
-		//echo"<pre>";print_r($Arr_Akses);
 		
 		$like_value     = $requestData['search']['value'];
         $column_order   = $requestData['order'][0]['column'];
@@ -118,83 +114,57 @@ class Warehouse_stock_tras extends CI_Controller {
 			1 => 'head_mstr.idmaterial',
 			2 => 'head_mstr.nm_material',
 			3 => 'head_mstr.nm_category',
-			4 => 'det_stock.nm_gudang',
-			5 => 'head_stock.qty_stock_akhir',
-			6 => 'head_stock.harga',
-			7 => 'head_stock.nilai_akhir_rp'
+			4 => 'head_whr.nm_gudang',
+			5 => 'head_stock.qty_stock',
+			6 => 'head_stock.qty_stock',
+			7 => 'head_stock.qty_stock'
 		);
 		
-		
-		
-		
-		
 		if($like_value){
-			if(!empty($WHERE))$WHERE	.=" AND ";
-			$WHERE	.="(
+			if(!empty($WHERE2))$WHERE2	.=" AND ";
+			$WHERE2	.="(
 						head_mstr.idmaterial LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR head_mstr.nm_material LIKE '%".$this->db->escape_like_str($like_value)."%'
-						OR det_stock.nm_gudang LIKE '%".$this->db->escape_like_str($like_value)."%'
+						OR head_whr.nm_gudang LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR head_mstr.nm_category LIKE '%".$this->db->escape_like_str($like_value)."%'
-						OR head_stock.qty_stock_akhir LIKE '%".$this->db->escape_like_str($like_value)."%'
-						/*
-						OR head_stock.harga LIKE '%".$this->db->escape_like_str($like_value)."%'
-						OR head_stock.nilai_akhir_rp LIKE '%".$this->db->escape_like_str($like_value)."%'
-						*/
+						OR head_stock.qty_stock LIKE '%".$this->db->escape_like_str($like_value)."%'
 						)";
 		}
-		
-		
-		
 		
 		$sql = "SELECT
 					head_mstr.idmaterial,
 					head_mstr.id_material,
 					head_mstr.nm_material,
 					head_mstr.nm_category,
-					head_stock.qty_stock_awal,
-					head_stock.qty_in,
-					head_stock.qty_out,
-					head_stock.qty_stock_akhir,
-					head_stock.harga,
-					head_stock.harga_bm,
-					head_stock.nilai_akhir_rp,
-					head_stock.nilai_awal_rp,
-					head_stock.nilai_trans_rp,
-					det_stock.id_gudang,
-					det_stock.nm_gudang,
-					(@row:=@row+1) AS urut
+					head_stock.qty_stock,
+					head_stock.qty_booking,
+					head_stock.qty_rusak,
+					head_stock.id_gudang,
+					head_whr.nm_gudang
 				FROM
-					tran_warehouse_jurnal_detail head_stock
-				INNER JOIN (
-					".$Query_Sub_Find."
-				)det_stock ON head_stock.id=det_stock.last_kode
-				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material,
-				(SELECT @row:=0) r 
-				WHERE ".$WHERE;
-		//print_r($sql);exit();
-		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
-		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
-
+					".$Table_Stock."
+				LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
+				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
+				WHERE ".$WHERE2."
+				ORDER BY head_mstr.nm_material ASC";
 		
-
-		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$all_records		= $this->db->query($sql)->result_array();
+		$fetch['totalData'] 	= count($all_records);
+		$fetch['totalFiltered']	= count($all_records);
+		
+		// Apply pagination
 		if($limit_length > 0){
-			$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+			$all_records = array_slice($all_records, $limit_start, $limit_length);
 		}
-
-		$fetch['query'] = $this->db->query($sql);
 		
 		$totalData		= $fetch['totalData'];
 		$totalFiltered	= $fetch['totalFiltered'];
-		$query			= $fetch['query'];
 		
 		$data		= array();
         $urut1  	= 1;
         $urut2  	= 0;
-		$Periode_Now= date('Y-m');
-		$Tahun_Now	= date('Y');
 		
-		foreach($query->result_array() as $row)
+		foreach($all_records as $row)
 		{
 			$total_data     = $totalData;
             $start_dari     = $requestData['start'];
@@ -208,39 +178,35 @@ class Warehouse_stock_tras extends CI_Controller {
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 			
-			
 			$Code_Material		= $row['id_material'];
 			$Code_MaterialReal	= $row['idmaterial'];
 			$Name_Material		= $row['nm_material'];
 			$Cat_Material		= $row['nm_category'];
 			$Code_Gudang		= $row['id_gudang'];
 			$Name_Gudang		= $row['nm_gudang'];
-			
-			$Nilai_HPP			= (!empty($row['harga']) && floatval($row['harga']) !== 0)?$row['harga']:0;
-			$SaldoAwal_HPP		= (!empty($row['nilai_awal_rp']) && floatval($row['nilai_awal_rp']) !== 0)?$row['nilai_awal_rp']:0;
-			$SaldoAkhir_HPP		= (!empty($row['nilai_akhir_rp']) && floatval($row['nilai_akhir_rp']) !== 0)?$row['nilai_akhir_rp']:0;
-			$Total_Trans		= (!empty($row['nilai_trans_rp']) && floatval($row['nilai_trans_rp']) !== 0)?$row['nilai_trans_rp']:0;
-			$Qty_Awal			= (!empty($row['qty_stock_awal']) && floatval($row['qty_stock_awal']) !== 0)?$row['qty_stock_awal']:0;
-			$Qty_In				= (!empty($row['qty_in']) && floatval($row['qty_in']) !== 0)?$row['qty_in']:0;
-			$Qty_Out			= (!empty($row['qty_out']) && floatval($row['qty_out']) !== 0)?$row['qty_out']:0;
-			$Qty_Akhir			= (!empty($row['qty_stock_akhir']) && floatval($row['qty_stock_akhir']) !== 0)?$row['qty_stock_akhir']:0;
+			$Qty_Stock			= (!empty($row['qty_stock']) && floatval($row['qty_stock']) !== 0)?$row['qty_stock']:0;
 			
 			$Code_Unik			= $Code_Material.'^_^'.$Code_Gudang.'^_^'.$Date_Find;
 			
 			$Template_Material	= '<a href="#" class="text-red" onClick = "ActionPreviewDetail({code:\''.$Code_Unik.'\',action :\'preview_detail_stock\',title:\'VIEW DETAIL STOCK\'});" title="VIEW DETAIL STOCK"> '.$Code_MaterialReal.' </a>';
 			
+			// Ambil harga dari price_book sesuai kategori gudang (sama seperti ExcelStockCompare)
 			$Jenis_Gudang		= '';			
 			if(isset($rows_Gudang[$Code_Gudang]) && !empty($rows_Gudang[$Code_Gudang])){
 				$Jenis_Gudang	= $rows_Gudang[$Code_Gudang];
 			}
 			
-			$Harga_HPP			= $Nilai_HPP;
-			// if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
-				// $Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
-			// }
+			$Harga_HPP		= 0;
+			$Table_Price	= $this->GetTablePrice($Jenis_Gudang);
+			$Query_Price	= "SELECT * FROM ".$Table_Price." WHERE id_material = '".$Code_Material."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+			$rows_Price		= $this->db->query($Query_Price)->row();
+			if($rows_Price){
+				if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
+					$Harga_HPP	= $rows_Price->price_book;
+				}
+			}
 			
-			//echo"<br> Qty : ".$Qty_Akhir." Harga : ".$Harga_HPP." Total : ".$SaldoAkhir_HPP;
-			
+			$Total_Value	= floatval($Harga_HPP) * floatval($Qty_Stock);
 			
 			$nestedData 	= array(); 
 			$nestedData[]	= $nomor;
@@ -248,11 +214,10 @@ class Warehouse_stock_tras extends CI_Controller {
 			$nestedData[]	= $Name_Material;
 			$nestedData[]	= $Cat_Material;
 			$nestedData[]	= $Name_Gudang;
-			$nestedData[]	= number_format($Qty_Akhir,4);
+			$nestedData[]	= number_format($Qty_Stock,4);
 			$nestedData[]	= number_format($Harga_HPP,2);
-			$nestedData[]	= number_format($SaldoAkhir_HPP,2);		
+			$nestedData[]	= number_format($Total_Value,2);		
 			$nestedData[]	= "<button type='button' class='btn btn-sm btn-warning look_history' title='History' data-nm_material='".strtoupper($row['nm_material'])."' data-id_material='".$row['id_material']."' data-id_gudang='".$row['id_gudang']."'><i class='fa fa-history'></i></button>";			
-			
 			
 			$data[] 		= $nestedData;
             $urut1++;
@@ -1180,7 +1145,7 @@ class Warehouse_stock_tras extends CI_Controller {
 	
 	public function get_total_material(){
 		$rows_Gudang	= $this->master_model->getArray('warehouse',array(),'id','category');
-		$Sub_Find		= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";
+		$WHERE2			= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-') AND head_stock.qty_stock <> 0";
 		
 		$Coa_Cari		= trim($this->input->post('no_perkiraan'));
 		$Date_Find		= trim($this->input->post('tanggal'));
@@ -1189,36 +1154,66 @@ class Warehouse_stock_tras extends CI_Controller {
 			$Date_Find	= date('Y-m-d');
 		}
 		
-		if($Date_Find){
-			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
-			$Sub_Find	.="DATE(tras_stock.tgl_trans ) <= '".$Date_Find."'";
+		// Tentukan tabel stock sesuai tanggal (sama seperti ExcelStockCompare)
+		$Table_Stock	= "warehouse_stock head_stock";
+		if($Date_Find < date('Y-m-d')){
+			$Table_Stock	= "warehouse_stock_per_day_duplikat head_stock";
+			
+			if(!empty($WHERE2))$WHERE2	.=" AND ";
+			$WHERE2	.="DATE(head_stock.hist_date) = '".$Date_Find."'";
 		}
 		
 		if($Coa_Cari){
-			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
-			$Sub_Find	.="head_whr.coa_1 IN('".$Coa_Cari."')";
+			if(!empty($WHERE2))$WHERE2	.=" AND ";
+			$WHERE2	.="head_whr.coa_1 IN('".$Coa_Cari."')";
 		}
-		
-		$Query_Sub_Find		= $this->SubQueryStock($Sub_Find);
 		
 		$sql = "SELECT
 					COUNT(*) AS total_material,
-					SUM(head_stock.qty_stock_akhir) AS total_qty,
-					SUM(head_stock.nilai_akhir_rp) AS total_value
+					SUM(head_stock.qty_stock) AS total_qty
 				FROM
-					tran_warehouse_jurnal_detail head_stock
-				INNER JOIN (
-					".$Query_Sub_Find."
-				)det_stock ON head_stock.id=det_stock.last_kode
+					".$Table_Stock."
+				LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
 				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
-				WHERE 1=1";
+				WHERE ".$WHERE2;
 		
 		$result	= $this->db->query($sql)->row();
+		
+		// Hitung total value dari price_book
+		$total_value = 0;
+		$sql_detail = "SELECT
+					head_stock.qty_stock,
+					head_stock.id_gudang,
+					head_stock.id_material
+				FROM
+					".$Table_Stock."
+				LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
+				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
+				WHERE ".$WHERE2;
+		$rows_detail = $this->db->query($sql_detail)->result_array();
+		if($rows_detail){
+			foreach($rows_detail as $rd){
+				$Jenis_Gudang = '';
+				if(isset($rows_Gudang[$rd['id_gudang']]) && !empty($rows_Gudang[$rd['id_gudang']])){
+					$Jenis_Gudang = $rows_Gudang[$rd['id_gudang']];
+				}
+				$Table_Price	= $this->GetTablePrice($Jenis_Gudang);
+				$Query_Price	= "SELECT price_book FROM ".$Table_Price." WHERE id_material = '".$rd['id_material']."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+				$rows_Price		= $this->db->query($Query_Price)->row();
+				$harga = 0;
+				if($rows_Price){
+					if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
+						$harga = $rows_Price->price_book;
+					}
+				}
+				$total_value += floatval($harga) * floatval($rd['qty_stock']);
+			}
+		}
 		
 		$data = array(
 			'total_material' => ($result) ? intval($result->total_material) : 0,
 			'total_qty'      => ($result) ? floatval($result->total_qty) : 0,
-			'total_value'    => ($result) ? floatval($result->total_value) : 0
+			'total_value'    => $total_value
 		);
 		
 		echo json_encode($data);
