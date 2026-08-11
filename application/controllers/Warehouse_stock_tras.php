@@ -1178,6 +1178,52 @@ class Warehouse_stock_tras extends CI_Controller {
 		exit;
 	}
 	
+	public function get_total_material(){
+		$rows_Gudang	= $this->master_model->getArray('warehouse',array(),'id','category');
+		$Sub_Find		= "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";
+		
+		$Coa_Cari		= trim($this->input->post('no_perkiraan'));
+		$Date_Find		= trim($this->input->post('tanggal'));
+		
+		if(empty($Date_Find) || $Date_Find == '-'){			
+			$Date_Find	= date('Y-m-d');
+		}
+		
+		if($Date_Find){
+			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
+			$Sub_Find	.="DATE(tras_stock.tgl_trans ) <= '".$Date_Find."'";
+		}
+		
+		if($Coa_Cari){
+			if(!empty($Sub_Find))$Sub_Find	.=" AND ";
+			$Sub_Find	.="head_whr.coa_1 IN('".$Coa_Cari."')";
+		}
+		
+		$Query_Sub_Find		= $this->SubQueryStock($Sub_Find);
+		
+		$sql = "SELECT
+					COUNT(*) AS total_material,
+					SUM(head_stock.qty_stock_akhir) AS total_qty,
+					SUM(head_stock.nilai_akhir_rp) AS total_value
+				FROM
+					tran_warehouse_jurnal_detail head_stock
+				INNER JOIN (
+					".$Query_Sub_Find."
+				)det_stock ON head_stock.id=det_stock.last_kode
+				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
+				WHERE 1=1";
+		
+		$result	= $this->db->query($sql)->row();
+		
+		$data = array(
+			'total_material' => ($result) ? intval($result->total_material) : 0,
+			'total_qty'      => ($result) ? floatval($result->total_qty) : 0,
+			'total_value'    => ($result) ? floatval($result->total_value) : 0
+		);
+		
+		echo json_encode($data);
+	}
+	
 	public function modal_history(){
 		$id_material 	= $this->uri->segment(3);
 		$id_gudang 		= $this->uri->segment(4);
