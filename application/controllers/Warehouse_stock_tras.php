@@ -197,12 +197,11 @@ class Warehouse_stock_tras extends CI_Controller {
 			}
 			
 			$Harga_HPP		= 0;
-			$Table_Price	= $this->GetTablePrice($Jenis_Gudang);
-			$Query_Price	= "SELECT * FROM ".$Table_Price." WHERE id_material = '".$Code_Material."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+			$Query_Price	= "SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_material = '".$Code_Material."' AND id_gudang = '".$Code_Gudang."' AND DATE(tgl_trans) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
 			$rows_Price		= $this->db->query($Query_Price)->row();
 			if($rows_Price){
-				if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
-					$Harga_HPP	= $rows_Price->price_book;
+				if(floatval($rows_Price->harga) > 0){
+					$Harga_HPP	= $rows_Price->harga;
 				}
 			}
 			
@@ -597,7 +596,8 @@ class Warehouse_stock_tras extends CI_Controller {
 			$sheet->getStyle($Col_Name.$NextRow)->applyFromArray($style_header);
 		}
 		
-		$Grand_Total	= $Total_Qty;			
+		$Grand_Total	= 0;
+		$Total_Qty		= 0;
 		if($record){
 			$Next_Row		= $NextRow;
 			$intL			= 0;
@@ -613,27 +613,14 @@ class Warehouse_stock_tras extends CI_Controller {
 				$Code_Gudang		= $row['id_gudang'];
 				$Name_Gudang		= $row['nm_gudang'];
 				
-				$Nilai_HPP			= (!empty($row['harga']) && floatval($row['harga']) !== 0)?$row['harga']:0;
-				$SaldoAwal_HPP		= (!empty($row['nilai_awal_rp']) && floatval($row['nilai_awal_rp']) !== 0)?$row['nilai_awal_rp']:0;
-				$SaldoAkhir_HPP		= (!empty($row['nilai_akhir_rp']) && floatval($row['nilai_akhir_rp']) !== 0)?$row['nilai_akhir_rp']:0;
-				$Total_Trans		= (!empty($row['nilai_trans_rp']) && floatval($row['nilai_trans_rp']) !== 0)?$row['nilai_trans_rp']:0;
-				$Qty_Awal			= (!empty($row['qty_stock_awal']) && floatval($row['qty_stock_awal']) !== 0)?$row['qty_stock_awal']:0;
-				$Qty_In				= (!empty($row['qty_in']) && floatval($row['qty_in']) !== 0)?$row['qty_in']:0;
-				$Qty_Out			= (!empty($row['qty_out']) && floatval($row['qty_out']) !== 0)?$row['qty_out']:0;
 				$Qty_Akhir			= (!empty($row['qty_stock_akhir']) && floatval($row['qty_stock_akhir']) !== 0)?$row['qty_stock_akhir']:0;
 				
+				// Ambil harga dari tran_warehouse_jurnal_detail
+				$Harga_HPP			= (!empty($row['harga']) && floatval($row['harga']) !== 0)?$row['harga']:0;
 				
-				$Jenis_Gudang		= '';			
-				if(isset($rows_Gudang[$Code_Gudang]) && !empty($rows_Gudang[$Code_Gudang])){
-					$Jenis_Gudang	= $rows_Gudang[$Code_Gudang];
-				}
+				$Total_Value		= floatval($Harga_HPP) * floatval($Qty_Akhir);
 				
-				$Harga_HPP			= $Nilai_HPP;
-				// if((floatval($Qty_Akhir) > 0 || floatval($Qty_Akhir) < 0) && (floatval($SaldoAkhir_HPP) > 0 || floatval($SaldoAkhir_HPP) < 0)){
-					// $Harga_HPP		= $SaldoAkhir_HPP / $Qty_Akhir;
-				// }
-				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($SaldoAkhir_HPP,2));
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($Total_Value,2));
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
@@ -642,16 +629,21 @@ class Warehouse_stock_tras extends CI_Controller {
 					$sheet->getStyle($Cols.$Next_Row)->applyFromArray($styleArray2);
 				}
 				
-				$Grand_Total	+=$SaldoAkhir_HPP;
-				$Total_Qty		+=$Qty_Akhir;
+				$Grand_Total	+= $Total_Value;
+				$Total_Qty		+= $Qty_Akhir;
 				
 			}
 			
 			$Next_Row++;
 			$sheet->setCellValue('A'.$Next_Row, 'Grand Total');
-			$sheet->getStyle('A'.$Next_Row.':G'.$Next_Row)->applyFromArray($style_header);
-			$sheet->mergeCells('A'.$Next_Row.':G'.$Next_Row);
+			$sheet->getStyle('A'.$Next_Row.':E'.$Next_Row)->applyFromArray($style_header);
+			$sheet->mergeCells('A'.$Next_Row.':E'.$Next_Row);
 			
+			$sheet->setCellValue('F'.$Next_Row, number_format($Total_Qty,4));
+			$sheet->getStyle('F'.$Next_Row)->applyFromArray($style_header);
+			
+			$sheet->setCellValue('G'.$Next_Row, '');
+			$sheet->getStyle('G'.$Next_Row)->applyFromArray($style_header);
 			
 			$sheet->setCellValue('H'.$Next_Row, number_format($Grand_Total,2));
 			$sheet->getStyle('H'.$Next_Row)->applyFromArray($style_header);
