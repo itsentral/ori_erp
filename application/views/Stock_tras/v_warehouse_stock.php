@@ -35,27 +35,7 @@ $gudang = $this->uri->segment(3);
 		&nbsp;&nbsp;
 		<button type='button' class='btn btn-sm btn-primary' id='download_excel_compare'><i class='fa fa-file-excel-o'></i> Download Tras vs Stock</button>
 		
-		<div class="row" style="margin-top:10px;">
-			<div class="col-sm-3">
-				<div class="info-box bg-aqua">
-					<span class="info-box-icon"><i class="fa fa-cubes"></i></span>
-					<div class="info-box-content">
-						<span class="info-box-text">Total Material</span>
-						<span class="info-box-number" id="info_total_material">0</span>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-3">
-				<div class="info-box bg-green">
-					<span class="info-box-icon"><i class="fa fa-balance-scale"></i></span>
-					<div class="info-box-content">
-						<span class="info-box-text">Total Qty</span>
-						<span class="info-box-number" id="info_total_qty">0</span>
-					</div>
-				</div>
-			</div>
 
-		</div>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
@@ -312,9 +292,6 @@ $gudang = $this->uri->segment(3);
 		let CoaChosen 	= $('#no_perkiraan').val();
 		let DateChosen 	= $('#date_filter').val();
 		
-		// Fetch total material info
-		GetTotalMaterial(CoaChosen, DateChosen);
-		
 		let table_data 		= $('#my-grid').DataTable({
 			"serverSide": true,
 			"destroy"	: true,
@@ -415,19 +392,6 @@ $gudang = $this->uri->segment(3);
 			$("#modalViewJrnl").modal('show');
 			$("#data_view_jurnal").html(response);	
 		  
-		});
-	}
-	
-	function GetTotalMaterial(coa, tanggal){
-		$.ajax({
-			url 	: base_url + '/' + active_controller + '/get_total_material',
-			type	: 'POST',
-			data	: {'no_perkiraan': coa, 'tanggal': tanggal},
-			dataType: 'json',
-			success	: function(res){
-				$('#info_total_material').text(numberFormat(res.total_material, 0));
-				$('#info_total_qty').text(numberFormat(res.total_qty, 4));
-			}
 		});
 	}
 	
