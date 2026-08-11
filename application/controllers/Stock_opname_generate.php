@@ -406,9 +406,9 @@ class Stock_opname_generate extends CI_Controller {
 	}
 
 	/**
-	 * Perbaiki harga di tran_warehouse_jurnal_detail agar cocok dengan ledger_subgudang.
-	 * Ambil selisih per material antara ledger dan warehouse_history,
-	 * lalu update harga & nilai_akhir_rp di record terakhir tran_warehouse_jurnal_detail.
+	 * Perbaiki harga di tran_warehouse_jurnal_detail agar total nilai_akhir_rp gudang 3
+	 * cocok dengan saldo ledger_subgudang.
+	 * Koreksi proporsional ke semua material yang punya nilai_akhir_rp > 0.
 	 */
 	public function fix_tran_detail(){
 		$date_target = $this->input->post('date_target');
@@ -419,91 +419,87 @@ class Stock_opname_generate extends CI_Controller {
 
 		$id_gudang = '3'; // Sub Gudang
 
-		// 1. Ambil transaksi dari ledger_subgudang tanggal tersebut, parse id_material
-		$sql_ledger = "SELECT id, keterangan, debet, kredit 
-						FROM ledger_subgudang 
-						WHERE DATE(tanggal_bukti) = '".$this->db->escape_str($date_target)."'
-						ORDER BY id ASC";
-		$ledger_rows = $this->db->query($sql_ledger)->result_array();
+		// 1. Ambil saldo akhir ledger
+		$sql_ledger = "SELECT saldo FROM ledger_subgudang 
+						WHERE DATE(tanggal_bukti) = '".$this->db->escape_str($date_target)."' 
+						ORDER BY id DESC LIMIT 1";
+		$row_ledger = $this->db->query($sql_ledger)->row();
 
-		if(empty($ledger_rows)){
+		if(empty($row_ledger)){
 			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data ledger tanggal '.$date_target));
 			return;
 		}
+		$saldo_ledger = (float)$row_ledger->saldo;
 
-		// Parse keterangan: "transfer pusat - subgudang,MTL-XXXXXXX,NAMA,QTYxHARGA"
-		$ledger_per_material = array();
-		foreach($ledger_rows as $lr){
-			if(preg_match('/(MTL-\d+)/', $lr['keterangan'], $matches)){
-				$mat_id = $matches[1];
-				if(!isset($ledger_per_material[$mat_id])){
-					$ledger_per_material[$mat_id] = array('debet' => 0, 'kredit' => 0);
-				}
-				$ledger_per_material[$mat_id]['debet'] += (float)$lr['debet'];
-				$ledger_per_material[$mat_id]['kredit'] += (float)$lr['kredit'];
-			}
+		// 2. Ambil record terakhir per material di tran_warehouse_jurnal_detail sampai tanggal target
+		$sql_sub = "SELECT tras_stock.id_material, MAX(tras_stock.id) AS last_id
+					FROM tran_warehouse_jurnal_detail tras_stock
+					LEFT JOIN warehouse head_whr ON tras_stock.id_gudang = head_whr.id
+					WHERE tras_stock.id_gudang = '".$id_gudang."'
+					AND DATE(tras_stock.tgl_trans) <= '".$this->db->escape_str($date_target)."'
+					GROUP BY tras_stock.id_material";
+		$sub_rows = $this->db->query($sql_sub)->result_array();
+
+		if(empty($sub_rows)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data tran_warehouse_jurnal_detail gudang 3.'));
+			return;
 		}
 
-		// 2. Ambil transaksi warehouse_history tanggal tersebut gudang 3
-		$sql_hist = "SELECT id_material, jumlah_mat, total_harga, 
-						id_gudang_dari, kd_gudang_dari, id_gudang_ke, id_gudang
-					FROM warehouse_history 
-					WHERE DATE(update_date) = '".$this->db->escape_str($date_target)."'
-					AND id_gudang = '".$id_gudang."'
-					ORDER BY id ASC";
-		$hist_rows = $this->db->query($sql_hist)->result_array();
-
-		$hist_per_material = array();
-		foreach($hist_rows as $h){
-			$mat = $h['id_material'];
-			if(!isset($hist_per_material[$mat])){
-				$hist_per_material[$mat] = array('total_in' => 0, 'total_out' => 0);
-			}
-			$val = abs((float)$h['total_harga']);
-			if($h['id_gudang'] == $h['id_gudang_ke'] || $h['kd_gudang_dari'] == 'PURCHASE'){
-				$hist_per_material[$mat]['total_in'] += $val;
-			} else {
-				$hist_per_material[$mat]['total_out'] += $val;
-			}
+		// Ambil detail record
+		$ids = array();
+		foreach($sub_rows as $s){
+			$ids[] = $s['last_id'];
 		}
 
-		// 3. Untuk setiap material yang ada selisih, update tran_warehouse_jurnal_detail
+		$sql_detail = "SELECT id, id_material, harga, nilai_akhir_rp, qty_stock_akhir 
+						FROM tran_warehouse_jurnal_detail 
+						WHERE id IN (".implode(',', $ids).")";
+		$detail_rows = $this->db->query($sql_detail)->result_array();
+
+		// Hitung total nilai_akhir_rp saat ini
+		$total_tras = 0;
+		foreach($detail_rows as $d){
+			$total_tras += (float)$d['nilai_akhir_rp'];
+		}
+
+		$selisih = $saldo_ledger - $total_tras;
+
+		// 3. Jika sudah cocok
+		if(abs($selisih) < 1){
+			echo json_encode(array(
+				'status' => 1,
+				'pesan' => 'Data sudah cocok. Saldo ledger: '.number_format($saldo_ledger,0,',','.').
+						   ' | Total tras: '.number_format($total_tras,0,',','.'),
+				'corrected' => 0
+			));
+			return;
+		}
+
+		// 4. Koreksi proporsional
 		$ArrUpdate = array();
 		$corrected = 0;
 
-		foreach($ledger_per_material as $mat_id => $ledger_vals){
-			$ledger_in = $ledger_vals['debet'];
-			$hist_in = isset($hist_per_material[$mat_id]) ? $hist_per_material[$mat_id]['total_in'] : 0;
+		if($total_tras == 0) $total_tras = 1;
 
-			$selisih = $ledger_in - $hist_in;
+		foreach($detail_rows as $d){
+			$old_nilai = (float)$d['nilai_akhir_rp'];
+			if($old_nilai == 0) continue;
 
-			if(abs($selisih) >= 1){
-				// Ambil record terakhir di tran_warehouse_jurnal_detail sampai tanggal target
-				$sql_tras = "SELECT a.id, a.harga, a.nilai_akhir_rp, a.qty_stock_akhir 
-							FROM tran_warehouse_jurnal_detail a
-							WHERE a.id_material = '".$this->db->escape_str($mat_id)."'
-							AND a.id_gudang = '".$id_gudang."'
-							AND DATE(a.tgl_trans) <= '".$this->db->escape_str($date_target)."'
-							ORDER BY a.id DESC LIMIT 1";
-				$rec = $this->db->query($sql_tras)->row();
+			$proporsi = $old_nilai / $total_tras;
+			$koreksi = $selisih * $proporsi;
+			$new_nilai = $old_nilai + $koreksi;
+			$qty = (float)$d['qty_stock_akhir'];
+			$new_harga = ($qty != 0) ? ($new_nilai / $qty) : (float)$d['harga'];
 
-				if(!empty($rec)){
-					$qty = (float)$rec->qty_stock_akhir;
-					$old_nilai = (float)$rec->nilai_akhir_rp;
-					$new_nilai = $old_nilai + $selisih;
-					$new_harga = ($qty != 0) ? ($new_nilai / $qty) : (float)$rec->harga;
-
-					$ArrUpdate[] = array(
-						'id' => $rec->id,
-						'harga' => $new_harga,
-						'nilai_akhir_rp' => $new_nilai,
-					);
-					$corrected++;
-				}
-			}
+			$ArrUpdate[] = array(
+				'id' => $d['id'],
+				'harga' => $new_harga,
+				'nilai_akhir_rp' => $new_nilai,
+			);
+			$corrected++;
 		}
 
-		// 4. Update batch
+		// 5. Update batch
 		if(!empty($ArrUpdate)){
 			$this->db->trans_start();
 			$this->db->update_batch('tran_warehouse_jurnal_detail', $ArrUpdate, 'id');
@@ -512,18 +508,16 @@ class Stock_opname_generate extends CI_Controller {
 			if($this->db->trans_status()){
 				echo json_encode(array(
 					'status' => 1,
-					'pesan' => 'Fix selesai. Dikoreksi '.$corrected.' material di tran_warehouse_jurnal_detail.',
+					'pesan' => 'Fix selesai. Selisih: '.number_format($selisih,0,',','.').
+							   ' | Dikoreksi '.$corrected.' material.'.
+							   ' Saldo ledger: '.number_format($saldo_ledger,0,',','.'),
 					'corrected' => $corrected
 				));
 			} else {
 				echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data.'));
 			}
 		} else {
-			echo json_encode(array(
-				'status' => 1, 
-				'pesan' => 'Tidak ada selisih yang perlu diperbaiki.',
-				'corrected' => 0
-			));
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data yang perlu diupdate.'));
 		}
 	}
 }
