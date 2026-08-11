@@ -1171,7 +1171,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$result	= $this->db->query($sql)->row();
 		
-		// Hitung total value dari price_book
+		// Hitung total value dari tran_warehouse_jurnal_detail (harga * qty_stock)
 		$total_value = 0;
 		$sql_detail = "SELECT
 					head_stock.qty_stock,
@@ -1185,18 +1185,11 @@ class Warehouse_stock_tras extends CI_Controller {
 		$rows_detail = $this->db->query($sql_detail)->result_array();
 		if($rows_detail){
 			foreach($rows_detail as $rd){
-				$Jenis_Gudang = '';
-				if(isset($rows_Gudang[$rd['id_gudang']]) && !empty($rows_Gudang[$rd['id_gudang']])){
-					$Jenis_Gudang = $rows_Gudang[$rd['id_gudang']];
-				}
-				$Table_Price	= $this->GetTablePrice($Jenis_Gudang);
-				$Query_Price	= "SELECT price_book FROM ".$Table_Price." WHERE id_material = '".$rd['id_material']."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+				$Query_Price	= "SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_material = '".$rd['id_material']."' AND id_gudang = '".$rd['id_gudang']."' AND DATE(tgl_trans) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
 				$rows_Price		= $this->db->query($Query_Price)->row();
 				$harga = 0;
-				if($rows_Price){
-					if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
-						$harga = $rows_Price->price_book;
-					}
+				if($rows_Price && floatval($rows_Price->harga) > 0){
+					$harga = $rows_Price->harga;
 				}
 				$total_value += floatval($harga) * floatval($rd['qty_stock']);
 			}
