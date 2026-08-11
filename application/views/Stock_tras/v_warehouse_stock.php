@@ -54,15 +54,7 @@ $gudang = $this->uri->segment(3);
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-3">
-				<div class="info-box bg-yellow">
-					<span class="info-box-icon"><i class="fa fa-money"></i></span>
-					<div class="info-box-content">
-						<span class="info-box-text">Total Value (Rp)</span>
-						<span class="info-box-number" id="info_total_value">0</span>
-					</div>
-				</div>
-			</div>
+
 		</div>
 	</div>
 	<!-- /.box-header -->
@@ -435,7 +427,6 @@ $gudang = $this->uri->segment(3);
 			success	: function(res){
 				$('#info_total_material').text(numberFormat(res.total_material, 0));
 				$('#info_total_qty').text(numberFormat(res.total_qty, 4));
-				$('#info_total_value').text(numberFormat(res.total_value, 2));
 			}
 		});
 	}
