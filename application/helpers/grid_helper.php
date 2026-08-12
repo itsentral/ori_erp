@@ -6383,8 +6383,8 @@
 				
 				
 				if(!empty($costbook2)) $PRICE2=$costbook2->harga;
-				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir;
+				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE2*$stokjurnalakhir2;
 				
 				$PRICENEW = round(($PRICE*$value) + ($PRICE2*$stokjurnalakhir2))/($value+$stokjurnalakhir2);
 

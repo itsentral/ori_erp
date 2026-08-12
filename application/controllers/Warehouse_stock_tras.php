@@ -598,6 +598,7 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$Grand_Total	= 0;
 		$Total_Qty		= 0;
+		$Grand_Total_Prev = 0;
 		if($record){
 			$Next_Row		= $NextRow;
 			$intL			= 0;
@@ -620,7 +621,17 @@ class Warehouse_stock_tras extends CI_Controller {
 				
 				$Total_Value		= floatval($Harga_HPP) * floatval($Qty_Akhir);
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($Total_Value,2));
+				// Ambil total value H-1
+				$Total_Value_Prev	= 0;
+				$Query_Prev			= "SELECT harga, qty_stock_akhir FROM tran_warehouse_jurnal_detail WHERE id_material = '".$Code_Material."' AND id_gudang = '".$Code_Gudang."' AND DATE(tgl_trans) <= '".$Date_Prev."' ORDER BY id DESC LIMIT 1";
+				$rows_Prev			= $this->db->query($Query_Prev)->row();
+				if($rows_Prev){
+					$Harga_Prev		= floatval($rows_Prev->harga);
+					$Qty_Prev		= floatval($rows_Prev->qty_stock_akhir);
+					$Total_Value_Prev = $Harga_Prev * $Qty_Prev;
+				}
+				
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,number_format($Qty_Akhir,4),number_format($Harga_HPP,2),number_format($Total_Value,2),number_format($Total_Value_Prev,2));
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
@@ -629,8 +640,9 @@ class Warehouse_stock_tras extends CI_Controller {
 					$sheet->getStyle($Cols.$Next_Row)->applyFromArray($styleArray2);
 				}
 				
-				$Grand_Total	+= $Total_Value;
-				$Total_Qty		+= $Qty_Akhir;
+				$Grand_Total		+= $Total_Value;
+				$Total_Qty			+= $Qty_Akhir;
+				$Grand_Total_Prev	+= $Total_Value_Prev;
 				
 			}
 			
@@ -647,6 +659,9 @@ class Warehouse_stock_tras extends CI_Controller {
 			
 			$sheet->setCellValue('H'.$Next_Row, number_format($Grand_Total,2));
 			$sheet->getStyle('H'.$Next_Row)->applyFromArray($style_header);
+			
+			$sheet->setCellValue('I'.$Next_Row, number_format($Grand_Total_Prev,2));
+			$sheet->getStyle('I'.$Next_Row)->applyFromArray($style_header);
 			
 			
 			
