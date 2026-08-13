@@ -565,6 +565,9 @@ class Adjustment_material_model extends CI_Model {
 
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
 
+				// Saldo akhir dihitung langsung: saldo_awal + nilai_transaksi (lebih akurat, tanpa floating point error)
+				$nilaiAkhirSubgudang = $nilaijurnalakhir2 + ($PRICE * $QTY_OKE);
+
 				
 				
 				$ArrJurnalNew2['id_material'] 		= $rest_gudang_ke[0]->id_material;
@@ -588,7 +591,7 @@ class Adjustment_material_model extends CI_Model {
 				$ArrJurnalNew2['harga_bm'] 			= 0;
 				$ArrJurnalNew2['nilai_awal_rp']		= $nilaijurnalakhir2;
 				$ArrJurnalNew2['nilai_trans_rp']		= $PRICE*$QTY_OKE;
-				$ArrJurnalNew2['nilai_akhir_rp']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+				$ArrJurnalNew2['nilai_akhir_rp']		= $nilaiAkhirSubgudang;
 				$ArrJurnalNew2['update_by'] 			= $UserName;
 				$ArrJurnalNew2['update_date'] 		= $DateTime;
 				$ArrJurnalNew2['no_jurnal'] 			= '-';
@@ -599,12 +602,12 @@ class Adjustment_material_model extends CI_Model {
 						$ArrHistKe['harga'] 			= $PRICE;
 						$ArrHistKe['total_harga'] 		= $PRICE*$QTY_OKE;
 						$ArrHistKe['saldo_awal']	    = $nilaijurnalakhir2;
-						$ArrHistKe['saldo_akhir']		= ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+						$ArrHistKe['saldo_akhir']		= $nilaiAkhirSubgudang;
 						$ArrHistKe['harga_baru'] 		= $PRICENEW;
 
 				//update syam 18/12/2025
 					$ArrStockKe['harga'] 		    = $PRICENEW;
-					$ArrStockKe['total_harga'] 	    = ($stokjurnalakhir2+$QTY_OKE)*$PRICENEW;
+					$ArrStockKe['total_harga'] 	    = $nilaiAkhirSubgudang;
 
 
 				
