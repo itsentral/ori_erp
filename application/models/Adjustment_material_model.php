@@ -1424,7 +1424,9 @@ class Adjustment_material_model extends CI_Model {
 				'action'		=> 'index',
 				'row_group'		=> $data_Group,
 				'akses_menu'	=> $Arr_Akses,
-				'gudang'		=> $gudang
+				'gudang'		=> $gudang,
+				'id'			=> '',
+				'kode'			=> ''
 			);
 			$this->load->view('Adjustment_material/add_adjustment',$data);
 		}
