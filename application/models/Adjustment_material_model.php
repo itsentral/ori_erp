@@ -560,7 +560,7 @@ class Adjustment_material_model extends CI_Model {
 				
 				if(!empty($costbook2)) $PRICE3=$costbook2->harga;
 				if(!empty($qty_akhir2)) $stokjurnalakhir2=$qty_akhir2->qty_stock;				
-				if(!empty($qty_akhir2)) $nilaijurnalakhir2=$PRICE3*$stokjurnalakhir2;
+				if(!empty($qty_akhir2)) $nilaijurnalakhir2=(!empty($qty_akhir2->total_harga))?$qty_akhir2->total_harga:$PRICE3*$stokjurnalakhir2;
 
 
 				$PRICENEW = (($PRICE*$QTY_OKE) + ($PRICE2*$stokjurnalakhir2))/($QTY_OKE+$stokjurnalakhir2);
