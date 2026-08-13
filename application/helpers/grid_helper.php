@@ -6208,6 +6208,7 @@
 		$ArrHist2 = array();
 		$ArrStockInsert2 = array();
 		$ArrHistInsert2 = array();
+		$ArrJurnalNewInsert2 = array();
 
 		foreach ($temp as $key => $value) {
 			//PENGURANGAN GUDANG
