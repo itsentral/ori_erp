@@ -1431,10 +1431,15 @@ function getPriceBookByDate($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('price_book')->result_array();
+    // Only fetch rows we need instead of loading the entire table
+    $ids = array_column($resultPriceBook, 'id');
     $ArrResult = [];
-    foreach ($result as $key => $value) {
-        $ArrResult[$value['id']] = $value['price_book'];
+    if (!empty($ids)) {
+        $idList = implode(',', array_map('intval', $ids));
+        $result = $CI->db->query("SELECT id, price_book FROM price_book WHERE id IN ($idList)")->result_array();
+        foreach ($result as $value) {
+            $ArrResult[$value['id']] = $value['price_book'];
+        }
     }
     
     $GET_PRICE_BOOK = $ArrResult;
@@ -1489,10 +1494,15 @@ function getPriceBookByDatesubgudang($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('price_book')->result_array();
+    // Only fetch rows we need instead of loading the entire table
+    $ids = array_column($resultPriceBook, 'id');
     $ArrResult = [];
-    foreach ($result as $key => $value) {
-        $ArrResult[$value['id']] = $value['price_book'];
+    if (!empty($ids)) {
+        $idList = implode(',', array_map('intval', $ids));
+        $result = $CI->db->query("SELECT id, price_book FROM price_book WHERE id IN ($idList)")->result_array();
+        foreach ($result as $value) {
+            $ArrResult[$value['id']] = $value['price_book'];
+        }
     }
     
     $GET_PRICE_BOOK = $ArrResult;
@@ -1540,8 +1550,6 @@ function getPriceBookByDatesubgudang2($dateFilter){
 function getPriceBookByDateproduksi($dateFilter){ 
     $CI =& get_instance();
 
-   $CI =& get_instance();
-
    $SQLPriceBook = "SELECT  MAX( a.id ) AS id,
                             a.id_material 
                         FROM
@@ -1552,10 +1560,15 @@ function getPriceBookByDateproduksi($dateFilter){
                             a.id_material";
     $resultPriceBook = $CI->db->query($SQLPriceBook)->result_array();
 
-    $result = $CI->db->get('tran_warehouse_jurnal_detail')->result_array();
+    // Only fetch rows we need instead of loading the entire table
+    $ids = array_column($resultPriceBook, 'id');
     $ArrResult = [];
-    foreach ($result as $key => $value) {
-        $ArrResult[$value['id']] = $value['harga'];
+    if (!empty($ids)) {
+        $idList = implode(',', array_map('intval', $ids));
+        $result = $CI->db->query("SELECT id, harga FROM tran_warehouse_jurnal_detail WHERE id IN ($idList)")->result_array();
+        foreach ($result as $value) {
+            $ArrResult[$value['id']] = $value['harga'];
+        }
     }
     
     $GET_PRICE_BOOK = $ArrResult;
