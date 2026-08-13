@@ -6509,6 +6509,34 @@
 					$ArrHistInsert2[$key]['saldo_awal']		    = 0;
 					$ArrHistInsert2[$key]['saldo_akhir']		= ($value)*$PRICENEW;
 					$ArrHistInsert2[$key]['harga_baru'] 		= $PRICENEW;
+
+					// Insert jurnal detail untuk material baru di gudang tujuan
+					$ArrJurnalNewInsert2[$key]['id_material'] 		= $key;
+					$ArrJurnalNewInsert2[$key]['idmaterial'] 		= $restMat[0]->idmaterial;
+					$ArrJurnalNewInsert2[$key]['nm_material'] 		= $restMat[0]->nm_material;
+					$ArrJurnalNewInsert2[$key]['id_category'] 		= $restMat[0]->id_category;
+					$ArrJurnalNewInsert2[$key]['nm_category'] 		= $restMat[0]->nm_category;
+					$ArrJurnalNewInsert2[$key]['id_gudang'] 		= $id_gudang_ke;
+					$ArrJurnalNewInsert2[$key]['kd_gudang'] 		= $kd_gudang_ke;
+					$ArrJurnalNewInsert2[$key]['id_gudang_dari'] 	= $id_gudang_dari;
+					$ArrJurnalNewInsert2[$key]['kd_gudang_dari'] 	= $kd_gudang_dari;
+					$ArrJurnalNewInsert2[$key]['id_gudang_ke'] 		= $id_gudang_ke;
+					$ArrJurnalNewInsert2[$key]['kd_gudang_ke'] 		= $kd_gudang_ke;
+					$ArrJurnalNewInsert2[$key]['qty_stock_awal'] 	= 0;
+					$ArrJurnalNewInsert2[$key]['qty_stock_akhir'] 	= $value;
+					$ArrJurnalNewInsert2[$key]['kode_trans'] 		= $kode_trans;
+					$ArrJurnalNewInsert2[$key]['tgl_trans'] 		= $dateTime;
+					$ArrJurnalNewInsert2[$key]['qty_in'] 			= $value;
+					$ArrJurnalNewInsert2[$key]['ket'] 				= 'penambahan gudang (insert new)';
+					$ArrJurnalNewInsert2[$key]['harga'] 			= $PRICE;
+					$ArrJurnalNewInsert2[$key]['harga_bm'] 		= 0;
+					$ArrJurnalNewInsert2[$key]['nilai_awal_rp']	= 0;
+					$ArrJurnalNewInsert2[$key]['nilai_trans_rp']	= $PRICE * $value;
+					$ArrJurnalNewInsert2[$key]['nilai_akhir_rp']	= $value * $PRICENEW;
+					$ArrJurnalNewInsert2[$key]['update_by'] 		= $UserName;
+					$ArrJurnalNewInsert2[$key]['update_date'] 		= $dateTime;
+					$ArrJurnalNewInsert2[$key]['no_jurnal'] 		= '-';
+					$ArrJurnalNewInsert2[$key]['coa_gudang'] 		= $coa_gudang2;
 				}
 			}
 		}
@@ -6550,6 +6578,9 @@
 		}
 		if(!empty($ArrHistInsert2)){
 			$CI->db->insert_batch('warehouse_history', $ArrHistInsert2);
+		}
+		if(!empty($ArrJurnalNewInsert2)){
+			$CI->db->insert_batch('tran_warehouse_jurnal_detail', $ArrJurnalNewInsert2);
 		}
 
 
@@ -6919,7 +6950,7 @@
 				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
 
 				$pricebook = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-				$costbook 	= $pricebook->harga;
+				$costbook 	= (!empty($pricebook)) ? $pricebook->harga : 0;
 					
 
 					$tempMaterial[$key]['tanggal'] 		= $dateTime;
@@ -6971,8 +7002,8 @@
 				$categoryGudang = (!empty($checkGudang[0]['category']))?$checkGudang[0]['category']:0;
 
 				if($categoryGudang == 'pusat' OR $categoryGudang == 'subgudang' OR $categoryGudang == 'produksi'){
-					$pricebook = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$id_gudang_dari, 'id_material'=>$key),1)->row();
-				    $costbook 	= $pricebook->harga;
+					$pricebook = $CI->db->order_by('tgl_trans', 'desc')->get_where('tran_warehouse_jurnal_detail',array('id_gudang'=>$gudangDariCostBook, 'id_material'=>$key),1)->row();
+				    $costbook 	= (!empty($pricebook)) ? $pricebook->harga : 0;
 
 					$tempMaterialIn[$key]['tanggal'] 		= $dateTime;
 					$tempMaterialIn[$key]['keterangan'] 	= null;
