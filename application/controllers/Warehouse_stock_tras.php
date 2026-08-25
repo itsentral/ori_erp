@@ -733,15 +733,13 @@ class Warehouse_stock_tras extends CI_Controller {
 									head_stock.id_gudang,
 									head_whr.nm_gudang,
 									head_stock.harga,
-									head_stock.total_harga,
-									head_stock.costbook,
-									head_stock.total_value
+									head_stock.total_harga
 								FROM
 									".$Table_Stock."
 								LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
 								LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
 								WHERE ".$WHERE2."
-								ORDER BY head_stock.nm_material ASC
+								ORDER BY head_mstr.nm_material ASC
 								";
 		$rows_Compare		= $this->db->query($Query_Compare)->result_array();
 		if($rows_Compare){
