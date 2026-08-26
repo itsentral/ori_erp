@@ -13986,6 +13986,7 @@ class Produksi extends CI_Controller {
 					'jenis_jurnal'  => 'produksi wip deadstock',
 					'no_request'    => $no_request,
 					'stspos'		  =>1,
+					'id_trans_stok' => '',
 					'reff_trans_stok'=>$noReffTrans,
 				);
 			}
@@ -14003,7 +14004,9 @@ class Produksi extends CI_Controller {
 			  'kredit'        => 0,
 			  'jenis_jurnal'  => 'produksi wip deadstock',
 			  'no_request'    => $no_request,
-			  'stspos'		  =>1
+			  'stspos'		  =>1,
+			  'id_trans_stok' => '',
+			  'reff_trans_stok'=>$noReffTrans
 			   );
 			
 					
