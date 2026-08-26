@@ -2340,3 +2340,23 @@ function getEstimasi_Product($id_milik,$product_name) {
 
     return $ArrayResult;
 }
+
+function getReffTranStok($nocab='101'){
+    $CI =& get_instance();
+    $dbGL = $CI->load->database('accounting', TRUE);
+    $yearMonth      = date('ym');
+    $qReffTranStok  = "SELECT subcab, reff_trans FROM pastibisa_tb_cabang WHERE nocab='".$nocab."' LIMIT 1";
+    $row            = $dbGL->query($qReffTranStok)->row_array();
+    $lastNo         = $row['reff_trans'];
+    $subcab         = $row['subcab'];
+    $perfixNo       = sprintf("%05d", $lastNo);
+
+    $noreff = $nocab.'-'.$yearMonth.$perfixNo; 
+    return $noreff;
+}
+function updateKonterReff($nocab='101'){
+    $CI =& get_instance();
+    $dbGL = $CI->load->database('accounting', TRUE);
+    $qReffTranStok  = "UPDATE pastibisa_tb_cabang SET reff_trans = reff_trans + 1 WHERE nocab='".$nocab."' LIMIT 1";
+    $dbGL->query($qReffTranStok);
+}
