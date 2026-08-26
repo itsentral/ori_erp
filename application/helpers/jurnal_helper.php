@@ -3574,7 +3574,7 @@
 			}
 			
 		   
-			$jurnalfg = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND jenis LIKE 'out%'")->result();
+			$jurnalfg = $CI->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood, jenis  FROM data_erp_fg WHERE id_pro_det ='".$kode."' AND jenis LIKE 'out%'")->result();
 			
 
 			$qty_n	= 0;	  
@@ -3607,8 +3607,13 @@
 				$coa_wip 		='1103-03-02';	
 				}else{
 				$coa_wip 		='1103-03-03';						
-				}					
-				$coafg   		='1103-04-01';
+				}
+				// COA kredit: deadstock (1103-04-02) atau FG biasa (1103-04-01)
+				if(strpos($data->jenis, 'deadstok') !== false){
+					$coafg = '1103-04-02';
+				}else{
+					$coafg = '1103-04-01';
+				}
                 				
 					 $det_Jurnaltes[]  = array(
 					  'nomor'         => '',
