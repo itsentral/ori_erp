@@ -6461,9 +6461,10 @@ class Delivery extends CI_Controller
 		$tgl_voucher = date('Y-m-d');
 		$det_Jurnaltes = [];
 		$totalfg = 0;
+		$noReffTrans = getReffTranStok('101');
 
 		// Ambil data dari data_erp_in_transit yang baru di-insert (jenis = 'out' berarti keluar dari intransit)
-		$dataRejectIntransit = $this->db->query("SELECT tanggal, keterangan, product, no_so, no_spk, kode_trans, id_trans, qty, nilai_unit as finishgood, kode_spool FROM data_erp_in_transit WHERE kode_delivery ='".$kode_delivery."' AND tanggal ='".$tgl_voucher."' AND jenis = 'out'")->result();
+		$dataRejectIntransit = $this->db->query("SELECT id, tanggal, keterangan, product, no_so, no_spk, kode_trans, id_trans, qty, nilai_unit as finishgood, kode_spool FROM data_erp_in_transit WHERE kode_delivery ='".$kode_delivery."' AND tanggal ='".$tgl_voucher."' AND jenis = 'out'")->result();
 
 		if(!empty($dataRejectIntransit)){
 			foreach($dataRejectIntransit AS $data){
@@ -6502,7 +6503,9 @@ class Delivery extends CI_Controller
 					'kredit'        => 0,
 					'jenis_jurnal'  => 'Intransit-Reject-FG',
 					'no_request'    => $nospk,
-					'stspos'        => 1
+					'stspos'        => 1,
+					'id_trans_stok' => $data->id,
+					'reff_trans_stok'=>$noReffTrans,	
 				);
 
 				$det_Jurnaltes[] = array(
@@ -6516,8 +6519,12 @@ class Delivery extends CI_Controller
 					'kredit'        => $finishgood,
 					'jenis_jurnal'  => 'Intransit-Reject-FG',
 					'no_request'    => $nospk,
-					'stspos'        => 1
+					'stspos'        => 1,
+					'id_trans_stok' => $data->id,
+					'reff_trans_stok'=>$noReffTrans,	
 				);
+
+				$this->db->query("UPDATE data_erp_in_transit SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 
 				// Update warehouse_stock_fg (tambah qty karena produk kembali ke FG)
 				if (!empty($nm_material)){
@@ -6600,10 +6607,14 @@ class Delivery extends CI_Controller
 					'kredit'        => $vals['kredit'],
 					'created_on'    => date('Y-m-d H:i:s'),
 					'created_by'    => 'reject intransit',
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 				);
 				$this->db->insert(DBACC.'.jurnal', $datadetail);
 			}
 		}
+		
+		updateKonterReff('101');
 	}
 
 	public function detailDelivery($kode_delivery){
@@ -6751,11 +6762,12 @@ class Delivery extends CI_Controller
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
+		$noReffTrans = getReffTranStok('101');
 		
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,kode_trans,no_spk,id_trans,qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
+			$wip = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,kode_trans,no_spk,id_trans,qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'in'")->result();
 			
 			$totalfg =0;
 			  
@@ -6803,7 +6815,9 @@ class Delivery extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
 					 );
 					 
@@ -6818,7 +6832,9 @@ class Delivery extends CI_Controller
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					 );
 
 
@@ -6842,6 +6858,8 @@ class Delivery extends CI_Controller
                       	$this->db->query("UPDATE  warehouse_stock_fg SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 					  }
 				    }
+
+					$this->db->query("UPDATE data_erp_in_transit SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 					
 					  	
 				$qty_n++;
@@ -6872,8 +6890,10 @@ class Delivery extends CI_Controller
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
-					'created_on'		=> date('Y-m-d H:i:s'),
-					'created_by'		=> 'intransit',
+					'created_on'	=> date('Y-m-d H:i:s'),
+					'created_by'	=> 'intransit',
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
@@ -6943,6 +6963,8 @@ class Delivery extends CI_Controller
 					$this->db->insert('warehouse_stock_intransit',$datastokfg);
 				}
 			}
+			
+		updateKonterReff('101');
 		  
 	}
 
@@ -6956,9 +6978,10 @@ class Delivery extends CI_Controller
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
+		$noReffTrans = getReffTranStok('101');
 		
 		
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans, qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
+			$wip = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans, qty, nilai_unit as finishgood  FROM data_erp_in_transit WHERE kode_delivery ='".$idtrans."' AND tanggal ='".$Date."' AND jenis = 'out'")->result();
 			
 			if(empty($wip)){
 				return;
@@ -7009,7 +7032,9 @@ class Delivery extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
 					 );
 					 
@@ -7024,7 +7049,9 @@ class Delivery extends CI_Controller
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood-Intransit',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					 );
 					  	
 
@@ -7045,6 +7072,8 @@ class Delivery extends CI_Controller
 					if (!empty($nm_material)){
                       $this->db->query("UPDATE  warehouse_stock_intransit SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
 				    }
+
+					$this->db->query("UPDATE data_erp_in_transit SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 				
 				$qty_n++;
 			}
@@ -7075,8 +7104,10 @@ class Delivery extends CI_Controller
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
-					'created_on'		=> date('Y-m-d H:i:s'),
-					'created_by'		=> 'customer'
+					'created_on'	=> date('Y-m-d H:i:s'),
+					'created_by'	=> 'customer',
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
@@ -7158,6 +7189,8 @@ class Delivery extends CI_Controller
 				}
 
 			}
+			
+			updateKonterReff('101');
 		  
 		}
 	
