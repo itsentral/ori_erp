@@ -257,42 +257,72 @@ class Stock_opname_generate extends CI_Controller {
 	}
 
 	/**
-	 * Update harga di tran_warehouse_jurnal_detail berdasarkan hasil generate.
-	 * Untuk setiap material yang punya qty > 0 dan total_harga > 0,
-	 * update record terakhir di tran_warehouse_jurnal_detail sampai tanggal target.
+	 * Update harga di tran_warehouse_jurnal_detail berdasarkan transaksi warehouse_history.
+	 * Hanya untuk material yang ada transaksi IN (penambahan) pada tanggal target.
+	 * Hitung harga average: (nilai_lama + nilai_masuk) / (qty_lama + qty_masuk)
 	 * SKIP id_gudang = 3 (sudah selesai diproses terpisah)
 	 */
 	private function _update_tran_detail($date_target, $data_stok){
 		$ArrUpdate = array();
 
-		foreach($data_stok as $row){
-			// Skip gudang 3
-			if($row['id_gudang'] == '3') continue;
+		// Ambil transaksi IN pada tanggal target (skip gudang 3)
+		$sql_trx = "SELECT id_material, id_gudang, jumlah_mat, total_harga, 
+						id_gudang_dari, kd_gudang_dari, id_gudang_ke
+					FROM warehouse_history 
+					WHERE DATE(update_date) = '".$this->db->escape_str($date_target)."'
+					AND id_gudang != '3'
+					AND (id_gudang = id_gudang_ke OR kd_gudang_dari = 'PURCHASE')
+					ORDER BY id ASC";
+		$transaksi = $this->db->query($sql_trx)->result_array();
 
-			$qty = (float)$row['qty_stock'];
-			$total_harga = (float)$row['total_harga'];
+		if(empty($transaksi)) return;
 
-			// Skip jika tidak ada nilai
-			if($qty == 0 && $total_harga == 0) continue;
+		// Group per material + gudang
+		$trans_map = array();
+		foreach($transaksi as $trx){
+			$key = $trx['id_material'].'_'.$trx['id_gudang'];
+			if(!isset($trans_map[$key])){
+				$trans_map[$key] = array(
+					'id_material' => $trx['id_material'],
+					'id_gudang' => $trx['id_gudang'],
+					'qty_in' => 0,
+					'val_in' => 0,
+				);
+			}
+			$trans_map[$key]['qty_in'] += abs((float)$trx['jumlah_mat']);
+			$trans_map[$key]['val_in'] += abs((float)$trx['total_harga']);
+		}
 
-			$harga_baru = ($qty != 0) ? ($total_harga / $qty) : 0;
+		// Untuk setiap material yang masuk, hitung harga average baru
+		foreach($trans_map as $key => $trx_data){
+			$id_material = $trx_data['id_material'];
+			$id_gudang = $trx_data['id_gudang'];
 
-			// Cari record terakhir di tran_warehouse_jurnal_detail
+			// Ambil record terakhir di tran_warehouse_jurnal_detail sebelum tanggal target
 			$sql = "SELECT id, harga, nilai_akhir_rp, qty_stock_akhir 
 					FROM tran_warehouse_jurnal_detail 
-					WHERE id_material = '".$this->db->escape_str($row['id_material'])."'
-					AND id_gudang = '".$this->db->escape_str($row['id_gudang'])."'
+					WHERE id_material = '".$this->db->escape_str($id_material)."'
+					AND id_gudang = '".$this->db->escape_str($id_gudang)."'
 					AND DATE(tgl_trans) <= '".$this->db->escape_str($date_target)."'
 					ORDER BY id DESC LIMIT 1";
 			$rec = $this->db->query($sql)->row();
 
 			if(!empty($rec)){
-				// Update hanya jika nilainya berbeda
-				if(abs((float)$rec->harga - $harga_baru) >= 0.01 || abs((float)$rec->nilai_akhir_rp - $total_harga) >= 1){
+				$qty_lama = (float)$rec->qty_stock_akhir;
+				$nilai_lama = (float)$rec->nilai_akhir_rp;
+				$qty_masuk = $trx_data['qty_in'];
+				$val_masuk = $trx_data['val_in'];
+
+				// Harga average = (nilai_lama + nilai_masuk) / (qty_lama)
+				// qty_lama sudah termasuk qty_masuk (karena record ini sudah terupdate qty-nya)
+				$new_nilai = $nilai_lama + $val_masuk;
+				$new_harga = ($qty_lama != 0) ? ($new_nilai / $qty_lama) : (float)$rec->harga;
+
+				if(abs((float)$rec->harga - $new_harga) >= 0.01 || abs($nilai_lama - $new_nilai) >= 1){
 					$ArrUpdate[] = array(
 						'id' => $rec->id,
-						'harga' => $harga_baru,
-						'nilai_akhir_rp' => $total_harga,
+						'harga' => $new_harga,
+						'nilai_akhir_rp' => $new_nilai,
 					);
 				}
 			}
