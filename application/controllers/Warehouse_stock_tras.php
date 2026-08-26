@@ -1211,4 +1211,73 @@ class Warehouse_stock_tras extends CI_Controller {
 		$this->load->view('Stock_tras/modal_history', $data);
 	}
 
+	/**
+	 * Halaman rekap total material per hari
+	 */
+	function rekap_harian(){
+		$controller = ucfirst(strtolower($this->uri->segment(1)));
+		$Arr_Akses  = getAcccesmenu($controller);
+
+		$Query_COA = "SELECT coa_1 FROM warehouse WHERE NOT(coa_1 IS NULL OR coa_1 = '' OR coa_1 ='-') GROUP BY coa_1";
+		$rows_COA  = $this->db->query($Query_COA)->result();
+
+		$data = array(
+			'title'    => 'REKAP TOTAL MATERIAL PER HARI',
+			'action'   => 'rekap_harian',
+			'rows_coa' => $rows_COA,
+			'akses_menu' => $Arr_Akses
+		);
+		$this->load->view($this->folder.'v_rekap_harian', $data);
+	}
+
+	/**
+	 * Get data rekap harian via AJAX
+	 */
+	function get_rekap_harian(){
+		$bulan      = $this->input->post('bulan');
+		$tahun      = $this->input->post('tahun');
+		$coa        = $this->input->post('no_perkiraan');
+
+		if(empty($bulan) || empty($tahun)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Bulan dan tahun harus dipilih!'));
+			return;
+		}
+
+		$periode = $tahun.'-'.str_pad($bulan, 2, '0', STR_PAD_LEFT);
+		$days_in_month = cal_days_in_month(CAL_GREGORIAN, (int)$bulan, (int)$tahun);
+
+		$where_coa = '';
+		if(!empty($coa)){
+			$where_coa = " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		}
+
+		$result = array();
+
+		for($day = 1; $day <= $days_in_month; $day++){
+			$tgl = $periode.'-'.str_pad($day, 2, '0', STR_PAD_LEFT);
+
+			$sql = "SELECT SUM(a.nilai_akhir_rp) as total_nilai, SUM(a.qty_stock_akhir) as total_qty
+					FROM tran_warehouse_jurnal_detail a
+					INNER JOIN (
+						SELECT tras.id_material, tras.id_gudang, MAX(tras.id) as last_id
+						FROM tran_warehouse_jurnal_detail tras
+						LEFT JOIN warehouse head_whr ON tras.id_gudang = head_whr.id
+						WHERE DATE(tras.tgl_trans) <= '".$tgl."'
+						AND NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 = '' OR head_whr.coa_1 = '-')
+						".$where_coa."
+						GROUP BY tras.id_material, tras.id_gudang
+					) b ON a.id = b.last_id";
+			$row = $this->db->query($sql)->row();
+
+			$result[] = array(
+				'tanggal'     => $tgl,
+				'hari'        => $day,
+				'total_nilai' => (!empty($row->total_nilai)) ? (float)$row->total_nilai : 0,
+				'total_qty'   => (!empty($row->total_qty)) ? (float)$row->total_qty : 0,
+			);
+		}
+
+		echo json_encode(array('status' => 1, 'data' => $result));
+	}
+
 }
