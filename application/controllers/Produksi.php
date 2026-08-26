@@ -13967,7 +13967,31 @@ class Produksi extends CI_Controller {
 				
 			}
 
-			// Insert 1 debit WIP di akhir (total semua kredit)
+			// Kredit Deadstok (1103-04-02) - nilai FG out deadstok
+			$deadstok_value = 0;
+			$getDeadstokFG = $this->db->get_where('data_erp_fg', array('kode_trans'=>$kodespk, 'jenis'=>'out deadstok'))->result();
+			if(!empty($getDeadstokFG)){
+				foreach($getDeadstokFG as $fg){
+					$deadstok_value += $fg->nilai_wip;
+				}
+				$det_Jurnaltes[]  = array(
+					'nomor'         => '',
+					'tanggal'       => $tgl_voucher,
+					'tipe'          => 'JV',
+					'no_perkiraan'  => '1103-04-02',
+					'keterangan'    => 'Deadstok',
+					'no_reff'       => $id.$noso,
+					'debet'         => 0,
+					'kredit'        => $deadstok_value,
+					'jenis_jurnal'  => 'produksi wip deadstock',
+					'no_request'    => $no_request,
+					'stspos'		  =>1,
+					'reff_trans_stok'=>$noReffTrans,
+				);
+			}
+
+			// Insert 1 debit WIP di akhir (total semua kredit + deadstok value)
+			$totalDebet = $wiptotal + $deadstok_value;
 			$det_Jurnaltes[]  = array(
 			  'nomor'         => '',
 			  'tanggal'       => $tgl_voucher,
@@ -13975,7 +13999,7 @@ class Produksi extends CI_Controller {
 			  'no_perkiraan'  => $nokirwip,
 			  'keterangan'    => 'WIP Produk '.$noso,
 			  'no_reff'       => $id.$noso,
-			  'debet'         => $wiptotal,
+			  'debet'         => $totalDebet,
 			  'kredit'        => 0,
 			  'jenis_jurnal'  => 'produksi wip deadstock',
 			  'no_request'    => $no_request,
@@ -13996,7 +14020,7 @@ class Produksi extends CI_Controller {
 			$Thn	= substr($tgl_voucher,0,4);
 			$idlaporan = $id;
 			$Keterangan_INV = 'Jurnal Produksi - WIP';
-			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $wiptotal, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+			$dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalDebet, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV.$idlaporan.' No. Produksi'.$id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
 			$this->db->insert(DBACC.'.javh',$dataJVhead);
 			$datadetail=array();
 			foreach ($det_Jurnaltes as $vals) {
