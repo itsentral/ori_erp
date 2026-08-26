@@ -140,6 +140,7 @@ class Warehouse_stock_tras extends CI_Controller {
 					head_stock.qty_booking,
 					head_stock.qty_rusak,
 					head_stock.id_gudang,
+					head_stock.harga,
 					head_whr.nm_gudang
 				FROM
 					".$Table_Stock."
@@ -200,7 +201,7 @@ class Warehouse_stock_tras extends CI_Controller {
 			$Query_Price	= "SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_material = '".$Code_Material."' AND id_gudang = '".$Code_Gudang."' AND DATE(tgl_trans) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
 			$rows_Price		= $this->db->query($Query_Price)->row();
 			if($rows_Price){
-				if(floatval($rows_Price->harga) > 0){
+				if(floatval($rows_Price->harga) > 0 || floatval($rows_Price->harga) < 0){
 					$Harga_HPP	= $rows_Price->harga;
 				}
 			}
@@ -440,6 +441,7 @@ class Warehouse_stock_tras extends CI_Controller {
 					head_mstr.nm_category,
 					head_stock.qty_stock,
 					head_stock.id_gudang,
+					head_stock.harga,
 					head_whr.nm_gudang
 				FROM
 					".$Table_Stock."
@@ -599,19 +601,13 @@ class Warehouse_stock_tras extends CI_Controller {
 				
 				$Qty_Stock			= (!empty($row['qty_stock']) && floatval($row['qty_stock']) !== 0)?$row['qty_stock']:0;
 				
-				// Ambil harga dari price_book sesuai kategori gudang
-				$Jenis_Gudang		= '';			
-				if(isset($rows_Gudang[$Code_Gudang]) && !empty($rows_Gudang[$Code_Gudang])){
-					$Jenis_Gudang	= $rows_Gudang[$Code_Gudang];
-				}
-				
+				// Ambil harga dari tran_warehouse_jurnal_detail
 				$Harga_HPP		= 0;
-				$Table_Price	= $this->GetTablePrice($Jenis_Gudang);
-				$Query_Price	= "SELECT price_book FROM ".$Table_Price." WHERE id_material = '".$Code_Material."' AND DATE(updated_date) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+				$Query_Price	= "SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_material = '".$Code_Material."' AND id_gudang = '".$Code_Gudang."' AND DATE(tgl_trans) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
 				$rows_Price		= $this->db->query($Query_Price)->row();
 				if($rows_Price){
-					if(empty($rows_Price->price_book) || floatval($rows_Price->price_book) > 0){
-						$Harga_HPP	= $rows_Price->price_book;
+					if(floatval($rows_Price->harga) > 0 || floatval($rows_Price->harga) < 0){
+						$Harga_HPP	= $rows_Price->harga;
 					}
 				}
 				
@@ -1166,9 +1162,34 @@ class Warehouse_stock_tras extends CI_Controller {
 		
 		$result	= $this->db->query($sql)->row();
 		
+		// Hitung total value dari tran_warehouse_jurnal_detail
+		$total_value = 0;
+		$sql_detail = "SELECT
+					head_stock.qty_stock,
+					head_stock.id_gudang,
+					head_stock.id_material
+				FROM
+					".$Table_Stock."
+				LEFT JOIN warehouse head_whr ON head_stock.id_gudang=head_whr.id
+				LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
+				WHERE ".$WHERE2;
+		$rows_detail = $this->db->query($sql_detail)->result_array();
+		if($rows_detail){
+			foreach($rows_detail as $rd){
+				$Query_Price = "SELECT harga FROM tran_warehouse_jurnal_detail WHERE id_material = '".$rd['id_material']."' AND id_gudang = '".$rd['id_gudang']."' AND DATE(tgl_trans) <= '".$Date_Find."' ORDER BY id DESC LIMIT 1";
+				$rows_Price = $this->db->query($Query_Price)->row();
+				$harga = 0;
+				if($rows_Price && (floatval($rows_Price->harga) > 0 || floatval($rows_Price->harga) < 0)){
+					$harga = $rows_Price->harga;
+				}
+				$total_value += floatval($harga) * floatval($rd['qty_stock']);
+			}
+		}
+		
 		$data = array(
 			'total_material' => ($result) ? intval($result->total_material) : 0,
-			'total_qty'      => ($result) ? floatval($result->total_qty) : 0
+			'total_qty'      => ($result) ? floatval($result->total_qty) : 0,
+			'total_value'    => $total_value
 		);
 		
 		echo json_encode($data);
