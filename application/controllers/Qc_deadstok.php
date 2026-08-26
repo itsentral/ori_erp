@@ -413,6 +413,29 @@ class Qc_deadstok extends CI_Controller
 		$kode_spk 			= (!empty($checkIdDeadstok[0]['kode_spk']))?$checkIdDeadstok[0]['kode_spk']:null;
 
 		$getQCDeadstockModif = $this->db->get_where('data_erp_wip_group',array('kode_trans'=>$kode_spk))->result_array();
+		
+		// Hitung total material dari data_erp_wip untuk mendapatkan nilai WIP yang sebenarnya (deadstok value + material closing)
+		$totalMaterialWip = 0;
+		$getWipDetail = $this->db->select('SUM(total_price) as total_material')
+			->get_where('data_erp_wip', array('kode_trans'=>$kode_spk))
+			->row();
+		if(!empty($getWipDetail)){
+			$totalMaterialWip = $getWipDetail->total_material;
+		}
+		// Ambil deadstok value dari data_erp_fg out deadstok
+		$totalDeadstokValue = 0;
+		$getDeadstokFGVal = $this->db->select('SUM(nilai_wip) as total_deadstok')
+			->get_where('data_erp_fg', array('kode_trans'=>$kode_spk, 'jenis'=>'out deadstok'))
+			->row();
+		if(!empty($getDeadstokFGVal)){
+			$totalDeadstokValue = $getDeadstokFGVal->total_deadstok;
+		}
+		// Total nilai WIP sebenarnya = material + deadstok value
+		$nilaiWipTotal = $totalMaterialWip + $totalDeadstokValue;
+		// Bagi per qty deadstok modif
+		$qtyDeadstokModif = count($getQCDeadstockModif);
+		$nilaiWipPerUnit = ($qtyDeadstokModif > 0) ? $nilaiWipTotal / $qtyDeadstokModif : 0;
+
 		$ArrIN_WIP_MATERIAL = [];
 		$ArrIN_FG_MATERIAL = [];
 		foreach ($getQCDeadstockModif as $key => $value) {
@@ -424,7 +447,7 @@ class Qc_deadstok extends CI_Controller
 			$ArrIN_WIP_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
 			$ArrIN_WIP_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
 			$ArrIN_WIP_MATERIAL[$key]['qty'] = 1;
-			$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_WIP_MATERIAL[$key]['nilai_wip'] = $nilaiWipPerUnit;
 			$ArrIN_WIP_MATERIAL[$key]['material'] = $value['material'];
 			$ArrIN_WIP_MATERIAL[$key]['wip_direct'] =  0;
 			$ArrIN_WIP_MATERIAL[$key]['wip_indirect'] =  0;
@@ -449,8 +472,8 @@ class Qc_deadstok extends CI_Controller
 			$ArrIN_FG_MATERIAL[$key]['kode_trans'] = $value['kode_trans'];
 			$ArrIN_FG_MATERIAL[$key]['id_pro_det'] = $value['id_pro_det'];
 			$ArrIN_FG_MATERIAL[$key]['qty'] = 1;
-			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] = $value['nilai_wip'];
-			$ArrIN_FG_MATERIAL[$key]['nilai_wip'] = $value['nilai_wip'];
+			$ArrIN_FG_MATERIAL[$key]['nilai_unit'] = $nilaiWipPerUnit;
+			$ArrIN_FG_MATERIAL[$key]['nilai_wip'] = $nilaiWipPerUnit;
 			$ArrIN_FG_MATERIAL[$key]['material'] = $value['material'];
 			$ArrIN_FG_MATERIAL[$key]['wip_direct'] =  0;
 			$ArrIN_FG_MATERIAL[$key]['wip_indirect'] =  0;
