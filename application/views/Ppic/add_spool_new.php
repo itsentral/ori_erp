@@ -126,6 +126,26 @@ $this->load->view('include/side_menu');
 				<tbody></tbody>
 			</table>
 		</div>
+		<h4>Spool Sisa Cutting Deadstok</h4>
+		<div class='table-responsive'>
+			<table class="table table-sm table-bordered table-striped" id="my-grid-deadstok-cutting" width='100%'>
+				<thead>
+					<tr class='bg-blue'>
+						<th class="text-center">#</th>
+						<th class="text-center">IPP</th>
+						<th class="text-center">No SPK</th>
+						<th class="text-center">No SO</th>
+						<th class="text-center no-sort">Product</th>
+						<th class="text-center no-sort">Spec</th>
+						<th class="text-center no-sort">Length</th>
+						<th class="text-center no-sort">Customer</th>
+						<th class="text-center no-sort">Project</th>
+						<th class="text-center no-sort">#</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
 	</div>
 	<!-- /.box-body -->
  </div>
@@ -142,6 +162,7 @@ $this->load->view('include/side_menu');
 		DataTables2(no_ipp);
 		DataTables3(no_ipp);
 		DataTables4(no_ipp);
+		DataTables5(no_ipp);
 
 		$(document).on('change','#no_ipp', function(){
 			let no_ipp = $('#no_ipp').val();
@@ -149,6 +170,7 @@ $this->load->view('include/side_menu');
 			DataTables2(no_ipp);
 			DataTables3(no_ipp);
 			DataTables4(no_ipp);
+			DataTables5(no_ipp);
 		});
 
 		$(document).on('change','#spool_induk', function(){
@@ -401,6 +423,42 @@ $this->load->view('include/side_menu');
 			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
 			"ajax":{
 				url : base_url + active_controller+'/server_side_request_deadstok_modif',
+				type: "post",
+				data: function(d){
+					d.no_ipp = no_ipp
+				},
+				cache: false,
+				error: function(){
+					$(".my-grid-error").html("");
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+					$("#my-grid_processing").css("display","none");
+				}
+			}
+		});
+	}
+
+	function DataTables5(no_ipp=null){
+		var dataTable = $('#my-grid-deadstok-cutting').DataTable({
+			"serverSide": true,
+			"stateSave" : true,
+			"bAutoWidth": true,
+			"destroy": true,
+			"processing": true,
+			"responsive": true,
+			"fixedHeader": {
+				"header": true,
+				"footer": true
+			},
+			"aaSorting": [[ 1, "asc" ]],
+			"columnDefs": [ {
+				"targets": 'no-sort',
+				"orderable": false,
+			}],
+			"sPaginationType": "simple_numbers",
+			"iDisplayLength": 10,
+			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
+			"ajax":{
+				url : base_url + active_controller+'/server_side_request_deadstok_cutting',
 				type: "post",
 				data: function(d){
 					d.no_ipp = no_ipp

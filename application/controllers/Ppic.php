@@ -1585,6 +1585,10 @@ class Ppic extends CI_Controller {
 			$check4 		= $data['check4'];
 		}
 
+		if(!empty($data['check5'])){
+			$check5 		= $data['check5'];
+		}
+
 		$spool_induk 	= $data['spool_induk'];
 		$kode_spool 	= $data['kode_spool'];
 		$no_drawing 	= $data['no_drawing'];
@@ -1611,6 +1615,7 @@ class Ppic extends CI_Controller {
 		$ArrUpdateProduksi = [];
 		$ArrUpdateDeadstok = [];
 		$ArrUpdateDeadstokModif = [];
+		$ArrUpdateDeadstokCutting = [];
 		$ArrUpdateCutting = [];
 		$nomorx = 0;
 		$ArrReportFG = [];
@@ -1782,6 +1787,35 @@ class Ppic extends CI_Controller {
 			}
 		}
 
+		//SISA CUTTING DEADSTOK
+		if(!empty($data['check5'])){
+			foreach ($check5 as $value) { $nomorx++;
+				if($kode_spool == '0'){
+					$nomor_so 		= get_nomor_so($no_ipp);
+					$srcPlant		= "SELECT MAX(kode_spool) as maxP FROM production_detail WHERE spool_induk = '".$spool_induk."' AND kode_spool LIKE '".$nomor_so."-SP-%' ";
+					$resultPlant	= $this->db->query($srcPlant)->result_array();
+					$angkaUrut2		= $resultPlant[0]['maxP'];
+					$urutan2		= (int)substr($angkaUrut2, 13, 2);
+					$urutan2++;
+					$urut2			= sprintf('%02s',$urutan2);
+					$kode_spool 	= $nomor_so.'-SP-'.$urut2;
+				}	
+
+				$ArrUpdateDeadstokCutting[$nomorx]['id'] = $value;
+				$ArrUpdateDeadstokCutting[$nomorx]['spool_induk'] = $spool_induk;
+				$ArrUpdateDeadstokCutting[$nomorx]['kode_spool'] = $kode_spool;
+				$ArrUpdateDeadstokCutting[$nomorx]['no_drawing'] = $no_drawing;
+				$ArrUpdateDeadstokCutting[$nomorx]['spool_by'] = $username;
+				$ArrUpdateDeadstokCutting[$nomorx]['spool_date'] = $datetime;
+
+				$getFG = $this->db->order_by('id','desc')->get_where('data_erp_fg',array('id_trans'=>$value,'jenis'=>'in cutting deadstok'))->result_array();
+				$ID_FG = (!empty($getFG[0]['id']))?$getFG[0]['id']:null;
+				if(!empty($ID_FG)){
+					$ArrReportFG[] = $ID_FG;
+				}
+			}
+		}
+
 		// print_r($spool_induk);
 		// print_r($ArrReportFG);
 		// exit;
@@ -1797,6 +1831,9 @@ class Ppic extends CI_Controller {
 			}
 			if(!empty($ArrUpdateDeadstokModif)){
 				$this->db->update_batch('deadstok_modif',$ArrUpdateDeadstokModif,'id');
+			}
+			if(!empty($ArrUpdateDeadstokCutting)){
+				$this->db->update_batch('so_cutting_detail',$ArrUpdateDeadstokCutting,'id');
 			}
 
 			if(!empty($ArrReportFG)){
@@ -2401,6 +2438,126 @@ class Ppic extends CI_Controller {
 		";
 		
 		// echo $sql; exit;
+
+		$data['totalData'] = $this->db->query($sql)->num_rows();
+		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$columns_order_by = array(
+			0 => 'nomor',
+			1 => 'no_ipp',
+			2 => 'no_spk',
+			3 => 'no_so',
+		);
+
+		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$data['query'] = $this->db->query($sql);
+		return $data;
+	}
+
+	//SPOOL SISA CUTTING DEADSTOK
+	public function server_side_request_deadstok_cutting(){
+		$controller			= ucfirst(strtolower($this->uri->segment(1))).'/spool';
+		$Arr_Akses			= getAcccesmenu($controller);
+		$requestData	= $_REQUEST;
+		$fetch			= $this->query_data_request_deadstok_cutting(
+			$requestData['no_ipp'],
+			$requestData['search']['value'],
+			$requestData['order'][0]['column'],
+			$requestData['order'][0]['dir'],
+			$requestData['start'],
+			$requestData['length']
+		);
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data	= array();
+		$urut1  = 1;
+        $urut2  = 0;
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+			
+            $customer = get_name('production','nm_customer','no_ipp', $row['no_ipp']);
+            $project = get_name('production','project','no_ipp', $row['no_ipp']);
+
+			$nestedData 	= array();
+			$nestedData[]	= "<div align='center'>".$nomor."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_ipp']."</div>";
+			$nestedData[]	= "<div align='left'>".$row['no_spk']."</div>";
+			$nestedData[]	= "<div align='center'>".$row['no_so']."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['product_name'].', '.$row['type_std'].' '.$row['resin'])."</div>";
+			$nestedData[]	= "<div align='left'>".strtoupper($row['product_spec'])."</div>";
+			$nestedData[]	= "<div align='right'>".number_format($row['length_split'])."</div>";
+			$nestedData[]	= "<div align='left'>".$customer."</div>";
+			$nestedData[]	= "<div align='left'>".$project."</div>";
+			$nestedData[]	= "<div align='center'><input type='checkbox' name='check5[$nomor]' class='chk_personal' data-nomor='$nomor' value='".$row['id_detail']."' ></div>";
+			
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            	=> intval( $requestData['draw'] ),
+			"recordsTotal"    	=> intval( $totalData ),
+			"recordsFiltered" 	=> intval( $totalFiltered ),
+			"data"            	=> $data
+		);
+
+		echo json_encode($json_data);
+	}
+
+	public function query_data_request_deadstok_cutting($no_ipp, $like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL){
+		$where = "";
+		if($no_ipp <> '0'){
+			$where = " AND b.no_ipp='".str_replace('PRO-','',$no_ipp)."' ";
+		}
+		
+		$sql = "
+			SELECT
+				(@row:=@row+1) AS nomor,
+				a.id AS id_detail,
+				a.id_header,
+				a.length_split,
+				a.cutting_ke,
+				a.spool_drawing,
+				c.id_bq,
+				c.id_deadstok,
+				b.no_ipp,
+				b.no_spk,
+				b.no_so,
+				b.product_name,
+				b.type_std,
+				b.resin,
+				b.product_spec
+			FROM
+				so_cutting_detail a
+				INNER JOIN so_cutting_header c ON a.id_header = c.id
+				INNER JOIN deadstok b ON c.id_deadstok = b.id,
+				(SELECT @row:=0) r
+		    WHERE 1=1 ".$where."
+				AND c.id_deadstok IS NOT NULL
+				AND a.spool_induk IS NULL
+				AND a.kode_delivery IS NULL
+				AND (
+					b.no_ipp LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR b.no_spk LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR b.product_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+					OR b.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+				)
+		";
 
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
