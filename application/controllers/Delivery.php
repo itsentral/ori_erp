@@ -579,7 +579,7 @@ class Delivery extends CI_Controller
 		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
 		$result4 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material', 'product_code' => 'field joint'))->result_array();
-		$result2 	= $this->db->order_by('id', 'asc')->group_by('spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
+		$result2 	= $this->db->order_by('id', 'asc')->group_by(array('spool_induk','kode_spool'))->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
 
 
 		$result_print1 = $this->db
@@ -1571,7 +1571,7 @@ class Delivery extends CI_Controller
 		$result 	= array_merge($result_1,$result_2);
 		$result3 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'so material'))->result_array();
 		$result4 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk' => NULL, 'sts_product' => 'field joint'))->result_array();
-		$result2 	= $this->db->order_by('id', 'asc')->group_by('spool_induk')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
+		$result2 	= $this->db->order_by('id', 'asc')->group_by(array('spool_induk','kode_spool'))->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery, 'spool_induk !=' => NULL))->result_array();
 		$result5 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('sts_product' => 'deadstok','kode_delivery' => $kode_delivery))->result_array();
 		$result6 	= $this->db->order_by('id', 'asc')->get_where('delivery_product_detail', array('sts_product' => 'aksesoris','kode_delivery' => $kode_delivery))->result_array();
 
@@ -2319,13 +2319,16 @@ class Delivery extends CI_Controller
 		$username 		= $this->session->userdata['ORI_User']['username'];
 
 		//INSERT DETAIL
-		$getInsert = $this->db
-			->select('*')
-			->from('delivery_group')
-			->where('kode_delivery', $kode_delivery)
-			->where('delivery_date', $time_update)
-			->get()
-			->result_array();
+		$existing_ids = $this->db->select('id_uniq')->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery))->result_array();
+		$existing_id_list = array_column($existing_ids, 'id_uniq');
+
+		$this->db->select('*');
+		$this->db->from('delivery_group');
+		$this->db->where('kode_delivery', $kode_delivery);
+		if (!empty($existing_id_list)) {
+			$this->db->where_not_in('id', $existing_id_list);
+		}
+		$getInsert = $this->db->get()->result_array();
 		$ArrInsert = [];
 		foreach ($getInsert as $key => $value) {
 			$IMPLODE = explode('.', $value['product_code']);
