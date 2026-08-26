@@ -13926,22 +13926,6 @@ class Produksi extends CI_Controller {
 					}					
 					
 
-<<<<<<< Updated upstream
-				// Insert kredit gudang produksi (per material)
-				$det_Jurnaltes[]  = array(
-				  'nomor'         => '',
-				  'tanggal'       => $tgl_voucher,
-				  'tipe'          => 'JV',
-				  'no_perkiraan'  => $nokir,
-				  'keterangan'    => $keterangan,
-				  'no_reff'       => $id.$noso,
-				  'debet'         => 0,
-				  'kredit'        => $kredit,
-				  'jenis_jurnal'  => 'produksi wip deadstock',
-				  'no_request'    => $no_request,
-				  'stspos'		  =>1
-				 );
-=======
 				$debit  = $totalwip;			
 				
 				if($totalwip != 0 ){
@@ -13980,7 +13964,6 @@ class Produksi extends CI_Controller {
 						);
 				}
 				$this->db->query("UPDATE data_erp_wip SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
->>>>>>> Stashed changes
 				
 			}
 
