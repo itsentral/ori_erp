@@ -504,6 +504,13 @@ class Qc_deadstok extends CI_Controller
 					$noso_fg = ','.$fg_val['no_so'];
 					$keterangan_fg = 'FG Deadstok to FG SO,'.$fg_val['product'].','.$fg_val['no_spk'].','.$fg_val['no_so'];
 
+					// Tentukan COA WIP berdasarkan product type
+					if($fg_val['product'] == 'pipe'){
+						$coa_wip_kredit = '1103-03-02';
+					} else {
+						$coa_wip_kredit = '1103-03-03';
+					}
+
 					$rowFg = $this->db->query("SELECT id FROM data_erp_fg WHERE kode_trans ='".$fg_val['kode_trans']."' AND no_spk='".$fg_val['no_spk']."' AND id_trans='".$fg_val['id_trans'] ."' AND id_pro_det='".$fg_val['id_pro_det'] ."' AND tanggal ='".$fg_val['tanggal']."' AND jenis='in deadstok modif'")->row();
 
 					$det_jurnal_fg_so[] = array(
@@ -526,7 +533,7 @@ class Qc_deadstok extends CI_Controller
 						'nomor'         => '',
 						'tanggal'       => $tgl_voucher_fg,
 						'tipe'          => 'JV',
-						'no_perkiraan'  => '1103-04-02',
+						'no_perkiraan'  => $coa_wip_kredit,
 						'keterangan'    => $keterangan_fg,
 						'no_reff'       => $id_fg.$noso_fg,
 						'debet'         => 0,
