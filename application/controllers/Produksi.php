@@ -13928,24 +13928,11 @@ class Produksi extends CI_Controller {
 
 				$debit  = $totalwip;			
 				
-				if($totalwip != 0 ){
-						$det_Jurnaltes[]  = array(
-						'nomor'         => '',
-						'tanggal'       => $tgl_voucher,
-						'tipe'          => 'JV',
-						'no_perkiraan'  => $nokirwip,
-						'keterangan'    => $keterangan,
-						'no_reff'       => $id.$noso,
-						'debet'         => $totalwip,
-						'kredit'        => 0,
-						'jenis_jurnal'  => 'produksi wip deadstock',
-						'no_request'    => $no_request,
-						'stspos'		  =>1,
-						'id_trans_stok' => $data->id,
-						'reff_trans_stok'=>$noReffTrans,	
-						);
+				// Skip row yang total_price = 0 dan total_price_debet > 0 (row FG deadstock, akan dihandle terpisah via 1103-04-02)
+				if($totalwip != 0 && $kredit == 0){
+						// Row ini adalah FG deadstock value, tidak perlu insert jurnal kredit (sudah dihandle COA 1103-04-02)
 					
-				}else{
+				}else if($kredit > 0){
 								
 					$det_Jurnaltes[]  = array(
 						'nomor'         => '',
@@ -13953,7 +13940,7 @@ class Produksi extends CI_Controller {
 						'tipe'          => 'JV',
 						'no_perkiraan'  => $nokir,
 						'keterangan'    => $keterangan,
-						'no_reff'       => $id,
+						'no_reff'       => $id.$noso,
 						'debet'         => 0,
 						'kredit'        => $kredit,
 						'jenis_jurnal'  => 'produksi wip deadstock',
