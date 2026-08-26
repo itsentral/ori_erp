@@ -101,9 +101,9 @@
 						<input type="hidden" id="data_so_<?=$numb5?>" name="data1[<?=$numb5?>][no_so]" value="<?=get_nomor_so($valx['no_ipp'])?>">
 						<input type="hidden" id="data_idmilik_<?=$numb5?>" name="data1[<?=$numb5?>][id_milik]" value="<?=$valx['id_milik']?>">
 						<input type="hidden" id="data_cogs_<?=$numb5?>" name="data1[<?=$numb5?>][cogs]" value="<?=$valx['cogs']?>">
+						<input type="hidden" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>">
 					</td>
 					<td><input type="text" class="form-control input-sm" id="material_name1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][material_name1]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
-					<td><input type="text" class="form-control input-sm" id="product_cust<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_cust]" value="<?=strtoupper(str_replace('"','',$valx['id_milik'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 					<td><input type="text" class="form-control input-sm" id="product_desc<?= $numb5;?>" name="data1[<?=$numb5 ?>][product_desc]" value="<?=strtoupper(str_replace('"','',$valx['id_product'])); ?>" readonly title='<?=get_nomor_so($valx['no_ipp']);?>' tabindex="-1"></td>
 					<td><input type="text" class="form-control input-sm text-right" id="diameter_1_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_1]" value="<?=0; ?>" readonly  tabindex="-1"></td>
 					<td><input type="text" class="form-control input-sm text-right" id="diameter_2_<?= $numb5;?>" name="data1[<?=$numb5 ?>][diameter_2]" value="<?=0; ?>" readonly  tabindex="-1"></td>
