@@ -2637,11 +2637,12 @@ class Ppic extends CI_Controller {
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
+		$noReffTrans = getReffTranStok('101');
 		
 		
 	        $idtrans = str_replace('-','',$kode);
 
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
+			$wip = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_wip as finishgood  FROM data_erp_wip_group WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='in spool'")->result();
 			
 			$totalwip =0;
 			  
@@ -2689,29 +2690,18 @@ class Ppic extends CI_Controller {
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
-					 ); 			
+					 ); 	 
+					 
+					$this->db->query("UPDATE data_erp_wip_group SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");		
 				
 			}
 			
 		   
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty,id_pro_det,nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
-
-			// Ambil daftar id deadstok & deadstok_modif yang ada di spool ini
-			$deadstok_ids = [];
-			$getDeadstokSpool = $this->db->get_where('deadstok', array('spool_induk'=>$kode));
-			if($getDeadstokSpool->num_rows() > 0){
-				foreach($getDeadstokSpool->result() as $rowDead){
-					$deadstok_ids[] = $rowDead->id;
-				}
-			}
-			$getDeadstokModifSpool = $this->db->get_where('deadstok_modif', array('spool_induk'=>$kode));
-			if($getDeadstokModifSpool->num_rows() > 0){
-				foreach($getDeadstokModifSpool->result() as $rowDeadModif){
-					$deadstok_ids[] = $rowDeadModif->id_deadstok;
-				}
-			}
+			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty,nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_spool ='".$kode."' AND tanggal ='".$Date."' AND jenis='out spool'")->result();
 			
 			
 			  $qty_n =0;
@@ -2762,11 +2752,13 @@ class Ppic extends CI_Controller {
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'Finishgood Part To WIP',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
 					 ); 	
 					 
-					 
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 
 					$kode_trans = $data->kode_trans;
 					$nospk      = $data->no_spk;
@@ -2803,6 +2795,8 @@ class Ppic extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
@@ -2869,6 +2863,9 @@ class Ppic extends CI_Controller {
 
 						$this->db->insert('warehouse_stock_wip',$datastokwip);
 						}
+			
+			
+			updateKonterReff('101');			
 		  
 		}
 

@@ -450,9 +450,10 @@ class Qc_pipe_cutting extends CI_Controller {
 		
 		
 	        $idtrans = $idprodet;
+			$noReffTrans = getReffTranStok('101');
 
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
+			$fg = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,id_trans,kode_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_pro_det ='".$idtrans."' AND tanggal ='".$Date."' AND jenis LIKE 'in cutting%'")->result();
 			
 			$totalfg =0;
 			  
@@ -500,8 +501,9 @@ class Qc_pipe_cutting extends CI_Controller {
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP to Finish Good (Cutting)',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
-					  
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,					  
 					 ); 	
 					 
 					  $det_Jurnaltes[]  = array(
@@ -515,7 +517,9 @@ class Qc_pipe_cutting extends CI_Controller {
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'WIP to Finish Good (Cutting)',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,		
 					  
 					 ); 		
 
@@ -525,7 +529,10 @@ class Qc_pipe_cutting extends CI_Controller {
 					$qty        = $data->qty;
 
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
-			  		 $qty_n++;
+
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
+			  		
+					$qty_n++;
 				
 			}
 
@@ -556,7 +563,9 @@ class Qc_pipe_cutting extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
-					);
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
+				);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
@@ -643,8 +652,9 @@ class Qc_pipe_cutting extends CI_Controller {
 			}
 
 			
+			
 		//}
-		  
+		updateKonterReff('101');
 	}
 
 }

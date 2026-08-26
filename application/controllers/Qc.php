@@ -4356,11 +4356,11 @@ class Qc extends CI_Controller
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
-		
+		$noReffTrans 	= getReffTranStok('101');
 		
 	
 		   
-			$wip = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND created_date='".$datetime."'")->result();
+			$wip = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,kode_trans,id_trans,qty, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND created_date='".$datetime."'")->result();
 			
 			$totalfg =0;
 			  
@@ -4422,7 +4422,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,		
 					  
 					 );
 					  $det_Jurnaltes[]  = array(
@@ -4436,7 +4438,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					  
 					 );
 					  $det_Jurnaltes[]  = array(
@@ -4450,7 +4454,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					  
 					 );
 					 $det_Jurnaltes[]  = array(
@@ -4464,7 +4470,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					  
 					 );
 					 $det_Jurnaltes[]  = array(
@@ -4478,7 +4486,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					  
 					 );
 					 
@@ -4496,7 +4506,9 @@ class Qc extends CI_Controller
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					 );
 					 
 					 
@@ -4512,7 +4524,9 @@ class Qc extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,
 					  
 					 );
 					 
@@ -4527,7 +4541,9 @@ class Qc extends CI_Controller
 					  'kredit'        => $cogs,
 					  'jenis_jurnal'  => 'WIP-Finishgood',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok'  => $data->id,
+					  'reff_trans_stok'=> $noReffTrans,
 					 );
 					  
 					 $kode_trans = $data->kode_trans;
@@ -4535,6 +4551,9 @@ class Qc extends CI_Controller
 					 $qty        = $data->qty;
 				
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
+
 			   $qty_n++;
 			}
 			
@@ -4565,6 +4584,8 @@ class Qc extends CI_Controller
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
@@ -4624,7 +4645,7 @@ class Qc extends CI_Controller
 			if(!empty($cekstok)){
             foreach ($stokwip as $vals) {
 			$qty = 	$vals->total;
-            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n  WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
+            $this->db->query("UPDATE  warehouse_stock_fg SET qty = qty+$qty_n WHERE no_so ='".$so."' AND kode_trans ='".$kodetrans."'  AND no_spk ='".$spk."' AND product ='".$product."' ");
 			}
 			}else{
 			$datastokfg=array();
@@ -4646,7 +4667,7 @@ class Qc extends CI_Controller
 						'wip_foh' =>  $vals->wip_foh,
 						'created_by' => $vals->created_by,
 						'created_date' => $vals->created_date,
-						'id_trans' => $vals->id_trans,
+						'id_trans' => $vals->id_trans
 						);
 
 			$this->db->insert('warehouse_stock_fg',$datastokfg);
@@ -4654,7 +4675,7 @@ class Qc extends CI_Controller
 			
 		}
 
-
+		updateKonterReff('101');
 		  
 	}
 
@@ -4757,9 +4778,10 @@ function jurnalIntoFG($kode){
 		
 		
 		$idtrans = str_replace('-','',$kode);
+		$noReffTrans = getReffTranStok('101');
 
 		
-		$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
+		$fg = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE id_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in'")->result();
 		
 		$totalfg =0;
 			
@@ -4807,7 +4829,9 @@ function jurnalIntoFG($kode){
 					'kredit'        => 0,
 					'jenis_jurnal'  => 'WIP to Fg Spool tanki',
 					'no_request'    => $no_request,
-					'stspos'		  =>1
+					'stspos'		  =>1,
+					'id_trans_stok' => $data->id,
+					'reff_trans_stok'=>$noReffTrans,	
 					
 					); 	
 					
@@ -4822,7 +4846,9 @@ function jurnalIntoFG($kode){
 					'kredit'        => $finishgood,
 					'jenis_jurnal'  => 'WIP to Fg Spool tanki',
 					'no_request'    => $no_request,
-					'stspos'		  =>1
+					'stspos'		  =>1,
+					'id_trans_stok' => $data->id,
+					'reff_trans_stok'=>$noReffTrans,
 					
 					); 		
 
@@ -4831,6 +4857,8 @@ function jurnalIntoFG($kode){
 				
 
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_spool ='".$kode."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 			   $qty_n++;
 			
 		}
@@ -4862,6 +4890,8 @@ function jurnalIntoFG($kode){
 				'no_reff'		=> $vals['no_reff'],
 				'debet'			=> $vals['debet'],
 				'kredit'		=> $vals['kredit'],
+				'id_trans_stok' => $vals['id_trans_stok'],
+				'reff_trans_stok'=>$vals['reff_trans_stok'],
 				);
 			$this->db->insert(DBACC.'.jurnal',$datadetail);
 		}
@@ -4950,6 +4980,7 @@ function jurnalIntoFG($kode){
 			}
 		
 	    }
+		updateKonterReff('101');
     }
 
 

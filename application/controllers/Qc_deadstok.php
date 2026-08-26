@@ -402,6 +402,7 @@ class Qc_deadstok extends CI_Controller
 		$kode			= $data['kode'];
 		$dateTime 		= date('Y-m-d H:i:s');
 		$username 		= $data_session['ORI_User']['username'];
+		$noReffTrans 	= getReffTranStok('101');
 
 		$ArrFlagRelease = [
 			'qc_by' => $username,
@@ -503,6 +504,8 @@ class Qc_deadstok extends CI_Controller
 					$noso_fg = ','.$fg_val['no_so'];
 					$keterangan_fg = 'FG Deadstok to FG SO,'.$fg_val['product'].','.$fg_val['no_spk'].','.$fg_val['no_so'];
 
+					$rowFg = $this->db->query("SELECT id FROM data_erp_fg WHERE kode_trans ='".$fg_val['kode_trans']."' AND no_spk='".$fg_val['no_spk']."' AND id_trans='".$fg_val['id_trans'] ."' AND id_pro_det='".$fg_val['id_pro_det'] ."' AND tanggal ='".$fg_val['tanggal']."' AND jenis='in deadstok modif'")->row();
+
 					$det_jurnal_fg_so[] = array(
 						'nomor'         => '',
 						'tanggal'       => $tgl_voucher_fg,
@@ -514,7 +517,9 @@ class Qc_deadstok extends CI_Controller
 						'kredit'        => 0,
 						'jenis_jurnal'  => 'Fg deadstock to Fg SO',
 						'no_request'    => $no_request_fg,
-						'stspos'        => 1
+						'stspos'        => 1,						
+						'id_trans_stok' => $rowFg->id,
+						'reff_trans_stok'=>$noReffTrans,	
 					);
 
 					$det_jurnal_fg_so[] = array(
@@ -528,8 +533,12 @@ class Qc_deadstok extends CI_Controller
 						'kredit'        => $finishgood_val,
 						'jenis_jurnal'  => 'Fg deadstock to Fg SO',
 						'no_request'    => $no_request_fg,
-						'stspos'        => 1
+						'stspos'        => 1,
+						'id_trans_stok' => $rowFg->id,
+						'reff_trans_stok'=>$noReffTrans,	
 					);
+
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$rowFg->id."' ");
 				}
 
 				if(!empty($det_jurnal_fg_so)){
@@ -566,6 +575,8 @@ class Qc_deadstok extends CI_Controller
 							'no_reff'       => $jfg['no_reff'],
 							'debet'         => $jfg['debet'],
 							'kredit'        => $jfg['kredit'],
+							'id_trans_stok' => $jfg['id_trans_stok'],
+							'reff_trans_stok'=>$jfg['reff_trans_stok'],
 						));
 					}
 				}
@@ -584,8 +595,10 @@ class Qc_deadstok extends CI_Controller
 
 			// Jurnal WIP to FG
 			if(!empty($ArrIN_FG_MATERIAL)){
-				$this->jurnalFG($kode_spk);
+				$this->jurnalFG($kode_spk, $noReffTrans);
 			}
+			
+			updateKonterReff('101');
 
 			$Arr_Kembali	= array(
 				'pesan'		=> 'Success process data. Thanks ...',
@@ -719,18 +732,17 @@ class Qc_deadstok extends CI_Controller
 		echo json_encode($Arr_Kembali);
 	}
 
-	function jurnalFG($idtrans){
+	function jurnalFG($idtrans, $noReffTrans=''){
 		
 		$data_session	= $this->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
 		$Date		    = date('Y-m-d'); 
 		
-		
 	        //$idtrans = str_replace('-','',$kode);
 
 			
-			$fg = $this->db->query("SELECT tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in deadstok'")->result();
+			$fg = $this->db->query("SELECT id, tanggal,keterangan,product,no_so,no_spk,id_trans, nilai_wip as wip, material as material, wip_direct as wip_direct, wip_indirect as wip_indirect,  wip_foh as wip_foh, wip_consumable as wip_consumable, nilai_unit as finishgood  FROM data_erp_fg WHERE kode_trans ='".$idtrans."' AND tanggal ='".$Date."' AND jenis='in deadstok'")->result();
 			
 			// print_r($idtrans);
 			// exit;
@@ -781,7 +793,9 @@ class Qc_deadstok extends CI_Controller
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'WIP to Fg deadstock',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
 					 ); 	
 					 
@@ -796,7 +810,9 @@ class Qc_deadstok extends CI_Controller
 					  'kredit'        => $finishgood,
 					  'jenis_jurnal'  => 'WIP to Fg deadstock',
 					  'no_request'    => $no_request,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					  
 					 );
 
@@ -806,6 +822,8 @@ class Qc_deadstok extends CI_Controller
 					$qty        = $data->qty;
 
 					$this->db->query("UPDATE  warehouse_stock_wip SET qty = qty-1  WHERE no_so ='".$noso."' AND kode_trans ='".$kode_trans."'  AND no_spk ='".$nospk."' AND product ='".$nm_material."'");
+
+					$this->db->query("UPDATE data_erp_fg SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 			    $qty_n++;
 				
 			}
@@ -838,6 +856,8 @@ class Qc_deadstok extends CI_Controller
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
@@ -926,6 +946,8 @@ class Qc_deadstok extends CI_Controller
 		
 	    }
 	    } // end if(!empty($det_Jurnaltes))
+
+		
     }
 
 }

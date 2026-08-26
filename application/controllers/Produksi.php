@@ -13590,6 +13590,7 @@ class Produksi extends CI_Controller {
 		$data_session	= $this->session->userdata;
 		$UserName		= $data_session['ORI_User']['username'];
 		$DateTime		= date('Y-m-d H:i:s');
+		$noReffTrans 	= getReffTranStok('101');
 		
 		
 	
@@ -13652,7 +13653,9 @@ class Produksi extends CI_Controller {
 					  'kredit'        => 0,
 					  'jenis_jurnal'  => 'produksi wip',
 					  'no_request'    => $id,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					   );
 					
 				}else{
@@ -13668,9 +13671,13 @@ class Produksi extends CI_Controller {
 					  'kredit'        => $kredit,
 					  'jenis_jurnal'  => 'produksi wip',
 					  'no_request'    => $id,
-					  'stspos'		  =>1
+					  'stspos'		  =>1,
+					  'id_trans_stok' => $data->id,
+					  'reff_trans_stok'=>$noReffTrans,	
 					 );
 				}
+
+				$this->db->query("UPDATE data_erp_wip SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
 				
 			}
 			
@@ -13724,6 +13731,8 @@ class Produksi extends CI_Controller {
 					'kredit'          => $vals['kredit'],
 					'jenis_jurnal'    => $vals['jenis_jurnal'],
 					'no_request'      => $vals['no_request'],
+					'id_trans_stok' 	=> $vals['id_trans_stok'],
+					'reff_trans_stok'	=>$vals['reff_trans_stok'],
 				);
 			}
 			if (!empty($dataGLDetail)) {
@@ -13761,6 +13770,8 @@ class Produksi extends CI_Controller {
 						'no_reff'      => $vals['no_reff'],
 						'debet'        => $vals['debet'],
 						'kredit'       => $vals['kredit'],
+						'id_trans_stok' 	=> $vals['id_trans_stok'],
+						'reff_trans_stok'	=>$vals['reff_trans_stok'],
 					);
 					$db2->insert('jurnal', $datadetail);
 				}
@@ -13855,8 +13866,8 @@ class Produksi extends CI_Controller {
 
 		$this->db->insert('warehouse_stock_wip',$datastokwip);
 		}
-
-
+	
+		updateKonterReff('101');
 		  
 	}
 		
@@ -13868,16 +13879,17 @@ class Produksi extends CI_Controller {
 		$DateTime		= date('Y-m-d H:i:s');
 		
 		
-	
-		    $kodejurnal='JV004';
-		  	
+
+			$kodejurnal='JV004';
+			$noReffTrans = getReffTranStok('101');
+			
 
 			$wip = $this->db->query("SELECT * FROM data_erp_wip WHERE kode_trans like'".$kodespk."%'")->result();
 			$id = $kodespk;
 			$totalwip =0;
 			$wiptotal =0; 
 			$det_Jurnaltes = [];
-			  
+				
 			foreach($wip AS $data){
 				
 				$nm_material = $data->nm_material;	
@@ -13886,7 +13898,7 @@ class Produksi extends CI_Controller {
 				$keterangan  = $data->nm_material;
 				$id          = $data->id_trans;
 				$noso 		 = ','.$data->no_so;
-                $no_request  = $data->no_spk;	
+				$no_request  = $data->no_spk;	
 				$kredit      = $data->total_price;
 				$totalwip       = $data->total_price_debet;	
 				$wiptotal       += $data->total_price;	
@@ -13899,7 +13911,7 @@ class Produksi extends CI_Controller {
 					$nokir = '2107-01-01' ;				
 				}elseif($nm_material=='WIP FOH'){					
 					$nokir = '2107-01-04' ;
-                }
+				}
 				else{
 					$nokir = '1103-01-03' ;
 				}
@@ -13914,6 +13926,7 @@ class Produksi extends CI_Controller {
 					}					
 					
 
+<<<<<<< Updated upstream
 				// Insert kredit gudang produksi (per material)
 				$det_Jurnaltes[]  = array(
 				  'nomor'         => '',
@@ -13928,6 +13941,46 @@ class Produksi extends CI_Controller {
 				  'no_request'    => $no_request,
 				  'stspos'		  =>1
 				 );
+=======
+				$debit  = $totalwip;			
+				
+				if($totalwip != 0 ){
+						$det_Jurnaltes[]  = array(
+						'nomor'         => '',
+						'tanggal'       => $tgl_voucher,
+						'tipe'          => 'JV',
+						'no_perkiraan'  => $nokirwip,
+						'keterangan'    => $keterangan,
+						'no_reff'       => $id.$noso,
+						'debet'         => $totalwip,
+						'kredit'        => 0,
+						'jenis_jurnal'  => 'produksi wip deadstock',
+						'no_request'    => $no_request,
+						'stspos'		  =>1,
+						'id_trans_stok' => $data->id,
+						'reff_trans_stok'=>$noReffTrans,	
+						);
+					
+				}else{
+								
+					$det_Jurnaltes[]  = array(
+						'nomor'         => '',
+						'tanggal'       => $tgl_voucher,
+						'tipe'          => 'JV',
+						'no_perkiraan'  => $nokir,
+						'keterangan'    => $keterangan,
+						'no_reff'       => $id,
+						'debet'         => 0,
+						'kredit'        => $kredit,
+						'jenis_jurnal'  => 'produksi wip deadstock',
+						'no_request'    => $no_request,
+						'stspos'		  =>1,
+						'id_trans_stok' => $data->id,
+						'reff_trans_stok'=>$noReffTrans,	
+						);
+				}
+				$this->db->query("UPDATE data_erp_wip SET reff_trans_stok = '$noReffTrans'  WHERE id ='".$data->id."' ");
+>>>>>>> Stashed changes
 				
 			}
 
@@ -13946,7 +13999,7 @@ class Produksi extends CI_Controller {
 			  'stspos'		  =>1
 			   );
 			
-			       
+					
 				
 			
 			$this->db->query("delete from jurnaltras WHERE jenis_jurnal='produksi wip' and no_reff ='$id'");
@@ -13973,11 +14026,14 @@ class Produksi extends CI_Controller {
 					'no_reff'		=> $vals['no_reff'],
 					'debet'			=> $vals['debet'],
 					'kredit'		=> $vals['kredit'],
+					'id_trans_stok' => $vals['id_trans_stok'],
+					'reff_trans_stok'=>$vals['reff_trans_stok'],
 					);
 				$this->db->insert(DBACC.'.jurnal',$datadetail);
 			}
 			unset($det_Jurnaltes);unset($datadetail);
-			} // end if(!empty($det_Jurnaltes))
-		  
-		}
+		} // end if(!empty($det_Jurnaltes))
+			
+		updateKonterReff('101');
+	}
 }
