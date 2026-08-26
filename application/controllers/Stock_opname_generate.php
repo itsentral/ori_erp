@@ -125,6 +125,9 @@ class Stock_opname_generate extends CI_Controller {
 		$DateTime  = date('Y-m-d H:i:s');
 
 		foreach($data_stok as $row){
+			// Skip gudang 3 (sudah selesai diproses terpisah)
+			if($row['id_gudang'] == '3') continue;
+
 			$mapKey = $row['id_material'].'_'.$row['id_gudang'];
 
 			$qty_stock_prev  = (float)$row['qty_stock'];
@@ -184,6 +187,9 @@ class Stock_opname_generate extends CI_Controller {
 
 		// Cek apakah ada material baru dari transaksi yang belum ada di data sebelumnya
 		foreach($transaksi as $trx){
+			// Skip gudang 3
+			if($trx['id_gudang'] == '3') continue;
+
 			$mapKey = $trx['id_material'].'_'.$trx['id_gudang'];
 			// Cek apakah sudah ada di data_stok
 			$exists = false;
@@ -235,6 +241,9 @@ class Stock_opname_generate extends CI_Controller {
 		$result = $this->stock_opname_generate_model->insert_batch_stock($ArrInsert);
 
 		if($result){
+			// Update harga di tran_warehouse_jurnal_detail untuk semua gudang
+			$this->_update_tran_detail($date_target, $ArrInsert);
+
 			echo json_encode(array(
 				'status' => 1,
 				'pesan'  => 'Berhasil generate '.count($ArrInsert).' data stok opname untuk tanggal '.$date_target,
@@ -244,6 +253,56 @@ class Stock_opname_generate extends CI_Controller {
 				'status' => 0,
 				'pesan'  => 'Gagal menyimpan data. Silakan coba lagi.',
 			));
+		}
+	}
+
+	/**
+	 * Update harga di tran_warehouse_jurnal_detail berdasarkan hasil generate.
+	 * Untuk setiap material yang punya qty > 0 dan total_harga > 0,
+	 * update record terakhir di tran_warehouse_jurnal_detail sampai tanggal target.
+	 * SKIP id_gudang = 3 (sudah selesai diproses terpisah)
+	 */
+	private function _update_tran_detail($date_target, $data_stok){
+		$ArrUpdate = array();
+
+		foreach($data_stok as $row){
+			// Skip gudang 3
+			if($row['id_gudang'] == '3') continue;
+
+			$qty = (float)$row['qty_stock'];
+			$total_harga = (float)$row['total_harga'];
+
+			// Skip jika tidak ada nilai
+			if($qty == 0 && $total_harga == 0) continue;
+
+			$harga_baru = ($qty != 0) ? ($total_harga / $qty) : 0;
+
+			// Cari record terakhir di tran_warehouse_jurnal_detail
+			$sql = "SELECT id, harga, nilai_akhir_rp, qty_stock_akhir 
+					FROM tran_warehouse_jurnal_detail 
+					WHERE id_material = '".$this->db->escape_str($row['id_material'])."'
+					AND id_gudang = '".$this->db->escape_str($row['id_gudang'])."'
+					AND DATE(tgl_trans) <= '".$this->db->escape_str($date_target)."'
+					ORDER BY id DESC LIMIT 1";
+			$rec = $this->db->query($sql)->row();
+
+			if(!empty($rec)){
+				// Update hanya jika nilainya berbeda
+				if(abs((float)$rec->harga - $harga_baru) >= 0.01 || abs((float)$rec->nilai_akhir_rp - $total_harga) >= 1){
+					$ArrUpdate[] = array(
+						'id' => $rec->id,
+						'harga' => $harga_baru,
+						'nilai_akhir_rp' => $total_harga,
+					);
+				}
+			}
+		}
+
+		if(!empty($ArrUpdate)){
+			$chunks = array_chunk($ArrUpdate, 500);
+			foreach($chunks as $chunk){
+				$this->db->update_batch('tran_warehouse_jurnal_detail', $chunk, 'id');
+			}
 		}
 	}
 

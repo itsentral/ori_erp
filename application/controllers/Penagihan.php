@@ -2153,9 +2153,17 @@ if($base_cur=='USD'){
 					}
 					if(!empty($dtListSO_dead)){
 						$dtImplodeSO = "('".implode("','", $dtListSO_dead)."')";
-						$result_data_dead = $this->db->query("SELECT * FROM billing_so WHERE so_number IN ".$dtImplodeSO." ORDER BY id ")->result_array();
-						if(!empty($result_data_dead)){
-							$result_data = array_merge($result_data, $result_data_dead);
+						$get_ipp_from_so = $this->db->query("SELECT no_ipp FROM so_bf_header WHERE so_number IN ".$dtImplodeSO)->result();
+						$dtListIppDead = [];
+						foreach($get_ipp_from_so AS $valx){
+							$dtListIppDead[] = $valx->no_ipp;
+						}
+						if(!empty($dtListIppDead)){
+							$dtImplodeIppDead = "('".implode("','", $dtListIppDead)."')";
+							$result_data_dead = $this->db->query("SELECT * FROM billing_so WHERE no_ipp IN ".$dtImplodeIppDead." ORDER BY id ")->result_array();
+							if(!empty($result_data_dead)){
+								$result_data = array_merge($result_data, $result_data_dead);
+							}
 						}
 					}
 
