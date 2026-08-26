@@ -68,25 +68,6 @@ $this->load->view('include/side_menu');
 			</div>
 		</div>
 		<div class="form-group row">
-			<div class="col-sm-2 text-right" style="line-height:34px;">
-				<label>Gudang</label>
-			</div>
-			<div class="col-sm-10">
-				<select class="form-control" id="id_gudang">
-					<option value="">-- Semua Gudang --</option>
-					<?php
-					if(!empty($list_gudang)){
-						foreach($list_gudang as $gd){
-							$nm_gudang = !empty($gd['nm_gudang']) ? strtoupper($gd['nm_gudang']) : '-';
-							$category = !empty($gd['category']) ? strtoupper($gd['category']) : '';
-							echo "<option value='".$gd['id_gudang']."'>".$gd['id_gudang']." - ".$nm_gudang." (".$category.")</option>";
-						}
-					}
-					?>
-				</select>
-			</div>
-		</div>
-		<div class="form-group row">
 			<div class="col-sm-2"></div>
 			<div class="col-sm-10">
 				<button type="button" class="btn btn-md btn-primary" id="btn_tampilkan"><i class="fa fa-search"></i> Tampilkan</button>
@@ -97,7 +78,7 @@ $this->load->view('include/side_menu');
 		<div class="form-group row">
 			<div class="col-sm-12">
 				<div class="text-center" id="title_periode" style="margin-bottom:10px;">
-					<strong>LAPORAN LEDGER MATERIAL</strong><br>
+					<strong>LAPORAN LEDGER PRODUKSI</strong><br>
 					<strong>Periode : <?php echo date('F Y'); ?></strong>
 				</div>
 				<div class="table-responsive">
@@ -134,16 +115,15 @@ $(document).ready(function(){
 	$('#btn_tampilkan').on('click', function(){
 		var bulan = $('#bulan').val();
 		var tahun = $('#tahun').val();
-		var id_gudang = $('#id_gudang').val();
 		var bulanInt = parseInt(bulan);
 
-		$('#title_periode').html('<strong>LAPORAN LEDGER MATERIAL</strong><br><strong>Periode : '+Arr_Bulan[bulanInt]+' '+tahun+'</strong>');
+		$('#title_periode').html('<strong>LAPORAN LEDGER PRODUKSI</strong><br><strong>Periode : '+Arr_Bulan[bulanInt]+' '+tahun+'</strong>');
 		$('#tbody_ledger').html('<tr><td colspan="11" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
 
 		$.ajax({
-			url: '<?php echo site_url("Ledger_material/get_data_json"); ?>',
+			url: '<?php echo site_url("Ledger_produksi/get_data_json"); ?>',
 			type: 'GET',
-			data: { bulan: bulan, tahun: tahun, id_gudang: id_gudang },
+			data: { bulan: bulan, tahun: tahun },
 			dataType: 'json',
 			success: function(response){
 				var html = '';
@@ -201,8 +181,7 @@ $(document).ready(function(){
 	$('#btn_download_excel').on('click', function(){
 		var bulan = $('#bulan').val();
 		var tahun = $('#tahun').val();
-		var id_gudang = $('#id_gudang').val();
-		window.location.href = '<?php echo site_url("Ledger_material/excel_ledger_material"); ?>/'+bulan+'/'+tahun+'/'+id_gudang;
+		window.location.href = '<?php echo site_url("Ledger_produksi/excel_ledger_produksi"); ?>/'+bulan+'/'+tahun;
 	});
 
 	function formatNumber(num){

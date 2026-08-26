@@ -1078,9 +1078,14 @@ class Warehouse_model extends CI_Model {
 							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $hutang), 'kredit' => ($rec->posisi == 'D' ? 0 : $hutang), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $hutang_kurs), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $hutang_kurs), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
 						);
 						$unbill_nilai=$hutang;
+					} else {
+						// PO tanpa DP atau DP sudah habis, seluruh total_rupiah jadi hutang unbill
+						$det_Jurnaltes1[] = array(
+							'nomor' => $nomor_jurnal, 'tanggal' => $payment_date, 'tipe' => 'JV', 'no_perkiraan' => $coa_hutang_unbill, 'keterangan' => 'Hutang ' . $no_po, 'no_request' => $no_po, 'debet' => ($rec->posisi == 'K' ? 0 : $total_rupiah), 'kredit' => ($rec->posisi == 'D' ? 0 : $total_rupiah), 'nilai_valas_debet' => ($rec->posisi == 'K' ? 0 : $total_forex), 'nilai_valas_kredit' => ($rec->posisi == 'D' ? 0 : $total_forex), 'no_reff' => $kode_trans, 'jenis_jurnal' => $jenis_jurnal, 'nocust' => $data_po->id_supplier, 'stspos' => "1", 'id_material' =>''
+						);
 					}
 					$unbill_coa=$rec->no_perkiraan;
-					if($hutang > 0) $unbill_nilai=$total_rupiah;
+					$unbill_nilai=$total_rupiah;
 				}
 				if ($rec->parameter_no == "4") {
 					$det_Jurnaltes1[] = array(

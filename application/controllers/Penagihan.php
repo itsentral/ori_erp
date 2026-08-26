@@ -2130,14 +2130,45 @@ if($base_cur=='USD'){
 					$updDeliveryHeader="update delivery_product set st_cogs='1' WHERE kode_delivery IN ".$dtImplode." ";
 					$dtdelivery_no=$dtImplode2;
 					$dtdelivery_no1=$dtImplode;
-					$getipp 	= $this->db->query("SELECT replace(id_produksi,'PRO-','') id_produksi FROM delivery_product_detail WHERE kode_delivery IN ".$dtImplode." group BY id_produksi")->result();
+
+					// Jalur 1: ambil id_produksi yang NOT NULL (delivery biasa)
+					$getipp 	= $this->db->query("SELECT replace(id_produksi,'PRO-','') id_produksi FROM delivery_product_detail WHERE kode_delivery IN ".$dtImplode." AND id_produksi IS NOT NULL group BY id_produksi")->result();
 					$dtListipp = [];
 					foreach($getipp AS $val => $valx ){
 						$dtListipp[]=$valx->id_produksi;
 					}
-					$dtImplode	= "('".implode("','", $dtListipp)."')";
-					$result_data 	= $this->db->query("SELECT * FROM billing_so WHERE no_ipp IN ".$dtImplode." ORDER BY id ")->result_array();
-					
+
+					// Jalur 2: ambil product_code (so_number) dari cut deadstock yang id_produksi NULL
+					$getipp_dead = $this->db->query("SELECT product_code FROM delivery_product_detail WHERE kode_delivery IN ".$dtImplode." AND id_produksi IS NULL AND sts_product = 'cut deadstock' GROUP BY product_code")->result();
+					$dtListSO_dead = [];
+					foreach($getipp_dead AS $val => $valx ){
+						$dtListSO_dead[] = $valx->product_code;
+					}
+
+					// Gabungkan: cari billing_so via no_ipp (jalur 1) dan via so_number (jalur 2)
+					$result_data = [];
+					if(!empty($dtListipp)){
+						$dtImplodeIpp = "('".implode("','", $dtListipp)."')";
+						$result_data = $this->db->query("SELECT * FROM billing_so WHERE no_ipp IN ".$dtImplodeIpp." ORDER BY id ")->result_array();
+					}
+					if(!empty($dtListSO_dead)){
+						$dtImplodeSO = "('".implode("','", $dtListSO_dead)."')";
+						$result_data_dead = $this->db->query("SELECT * FROM billing_so WHERE so_number IN ".$dtImplodeSO." ORDER BY id ")->result_array();
+						if(!empty($result_data_dead)){
+							$result_data = array_merge($result_data, $result_data_dead);
+						}
+					}
+
+					// Remove duplicates by id
+					$seen_ids = [];
+					$result_data_unique = [];
+					foreach($result_data as $rd){
+						if(!in_array($rd['id'], $seen_ids)){
+							$seen_ids[] = $rd['id'];
+							$result_data_unique[] = $rd;
+						}
+					}
+					$result_data = $result_data_unique;
 					
 					$dtListIDipp = [];
 					foreach($result_data AS $val => $valx ){
@@ -2446,20 +2477,43 @@ else{
 		$sql = "
 				SELECT
 					(@row:=@row+1) AS nomor,
-					a.id, c.so_number,c.no_po no_pox,c.project,c.nm_customer customer,a.kode_delivery , c.no_ipp
-				FROM
-					delivery_product a
-					LEFT JOIN delivery_product_detail b ON a.kode_delivery=b.kode_delivery
-					left join (select m.no_ipp, so_number, no_po, project, id_customer, nm_customer from table_sales_order m LEFT JOIN so_bf_header n ON m.no_ipp=n.no_ipp) c on replace(b.id_produksi,'PRO-','')=c.no_ipp,
-					(SELECT @row:=0) r
-				WHERE b.sts_invoice=0
-					AND b.posisi = 'CUSTOMER'
-					AND (
-						 c.no_po like '%".$no_po."%'
-						)
-				GROUP BY
-					a.kode_delivery,c.so_number,c.no_po,c.project,c.nm_customer
-		";		//c.id_customer='".$customer."' and
+					combined.*
+				FROM (
+					SELECT
+						a.id, c.so_number,c.no_po no_pox,c.project,c.nm_customer customer,a.kode_delivery , c.no_ipp
+					FROM
+						delivery_product a
+						LEFT JOIN delivery_product_detail b ON a.kode_delivery=b.kode_delivery
+						left join (select m.no_ipp, so_number, no_po, project, id_customer, nm_customer from table_sales_order m LEFT JOIN so_bf_header n ON m.no_ipp=n.no_ipp) c on replace(b.id_produksi,'PRO-','')=c.no_ipp
+					WHERE b.sts_invoice=0
+						AND b.posisi = 'CUSTOMER'
+						AND b.id_produksi IS NOT NULL
+						AND (
+							 c.no_po like '%".$this->db->escape_like_str($no_po)."%'
+							)
+					GROUP BY
+						a.kode_delivery,c.so_number,c.no_po,c.project,c.nm_customer
+
+					UNION
+
+					SELECT
+						a.id, COALESCE(c.so_number, b.product_code) AS so_number, c.no_po AS no_pox, c.project, c.nm_customer AS customer, a.kode_delivery, c.no_ipp
+					FROM
+						delivery_product a
+						LEFT JOIN delivery_product_detail b ON a.kode_delivery=b.kode_delivery
+						LEFT JOIN (select m.no_ipp, so_number, no_po, project, id_customer, nm_customer from table_sales_order m LEFT JOIN so_bf_header n ON m.no_ipp=n.no_ipp) c ON b.product_code = c.so_number
+					WHERE b.sts_invoice=0
+						AND b.posisi = 'CUSTOMER'
+						AND b.id_produksi IS NULL
+						AND b.sts_product = 'cut deadstock'
+						AND (
+							c.no_po like '%".$this->db->escape_like_str($no_po)."%'
+							OR b.product_code LIKE '%".$this->db->escape_like_str($no_po)."%'
+							)
+					GROUP BY
+						a.kode_delivery,c.so_number,c.no_po,c.project,c.nm_customer
+				) AS combined, (SELECT @row:=0) r
+		";
 }
 		$data['totalData'] = $this->db->query($sql)->num_rows();
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
@@ -6911,13 +6965,12 @@ else
 			}
 			
 //loose_dead	
-			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, b.id_milik, b.id_product, b.id_produksi from delivery_product_detail a join production_detail b on a.id_milik=b.id_deadstok_dipakai where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by b.id_milik, b.id_product, b.id_produksi ";
+			$sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead' group by a.id_milik, a.product, a.id_produksi ";
 			$delivery_loose	= $this->db->query($sql)->result_array();
 			if(!empty($delivery_loose)){
 				foreach ($delivery_loose as $keys=>$vals){
 					$this->db->query("insert into penagihan_product_temp (id_penagihan,id_milik,no_ipp,qty,sts_do,cogs,id_product) VALUES ('".$id."','".$vals['id_milik']."','".str_ireplace("PRO-","",$vals['id_produksi'])."','".$vals['qty']."','loose_dead','".$vals['cogs']."','".$vals['id_product']."') ");
 				}
-				
 			}
 		
 			// $sql="select count(a.id_uniq) as qty, sum(a.nilai_cogs) as cogs, a.id_milik, a.product as id_product, a.id_produksi from delivery_product_detail a where a.kode_delivery in ('".$kode_delivery."') and a.sts='loose_dead_modif' ";
@@ -6958,6 +7011,11 @@ else
 			$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, c.qty as qty_delivery, c.cogs, c.sts_do from billing_so_product a join so_bf_detail_header b on a.id_milik=b.id_milik join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp,x.id_product, CONCAT('BQ-',x.no_ipp) as id_bq, x.id_penagihan, y.id_milik, x.sts_do	from penagihan_product_temp x join so_detail_header y on x.id_milik=y.id WHERE
 			x.id_penagihan='".$id."' group by x.no_ipp,x.id_product,y.id_milik) c on b.id=c.id_milik and b.id_bq=c.id_bq and a.no_ipp=c.no_ipp")->result_array();
 			
+//fallback for deadstok - langsung dari billing_so_product via no_ipp karena id_milik tidak nyambung ke so_detail_header
+			if(empty($getDetail)){
+				$getDetail	= $this->db->query("select a.*, a.qty as qty_total, (a.qty-a.qty_inv) as qty_inv, IFNULL(c.qty,0) as qty_delivery, IFNULL(c.cogs,0) as cogs, c.sts_do from billing_so_product a left join ( select sum(x.qty) as qty, sum(x.cogs) as cogs, x.no_ipp, x.id_product, x.id_penagihan, x.sts_do from penagihan_product_temp x where x.id_penagihan='".$id."' group by x.no_ipp,x.id_product) c on a.no_ipp=c.no_ipp where a.no_ipp in ('".$noipp."')")->result_array();
+			}
+
 			$getDetailcut	= $this->db->query("select a.* FROM penagihan_product_temp a WHERE a.sts_do='cut non produksi' AND a.id_penagihan='".$id."'")->result_array();
 			
 			$getidmilik   = $this->db->query("SELECT sum(x.qty) AS qty,sum(x.cogs) AS cogs, x.no_ipp, x.id_product, CONCAT('BQ-', x.no_ipp) AS id_bq, x.id_penagihan, y.id_milik,  x.sts_do  FROM  penagihan_product_temp x JOIN so_detail_header y ON x.id_milik = y.id WHERE x.id_penagihan='".$id."' AND y.id_milik IS NULL  GROUP BY x.no_ipp, x.id_product, y.id_milik")->result_array();

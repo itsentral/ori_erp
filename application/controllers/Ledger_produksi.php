@@ -1,12 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Ledger_material extends CI_Controller {
+class Ledger_produksi extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('master_model');
-		$this->load->model('Ledger_material_model');
+		$this->load->model('Ledger_produksi_model');
 		if(!$this->session->userdata('isORIlogin')){
 			redirect('login');
 		}
@@ -22,38 +22,31 @@ class Ledger_material extends CI_Controller {
 		}
 
 		$menu_akses		= $this->master_model->getMenu();
-		$list_gudang	= $this->Ledger_material_model->get_list_gudang();
 		$data = array(
-			'title'			=> 'Laporan Ledger Material',
+			'title'			=> 'Laporan Ledger Produksi',
 			'action'		=> 'index',
 			'data_menu'		=> $menu_akses,
-			'list_gudang'	=> $list_gudang,
 			'akses_menu'	=> $Arr_Akses
 		);
 
-		$this->load->view('Report_new/Ledger_material/index', $data);
+		$this->load->view('Report_new/Ledger_produksi/index', $data);
 	}
 
 	public function get_data_json(){
-		$controller		= ucfirst(strtolower($this->uri->segment(1)));
-		$Arr_Akses		= getAcccesmenu($controller);
-
 		$bulan		= $this->input->get('bulan') ? $this->input->get('bulan') : date('m');
 		$tahun		= $this->input->get('tahun') ? $this->input->get('tahun') : date('Y');
-		$id_gudang	= $this->input->get('id_gudang') ? $this->input->get('id_gudang') : '';
 
-		$fetch = $this->Ledger_material_model->get_ledger_data($bulan, $tahun, $id_gudang);
+		$fetch = $this->Ledger_produksi_model->get_ledger_data($bulan, $tahun);
 
 		echo json_encode($fetch);
 	}
 
-	public function excel_ledger_material(){
+	public function excel_ledger_produksi(){
 		set_time_limit(0);
 		ini_set('memory_limit','1024M');
 
 		$bulan		= $this->uri->segment(3);
 		$tahun		= $this->uri->segment(4);
-		$id_gudang	= $this->uri->segment(5);
 
 		$this->load->library("PHPExcel");
 		$objPHPExcel = new PHPExcel();
@@ -70,16 +63,16 @@ class Ledger_material extends CI_Controller {
 		$Arr_Bulan = array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
 		$sheet = $objPHPExcel->getActiveSheet();
 
-		$fetch = $this->Ledger_material_model->get_ledger_data($bulan, $tahun, $id_gudang);
+		$fetch = $this->Ledger_produksi_model->get_ledger_data($bulan, $tahun);
 
 		$Row = 1;
 		$Col_Akhir = getColsChar(11);
-		$sheet->setCellValue('A'.$Row, 'LAPORAN LEDGER MATERIAL');
+		$sheet->setCellValue('A'.$Row, 'LAPORAN LEDGER PRODUKSI');
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$Row)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$Row);
 
 		$Row++;
-		$sheet->setCellValue('A'.$Row, 'Periode : '.$Arr_Bulan[(int)$bulan].' '.$tahun.' | Gudang : '.$id_gudang);
+		$sheet->setCellValue('A'.$Row, 'Periode : '.$Arr_Bulan[(int)$bulan].' '.$tahun);
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$Row)->applyFromArray($mainTitle);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$Row);
 
@@ -155,9 +148,9 @@ class Ledger_material extends CI_Controller {
 			$Row++;
 		}
 
-		$objPHPExcel->getActiveSheet()->setTitle('Ledger Material');
+		$objPHPExcel->getActiveSheet()->setTitle('Ledger Produksi');
 		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="Ledger_Material_'.$Arr_Bulan[(int)$bulan].'_'.$tahun.'.xlsx"');
+		header('Content-Disposition: attachment;filename="Ledger_Produksi_'.$Arr_Bulan[(int)$bulan].'_'.$tahun.'.xlsx"');
 		header('Cache-Control: max-age=0');
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		$objWriter->save('php://output');

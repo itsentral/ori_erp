@@ -5691,10 +5691,16 @@ class Delivery extends CI_Controller
 		$ArrGroupOutAksesoris = [];
 		$ArrayDeliveryAksesoris = $this->db->get_where('delivery_product_detail',array('kode_delivery'=>$kode_delivery,'sts_product'=>'aksesoris'))->result_array();
 		if(!empty($ArrayDeliveryAksesoris)){
+			// Track kode_req yang sudah diproses untuk mencegah duplikasi
+			$processedKodeReq = [];
 			foreach ($ArrayDeliveryAksesoris as $value => $valx) {
 				// Cari data di data_erp_fg berdasarkan no_spk (kode request) dari request_accessories
 				$getReqAcc = $this->db->get_where('request_accessories',array('id'=>$valx['id_uniq']))->result();
 				$kode_req = (!empty($getReqAcc[0]->kode))?$getReqAcc[0]->kode:'';
+
+				// Skip jika kode_req ini sudah pernah diproses
+				if(in_array($kode_req, $processedKodeReq)) continue;
+				$processedKodeReq[] = $kode_req;
 
 				$getSummary = $this->db->select('*')->order_by('id','desc')->get_where('data_erp_fg',array('no_spk'=>$kode_req,'keterangan'=>'Consumable to Finish Good'))->result_array();
 

@@ -72,18 +72,7 @@ $this->load->view('include/side_menu');
 				<label>Gudang</label>
 			</div>
 			<div class="col-sm-10">
-				<select class="form-control" id="id_gudang">
-					<option value="">-- Semua Gudang --</option>
-					<?php
-					if(!empty($list_gudang)){
-						foreach($list_gudang as $gd){
-							$nm_gudang = !empty($gd['nm_gudang']) ? strtoupper($gd['nm_gudang']) : '-';
-							$category = !empty($gd['category']) ? strtoupper($gd['category']) : '';
-							echo "<option value='".$gd['id_gudang']."'>".$gd['id_gudang']." - ".$nm_gudang." (".$category.")</option>";
-						}
-					}
-					?>
-				</select>
+				<input type="text" class="form-control" value="INDIRECT (ID: 10)" disabled>
 			</div>
 		</div>
 		<div class="form-group row">
@@ -97,17 +86,15 @@ $this->load->view('include/side_menu');
 		<div class="form-group row">
 			<div class="col-sm-12">
 				<div class="text-center" id="title_periode" style="margin-bottom:10px;">
-					<strong>LAPORAN LEDGER MATERIAL</strong><br>
+					<strong>LAPORAN LEDGER INDIRECT</strong><br>
 					<strong>Periode : <?php echo date('F Y'); ?></strong>
 				</div>
 				<div class="table-responsive">
 					<table class="table table-bordered table-ledger" id="tbl_ledger" width="100%">
 						<thead>
 							<tr class="bg-blue">
-								<th>ID Material</th>
 								<th>Material</th>
 								<th>Kategori</th>
-								<th>Qty</th>
 								<th>Tanggal</th>
 								<th>Kode Trans</th>
 								<th>Keterangan</th>
@@ -118,7 +105,7 @@ $this->load->view('include/side_menu');
 							</tr>
 						</thead>
 						<tbody id="tbody_ledger">
-							<tr><td colspan="11" class="text-center">Silahkan pilih periode lalu klik Tampilkan</td></tr>
+							<tr><td colspan="9" class="text-center">Silahkan pilih periode lalu klik Tampilkan</td></tr>
 						</tbody>
 					</table>
 				</div>
@@ -134,16 +121,15 @@ $(document).ready(function(){
 	$('#btn_tampilkan').on('click', function(){
 		var bulan = $('#bulan').val();
 		var tahun = $('#tahun').val();
-		var id_gudang = $('#id_gudang').val();
 		var bulanInt = parseInt(bulan);
 
-		$('#title_periode').html('<strong>LAPORAN LEDGER MATERIAL</strong><br><strong>Periode : '+Arr_Bulan[bulanInt]+' '+tahun+'</strong>');
-		$('#tbody_ledger').html('<tr><td colspan="11" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+		$('#title_periode').html('<strong>LAPORAN LEDGER INDIRECT</strong><br><strong>Periode : '+Arr_Bulan[bulanInt]+' '+tahun+'</strong>');
+		$('#tbody_ledger').html('<tr><td colspan="9" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
 
 		$.ajax({
-			url: '<?php echo site_url("Ledger_material/get_data_json"); ?>',
+			url: '<?php echo site_url("Ledger_indirect/get_data_json"); ?>',
 			type: 'GET',
-			data: { bulan: bulan, tahun: tahun, id_gudang: id_gudang },
+			data: { bulan: bulan, tahun: tahun },
 			dataType: 'json',
 			success: function(response){
 				var html = '';
@@ -151,7 +137,7 @@ $(document).ready(function(){
 					// Row saldo awal
 					if(response.saldo_awal && response.saldo_awal != 0){
 						html += '<tr class="row-header">';
-						html += '<td colspan="7">SALDO AWAL</td>';
+						html += '<td colspan="5">SALDO AWAL</td>';
 						html += '<td class="text-right">0</td>';
 						html += '<td class="text-right">0</td>';
 						html += '<td class="text-right">0</td>';
@@ -167,10 +153,8 @@ $(document).ready(function(){
 						totalOut += parseFloat(det.out) || 0;
 						lastSaldo = parseFloat(det.saldo) || 0;
 						html += '<tr>';
-						html += '<td>'+det.id_material+'</td>';
 						html += '<td>'+det.nm_material+'</td>';
 						html += '<td>'+det.nm_category+'</td>';
-						html += '<td class="text-right">'+formatNumber(det.qty)+'</td>';
 						html += '<td class="text-center">'+det.tanggal+'</td>';
 						html += '<td>'+det.kode_trans+'</td>';
 						html += '<td>'+det.keterangan+'</td>';
@@ -182,18 +166,18 @@ $(document).ready(function(){
 					});
 					// Total row
 					html += '<tr class="row-header">';
-					html += '<td colspan="8" class="text-right"><strong>TOTAL</strong></td>';
+					html += '<td colspan="6" class="text-right"><strong>TOTAL</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalIn)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(totalOut)+'</strong></td>';
 					html += '<td class="text-right"><strong>'+formatNumber(lastSaldo)+'</strong></td>';
 					html += '</tr>';
 				} else {
-					html = '<tr><td colspan="11" class="text-center">Data tidak ditemukan</td></tr>';
+					html = '<tr><td colspan="9" class="text-center">Data tidak ditemukan</td></tr>';
 				}
 				$('#tbody_ledger').html(html);
 			},
 			error: function(){
-				$('#tbody_ledger').html('<tr><td colspan="11" class="text-center text-danger">Gagal memuat data</td></tr>');
+				$('#tbody_ledger').html('<tr><td colspan="9" class="text-center text-danger">Gagal memuat data</td></tr>');
 			}
 		});
 	});
@@ -201,8 +185,7 @@ $(document).ready(function(){
 	$('#btn_download_excel').on('click', function(){
 		var bulan = $('#bulan').val();
 		var tahun = $('#tahun').val();
-		var id_gudang = $('#id_gudang').val();
-		window.location.href = '<?php echo site_url("Ledger_material/excel_ledger_material"); ?>/'+bulan+'/'+tahun+'/'+id_gudang;
+		window.location.href = '<?php echo site_url("Ledger_indirect/excel_ledger_indirect"); ?>/'+bulan+'/'+tahun;
 	});
 
 	function formatNumber(num){

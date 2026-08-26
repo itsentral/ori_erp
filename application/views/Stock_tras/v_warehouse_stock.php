@@ -34,6 +34,8 @@ $gudang = $this->uri->segment(3);
 		<button type='button' class='btn btn-sm btn-success' id='download_excel'><i class='fa fa-file-excel-o'></i> Download</button>
 		&nbsp;&nbsp;
 		<button type='button' class='btn btn-sm btn-primary' id='download_excel_compare'><i class='fa fa-file-excel-o'></i> Download Tras vs Stock</button>
+		
+
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
@@ -391,6 +393,11 @@ $gudang = $this->uri->segment(3);
 			$("#data_view_jurnal").html(response);	
 		  
 		});
+	}
+	
+	function numberFormat(number, decimals){
+		number = parseFloat(number) || 0;
+		return number.toLocaleString('id-ID', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
 	}
 	
 </script>

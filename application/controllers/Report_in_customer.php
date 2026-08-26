@@ -121,7 +121,7 @@ class Report_in_customer extends CI_Controller {
                 FROM
                     data_erp_in_customer a,
                     (SELECT @row:=0) r
-                WHERE 1=1 ".$WHERE_DATE." 
+                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in'
                     AND (
                         a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
                         OR a.kode_trans LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -172,7 +172,7 @@ class Report_in_customer extends CI_Controller {
 			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
 		}
 
-        $sql = "SELECT a.* FROM data_erp_in_customer a WHERE 1=1 ".$WHERE_DATE;
+        $sql = "SELECT a.* FROM data_erp_in_customer a WHERE 1=1 ".$WHERE_DATE." AND a.jenis='in'";
 
 		// echo $qDetail1; exit;
 		$restDetail1	= $this->db->query($sql)->result_array();
@@ -425,7 +425,7 @@ class Report_in_customer extends CI_Controller {
                 FROM
                     data_erp_in_customer a,
                     (SELECT @row:=0) r
-                WHERE 1=1 ".$WHERE_DATE." 
+                WHERE 1=1 ".$WHERE_DATE." AND a.jenis='out'
                     AND (
                         a.no_so LIKE '%".$this->db->escape_like_str($like_value)."%'
 						OR a.kode_delivery LIKE '%".$this->db->escape_like_str($like_value)."%'
@@ -497,7 +497,7 @@ class Report_in_customer extends CI_Controller {
 			$WHERE_DATE = "AND (DATE( a.tanggal ) BETWEEN '".$tgl_awal."' AND '".$tgl_akhir."' )";
 		}
 
-        $sql = "SELECT a.* FROM data_erp_in_customer a WHERE 1=1 ".$WHERE_DATE;
+        $sql = "SELECT a.* FROM data_erp_in_customer a WHERE 1=1 ".$WHERE_DATE." AND a.jenis='out'";
 		// echo $qDetail1; exit;
 		$restDetail1	= $this->db->query($sql)->result_array();
 

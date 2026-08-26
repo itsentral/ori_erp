@@ -123,8 +123,10 @@ class Ledger_material_model extends CI_Model {
 			}
 
 			$result['data'][] = array(
+				'id_material'	=> $row['id_material'],
 				'nm_material'	=> $row['nm_material'],
 				'nm_category'	=> $row['nm_category'],
+				'qty'			=> (float)$row['jumlah_mat'],
 				'tanggal'		=> date('d-m-Y H:i', strtotime($row['update_date'])),
 				'kode_trans'	=> $row['no_ipp'],
 				'keterangan'	=> $keterangan,
