@@ -878,6 +878,7 @@ class Warehouse_stock_tras extends CI_Controller {
 			'ID Material',
 			'Nama Material',
 			'Categori',
+			'ID Gudang',
 			'Warehouse'
 		);
 		
@@ -1016,7 +1017,7 @@ class Warehouse_stock_tras extends CI_Controller {
 				}
 				
 				
-				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Name_Gudang,$Qty_Temp,$Harga_Temp,$Total_Temp);
+				$Temp_Loop			= array($intL,$Code_Material,$Name_Material,$Cat_Material,$Code_Gudang,$Name_Gudang,$Qty_Temp,$Harga_Temp,$Total_Temp);
 				
 				foreach($Temp_Loop as $KeyLoop=>$valLoop){
 					$Mula_Col++;				
