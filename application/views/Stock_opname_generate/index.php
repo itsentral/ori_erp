@@ -39,6 +39,9 @@
 				<input type="number" id="total_inventory_input" name="total_inventory_input" class="form-control" placeholder="Masukkan total inventory" step="0.01">
 			</div>
 			<div class="col-sm-3" style="padding-top:25px;">
+				<button type="button" class="btn btn-default btn-sm" id="btn_preview_adjust">
+					<i class="fa fa-search"></i> Preview
+				</button>
 				<button type="button" class="btn btn-primary btn-sm" id="btn_adjust_harga">
 					<i class="fa fa-refresh"></i> Adjust Harga Produksi
 				</button>
@@ -46,6 +49,35 @@
 			<div class="col-sm-3" style="padding-top:25px;">
 				<div id="info_panel_adjust" class="alert alert-info" style="display:none; padding:8px; margin:0;">
 					<span id="info_text_adjust"></span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tabel Detail Selisih -->
+		<div class="row" id="panel_detail_selisih" style="display:none;">
+			<div class="col-sm-12">
+				<h4>Detail Material Selisih</h4>
+				<div id="summary_preview" style="margin-bottom:10px;"></div>
+				<div class="table-responsive">
+					<table class="table table-bordered table-striped table-condensed" id="tbl_detail_selisih">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>ID Material</th>
+								<th>ID Gudang</th>
+								<th>Qty Hari Ini</th>
+								<th>Harga Hari Ini</th>
+								<th>Total Hari Ini</th>
+								<th>Qty Kemarin</th>
+								<th>Harga Kemarin</th>
+								<th>Total Kemarin</th>
+								<th>Selisih Qty</th>
+								<th>Selisih Harga</th>
+								<th>Selisih Total</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -179,6 +211,75 @@ $(document).ready(function(){
 		dateFormat: 'yy-mm-dd',
 		changeMonth: true,
 		changeYear: true
+	});
+
+	// Preview Adjust button
+	$('#btn_preview_adjust').on('click', function(){
+		var date_adjust = $('#date_adjust').val();
+		var total_input = $('#total_inventory_input').val();
+
+		if(!date_adjust){
+			alert('Pilih tanggal adjust terlebih dahulu!');
+			return;
+		}
+
+		var btn = $(this);
+		btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Loading...');
+
+		$.ajax({
+			url: '<?php echo site_url("stock_opname_generate/preview_adjust_inventory"); ?>',
+			type: 'POST',
+			data: { date_target: date_adjust, total_inventory_input: total_input || 0 },
+			dataType: 'json',
+			success: function(res){
+				btn.prop('disabled', false).html('<i class="fa fa-search"></i> Preview');
+				if(res.status == 1){
+					// Summary
+					var html_summary = '<strong>Tanggal:</strong> '+res.date_target+' | <strong>H-1:</strong> '+res.date_prev+'<br>';
+					html_summary += '<strong>Total Inventory Hari Ini:</strong> '+Number(res.total_inventory_today).toLocaleString('id-ID')+'<br>';
+					html_summary += '<strong>Total Inventory Kemarin:</strong> '+Number(res.total_inventory_prev).toLocaleString('id-ID')+'<br>';
+					html_summary += '<strong>Total Inventory Selisih:</strong> '+Number(res.total_inventory_selisih).toLocaleString('id-ID')+'<br>';
+					html_summary += '<strong>Total Input:</strong> '+Number(res.total_input).toLocaleString('id-ID')+'<br>';
+					html_summary += '<strong>Rasio:</strong> '+res.rasio+'<br>';
+					html_summary += '<strong>Jumlah Material Selisih:</strong> '+res.jumlah_material_selisih;
+					$('#summary_preview').html(html_summary);
+
+					// Table
+					var tbody = '';
+					if(res.detail_selisih && res.detail_selisih.length > 0){
+						for(var i=0; i<res.detail_selisih.length; i++){
+							var d = res.detail_selisih[i];
+							tbody += '<tr>';
+							tbody += '<td>'+(i+1)+'</td>';
+							tbody += '<td>'+d.id_material+'</td>';
+							tbody += '<td>'+d.id_gudang+'</td>';
+							tbody += '<td align="right">'+Number(d.qty_today).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
+							tbody += '<td align="right">'+Number(d.harga_today).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '<td align="right">'+Number(d.total_today).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '<td align="right">'+Number(d.qty_prev).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
+							tbody += '<td align="right">'+Number(d.harga_prev).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '<td align="right">'+Number(d.total_prev).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '<td align="right">'+Number(d.selisih_qty).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
+							tbody += '<td align="right">'+Number(d.selisih_harga).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '<td align="right">'+Number(d.selisih_total).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
+							tbody += '</tr>';
+						}
+					} else {
+						tbody = '<tr><td colspan="12" align="center">Tidak ada material selisih</td></tr>';
+					}
+					$('#tbl_detail_selisih tbody').html(tbody);
+					$('#panel_detail_selisih').show();
+				} else {
+					$('#panel_detail_selisih').hide();
+					$('#info_panel_adjust').removeClass('alert-info').addClass('alert-danger').show();
+					$('#info_text_adjust').html('<i class="fa fa-warning"></i> '+res.pesan);
+				}
+			},
+			error: function(){
+				btn.prop('disabled', false).html('<i class="fa fa-search"></i> Preview');
+				alert('Terjadi kesalahan server!');
+			}
+		});
 	});
 
 	// Adjust Harga Inventory Produksi button

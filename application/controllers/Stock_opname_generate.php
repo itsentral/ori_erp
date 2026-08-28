@@ -495,6 +495,106 @@ class Stock_opname_generate extends CI_Controller {
 	}
 
 	/**
+	 * Preview: Tampilkan detail material selisih tanpa update
+	 * Untuk membandingkan dengan perhitungan manual sebelum eksekusi adjust
+	 *
+	 * Input POST: date_target, total_inventory_input
+	 */
+	public function preview_adjust_inventory(){
+		$date_target = $this->input->post('date_target');
+		$total_input = (float)$this->input->post('total_inventory_input');
+
+		if(empty($date_target)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tanggal harus dipilih!'));
+			return;
+		}
+
+		$date_prev = date('Y-m-d', strtotime($date_target.' -1 day'));
+
+		$map_today = $this->_get_inventory_per_material($date_target);
+		$map_prev  = $this->_get_inventory_per_material($date_prev);
+
+		if(empty($map_today)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data inventory gudang produksi pada tanggal '.$date_target));
+			return;
+		}
+
+		// Total inventory saat ini
+		$total_inventory_current = 0;
+		foreach($map_today as $key => $val){
+			$total_inventory_current += $val['total'];
+		}
+
+		// Total inventory kemarin
+		$total_inventory_prev = 0;
+		foreach($map_prev as $key => $val){
+			$total_inventory_prev += $val['total'];
+		}
+
+		// Cari material yang selisih
+		$material_selisih = array();
+		foreach($map_today as $key => $val){
+			$total_today = $val['total'];
+			$total_kemarin = isset($map_prev[$key]) ? $map_prev[$key]['total'] : 0;
+			if(abs($total_today - $total_kemarin) >= 1){
+				$material_selisih[$key] = true;
+			}
+		}
+		foreach($map_prev as $key => $val){
+			if(!isset($map_today[$key])){
+				$material_selisih[$key] = true;
+			}
+		}
+
+		// Detail per material selisih
+		$detail_selisih = array();
+		$total_inventory_selisih = 0;
+		foreach($material_selisih as $key => $val){
+			$parts = explode('^_^', $key);
+			$id_gudang_item = $parts[0];
+			$id_material_item = $parts[1];
+
+			$today_data = isset($map_today[$key]) ? $map_today[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
+			$prev_data  = isset($map_prev[$key]) ? $map_prev[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
+
+			$total_inventory_selisih += $today_data['total'];
+
+			$detail_selisih[] = array(
+				'id_material'   => $id_material_item,
+				'id_gudang'     => $id_gudang_item,
+				'qty_today'     => $today_data['qty'],
+				'harga_today'   => $today_data['harga'],
+				'total_today'   => $today_data['total'],
+				'qty_prev'      => $prev_data['qty'],
+				'harga_prev'    => $prev_data['harga'],
+				'total_prev'    => $prev_data['total'],
+				'selisih_qty'   => $today_data['qty'] - $prev_data['qty'],
+				'selisih_harga' => $today_data['harga'] - $prev_data['harga'],
+				'selisih_total' => $today_data['total'] - $prev_data['total'],
+			);
+		}
+
+		// Hitung rasio jika total_input diisi
+		$rasio = 0;
+		if($total_input > 0 && $total_inventory_selisih != 0){
+			$rasio = (($total_inventory_current - $total_inventory_selisih) - $total_input) / $total_inventory_selisih;
+		}
+
+		echo json_encode(array(
+			'status'                 => 1,
+			'date_target'            => $date_target,
+			'date_prev'              => $date_prev,
+			'total_inventory_today'  => $total_inventory_current,
+			'total_inventory_prev'   => $total_inventory_prev,
+			'total_inventory_selisih'=> $total_inventory_selisih,
+			'total_input'            => $total_input,
+			'rasio'                  => $rasio,
+			'jumlah_material_selisih'=> count($material_selisih),
+			'detail_selisih'         => $detail_selisih
+		));
+	}
+
+	/**
 	 * Adjust harga di tran_warehouse_jurnal_detail agar total inventory dari ExcelStockCompare
 	 * sama dengan total yang diinput user.
 	 * 
@@ -574,6 +674,31 @@ class Stock_opname_generate extends CI_Controller {
 				'pesan'  => 'Tidak ada material yang berubah antara tanggal '.$date_prev.' dan '.$date_target.'. Total inventory: '.number_format($total_inventory_current,0,',','.'),
 			));
 			return;
+		}
+
+		// Buat detail material selisih
+		$detail_selisih = array();
+		foreach($material_selisih as $key => $val){
+			$parts = explode('^_^', $key);
+			$id_gudang_item = $parts[0];
+			$id_material_item = $parts[1];
+
+			$today_data = isset($map_today[$key]) ? $map_today[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
+			$prev_data  = isset($map_prev[$key]) ? $map_prev[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
+
+			$detail_selisih[] = array(
+				'id_material'   => $id_material_item,
+				'id_gudang'     => $id_gudang_item,
+				'qty_today'     => $today_data['qty'],
+				'harga_today'   => $today_data['harga'],
+				'total_today'   => $today_data['total'],
+				'qty_prev'      => $prev_data['qty'],
+				'harga_prev'    => $prev_data['harga'],
+				'total_prev'    => $prev_data['total'],
+				'selisih_qty'   => $today_data['qty'] - $prev_data['qty'],
+				'selisih_harga' => $today_data['harga'] - $prev_data['harga'],
+				'selisih_total' => $today_data['total'] - $prev_data['total'],
+			);
 		}
 
 		// === 4. Update harga di tran_warehouse_jurnal_detail pada tanggal target ===
@@ -659,7 +784,8 @@ class Stock_opname_generate extends CI_Controller {
 				'total_selisih' => $total_inventory_selisih,
 				'rasio'         => $rasio,
 				'updated_count' => count($ArrUpdate),
-				'material_selisih' => count($material_selisih)
+				'material_selisih' => count($material_selisih),
+				'detail_selisih'   => $detail_selisih
 			));
 		} else {
 			echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data. Transaction rollback.'));
