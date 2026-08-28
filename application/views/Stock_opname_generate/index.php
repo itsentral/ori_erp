@@ -30,9 +30,13 @@
 
 		<!-- Panel Adjust Harga Inventory Produksi -->
 		<div class="row" style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
-			<div class="col-sm-3">
+			<div class="col-sm-2">
 				<label>Tanggal Adjust:</label>
 				<input type="text" id="date_adjust" name="date_adjust" class="form-control text-center" placeholder="Pilih Tanggal">
+			</div>
+			<div class="col-sm-2">
+				<label>No Perkiraan (COA):</label>
+				<input type="text" id="coa_adjust" name="coa_adjust" class="form-control" placeholder="cth: 1103-01-03">
 			</div>
 			<div class="col-sm-3">
 				<label>Total Inventory (Input):</label>
@@ -46,7 +50,7 @@
 					<i class="fa fa-refresh"></i> Adjust Harga Produksi
 				</button>
 			</div>
-			<div class="col-sm-3" style="padding-top:25px;">
+			<div class="col-sm-2" style="padding-top:25px;">
 				<div id="info_panel_adjust" class="alert alert-info" style="display:none; padding:8px; margin:0;">
 					<span id="info_text_adjust"></span>
 				</div>
@@ -62,18 +66,17 @@
 					<table class="table table-bordered table-striped table-condensed" id="tbl_detail_selisih">
 						<thead>
 							<tr>
-								<th>No</th>
+								<th>ID</th>
 								<th>ID Material</th>
+								<th>Nama</th>
+								<th>Category</th>
 								<th>ID Gudang</th>
-								<th>Qty Hari Ini</th>
-								<th>Harga Hari Ini</th>
+								<th>Nm Gudang</th>
+								<th>Qty</th>
+								<th>Harga</th>
 								<th>Total Hari Ini</th>
-								<th>Qty Kemarin</th>
-								<th>Harga Kemarin</th>
 								<th>Total Kemarin</th>
-								<th>Selisih Qty</th>
-								<th>Selisih Harga</th>
-								<th>Selisih Total</th>
+								<th>Selisih</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -229,7 +232,7 @@ $(document).ready(function(){
 		$.ajax({
 			url: '<?php echo site_url("stock_opname_generate/preview_adjust_inventory"); ?>',
 			type: 'POST',
-			data: { date_target: date_adjust, total_inventory_input: total_input || 0 },
+			data: { date_target: date_adjust, total_inventory_input: total_input || 0, coa: $('#coa_adjust').val() },
 			dataType: 'json',
 			success: function(res){
 				btn.prop('disabled', false).html('<i class="fa fa-search"></i> Preview');
@@ -250,22 +253,21 @@ $(document).ready(function(){
 						for(var i=0; i<res.detail_selisih.length; i++){
 							var d = res.detail_selisih[i];
 							tbody += '<tr>';
-							tbody += '<td>'+(i+1)+'</td>';
+							tbody += '<td>'+d.id+'</td>';
 							tbody += '<td>'+d.id_material+'</td>';
+							tbody += '<td>'+d.nm_material+'</td>';
+							tbody += '<td>'+d.nm_category+'</td>';
 							tbody += '<td>'+d.id_gudang+'</td>';
+							tbody += '<td>'+d.nm_gudang+'</td>';
 							tbody += '<td align="right">'+Number(d.qty_today).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
 							tbody += '<td align="right">'+Number(d.harga_today).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
 							tbody += '<td align="right">'+Number(d.total_today).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
-							tbody += '<td align="right">'+Number(d.qty_prev).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
-							tbody += '<td align="right">'+Number(d.harga_prev).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
 							tbody += '<td align="right">'+Number(d.total_prev).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
-							tbody += '<td align="right">'+Number(d.selisih_qty).toLocaleString('id-ID',{minimumFractionDigits:4})+'</td>';
-							tbody += '<td align="right">'+Number(d.selisih_harga).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
 							tbody += '<td align="right">'+Number(d.selisih_total).toLocaleString('id-ID',{minimumFractionDigits:2})+'</td>';
 							tbody += '</tr>';
 						}
 					} else {
-						tbody = '<tr><td colspan="12" align="center">Tidak ada material selisih</td></tr>';
+						tbody = '<tr><td colspan="11" align="center">Tidak ada material selisih</td></tr>';
 					}
 					$('#tbl_detail_selisih tbody').html(tbody);
 					$('#panel_detail_selisih').show();
@@ -306,7 +308,7 @@ $(document).ready(function(){
 		$.ajax({
 			url: '<?php echo site_url("stock_opname_generate/adjust_harga_inventory"); ?>',
 			type: 'POST',
-			data: { date_target: date_adjust, total_inventory_input: total_input },
+			data: { date_target: date_adjust, total_inventory_input: total_input, coa: $('#coa_adjust').val() },
 			dataType: 'json',
 			success: function(res){
 				btn.prop('disabled', false).html('<i class="fa fa-refresh"></i> Adjust Harga Produksi');

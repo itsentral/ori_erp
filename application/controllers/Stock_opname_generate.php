@@ -503,6 +503,7 @@ class Stock_opname_generate extends CI_Controller {
 	public function preview_adjust_inventory(){
 		$date_target = $this->input->post('date_target');
 		$total_input = (float)$this->input->post('total_inventory_input');
+		$coa         = trim($this->input->post('coa'));
 
 		if(empty($date_target)){
 			echo json_encode(array('status' => 0, 'pesan' => 'Tanggal harus dipilih!'));
@@ -511,8 +512,8 @@ class Stock_opname_generate extends CI_Controller {
 
 		$date_prev = date('Y-m-d', strtotime($date_target.' -1 day'));
 
-		$map_today = $this->_get_inventory_per_material($date_target);
-		$map_prev  = $this->_get_inventory_per_material($date_prev);
+		$map_today = $this->_get_inventory_per_material($date_target, $coa);
+		$map_prev  = $this->_get_inventory_per_material($date_prev, $coa);
 
 		if(empty($map_today)){
 			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data inventory gudang produksi pada tanggal '.$date_target));
@@ -550,26 +551,22 @@ class Stock_opname_generate extends CI_Controller {
 		$detail_selisih = array();
 		$total_inventory_selisih = 0;
 		foreach($material_selisih as $key => $val){
-			$parts = explode('^_^', $key);
-			$id_gudang_item = $parts[0];
-			$id_material_item = $parts[1];
-
-			$today_data = isset($map_today[$key]) ? $map_today[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
+			$today_data = isset($map_today[$key]) ? $map_today[$key] : array('id_pk' => '', 'id_material' => '', 'nm_material' => '', 'nm_category' => '', 'id_gudang' => '', 'nm_gudang' => '', 'harga' => 0, 'qty' => 0, 'total' => 0);
 			$prev_data  = isset($map_prev[$key]) ? $map_prev[$key] : array('harga' => 0, 'qty' => 0, 'total' => 0);
 
 			$total_inventory_selisih += $today_data['total'];
 
 			$detail_selisih[] = array(
-				'id_material'   => $id_material_item,
-				'id_gudang'     => $id_gudang_item,
+				'id'            => $today_data['id_pk'],
+				'id_material'   => $today_data['id_material'],
+				'nm_material'   => $today_data['nm_material'],
+				'nm_category'   => $today_data['nm_category'],
+				'id_gudang'     => $today_data['id_gudang'],
+				'nm_gudang'     => $today_data['nm_gudang'],
 				'qty_today'     => $today_data['qty'],
 				'harga_today'   => $today_data['harga'],
 				'total_today'   => $today_data['total'],
-				'qty_prev'      => $prev_data['qty'],
-				'harga_prev'    => $prev_data['harga'],
 				'total_prev'    => $prev_data['total'],
-				'selisih_qty'   => $today_data['qty'] - $prev_data['qty'],
-				'selisih_harga' => $today_data['harga'] - $prev_data['harga'],
 				'selisih_total' => $today_data['total'] - $prev_data['total'],
 			);
 		}
@@ -611,6 +608,7 @@ class Stock_opname_generate extends CI_Controller {
 	public function adjust_harga_inventory(){
 		$date_target         = $this->input->post('date_target');
 		$total_input         = (float)$this->input->post('total_inventory_input');
+		$coa                 = trim($this->input->post('coa'));
 
 		if(empty($date_target)){
 			echo json_encode(array('status' => 0, 'pesan' => 'Tanggal harus dipilih!'));
@@ -624,8 +622,8 @@ class Stock_opname_generate extends CI_Controller {
 		$date_prev = date('Y-m-d', strtotime($date_target.' -1 day'));
 
 		// === HELPER: Hitung total inventory per material+gudang pada tanggal tertentu ===
-		$map_today = $this->_get_inventory_per_material($date_target);
-		$map_prev  = $this->_get_inventory_per_material($date_prev);
+		$map_today = $this->_get_inventory_per_material($date_target, $coa);
+		$map_prev  = $this->_get_inventory_per_material($date_prev, $coa);
 
 		if(empty($map_today)){
 			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data inventory gudang produksi pada tanggal '.$date_target));
@@ -695,8 +693,6 @@ class Stock_opname_generate extends CI_Controller {
 				'qty_prev'      => $prev_data['qty'],
 				'harga_prev'    => $prev_data['harga'],
 				'total_prev'    => $prev_data['total'],
-				'selisih_qty'   => $today_data['qty'] - $prev_data['qty'],
-				'selisih_harga' => $today_data['harga'] - $prev_data['harga'],
 				'selisih_total' => $today_data['total'] - $prev_data['total'],
 			);
 		}
@@ -728,6 +724,9 @@ class Stock_opname_generate extends CI_Controller {
 					WHERE DATE(tras.tgl_trans) = '".$this->db->escape_str($date_target)."'
 					AND tras.id_gudang NOT IN ('1','2','3','4')
 					AND head_whr.category = 'produksi'";
+		if(!empty($coa)){
+			$sql_trans .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		}
 		$rows_trans = $this->db->query($sql_trans)->result_array();
 
 		if(empty($rows_trans)){
@@ -795,9 +794,9 @@ class Stock_opname_generate extends CI_Controller {
 	/**
 	 * Helper: Ambil inventory per material+gudang pada tanggal tertentu
 	 * Logic sama seperti ExcelStockCompare (harga last record × qty stock)
-	 * Return: array [ 'id_gudang^_^id_material' => ['harga' => x, 'qty' => y, 'total' => x*y] ]
+	 * Return: array [ 'id_gudang^_^id_material' => ['id' => x, 'id_material' => x, 'nm_material' => x, 'nm_category' => x, 'id_gudang' => x, 'nm_gudang' => x, 'harga' => x, 'qty' => y, 'total' => x*y] ]
 	 */
-	private function _get_inventory_per_material($date){
+	private function _get_inventory_per_material($date, $coa = ''){
 		$result = array();
 
 		// Tentukan tabel stock
@@ -808,24 +807,42 @@ class Stock_opname_generate extends CI_Controller {
 			$WHERE_Stock .= " AND DATE(head_stock.hist_date) = '".$this->db->escape_str($date)."'";
 		}
 
-		// Ambil qty stock per material per gudang
+		// Filter COA jika ada
+		if(!empty($coa)){
+			$WHERE_Stock .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		}
+
+		// Ambil qty stock per material per gudang + info material & gudang
 		$sql_stock = "SELECT
 						head_stock.id_material,
 						head_stock.id_gudang,
-						head_stock.qty_stock
+						head_stock.qty_stock,
+						head_mstr.id AS idmaterial_pk,
+						head_mstr.nm_material,
+						head_mstr.nm_category,
+						head_whr.nm_gudang
 					FROM ".$Table_Stock." head_stock
 					LEFT JOIN warehouse head_whr ON head_stock.id_gudang = head_whr.id
+					LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
 					WHERE ".$WHERE_Stock."
 					AND head_stock.id_gudang NOT IN ('1','2','3','4')";
 		$rows_stock = $this->db->query($sql_stock)->result_array();
 
 		if(empty($rows_stock)) return $result;
 
-		// Index qty
-		$map_qty = array();
+		// Index qty + info
+		$map_stock = array();
 		foreach($rows_stock as $row){
 			$key = $row['id_gudang'].'^_^'.$row['id_material'];
-			$map_qty[$key] = (float)$row['qty_stock'];
+			$map_stock[$key] = array(
+				'qty'         => (float)$row['qty_stock'],
+				'id_pk'       => $row['idmaterial_pk'],
+				'id_material' => $row['id_material'],
+				'nm_material' => $row['nm_material'],
+				'nm_category' => $row['nm_category'],
+				'id_gudang'   => $row['id_gudang'],
+				'nm_gudang'   => $row['nm_gudang'],
+			);
 		}
 
 		// Ambil harga terakhir per material+gudang dari tran_warehouse_jurnal_detail
@@ -833,6 +850,9 @@ class Stock_opname_generate extends CI_Controller {
 		$Sub_Find .= " AND DATE(tras_stock.tgl_trans) <= '".$this->db->escape_str($date)."'";
 		$Sub_Find .= " AND tras_stock.id_gudang NOT IN ('1','2','3','4')";
 		$Sub_Find .= " AND head_whr.category = 'produksi'";
+		if(!empty($coa)){
+			$Sub_Find .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		}
 
 		$sql_last = "SELECT
 						tras_stock.id_material,
@@ -859,12 +879,22 @@ class Stock_opname_generate extends CI_Controller {
 		foreach($rows_detail as $d){
 			$key = $d['id_gudang'].'^_^'.$d['id_material'];
 			$harga = (float)$d['harga'];
-			$qty = isset($map_qty[$key]) ? $map_qty[$key] : 0;
+			$qty = isset($map_stock[$key]) ? $map_stock[$key]['qty'] : 0;
+			$info = isset($map_stock[$key]) ? $map_stock[$key] : array(
+				'id_pk' => '', 'id_material' => $d['id_material'], 'nm_material' => '', 'nm_category' => '',
+				'id_gudang' => $d['id_gudang'], 'nm_gudang' => '', 'qty' => 0
+			);
 
 			$result[$key] = array(
-				'harga' => $harga,
-				'qty'   => $qty,
-				'total' => $harga * $qty,
+				'id_pk'       => $info['id_pk'],
+				'id_material' => $info['id_material'],
+				'nm_material' => $info['nm_material'],
+				'nm_category' => $info['nm_category'],
+				'id_gudang'   => $info['id_gudang'],
+				'nm_gudang'   => $info['nm_gudang'],
+				'harga'       => $harga,
+				'qty'         => $qty,
+				'total'       => $harga * $qty,
 			);
 		}
 
