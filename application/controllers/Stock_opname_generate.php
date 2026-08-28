@@ -125,8 +125,8 @@ class Stock_opname_generate extends CI_Controller {
 		$DateTime  = date('Y-m-d H:i:s');
 
 		foreach($data_stok as $row){
-			// Skip gudang 3 (sudah selesai diproses terpisah)
-			if($row['id_gudang'] == '3') continue;
+			// Skip gudang 1, 2 (pusat), 3 dan 4
+			if(in_array($row['id_gudang'], array('1','2','3','4'))) continue;
 
 			$mapKey = $row['id_material'].'_'.$row['id_gudang'];
 
@@ -187,8 +187,8 @@ class Stock_opname_generate extends CI_Controller {
 
 		// Cek apakah ada material baru dari transaksi yang belum ada di data sebelumnya
 		foreach($transaksi as $trx){
-			// Skip gudang 3
-			if($trx['id_gudang'] == '3') continue;
+			// Skip gudang 1, 2 (pusat), 3 dan 4
+			if(in_array($trx['id_gudang'], array('1','2','3','4'))) continue;
 
 			$mapKey = $trx['id_material'].'_'.$trx['id_gudang'];
 			// Cek apakah sudah ada di data_stok
@@ -270,7 +270,7 @@ class Stock_opname_generate extends CI_Controller {
 						id_gudang_dari, kd_gudang_dari, id_gudang_ke
 					FROM warehouse_history 
 					WHERE DATE(update_date) = '".$this->db->escape_str($date_target)."'
-					AND id_gudang != '3'
+					AND id_gudang NOT IN ('1','2','3','4')
 					AND (id_gudang = id_gudang_ke OR kd_gudang_dari = 'PURCHASE')
 					ORDER BY id ASC";
 		$transaksi = $this->db->query($sql_trx)->result_array();
