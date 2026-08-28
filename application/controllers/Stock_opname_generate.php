@@ -577,7 +577,7 @@ class Stock_opname_generate extends CI_Controller {
 		// Hitung rasio jika total_input diisi
 		$rasio = 0;
 		if($total_input > 0 && $total_inventory_selisih != 0){
-			$rasio = (($total_inventory_current - $total_inventory_selisih) - $total_input) / $total_inventory_selisih;
+			$rasio = ($total_input - ($total_inventory_current - $total_inventory_selisih)) / $total_inventory_selisih;
 		}
 
 		echo json_encode(array(
@@ -721,7 +721,7 @@ class Stock_opname_generate extends CI_Controller {
 			));
 			return;
 		}
-		$rasio = (($total_inventory_current - $total_inventory_selisih) - $total_input) / $total_inventory_selisih;
+		$rasio = ($total_input - ($total_inventory_current - $total_inventory_selisih)) / $total_inventory_selisih;
 
 		// Ambil transaksi di tanggal target untuk gudang produksi
 		$sql_trans = "SELECT tras.id, tras.id_material, tras.id_gudang, tras.harga
