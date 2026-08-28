@@ -723,9 +723,11 @@ class Stock_opname_generate extends CI_Controller {
 					LEFT JOIN warehouse head_whr ON tras.id_gudang = head_whr.id
 					WHERE DATE(tras.tgl_trans) = '".$this->db->escape_str($date_target)."'
 					AND tras.id_gudang NOT IN ('1','2','3','4')
-					AND head_whr.category = 'produksi'";
+					AND NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";
 		if(!empty($coa)){
 			$sql_trans .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		} else {
+			$sql_trans .= " AND head_whr.category = 'produksi'";
 		}
 		$rows_trans = $this->db->query($sql_trans)->result_array();
 
@@ -801,7 +803,7 @@ class Stock_opname_generate extends CI_Controller {
 
 		// Tentukan tabel stock
 		$Table_Stock = "warehouse_stock";
-		$WHERE_Stock = "head_whr.category = 'produksi' AND head_stock.qty_stock <> 0";
+		$WHERE_Stock = "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-') AND head_stock.qty_stock <> 0";
 		if($date < date('Y-m-d')){
 			$Table_Stock = "warehouse_stock_per_day_duplikat";
 			$WHERE_Stock .= " AND DATE(head_stock.hist_date) = '".$this->db->escape_str($date)."'";
@@ -810,6 +812,8 @@ class Stock_opname_generate extends CI_Controller {
 		// Filter COA jika ada
 		if(!empty($coa)){
 			$WHERE_Stock .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		} else {
+			$WHERE_Stock .= " AND head_whr.category = 'produksi'";
 		}
 
 		// Ambil qty stock per material per gudang + info material & gudang
@@ -849,9 +853,10 @@ class Stock_opname_generate extends CI_Controller {
 		$Sub_Find = "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";
 		$Sub_Find .= " AND DATE(tras_stock.tgl_trans) <= '".$this->db->escape_str($date)."'";
 		$Sub_Find .= " AND tras_stock.id_gudang NOT IN ('1','2','3','4')";
-		$Sub_Find .= " AND head_whr.category = 'produksi'";
 		if(!empty($coa)){
 			$Sub_Find .= " AND head_whr.coa_1 = '".$this->db->escape_str($coa)."'";
+		} else {
+			$Sub_Find .= " AND head_whr.category = 'produksi'";
 		}
 
 		$sql_last = "SELECT
