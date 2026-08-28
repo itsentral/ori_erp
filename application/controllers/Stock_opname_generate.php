@@ -498,11 +498,13 @@ class Stock_opname_generate extends CI_Controller {
 	 * Adjust harga di tran_warehouse_jurnal_detail agar total inventory dari ExcelStockCompare
 	 * sama dengan total yang diinput user.
 	 * 
-	 * Logic (sama seperti ExcelStockCompare):
-	 * - Total inventory = SUM(harga_tran_detail * qty_stock_warehouse) per material per gudang
-	 * - Hanya untuk gudang produksi (id_gudang NOT IN 1,2,3,4)
-	 * - Jika total inventory ≠ total input, update harga di tran_warehouse_jurnal_detail
-	 *   pada transaksi tanggal tersebut dengan rumus: harga_baru = (total_input / total_inventory) * harga_lama
+	 * Logic:
+	 * 1. Hitung total inventory hari ini (tanggal target) per material+gudang — ExcelStockCompare logic
+	 * 2. Hitung total inventory sehari sebelumnya (H-1) per material+gudang — sama logic
+	 * 3. Bandingkan per material+gudang — yang ada selisih, itu yang harganya di-update
+	 * 4. Update harga di tran_warehouse_jurnal_detail pada transaksi tanggal target
+	 *    hanya untuk material+gudang yang ada selisih
+	 *    Rumus: harga_baru = (total_inventory_input / total_inventory_current) * harga_lama
 	 *
 	 * Input POST: date_target, total_inventory_input
 	 */
@@ -519,16 +521,151 @@ class Stock_opname_generate extends CI_Controller {
 			return;
 		}
 
-		// === 1. Hitung total inventory saat ini (logic ExcelStockCompare) ===
-		// Tentukan tabel stock sesuai tanggal
-		$Table_Stock = "warehouse_stock";
-		$WHERE_Stock = "head_whr.category = 'produksi' AND head_stock.qty_stock <> 0";
-		if($date_target < date('Y-m-d')){
-			$Table_Stock = "warehouse_stock_per_day_duplikat";
-			$WHERE_Stock .= " AND DATE(head_stock.hist_date) = '".$this->db->escape_str($date_target)."'";
+		$date_prev = date('Y-m-d', strtotime($date_target.' -1 day'));
+
+		// === HELPER: Hitung total inventory per material+gudang pada tanggal tertentu ===
+		$map_today = $this->_get_inventory_per_material($date_target);
+		$map_prev  = $this->_get_inventory_per_material($date_prev);
+
+		if(empty($map_today)){
+			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data inventory gudang produksi pada tanggal '.$date_target));
+			return;
 		}
 
-		// Ambil qty stock per material per gudang (dari warehouse_stock / duplikat)
+		// === 1. Hitung total inventory saat ini ===
+		$total_inventory_current = 0;
+		foreach($map_today as $key => $val){
+			$total_inventory_current += $val['total'];
+		}
+
+		// === 2. Bandingkan total inventory saat ini dengan total input ===
+		$selisih_global = $total_input - $total_inventory_current;
+
+		if(abs($selisih_global) < 1){
+			echo json_encode(array(
+				'status' => 1,
+				'pesan'  => 'Total inventory sudah cocok. Total saat ini: '.number_format($total_inventory_current,0,',','.'),
+				'total_current' => $total_inventory_current,
+				'selisih' => 0
+			));
+			return;
+		}
+
+		// === 3. Cari material+gudang yang ada selisih antara hari ini dan kemarin ===
+		$material_selisih = array(); // key => true
+		foreach($map_today as $key => $val){
+			$total_today = $val['total'];
+			$total_kemarin = isset($map_prev[$key]) ? $map_prev[$key]['total'] : 0;
+
+			if(abs($total_today - $total_kemarin) >= 1){
+				$material_selisih[$key] = true;
+			}
+		}
+		// Cek juga material yang ada kemarin tapi tidak ada hari ini
+		foreach($map_prev as $key => $val){
+			if(!isset($map_today[$key])){
+				$material_selisih[$key] = true;
+			}
+		}
+
+		if(empty($material_selisih)){
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'Tidak ada material yang berubah antara tanggal '.$date_prev.' dan '.$date_target.'. Total inventory: '.number_format($total_inventory_current,0,',','.'),
+			));
+			return;
+		}
+
+		// === 4. Update harga di tran_warehouse_jurnal_detail pada tanggal target ===
+		// Hanya untuk material+gudang yang ada selisih
+		// Rumus: harga_baru = (total_inventory_input / total_inventory_current) * harga_lama
+		$rasio = $total_input / $total_inventory_current;
+
+		// Ambil transaksi di tanggal target untuk gudang produksi
+		$sql_trans = "SELECT tras.id, tras.id_material, tras.id_gudang, tras.harga
+					FROM tran_warehouse_jurnal_detail tras
+					LEFT JOIN warehouse head_whr ON tras.id_gudang = head_whr.id
+					WHERE DATE(tras.tgl_trans) = '".$this->db->escape_str($date_target)."'
+					AND tras.id_gudang NOT IN ('1','2','3','4')
+					AND head_whr.category = 'produksi'";
+		$rows_trans = $this->db->query($sql_trans)->result_array();
+
+		if(empty($rows_trans)){
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'Tidak ada transaksi di tran_warehouse_jurnal_detail pada tanggal '.$date_target.' untuk gudang produksi.',
+				'total_current' => $total_inventory_current
+			));
+			return;
+		}
+
+		// Filter hanya material+gudang yang ada selisih
+		$ArrUpdate = array();
+		foreach($rows_trans as $t){
+			$key = $t['id_gudang'].'^_^'.$t['id_material'];
+			if(!isset($material_selisih[$key])) continue;
+
+			$harga_lama = (float)$t['harga'];
+			$harga_baru = $rasio * $harga_lama;
+
+			$ArrUpdate[] = array(
+				'id'    => $t['id'],
+				'harga' => $harga_baru,
+			);
+		}
+
+		if(empty($ArrUpdate)){
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'Tidak ada transaksi yang perlu di-update pada tanggal '.$date_target.' untuk material yang berselisih.',
+				'material_selisih' => count($material_selisih)
+			));
+			return;
+		}
+
+		// Execute update
+		$this->db->trans_start();
+		$chunks = array_chunk($ArrUpdate, 500);
+		foreach($chunks as $chunk){
+			$this->db->update_batch('tran_warehouse_jurnal_detail', $chunk, 'id');
+		}
+		$this->db->trans_complete();
+
+		if($this->db->trans_status()){
+			echo json_encode(array(
+				'status'        => 1,
+				'pesan'         => 'Berhasil adjust harga '.count($ArrUpdate).' transaksi (dari '.count($material_selisih).' material berselisih). Rasio: '.number_format($rasio,6).
+								   ' | Total sebelum: '.number_format($total_inventory_current,0,',','.').
+								   ' | Total target: '.number_format($total_input,0,',','.').
+								   ' | Selisih: '.number_format($selisih_global,0,',','.'),
+				'total_before'  => $total_inventory_current,
+				'total_target'  => $total_input,
+				'rasio'         => $rasio,
+				'updated_count' => count($ArrUpdate),
+				'material_selisih' => count($material_selisih)
+			));
+		} else {
+			echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data. Transaction rollback.'));
+		}
+	}
+
+	/**
+	 * Helper: Ambil inventory per material+gudang pada tanggal tertentu
+	 * Logic sama seperti ExcelStockCompare (harga last record × qty stock)
+	 * Return: array [ 'id_gudang^_^id_material' => ['harga' => x, 'qty' => y, 'total' => x*y] ]
+	 */
+	private function _get_inventory_per_material($date){
+		$result = array();
+
+		// Tentukan tabel stock
+		$Table_Stock = "warehouse_stock";
+		$WHERE_Stock = "head_whr.category = 'produksi' AND head_stock.qty_stock <> 0";
+		if($date < date('Y-m-d')){
+			$Table_Stock = "warehouse_stock_per_day_duplikat";
+			$WHERE_Stock .= " AND DATE(head_stock.hist_date) = '".$this->db->escape_str($date)."'";
+		}
+
+		// Ambil qty stock per material per gudang
 		$sql_stock = "SELECT
 						head_stock.id_material,
 						head_stock.id_gudang,
@@ -539,21 +676,18 @@ class Stock_opname_generate extends CI_Controller {
 					AND head_stock.id_gudang NOT IN ('1','2','3','4')";
 		$rows_stock = $this->db->query($sql_stock)->result_array();
 
-		if(empty($rows_stock)){
-			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data stock gudang produksi pada tanggal '.$date_target));
-			return;
-		}
+		if(empty($rows_stock)) return $result;
 
-		// Index qty_stock per material+gudang
+		// Index qty
 		$map_qty = array();
 		foreach($rows_stock as $row){
 			$key = $row['id_gudang'].'^_^'.$row['id_material'];
 			$map_qty[$key] = (float)$row['qty_stock'];
 		}
 
-		// Ambil harga terakhir per material+gudang dari tran_warehouse_jurnal_detail (SubQueryStock logic)
+		// Ambil harga terakhir per material+gudang dari tran_warehouse_jurnal_detail
 		$Sub_Find = "NOT(head_whr.coa_1 IS NULL OR head_whr.coa_1 ='' OR head_whr.coa_1 ='-')";
-		$Sub_Find .= " AND DATE(tras_stock.tgl_trans) <= '".$this->db->escape_str($date_target)."'";
+		$Sub_Find .= " AND DATE(tras_stock.tgl_trans) <= '".$this->db->escape_str($date)."'";
 		$Sub_Find .= " AND tras_stock.id_gudang NOT IN ('1','2','3','4')";
 		$Sub_Find .= " AND head_whr.category = 'produksi'";
 
@@ -567,108 +701,31 @@ class Stock_opname_generate extends CI_Controller {
 					GROUP BY tras_stock.id_material, tras_stock.id_gudang";
 		$rows_last = $this->db->query($sql_last)->result_array();
 
-		if(empty($rows_last)){
-			echo json_encode(array('status' => 0, 'pesan' => 'Tidak ada data tran_warehouse_jurnal_detail untuk gudang produksi.'));
-			return;
-		}
+		if(empty($rows_last)) return $result;
 
-		// Ambil detail harga dari record terakhir
+		// Ambil detail harga
 		$ids = array();
-		$map_last_id = array(); // key => last_id
 		foreach($rows_last as $r){
 			$ids[] = $r['last_id'];
-			$key = $r['id_gudang'].'^_^'.$r['id_material'];
-			$map_last_id[$key] = $r['last_id'];
 		}
 
 		$sql_detail = "SELECT id, id_material, id_gudang, harga FROM tran_warehouse_jurnal_detail WHERE id IN (".implode(',', $ids).")";
 		$rows_detail = $this->db->query($sql_detail)->result_array();
 
-		// Hitung total inventory saat ini (ExcelStockCompare logic: harga * qty_stock)
-		$total_inventory_current = 0;
-		$map_harga = array(); // key => harga
+		// Hitung total per material+gudang
 		foreach($rows_detail as $d){
 			$key = $d['id_gudang'].'^_^'.$d['id_material'];
 			$harga = (float)$d['harga'];
-			$map_harga[$key] = $harga;
+			$qty = isset($map_qty[$key]) ? $map_qty[$key] : 0;
 
-			if(isset($map_qty[$key])){
-				$total_inventory_current += $harga * $map_qty[$key];
-			}
-		}
-
-		// === 2. Bandingkan total inventory saat ini dengan total input ===
-		$selisih = $total_input - $total_inventory_current;
-
-		if(abs($selisih) < 1){
-			echo json_encode(array(
-				'status' => 1,
-				'pesan'  => 'Total inventory sudah cocok. Total saat ini: '.number_format($total_inventory_current,0,',','.'),
-				'total_current' => $total_inventory_current,
-				'selisih' => 0
-			));
-			return;
-		}
-
-		// === 3. Update harga di tran_warehouse_jurnal_detail pada transaksi tanggal tersebut ===
-		// Rumus: harga_baru = (total_inventory_current / total_input) * harga_lama
-		$rasio = $total_inventory_current / $total_input;
-
-		// Ambil semua transaksi di tran_warehouse_jurnal_detail pada tanggal target untuk gudang produksi
-		$sql_trans = "SELECT tras.id, tras.id_material, tras.id_gudang, tras.harga
-					FROM tran_warehouse_jurnal_detail tras
-					LEFT JOIN warehouse head_whr ON tras.id_gudang = head_whr.id
-					WHERE DATE(tras.tgl_trans) = '".$this->db->escape_str($date_target)."'
-					AND tras.id_gudang NOT IN ('1','2','3','4')
-					AND head_whr.category = 'produksi'";
-		$rows_trans = $this->db->query($sql_trans)->result_array();
-
-		if(empty($rows_trans)){
-			echo json_encode(array(
-				'status' => 0,
-				'pesan'  => 'Tidak ada transaksi di tran_warehouse_jurnal_detail pada tanggal '.$date_target.' untuk gudang produksi. Total inventory saat ini: '.number_format($total_inventory_current,0,',','.'),
-				'total_current' => $total_inventory_current
-			));
-			return;
-		}
-
-		// Update harga
-		$ArrUpdate = array();
-		foreach($rows_trans as $t){
-			$harga_lama = (float)$t['harga'];
-			$harga_baru = $rasio * $harga_lama;
-
-			$ArrUpdate[] = array(
-				'id'    => $t['id'],
-				'harga' => $harga_baru,
+			$result[$key] = array(
+				'harga' => $harga,
+				'qty'   => $qty,
+				'total' => $harga * $qty,
 			);
 		}
 
-		// Execute update
-		$this->db->trans_start();
-		if(!empty($ArrUpdate)){
-			$chunks = array_chunk($ArrUpdate, 500);
-			foreach($chunks as $chunk){
-				$this->db->update_batch('tran_warehouse_jurnal_detail', $chunk, 'id');
-			}
-		}
-		$this->db->trans_complete();
-
-		if($this->db->trans_status()){
-			echo json_encode(array(
-				'status'        => 1,
-				'pesan'         => 'Berhasil adjust harga '.count($ArrUpdate).' transaksi. Rasio: '.number_format($rasio,6).
-								   ' | Total sebelum: '.number_format($total_inventory_current,0,',','.').
-								   ' | Total target: '.number_format($total_input,0,',','.').
-								   ' | Selisih: '.number_format($selisih,0,',','.'),
-				'total_before'  => $total_inventory_current,
-				'total_target'  => $total_input,
-				'rasio'         => $rasio,
-				'updated_count' => count($ArrUpdate)
-			));
-		} else {
-			echo json_encode(array('status' => 0, 'pesan' => 'Gagal update data. Transaction rollback.'));
-		}
+		return $result;
 	}
 
 	/**
