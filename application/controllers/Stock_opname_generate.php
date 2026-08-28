@@ -501,6 +501,9 @@ class Stock_opname_generate extends CI_Controller {
 	 * Input POST: date_target, total_inventory_input
 	 */
 	public function preview_adjust_inventory(){
+		set_time_limit(0);
+		ini_set('memory_limit','512M');
+
 		$date_target = $this->input->post('date_target');
 		$total_input = (float)$this->input->post('total_inventory_input');
 		$coa         = trim($this->input->post('coa'));
@@ -606,6 +609,9 @@ class Stock_opname_generate extends CI_Controller {
 	 * Input POST: date_target, total_inventory_input
 	 */
 	public function adjust_harga_inventory(){
+		set_time_limit(0);
+		ini_set('memory_limit','512M');
+
 		$date_target         = $this->input->post('date_target');
 		$total_input         = (float)$this->input->post('total_inventory_input');
 		$coa                 = trim($this->input->post('coa'));
@@ -821,13 +827,12 @@ class Stock_opname_generate extends CI_Controller {
 						head_stock.id_material,
 						head_stock.id_gudang,
 						head_stock.qty_stock,
-						head_mstr.id AS idmaterial_pk,
-						head_mstr.nm_material,
-						head_mstr.nm_category,
+						head_stock.id AS idmaterial_pk,
+						head_stock.nm_material,
+						head_stock.nm_category,
 						head_whr.nm_gudang
 					FROM ".$Table_Stock." head_stock
 					LEFT JOIN warehouse head_whr ON head_stock.id_gudang = head_whr.id
-					LEFT JOIN raw_materials head_mstr ON head_stock.id_material = head_mstr.id_material
 					WHERE ".$WHERE_Stock."
 					AND head_stock.id_gudang NOT IN ('1','2','3','4')";
 		$rows_stock = $this->db->query($sql_stock)->result_array();
