@@ -578,8 +578,23 @@ class Stock_opname_generate extends CI_Controller {
 
 		// === 4. Update harga di tran_warehouse_jurnal_detail pada tanggal target ===
 		// Hanya untuk material+gudang yang ada selisih
-		// Rumus: harga_baru = (total_inventory_input / total_inventory_current) * harga_lama
-		$rasio = $total_input / $total_inventory_current;
+		// Hitung total inventory selisih (sum total dari material yang berselisih)
+		$total_inventory_selisih = 0;
+		foreach($material_selisih as $key => $val){
+			if(isset($map_today[$key])){
+				$total_inventory_selisih += $map_today[$key]['total'];
+			}
+		}
+
+		// Rumus: harga_baru = (((total_inventory_current - total_inventory_selisih) - total_input) / total_inventory_selisih) * harga_lama
+		if($total_inventory_selisih == 0){
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'Total inventory selisih = 0, tidak bisa menghitung rasio.',
+			));
+			return;
+		}
+		$rasio = (($total_inventory_current - $total_inventory_selisih) - $total_input) / $total_inventory_selisih;
 
 		// Ambil transaksi di tanggal target untuk gudang produksi
 		$sql_trans = "SELECT tras.id, tras.id_material, tras.id_gudang, tras.harga
@@ -635,11 +650,13 @@ class Stock_opname_generate extends CI_Controller {
 			echo json_encode(array(
 				'status'        => 1,
 				'pesan'         => 'Berhasil adjust harga '.count($ArrUpdate).' transaksi (dari '.count($material_selisih).' material berselisih). Rasio: '.number_format($rasio,6).
-								   ' | Total sebelum: '.number_format($total_inventory_current,0,',','.').
+								   ' | Total inventory: '.number_format($total_inventory_current,0,',','.').
+								   ' | Total selisih: '.number_format($total_inventory_selisih,0,',','.').
 								   ' | Total target: '.number_format($total_input,0,',','.').
-								   ' | Selisih: '.number_format($selisih_global,0,',','.'),
+								   ' | Selisih global: '.number_format($selisih_global,0,',','.'),
 				'total_before'  => $total_inventory_current,
 				'total_target'  => $total_input,
+				'total_selisih' => $total_inventory_selisih,
 				'rasio'         => $rasio,
 				'updated_count' => count($ArrUpdate),
 				'material_selisih' => count($material_selisih)
