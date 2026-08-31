@@ -1318,7 +1318,7 @@ class Delivery extends CI_Controller
 				$nomor = ($total_data - $start_dari) - $urut2;
 			}
 
-			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, id_category, no_spk, length, sts, cutting_ke, COUNT(id) AS qty')->group_by('id_milik')->order_by('id', 'asc')->get_where('spool_group_release', array('spool_induk' => $row['spool_induk'], 'kode_spool' => $row['kode_spool']))->result_array();
+			$get_split_ipp = $this->db->select('id_produksi, id_milik, kode_spool, product_code, product_ke, id_category, no_spk, length, sts, cutting_ke, COUNT(id) AS qty')->group_by('id_milik')->order_by('id', 'asc')->get_where('spool_group_all', array('spool_induk' => $row['spool_induk'], 'kode_spool' => $row['kode_spool']))->result_array();
 			$ArrNo_Spool = [];
 			$ArrNo_IPP = [];
 			$ArrNo_SPK = [];
@@ -1505,6 +1505,59 @@ class Delivery extends CI_Controller
 		// exit;
 		$this->insert_delivery($kode_delivery);
 		$this->insert_detail_delivery($kode_delivery, $datetime);
+
+		// Insert deadstok_modif yang ada di spool ke delivery_product_detail
+		foreach ($get_detail_produksi as $valx2 => $value2) {
+			$EXPLODE2 = explode('&', $value2['id_uniq']);
+			$kode_induk2 = $EXPLODE2[0];
+			$kode_spool2 = $EXPLODE2[1];
+
+			$get_deadstok_modif = $this->db->get_where('deadstok_modif', array(
+				'spool_induk' => $kode_induk2,
+				'kode_spool' => $kode_spool2,
+				'kode_delivery' => $kode_delivery
+			))->result_array();
+
+			if (!empty($get_deadstok_modif)) {
+				foreach ($get_deadstok_modif as $keyDM => $valueDM) {
+					// Cek apakah sudah ada di delivery_product_detail
+					$cek_exist = $this->db->get_where('delivery_product_detail', array(
+						'kode_delivery' => $kode_delivery,
+						'id_uniq' => $valueDM['id']
+					))->result();
+
+					if (empty($cek_exist)) {
+						$GET_DEADSTOK = $this->db->get_where('deadstok', array('id' => $valueDM['id_deadstok']))->result_array();
+						$PRODUCT_NAME = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['product_name'] . ', ' . $GET_DEADSTOK[0]['product_spec'] : '';
+						$no_spk_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['no_spk'] : '';
+						$length_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['length'] : '';
+						$no_so_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['no_so'] : '';
+						$no_ipp_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['no_ipp'] : '';
+
+						$ArrInsertDM = array(
+							'kode_delivery' => $kode_delivery,
+							'id_uniq' => $valueDM['id'],
+							'id_pro' => $valueDM['id'],
+							'product' => $PRODUCT_NAME,
+							'id_milik' => $valueDM['id_deadstok'],
+							'id_produksi' => $no_ipp_dm,
+							'spool_induk' => $kode_induk2,
+							'kode_spool' => $kode_spool2,
+							'product_code' => $no_so_dm,
+							'no_spk' => $no_spk_dm,
+							'kode_spk' => (!empty($valueDM['kode'])) ? $valueDM['kode'] : '',
+							'length' => $length_dm,
+							'no_drawing' => (!empty($valueDM['no_drawing'])) ? $valueDM['no_drawing'] : NULL,
+							'sts' => 'loose_dead_modif',
+							'sts_product' => 'cut deadstock',
+							'updated_by' => $username,
+							'updated_date' => $datetime
+						);
+						$this->db->insert('delivery_product_detail', $ArrInsertDM);
+					}
+				}
+			}
+		}
 
 		$this->db->where('created_by', $username);
 		$this->db->where('category', $category);
