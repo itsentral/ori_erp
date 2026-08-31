@@ -528,8 +528,7 @@ class Delivery extends CI_Controller
 								delivery_date='$datetime'
 							WHERE 
 								spool_induk='" . $post['qr_code'] . "'
-								AND kode_delivery IS NULL
-								AND lock_delivery_date IS NULL");
+								AND kode_delivery IS NULL");
 		if(!empty($post['list_so'])){
 			$this->insert_delivery($kode_delivery, $post['list_so']);
 		}
@@ -1501,8 +1500,7 @@ class Delivery extends CI_Controller
 								WHERE 
 									spool_induk='" . $kode_induk . "'
 									AND kode_spool= '" . $kode_spool . "'
-									AND kode_delivery IS NULL
-									AND lock_delivery_date IS NULL");
+									AND kode_delivery IS NULL");
 		}
 		// exit;
 		$this->insert_delivery($kode_delivery);
