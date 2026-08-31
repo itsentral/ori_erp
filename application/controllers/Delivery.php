@@ -518,6 +518,18 @@ class Delivery extends CI_Controller
 								spool_induk='" . $post['qr_code'] . "'
 								AND kode_delivery IS NULL
 								AND lock_delivery_date IS NULL");
+
+		//DEADSTOK MODIF
+		$this->db->query("	UPDATE 
+								deadstok_modif
+							SET 
+								kode_delivery='$kode_delivery',
+								delivery_by='$username',
+								delivery_date='$datetime'
+							WHERE 
+								spool_induk='" . $post['qr_code'] . "'
+								AND kode_delivery IS NULL
+								AND lock_delivery_date IS NULL");
 		if(!empty($post['list_so'])){
 			$this->insert_delivery($kode_delivery, $post['list_so']);
 		}
@@ -1465,6 +1477,32 @@ class Delivery extends CI_Controller
 													AND kode_spool= '" . $kode_spool . "'
 													AND kode_delivery IS NULL
 													AND lock_delivery_date IS NULL");
+
+			// Update deadstok
+			$this->db->query("UPDATE 
+									deadstok
+								SET 
+									kode_delivery='$kode_delivery',
+									delivery_by='$username',
+									delivery_date='$datetime'
+								WHERE 
+									spool_induk='" . $kode_induk . "'
+									AND kode_spool= '" . $kode_spool . "'
+									AND kode_delivery IS NULL
+									AND lock_delivery_date IS NULL");
+
+			// Update deadstok_modif
+			$this->db->query("UPDATE 
+									deadstok_modif
+								SET 
+									kode_delivery='$kode_delivery',
+									delivery_by='$username',
+									delivery_date='$datetime'
+								WHERE 
+									spool_induk='" . $kode_induk . "'
+									AND kode_spool= '" . $kode_spool . "'
+									AND kode_delivery IS NULL
+									AND lock_delivery_date IS NULL");
 		}
 		// exit;
 		$this->insert_delivery($kode_delivery);
