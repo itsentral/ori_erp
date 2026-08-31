@@ -536,6 +536,51 @@ class Delivery extends CI_Controller
 			$this->db->insert_batch('history_product_fg', $ArrHistFG);
 		}
 		$this->insert_detail_delivery($kode_delivery, $datetime);
+
+		// Insert deadstok_modif yang ada di spool ke delivery_product_detail (QR code flow)
+		if (!empty($post['qr_code'])) {
+			$qr_spool = (substr($post['qr_code'], 0, 3) == 'SP-') ? $post['qr_code'] : null;
+			if ($qr_spool) {
+				$get_dm_qr = $this->db->get_where('deadstok_modif', array(
+					'spool_induk' => $qr_spool,
+					'kode_delivery' => $kode_delivery
+				))->result_array();
+
+				if (!empty($get_dm_qr)) {
+					foreach ($get_dm_qr as $dmKey => $dmVal) {
+						$cek_exist_qr = $this->db->get_where('delivery_product_detail', array(
+							'kode_delivery' => $kode_delivery,
+							'id_uniq' => $dmVal['id'],
+							'sts' => 'loose_dead_modif'
+						))->result();
+
+						if (empty($cek_exist_qr)) {
+							$GET_DS = $this->db->get_where('deadstok', array('id' => $dmVal['id_deadstok']))->result_array();
+							$this->db->insert('delivery_product_detail', array(
+								'kode_delivery' => $kode_delivery,
+								'id_uniq' => $dmVal['id'],
+								'id_pro' => $dmVal['id'],
+								'product' => (!empty($GET_DS)) ? $GET_DS[0]['product_name'] . ', ' . $GET_DS[0]['product_spec'] : '',
+								'id_milik' => $dmVal['id_deadstok'],
+								'id_produksi' => (!empty($GET_DS)) ? $GET_DS[0]['no_ipp'] : '',
+								'spool_induk' => $dmVal['spool_induk'],
+								'kode_spool' => $dmVal['kode_spool'],
+								'product_code' => (!empty($GET_DS)) ? $GET_DS[0]['no_so'] : '',
+								'no_spk' => (!empty($GET_DS)) ? $GET_DS[0]['no_spk'] : '',
+								'kode_spk' => (!empty($dmVal['kode_spk'])) ? $dmVal['kode_spk'] : '',
+								'length' => (!empty($GET_DS)) ? $GET_DS[0]['length'] : '',
+								'no_drawing' => (!empty($dmVal['no_drawing'])) ? $dmVal['no_drawing'] : NULL,
+								'sts' => 'loose_dead_modif',
+								'sts_product' => 'cut deadstock',
+								'updated_by' => $username,
+								'updated_date' => $datetime
+							));
+						}
+					}
+				}
+			}
+		}
+
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
 			$Arr_Kembali	= array(
@@ -1523,7 +1568,8 @@ class Delivery extends CI_Controller
 					// Cek apakah sudah ada di delivery_product_detail
 					$cek_exist = $this->db->get_where('delivery_product_detail', array(
 						'kode_delivery' => $kode_delivery,
-						'id_uniq' => $valueDM['id']
+						'id_uniq' => $valueDM['id'],
+						'sts' => 'loose_dead_modif'
 					))->result();
 
 					if (empty($cek_exist)) {
@@ -1534,7 +1580,7 @@ class Delivery extends CI_Controller
 						$no_so_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['no_so'] : '';
 						$no_ipp_dm = (!empty($GET_DEADSTOK)) ? $GET_DEADSTOK[0]['no_ipp'] : '';
 
-						$ArrInsertDM = array(
+						$this->db->insert('delivery_product_detail', array(
 							'kode_delivery' => $kode_delivery,
 							'id_uniq' => $valueDM['id'],
 							'id_pro' => $valueDM['id'],
@@ -1545,15 +1591,14 @@ class Delivery extends CI_Controller
 							'kode_spool' => $kode_spool2,
 							'product_code' => $no_so_dm,
 							'no_spk' => $no_spk_dm,
-							'kode_spk' => (!empty($valueDM['kode'])) ? $valueDM['kode'] : '',
+							'kode_spk' => (!empty($valueDM['kode_spk'])) ? $valueDM['kode_spk'] : '',
 							'length' => $length_dm,
 							'no_drawing' => (!empty($valueDM['no_drawing'])) ? $valueDM['no_drawing'] : NULL,
 							'sts' => 'loose_dead_modif',
 							'sts_product' => 'cut deadstock',
 							'updated_by' => $username,
 							'updated_date' => $datetime
-						);
-						$this->db->insert('delivery_product_detail', $ArrInsertDM);
+						));
 					}
 				}
 			}
