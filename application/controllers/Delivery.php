@@ -601,6 +601,34 @@ class Delivery extends CI_Controller
 		echo json_encode($Arr_Kembali);
 	}
 
+	// TEMPORARY DEBUG - hapus setelah fix
+	public function debug_deadstok_modif()
+	{
+		$spool_induk = $this->input->get('spool');
+		$kode_delivery = $this->input->get('dv');
+		
+		$result = [];
+		
+		// 1. Cek data deadstok_modif untuk spool ini
+		$dm_all = $this->db->get_where('deadstok_modif', array('spool_induk' => $spool_induk))->result_array();
+		$result['deadstok_modif_by_spool'] = $dm_all;
+		
+		// 2. Cek data deadstok_modif dengan kode_delivery
+		$dm_dv = $this->db->get_where('deadstok_modif', array('spool_induk' => $spool_induk, 'kode_delivery' => $kode_delivery))->result_array();
+		$result['deadstok_modif_with_delivery'] = $dm_dv;
+		
+		// 3. Cek delivery_product_detail
+		$dpd = $this->db->get_where('delivery_product_detail', array('kode_delivery' => $kode_delivery))->result_array();
+		$result['delivery_product_detail'] = $dpd;
+		
+		// 4. Cek delivery_group
+		$dg = $this->db->get_where('delivery_group', array('kode_delivery' => $kode_delivery))->result_array();
+		$result['delivery_group'] = $dg;
+		
+		header('Content-Type: application/json');
+		echo json_encode($result, JSON_PRETTY_PRINT);
+	}
+
 	public function load_so()
 	{
 		$controller			= ucfirst(strtolower($this->uri->segment(1)));
