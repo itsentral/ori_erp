@@ -571,7 +571,7 @@ class Delivery extends CI_Controller
 								'length' => (!empty($GET_DS)) ? $GET_DS[0]['length'] : '',
 								'no_drawing' => (!empty($dmVal['no_drawing'])) ? $dmVal['no_drawing'] : NULL,
 								'sts' => 'loose_dead_modif',
-								'sts_product' => 'cut deadstock',
+								'sts_product' => NULL,
 								'updated_by' => $username,
 								'updated_date' => $datetime
 							));
@@ -1640,7 +1640,7 @@ class Delivery extends CI_Controller
 							'length' => $length_dm,
 							'no_drawing' => (!empty($valueDM['no_drawing'])) ? $valueDM['no_drawing'] : NULL,
 							'sts' => 'loose_dead_modif',
-							'sts_product' => 'cut deadstock',
+							'sts_product' => NULL,
 							'updated_by' => $username,
 							'updated_date' => $datetime
 						));
