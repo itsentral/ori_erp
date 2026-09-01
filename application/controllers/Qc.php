@@ -1726,6 +1726,9 @@ class Qc extends CI_Controller
 		$this->db->update('deadstok', $ArrFlagRelease);
 
 		$this->db->where('spool_induk', $spool_induk);
+		$this->db->update('deadstok_modif', $ArrFlagRelease);
+
+		$this->db->where('spool_induk', $spool_induk);
 		$this->db->update('spool', $ArrEditHeader);
 
 		if (!empty($ArrDetail)) {
@@ -1749,6 +1752,11 @@ class Qc extends CI_Controller
 		if (!empty($ArrDetailSpool)) {
 			$this->db->where('spool_induk', $spool_induk);
 			$this->db->update_batch('deadstok', $ArrDetailSpool, 'kode_spool');
+		}
+
+		if (!empty($ArrDetailSpool)) {
+			$this->db->where('spool_induk', $spool_induk);
+			$this->db->update_batch('deadstok_modif', $ArrDetailSpool, 'kode_spool');
 		}
 		$this->db->trans_complete();
 

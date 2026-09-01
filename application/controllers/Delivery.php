@@ -606,7 +606,24 @@ class Delivery extends CI_Controller
 	{
 		$spool_induk = $this->input->get('spool');
 		$kode_delivery = $this->input->get('dv');
+		$fix = $this->input->get('fix');
 		
+		// Fix: set release_spool_date untuk deadstok_modif yang belum di-set
+		if ($fix == '1' && !empty($spool_induk)) {
+			// Cek dulu apakah kolom release_spool_date ada di tabel deadstok_modif
+			$columns = $this->db->query("SHOW COLUMNS FROM deadstok_modif LIKE 'release_spool_date'")->result_array();
+			$result['column_check'] = $columns;
+			
+			if (!empty($columns)) {
+				$now = date('Y-m-d H:i:s');
+				$this->db->query("UPDATE deadstok_modif SET release_spool_date = '$now' WHERE spool_induk = '$spool_induk' AND release_spool_date IS NULL");
+				$result['fix_affected_rows'] = $this->db->affected_rows();
+				$result['fix_last_error'] = $this->db->error();
+			} else {
+				$result['fix_message'] = 'Kolom release_spool_date TIDAK ADA di tabel deadstok_modif!';
+			}
+		}
+
 		$result = [];
 		
 		// 1. Cek data deadstok_modif untuk spool ini
